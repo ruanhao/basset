@@ -60,3 +60,24 @@ Flags  | Comment
 -a     | eg: test -r file -a -x file
 -o     | eg: test -r file -o -x file
 !      | eg: test ! -x file
+&&     | 用于双括号结构中
+||     | 用于双括号结构中
+
+
+
+### Misc
+```bash
+## 双括号和单中括号中的行为是不同的
+[[ $var == z* ]]   ## 如果 var 以 z 开头，则结果为真
+[ $var == z* ]     ## 如果 var 为 zoo，当前目录下有且只有一个文件名为 zoo，则结果为真，
+                   ## 此处，z* 将文件名扩展了
+[[ $var == "z*" ]] ## 如果 var 和 "z*" 在字面上完全相等，则结果为真
+[ $var == "z*" ]   ## 同上
+
+## 下面所有的比较都是等价的
+test "$a" -lt 16 && echo "yes"
+/bin/test "$a" -lt 16 && echo "yes"
+[ "$a" -lt 16 ] && echo "yes"
+[[ $a -lt 16 ]] && echo "yes"
+(( a < 16 )) && echo "yes"
+```
