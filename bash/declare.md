@@ -7,8 +7,7 @@
 * declare -a `Array` -> 变量Array将被视为数组
 * declare -f `[FunctionName]` -> 如果不提供FunctionName，将会列出这个脚本之前定义的所有函数，若提供函数名，则给出这个函数的相关信息
 * declare -x var=<value> -> 申明一个变量，并作为这个脚本的环境变量被导出
-
-    使用declare命令也可以限制变量的作用域：  
+* 使用declare命令也可以限制变量的作用域：  
 ```shell
 foo() {
     declare FOO="bar"
