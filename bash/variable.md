@@ -20,33 +20,6 @@ var=$( <FileName ) ## 将FileName中的内容赋给变量var
 eval var1=\$$var2  ## 间接引用，同：var1=${!var2}
 ```
 
-## Misc
-```bash
-: ${variable?error_msg} ## 一种检查变量是否设置的方法，
-                        ## 若没有设置，则error_msg会输出到std_err中
-                        
-num=$#; ${!num}         ## 最后一个参数  
-                        ## 不能直接写作${!$#}，这是一种**间接引用**  
-                        ## ruanhao: ${$num}是不允许的，因为变量替换不能嵌套，
-                        ## 但是类似${var:$len}是可行的
-                        
-## **赋值时变量不扩展**
-var1="hello world"
-var2=$var1    ## var2: "hello world"
-echo $var1    ## equals 'echo hello world'
-## **数组赋值例外**
-b=( 1 2 3 )
-a=( ${b[*]} ) ## a has 3 elements, not "1 2 3"
-
-${!varprefix*} ## 匹配所有之前声明过的，并且以varprefix开头的变量
-${!varprefix@} ## 同上
-xyz23=whatever
-xyz24=
-a=${!xyz*}                     ## 展开所有以"xyz"开头的，并且之前声明过的变量名
-echo "a = $a"                  ## a = xyz23 xyz24
-a=${!xyz@}                     ## 同上
-```
-
 ## 字符串
 ```bash
 ${#var}            ## 字符串var的长度
@@ -126,4 +99,40 @@ $@        ## "$@" 等价于 "$1" "$2" "$3",
           ## *$@ 与 $* 中的参数只有在被双引号引用起来的时候才会不同
 ${#*}     ## 位置参数的个数
 ${#@}     ## 同上
+```
+
+## Misc
+```bash
+: ${variable?error_msg} ## 一种检查变量是否设置的方法，
+                        ## 若没有设置，则error_msg会输出到std_err中
+                        
+num=$#; ${!num}         ## 最后一个参数  
+                        ## 不能直接写作${!$#}，这是一种**间接引用**  
+                        ## ruanhao: ${$num}是不允许的，因为变量替换不能嵌套，
+                        ## 但是类似${var:$len}是可行的
+                        
+## **赋值时变量不扩展**
+var1="hello world"
+var2=$var1    ## var2: "hello world"
+echo $var1    ## equals 'echo hello world'
+## **数组赋值例外**
+b=( 1 2 3 )
+a=( ${b[*]} ) ## a has 3 elements, not "1 2 3"
+
+${!varprefix*} ## 匹配所有之前声明过的，并且以varprefix开头的变量
+${!varprefix@} ## 同上
+xyz23=whatever
+xyz24=
+a=${!xyz*}                     ## 展开所有以"xyz"开头的，并且之前声明过的变量名
+echo "a = $a"                  ## a = xyz23 xyz24
+a=${!xyz@}                     ## 同上
+
+(( t = a < 1 ? 2 : 3 ))        ## C语言风格的三元操作
+
+## 双括号和单中括号中的行为是不同的
+[[ $var == z* ]]   ## 如果 var 以 z 开头，则结果为真
+[ $var == z* ]     ## 如果 var 为 zoo，当前目录下有且只有一个文件名为 zoo，则结果为真，
+                   ## 此处，z* 将文件名扩展了
+[[ $var == "z*" ]] ## 如果 var 和 "z*" 在字面上完全相等，则结果为真
+[ $var == "z*" ]   ## 同上
 ```
