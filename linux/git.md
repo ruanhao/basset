@@ -1,4 +1,4 @@
-# git
+# Git
 
 ## git config
 * git config --global user.name `Name`
