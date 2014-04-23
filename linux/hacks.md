@@ -1,7 +1,7 @@
 ## Hacks
 
 ```bash
-echo ∴ → ☿ ★ | hexdump -C     ## 查看字符的 binary 表示方法
+echo ∴ → ☿ ★ | hexdump -C   ## 查看字符的 binary 表示方法
 			      
 look <Arg>                    ## 查找以参数开头的单词
 			      
@@ -22,6 +22,10 @@ Ctrl-x-e                      ## 快速启动编辑器($EDITOR)
 
 netstat -tlnp                 ## 列出本机进程监听的端口号
 netstat -anop                 ## 显示侦听在这个端口上的进程
+netstat -tuln                 ## 查询目前主机所有开启的网络服务端口，
+                              ## IP 部分说明的是该服务位于哪个介面上，
+			      ## 若为 127.0.0.1 则是仅针对本机开放，
+			      ## 若是 0.0.0.0 或 ::: 则代表对整个 Internet 开放
 
 lsof -i                       ## 实时查看本机网络服务的活动状态
 
@@ -50,7 +54,13 @@ nmap <server-ip>              ## 扫描一个服务器来定位打开的端口�
 
 /usr/share/doc                ## doc dir
 /etc/sysconfig/i18n           ## encoding setup
-/usr/share/dict                ## 存放字典
+/usr/share/dict               ## 存放字典
+## 内核模块(驱动模块)目录
+/lib/modules/$(uname -r)/kernel
+/etc/sysctl.conf              ## 定义最大句柄数:
+                              ## echo "fs.file-max = <number>" >> /etc/sysctl.conf, 运行sysctl -e -p 使之生效
+                              ## 查看当前最大句柄数: 
+                              ## cat /proc/sys/fs/file-max
 
 tput longname                 ## 查看xterm信息
 
@@ -75,9 +85,39 @@ cat <file_name_prefix>* >> <file_name>
 tcpdump -i any -s 0 -w <file_to_store>
 
 ethtool -i eth0               ## 查看网卡信息
+
+yum install yum-downloadonly
+yum install <package> --downloadonly --downloaddir=<dir> -y
+yum update <package> --downloadonly --downloaddir=<dir> -y
+## place to put packages
+/var/cache/yum/update/packages
+
+rpm -qi <package>             ## information
+rpm -e <package>              ## remove
+rpm -qf <cmd>                 ## check which package this cmd belongs to
+rpm -qfi <cmd>                ## information about the package this cmd belongs to
+rpm -ivh --force <package>    ## force to install even if this package has already been installed
+rpm -ivh --no-deps <package>  ## install package regardless of dependency
+rpm -qa                       ## query all packages installed
+rpm -qp <package>             ## query package that is not install but exsists
+
+w                             ## 显示用户登录名、终端标志、星期几登录和具体登录时间、
+                              ## 闲置时间、用户正在执行的程序、占用CPU时间、系统的运行时间和平均负载
+who                           ## 显示用户登录名、终端标志、和登录日期和时间
+who am i                      ## 显示当前用户正使用的终端和登录时间
+
+#ascii -> alphabet:
+printf \\$(printf '%03o' <ascii>)
+#alphabet -> ascii:
+printf '%d' "'<ascii>"
 ```
 
-> 在shell的hash表中，记录指定命令的路径名，所以在shell或脚本中调用这个命令的话，就不需要再在$PATH中重新搜索这个命令了。如果不带参数地调用hash命令，它将列出所有已经被hash的命令。-r 选项会重新设置hash表  
+> 在shell的hash表中，记录指定命令的路径名，所以在shell或脚本中调用这个命令的话，就不需要再在$PATH中重新搜索这个命令了。如果不带参数地调用hash命令，它将列出所有已经被hash的命令。-r 选项会重新设置hash表
 
-> disown 的作用是使一个后台进程不属于当前 shell 的管辖，可能使这个后台进程变成 orphan process  
+------
+
+> disown 的作用是使一个后台进程不属于当前 shell 的管辖，可能使这个后台进程变成 orphan process
 > 可以使用 wait 命令来防止在后台作业没完成之前退出脚本，wait可以接受一个作业标示符作为参数，比如 wait %1 或者 wait $PPID
+
+------
+
