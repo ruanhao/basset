@@ -26,6 +26,8 @@ netstat -tuln                 ## 查询目前主机所有开启的网络服务�
                               ## IP 部分说明的是该服务位于哪个介面上，
 			      ## 若为 127.0.0.1 则是仅针对本机开放，
 			      ## 若是 0.0.0.0 或 ::: 则代表对整个 Internet 开放
+## 查看连接某服务端口最多的IP地址
+netstat -nat | grep "192.168.1.15:22" | awk '{print $5}' | awk -F: '{print $1}' | sort | uniq -c | sort -nr | head -20
 
 lsof -i                       ## 实时查看本机网络服务的活动状态
 
@@ -112,12 +114,12 @@ printf \\$(printf '%03o' <ascii>)
 printf '%d' "'<ascii>"
 ```
 
-> 在shell的hash表中，记录指定命令的路径名，所以在shell或脚本中调用这个命令的话，就不需要再在$PATH中重新搜索这个命令了。如果不带参数地调用hash命令，它将列出所有已经被hash的命令。-r 选项会重新设置hash表
+> 在shell的hash表中，记录指定命令的路径名，所以在shell或脚本中调用这个命令的话，就不需要再在$PATH中重新搜索这个命令了  
+> 如果不带参数地调用hash命令，它将列出所有已经被hash的命令。-r 选项会重新设置hash表
 
 ------
 
-> disown 的作用是使一个后台进程不属于当前 shell 的管辖，可能使这个后台进程变成 orphan process
+> disown 的作用是使一个后台进程不属于当前 shell 的管辖，可能使这个后台进程变成 orphan process  
 > 可以使用 wait 命令来防止在后台作业没完成之前退出脚本，wait可以接受一个作业标示符作为参数，比如 wait %1 或者 wait $PPID
 
 ------
-
