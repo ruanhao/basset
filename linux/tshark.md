@@ -1,0 +1,123 @@
+##  Tshark
+
+```bash
+##  抓包接口设置
+-D: 查看网络接口的编号以供-i参数使用
+-f: 设定抓包过滤表达式
+-s: 设置每个抓包的大小, 默认为65535
+    多于这个大小的数据将不会被程序记入内存, 写入文件
+    这个参数相当于tcpdump的-s, tcpdump默认抓包的大小仅为68
+-p: 设置网络接口以非混合模式工作, 即只关心和本机有关的流量
+-y: 设置抓包的数据链路层协议, 不设置则默认为-L找到的第一个协议
+-L: 列出本机支持的数据链路层协议, 供-y参数使用
+
+
+##  抓包停止条件
+-c: 抓取的packet数, 在处理一定数量的packet后, 停止抓取, 程序退出
+-a: 设置tshark抓包停止向文件书写的条件
+    写为test:value的形式, 如:
+    -a duration:5 表示tshark启动后在5秒内抓包然后停止
+    -a filesize:10 表示tshark在输出文件达到10KB后停止
+    -a files:n 表示tshark在写满n个文件后停止
+
+
+##  文件输出控制
+-b: 设置ring buffer文件参数
+    ring buffer的文件名由-w参数决定
+    -b参数采用test:value的形式书写, 如:
+    -b duration:5 表示每5秒写下一个ring buffer文件
+    -b filesize:5 表示每达到5KB写下一个ring buffer文件
+    -b files:7 表示ring buffer文件最多7个, 周而复始地使用, 如果这个参数不设定, tshark会将磁盘写满为止
+
+##  输入控制
+-r: 设置tshark分析的输入文件
+    tshark既可以抓取分析即时的网络流量, 又可以分析dump在文件中的数据
+    -r不能是命名管道和标准输入
+
+##  处理
+-R: 设置读取(显示)过滤表达式
+    不符合此表达式的流量同样不会被写入文件
+    注意, 读取(显示)过滤表达式的语法和底层相关的抓包过滤表达式语法不相同, 它的语法表达要丰富得多, 请参考:
+    http://www.ethereal.com/docs/dfref/ 和 http://www.ethereal.com/docs/man-pages/ethereal-filter.4.html
+-n: 禁止所有地址名字解析(默认为允许所有)
+-N: 启用某一层的地址名字解析
+    m代表MAC层, n代表网络层, t代表传输层, C代表当前异步DNS查找. 如果-n和-N参数同时存在, -n将被忽略. 如果-n和-N参数都不写, 则默认打开所有地址名字解析
+-d: 将指定的数据按有关协议解包输出
+    如要将tcp 8888端口的流量按http解包, 写为-d tcp.port==8888,http. 注意选择子和解包协议之间不能留空格
+
+##  输出类
+-w: 设置raw数据的输出文件
+    这个参数不设置, tshark将会把解码结果输出到stdout
+    -w-表示把raw输出到stdout
+    如果要把解码结果输出到文件, 使用重定向而不要-w参数。
+-F: 设置输出raw数据的格式, 默认为libpcap
+    tshark -F会列出所有支持的raw格式
+-V: 设置将解码结果的细节输出, 否则解码结果仅显示一个packet一行的summary
+-x: 设置在解码输出结果中, 每个packet后面以HEX dump的方式显示具体数据
+-T: 设置解码结果输出的格式, 包括text, ps, psml和pdml, 默认为text
+-t: 设置解码结果的时间格式
+    ad表示带日期的绝对时间, a表示不带日期的绝对时间, r表示从第一个包到现在的相对时间, d表示两个相邻包之间的增量时间
+-S: 在向raw文件输出的同时, 将解码结果打印到控制台
+-l: 在处理每个包时即时刷新输出
+-X: 扩展项
+-q: 设置安静的stdout输出, 例如做统计时
+-z: 设置统计参数
+
+```
+
+
+## Capture filter
+```
+Syntax:  | Protocol | Direction |  Host(s) | Value | Logical Operation |    Other expression   |
+Example: |   tcp    |    dst    | 10.1.1.1 |   80  |       and         | tcp dst 10.2.2.2 3128 |
+
+
+tcp dst port 3128
+显示目的TCP端口为3128的封包
+
+ip src host 10.1.1.1
+显示来源IP地址为10.1.1.1的封包
+
+host 10.1.2.3
+显示目的或来源IP地址为10.1.2.3的封包
+
+src portrange 2000-2500
+显示来源为UDP或TCP，并且端口号在2000至2500范围内的封包
+
+not imcp
+显示除了icmp以外的所有封包(icmp通常被ping工具使用)
+
+src host 10.7.2.12 and not dst net 10.200.0.0/16
+显示来源IP地址为10.7.2.12, 但目的地不是10.200.0.0/16的封包
+
+(src host 10.4.1.12 or src net 10.6.0.0/16) and tcp dst portrange 200-10000 and dst net 10.0.0.0/8
+显示来源IP为10.4.1.12或者来源网络为10.6.0.0/16, 目的地TCP端口号在200至10000之间, 并且目的位于网络10.0.0.0/8内的所有封包
+
+注意事项：
+
+当使用关键字作为值时, 需使用反斜杠“\”
+"ether proto \ip" (与关键字"ip"相同)
+这样写将会以IP协议作为目标
+
+"ip proto \icmp" (与关键字"icmp"相同)
+这样写将会以ping工具常用的icmp作为目标
+
+可以在"ip"或"ether"后面使用"multicast"及"broadcast"关键字
+当您想排除广播请求时, "no broadcast"就会非常有用
+
+```
+
+
+## Example
+```bash
+tshark -r diameter.cap -R 'diameter.cmd.code == 271'
+tshark -a duration:10 -q -z io,stat,1
+```
+
+
+
+
+## Ref
+>  http://blog.sina.com.cn/s/blog_5919b8b10100064e.html
+>  http://wiki.wireshark.org/CaptureFilters
+>  http://openmaniak.com/cn/wireshark_filters.php
