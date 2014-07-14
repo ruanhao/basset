@@ -123,6 +123,7 @@ unset array[2]      ## 删除数组第3个元素
 unset array         ## 删除整个数组
 
 ## 扩展数组
+new_array+=( 1 2 3 )
 new_array=( "${old_array[@]}" new_element )
 array[${#array[*]}]=new_element
 new_array="${old_array[@]}"  ## 复制数组(但是如果在”缺项“数组中使用的话，将会失败，新数组中的某个元素会没被赋值)

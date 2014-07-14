@@ -112,6 +112,15 @@ who am i                      ## 显示当前用户正使用的终端和登录�
 printf \\$(printf '%03o' <ascii>)
 #alphabet -> ascii:
 printf '%d' "'<ascii>"
+
+read -r line < file           ## 读取文件的首行并赋值给变量
+
+echo hello{,,,,,}	      ## 重复n次
+
+var=hello
+declare -u var=$var	      ## 大写, 反之: declare -l
+echo ${var^^}                 ## 这样也可以, 反之: echo ${var,,}
+
 ```
 
 > 在shell的hash表中，记录指定命令的路径名，所以在shell或脚本中调用这个命令的话，就不需要再在$PATH中重新搜索这个命令了  
