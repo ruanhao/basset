@@ -40,7 +40,7 @@ O_RSYNC    Have each read operation on the file descriptor wait until any pendin
 O_SYNC     Have each write wait for physical I/O to complete, including I/O necessary to update file attributes
            modified as a result of the write
 */
-
+// Eg: open(pathname, O_WRONLY | O_CREAT | O_TRUNC, mode);
 
 #include <unistd.h>
 /* Returns: 0 if OK, –1 on error */
@@ -70,3 +70,30 @@ ssize_t write(int filedes, const void *buf, size_t nbytes);
 ssize_t pread(int filedes, void *buf, size_t nbytes, off_t offset);
 /* Returns: number of bytes written if OK, –1 on error */
 ssize_t pwrite(int filedes, const void *buf, size_t nbytes, off_t offset);
+
+#include <unistd.h>
+/* Both return: new file descriptor if OK, –1 on error */
+int dup(int filedes);
+int dup2(int filedes, int filedes2);
+
+#include <unistd.h>
+/* Returns: 0 if OK, –1 on error */
+int fsync(int filedes);
+int fdatasync(int filedes);
+/* No return */
+void sync(void);
+
+#include <fcntl.h>
+/* Returns: depends on cmd if OK, –1 on error */
+int fcntl(int filedes, int cmd, ... /* int arg */ ); /*
+                                                       The fcntlfunction is used for five different purposes:
+                                                       1.  Duplicate an existing descriptor (cmd = F_DUPFD)
+                                                       2.  Get/set file descriptor flags (cmd = F_GETFD or F_SETFD)
+                                                       3.  Get/set file status flags (cmd = F_GETFL or F_SETFL)
+                                                       4.  Get/set asynchronous I/O ownership (cmd = F_GETOWN or F_SETOWN)
+                                                       5.  Get/set record locks (cmd = F_GETLK, F_SETLK, or F_SETLKW)
+                                                     */
+
+#include <sys/ioctl.h> /* BSD and Linux */
+/* Returns: –1 on error, something else if OK */
+int ioctl(int filedes, int request, ...);
