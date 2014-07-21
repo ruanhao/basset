@@ -42,6 +42,18 @@ int pthread_getconcurrency(void);
 /* Returns: 0 if OK, error number on failure */
 int pthread_setconcurrency(int level);
 
+/* Two thread attributes that are not included in the pthread_attr_t structure are the cancelability state and the
+   cancelability type. These attributes affect the behavior of a thread in response to a call to pthread_cancel */
+/* Returns: 0 if OK, error number on failure */
+int pthread_setcancelstate(int state, int *oldstate); /* state :: [PTHREAD_CANCEL_ENABLE, PTHREAD_CANCEL_DISABLE] */
+
+void pthread_testcancel(void);
+
+/* The default cancellation type we have been describing is known as deferred cancellation.
+   We can change the cancellation type by calling pthread_setcanceltype */
+/* Returns: 0 if OK, error number on failure */
+int pthread_setcanceltype(int type, int *oldtype);
+
 /*********************** Synchronization Attributes *************************/
 
 /* Both return: 0 if OK, error number on failure */
@@ -87,3 +99,32 @@ int pthread_key_create(pthread_key_t *keyp, void (*destructor)(void *));
 
 /* Returns: 0 if OK, error number on failure */
 int pthread_key_delete(pthread_key_t *key);
+
+/* Returns: 0 if OK, error number on failure */
+pthread_once_t initflag = PTHREAD_ONCE_INIT;
+int pthread_once(pthread_once_t *initflag, void (*initfn)(void));
+
+/* Returns: thread-specific data value or NULLif no value has been associated with the key */
+void *pthread_getspecific(pthread_key_t key);
+
+/* Returns: 0 if OK, error number on failure */
+int pthread_setspecific(pthread_key_t key, const void *value);
+
+/*********************** Thread and Signal *************************/
+
+/* Returns: 0 if OK, error number on failure */
+int pthread_sigmask(int how, const sigset_t *restrict set, sigset_t *restrict oset);
+
+/* A thread can wait for one or more signals to occur by calling sigwait */
+#include <signal.h>
+/* Returns: 0 if OK, error number on failure */
+int sigwait(const sigset_t *restrict set, int *restrict signop);
+
+/* To send a signal to a thread, we call pthread_kill */
+#include <signal.h>
+/* Returns: 0 if OK, error number on failure */
+int pthread_kill(pthread_t thread, int signo);
+
+/*********************** Thread and Fork *************************/
+/* Returns: 0 if OK, error number on failure */
+int pthread_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void));
