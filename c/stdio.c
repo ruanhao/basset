@@ -85,3 +85,24 @@ void rewind(FILE *fp);
 /* Both return: 0 if OK, nonzero on error */
 int fgetpos(FILE *restrict fp, fpos_t *restrict pos);
 int fsetpos(FILE *fp, const fpos_t *pos);
+
+
+/******************** Format I/O ****************************/
+
+/* Both return: number of characters output if OK, negative value if output error */
+int printf(const char *restrict format, ...);
+int fprintf(FILE *restrict fp, const char *restrictformat, ...);
+
+/* Both return: number of characters stored in array if OK, negative value if encoding error */
+int sprintf(char *restrict buf, const char *restrict format, ...);
+int snprintf(char *restrict buf, size_t n, const char *restrict format, ...);
+
+/* All three return: number of input items assigned, EOF if input error or end of file before any conversion */
+int scanf(const char *restrict format, ...);
+int fscanf(FILE *restrict fp, const char *restrict format, ...);
+int sscanf(const char *restrict buf, const char *restrict format, ...);
+
+/*************** Details *******************/
+
+/* Returns: the file descriptor associated with the stream */
+int fileno(FILE *fp);
