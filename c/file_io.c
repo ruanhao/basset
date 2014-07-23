@@ -86,7 +86,7 @@ void sync(void);
 #include <fcntl.h>
 /* Returns: depends on cmd if OK, –1 on error */
 int fcntl(int filedes, int cmd, ... /* int arg */ ); /*
-                                                       The fcntlfunction is used for five different purposes:
+                                                       The fcntl function is used for five different purposes:
                                                        1.  Duplicate an existing descriptor (cmd = F_DUPFD)
                                                        2.  Get/set file descriptor flags (cmd = F_GETFD or F_SETFD)
                                                        3.  Get/set file status flags (cmd = F_GETFL or F_SETFL)
