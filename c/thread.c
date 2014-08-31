@@ -1,46 +1,206 @@
+/* ============== Thread Info ============== */
 #include <pthread.h>
+int pthread_equal(pthread_t tid1, pthread_t tid2);
+/* Returns: nonzero if equal, 0 otherwise */
+
+#include <pthread.h>
+pthread_t pthread_self(void);
+/* Returns: the thread ID of the calling thread */
+
+
+
+
+/* ============== Thread Create ============== */
+#include <pthread.h>
+int pthread_create(pthread_t *restrict tidp, const pthread_attr_t *restrict attr,
+                   void *(*start_rtn)(void), void *restrict arg);
+/* Returns: 0 if OK, error number on failure */
+
+#include <pthread.h>
+int pthread_detach(pthread_t tid);
+/* Returns: 0 if OK, error number on failure */
+
+
+
+
+/* ============== Thread Terminate ============== */
+/*
+  A single thread can exit in three ways:
+  1. The thread can simply return from the start routine. The return value is the thread's exit code.
+  2. The thread can be canceled by another thread in the same process.
+  3. The thread can call pthread_exit.
+*/
+#include <pthread.h>
+void pthread_exit(void *rval_ptr);
+/* The rval_ptr is a typeless pointer, similar to the single argument passed to the start routine.
+   This pointer is available to other threads in the process by calling the pthread_join function: */
+#include <pthread.h>
+int pthread_join(pthread_t thread, void **rval_ptr);
+/* Returns: 0 if OK, error number on failure */
+
+#include <pthread.h>
+int pthread_cancel(pthread_t tid);
+/* Returns: 0 if OK, error number on failure */
+
+
+
+
+/* ============== Thread Cleanup ============== */
+#include <pthread.h>
+void pthread_cleanup_push(void (*rtn)(void *), void *arg);
+void pthread_cleanup_pop(int execute);
+/* Cleanup function is to be called when the thread performs one of the following actions:
+   1, Makes a call to pthread_exit
+   2, Responds to a cancellation request
+   3, Makes a call to pthread_cleanup_pop with a nonzero execute argument */
+/* THESE TWO FUNCTIONS MUST BE USED IN MATCHED PAIRS WITHIN THE SAME SCOPE IN A THREAD */
+
+
+
+
+/* ============== Thread Synchronize ============== */
+/* Mutex */
+#include <pthread.h>
+int pthread_mutex_init(pthread_mutex_t *restrict mutex, const pthread_mutexattr_t *restrict attr);
+// pthread_mutex_t pmutex = PTHREAD_MUTEX_INITIALIZER;
+int pthread_mutex_destroy(pthread_mutex_t *mutex);
+/* Both return: 0 if OK, error number on failure */
+
+#include <pthread.h>
+int pthread_mutex_lock(pthread_mutex_t *mutex);
+int pthread_mutex_trylock(pthread_mutex_t *mutex);
+int pthread_mutex_unlock(pthread_mutex_t *mutex);
+/* All return: 0 if OK, error number on failure */
+
+/* RwLock */
+#include <pthread.h>
+int pthread_rwlock_init(pthread_rwlock_t *restrict rwlock, const pthread_rwlockattr_t *restrict attr);
+// pthread_rwlock_t prwl = PTHREAD_RWLOCK_INITIALIZER;
+int pthread_rwlock_destroy(pthread_rwlock_t *rwlock);
+/* Both return: 0 if OK, error number on failure */
+
+#include <pthread.h>
+int pthread_rwlock_rdlock(pthread_rwlock_t *rwlock);
+int pthread_rwlock_wrlock(pthread_rwlock_t *rwlock);
+int pthread_rwlock_unlock(pthread_rwlock_t *rwlock);
+/* All return: 0 if OK, error number on failure */
+
+#include <pthread.h>
+int pthread_rwlock_tryrdlock(pthread_rwlock_t *rwlock);
+int pthread_rwlock_trywrlock(pthread_rwlock_t *rwlock);
+/* Both return: 0 if OK, error number on failure */
+
+/* Condition Variables */
+#include <pthread.h>
+int pthread_cond_init(pthread_cond_t *restrict cond, pthread_condattr_t *restrict attr);
+// pthread_cond_t pcond = PTHREAD_COND_INITIALIZER;
+int pthread_cond_destroy(pthread_cond_t *cond);
+/* Both return: 0 if OK, error number on failure */
+
+#include <pthread.h>
+int pthread_cond_wait(pthread_cond_t *restrict cond, pthread_mutex_t *restrict mutex);
+int pthread_cond_timedwait(pthread_cond_t *restrict cond, pthread_mutex_t *restrict mutex,
+                           const struct timespec *restrict timeout);
+/* Both return: 0 if OK, error number on failure */
+
+struct timespec {
+    time_t tv_sec; /* seconds     */
+    long tv_nsec;  /* nanoseconds */
+};
+
+/* Use 'gettimeofday' to get the current time expressed as a timeval structure and
+   translate this into a timespec structure.
+   We can use the following function: */
+void maketimeout(struct timespec *tsp, long minutes) {
+    struct timeval now;
+    /* get the current time */
+    gettimeofday(&now);
+    tsp->tv_sec = now.tv_sec;
+    tsp->tv_nsec = now.tv_usec * 1000; /* usec to nsec */
+    /* add the offset to get timeout value */
+    tsp->tv_sec += minutes * 60;
+}
+
+#include <pthread.h>
+int pthread_cond_signal(pthread_cond_t *cond);
+int pthread_cond_broadcast(pthread_cond_t *cond);
+/* Both return: 0 if OK, error number on failure */
+
+
+
+
 
 /*
  * THREAD CONTROL
  */
 
-/*********************** Thread Attributes *************************/
+/* ============== Thread Attributes ============== */
 
-/*
- * POSIX.1 thread attributes:
- * detachstate  detached thread attribute
- * guardsize    guard buffer size in bytes at end of thread stack
- * stackaddr    lowest address of thread stack
- * stacksize    size in bytes of thread stack
- */
 
-/* Both return: 0 if OK, error number on failure */
+#include <pthread.h>
 int pthread_attr_init(pthread_attr_t *attr);
 int pthread_attr_destroy(pthread_attr_t *attr);
-
 /* Both return: 0 if OK, error number on failure */
+
+/*
+ * POSIX.1 thread attributes: (represented by pthread_attr_t structure)
+ * Name        |  Description
+ * ------------|---------------------------------------------------
+ * detachstate |  detached thread attribute
+ * guardsize   |  guard buffer size in bytes at end of thread stack
+ * stackaddr   |  lowest address of thread stack
+ * stacksize   |  size in bytes of thread stack
+ */
+
+/*
+ * Other attributes not represented by pthread_attr_t structure:
+ * 1, cancelability state
+ * 2, cancelability type
+ * 3, concurrency level
+ */
+
+
+/* Set detachstate */
+#include <pthread.h>
 int pthread_attr_getdetachstate(const pthread_attr_t *restrict attr, int *detachstate);
-int pthread_attr_setdetachstate(pthread_attr_t *attr, int detachstate); /* detachstate :: [PTHREAD_CREATE_DETACHED, PTHREAD_CREATE_JOINABLE] */
-
+int pthread_attr_setdetachstate(pthread_attr_t *attr, int detachstate);
+// detachstate :: [PTHREAD_CREATE_DETACHED, PTHREAD_CREATE_JOINABLE]
 /* Both return: 0 if OK, error number on failure */
+
+
+
+/* Set stackaddr & stacksize */
+#include <pthread.h>
 int pthread_attr_getstack(const pthread_attr_t *restrict attr, void **restrict stackaddr, size_t *restrict stacksize);
 int pthread_attr_setstack(const pthread_attr_t *attr, void *stackaddr, size_t *stacksize);
-
 /* Both return: 0 if OK, error number on failure */
+
+/* The pthread_attr_setstacksize function is useful
+ * when you want to change the default stack size but don't
+ * want to deal with allocating the thread stacks on your own */
+#include <pthread.h>
 int pthread_attr_getstacksize(const pthread_attr_t *restrict attr, size_t *restrict stacksize);
-int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize); /* The pthread_attr_setstacksizefunction is useful
-                                                                        * when you want to change the default stack size but don't
-                                                                        * want to deal with allocating the thread stacks on your own
-                                                                        */
-
+int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize);
 /* Both return: 0 if OK, error number on failure */
+
+
+
+/* Set guradsize */
+/* If the thread's stack pointer overflows into the guard area,
+   the application will receive an error, possibly with a signal */
+#include <pthread.h>
 int pthread_attr_getguardsize(const pthread_attr_t *restrict attr, size_t *restrict guardsize);
 int pthread_attr_setguardsize(pthread_attr_t *attr, size_t guardsize);
+/* Both return: 0 if OK, error number on failure */
 
-/* Returns: current concurrency level */
+
+
+/* Set concurrency leval */
+#include <pthread.h>
 int pthread_getconcurrency(void);
-/* Returns: 0 if OK, error number on failure */
+/* Returns: current concurrency level */
 int pthread_setconcurrency(int level);
+/* Returns: 0 if OK, error number on failure */
 
 /* Two thread attributes that are not included in the pthread_attr_t structure are the cancelability state and the
    cancelability type. These attributes affect the behavior of a thread in response to a call to pthread_cancel */

@@ -2,6 +2,8 @@
 #define SIG_DFL (void (*)())0
 #define SIG_IGN (void (*)())1
 
+
+/* =========== Signal Handler =========== */
 #include <signal.h>
 void (*signal(int signo, void (*func)(int)))(int);
 /* Returns: previous disposition of signal (see following) if OK, SIG_ERR on error */
@@ -11,48 +13,6 @@ void (*signal(int signo, void (*func)(int)))(int);
                        (c) the address of a function to be called when the signal occurs
   The return value from signalis the pointer to the previous signal handler
 */
-
-
-#include <signal.h>
-int kill(pid_t pid, int signo);
-int raise(int signo);
-/* Both return: 0 if OK, –1 on error */
-
-#include <unistd.h>
-unsigned int alarm(unsigned int seconds);
-/* Returns: 0 or number of seconds until previously set alarm */
-
-#include <unistd.h>
-int pause(void);
-/* Returns: –1 with errnoset to EINTR */
-
-#include <signal.h>
-int sigemptyset(sigset_t *set);
-int sigfillset(sigset_t *set);
-int sigaddset(sigset_t *set, int signo);
-int sigdelset(sigset_t *set, int signo);
-/* All four return: 0 if OK, –1 on error */
-int sigismember(const sigset_t *set, int signo);
-/* Returns: 1 if true, 0 if false, –1 on error */
-
-#include <signal.h>
-int sigprocmask(int how, const sigset_t *restrict set, sigset_t *restrict oset);
-/* Returns: 0 if OK, –1 on error */
-/*
-how            Description
-SIG_BLOCK      The new signal mask for the process is the union ofits current signal mask and the signal set pointed to by set.
-               That is, set contains the additional signals that we want to block.
-SIG_UNBLOCK    The new signal mask for the process is the intersection of its current signal mask and the complement of the signal set pointed to by set.
-               That is, set contains the signals that we want to unblock.
-SIG_SETMASK    The new signal mask for the process is replaced by the value of the signal set pointed to by set.
-*/
-
-#include <signal.h>
-int sigpending(sigset_t *set);
-/* Returns: 0 if OK, –1 on error */
-
-
-
 
 #include <signal.h>
 int sigaction(int signo, const struct sigaction *restrict act, struct sigaction *restrict oact);
@@ -101,12 +61,72 @@ void (*signal(int signo, void (*func)(int)))(int) {
 }
 
 
+
+
+
+/* =========== Signal Generate =========== */
+#include <signal.h>
+int kill(pid_t pid, int signo);
+int raise(int signo);
+/* Both return: 0 if OK, –1 on error */
+
+#include <unistd.h>
+unsigned int alarm(unsigned int seconds);
+/* Returns: 0 or number of seconds until previously set alarm */
+
+
+
+
+
+/* =========== Signal Waiting =========== */
+#include <unistd.h>
+int pause(void);
+/* Returns: –1 with errnoset to EINTR */
+
+#include <signal.h>
+int sigsuspend(const sigset_t *sigmask);
+/* Returns: –1 with errnoset to EINTR */
+
+
+
+
+
+/* =========== Process Signal Mask =========== */
+#include <signal.h>
+int sigemptyset(sigset_t *set);
+int sigfillset(sigset_t *set);
+int sigaddset(sigset_t *set, int signo);
+int sigdelset(sigset_t *set, int signo);
+/* All four return: 0 if OK, –1 on error */
+int sigismember(const sigset_t *set, int signo);
+/* Returns: 1 if true, 0 if false, –1 on error */
+
+#include <signal.h>
+int sigprocmask(int how, const sigset_t *restrict set, sigset_t *restrict oset);
+/* Returns: 0 if OK, –1 on error */
+/*
+How          |  Description
+-------------|-----------------------------------------------------------------------------------------
+SIG_BLOCK    |  The new signal mask for the process is the union ofits current signal mask and
+             |  the signal set pointed to by set.
+             |  That is, set contains the additional signals that we want to block.
+SIG_UNBLOCK  |  The new signal mask for the process is the intersection of its current signal mask and
+             |  the complement of the signal set pointed to by set.
+             |  That is, set contains the signals that we want to unblock.
+SIG_SETMASK  |  The new signal mask for the process is replaced by
+             |  the value of the signal set pointed to by set.
+*/
+
+
+
+
+
+/* =========== Signal Utils =========== */
 #include <setjmp.h>
 int sigsetjmp(sigjmp_buf env, int savemask);
 /* Returns: 0 if called directly, nonzero if returning from a call to siglongjmp */
 void siglongjmp(sigjmp_buf env, int val);
 
-
 #include <signal.h>
-int sigsuspend(const sigset_t *sigmask);
-/* Returns: –1 with errnoset to EINTR */
+int sigpending(sigset_t *set);
+/* Returns: 0 if OK, –1 on error */
