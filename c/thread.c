@@ -136,7 +136,6 @@ int pthread_cond_broadcast(pthread_cond_t *cond);
 
 /* ============== Thread Attributes ============== */
 
-
 #include <pthread.h>
 int pthread_attr_init(pthread_attr_t *attr);
 int pthread_attr_destroy(pthread_attr_t *attr);
@@ -214,43 +213,70 @@ void pthread_testcancel(void);
 /* Returns: 0 if OK, error number on failure */
 int pthread_setcanceltype(int type, int *oldtype);
 
-/*********************** Synchronization Attributes *************************/
 
-/* Both return: 0 if OK, error number on failure */
+
+
+
+
+
+
+
+/* ============== Mutex Attributes ============== */
+
+#include <pthread.h>
 int pthread_mutexattr_init(pthread_mutexattr_t *attr);
 int pthread_mutexattr_destroy(pthread_mutexattr_t *attr);
-
-/* Two attributes of interest for MUTEX are the PROCESS-SHARED attribute and the TYPE attribute */
-
 /* Both return: 0 if OK, error number on failure */
+
+#include <pthread.h>
 int pthread_mutexattr_getpshared(const pthread_mutexattr_t * restrict attr, int *restrict pshared);
-int pthread_mutexattr_setpshared(pthread_mutexattr_t *attr, int pshared); /* pshared :: [PTHREAD_PROCESS_PRIVATE, PTHREAD_PROCESS_SHARED] */
-
+int pthread_mutexattr_setpshared(pthread_mutexattr_t *attr, int pshared);
+// pshared :: [PTHREAD_PROCESS_PRIVATE, PTHREAD_PROCESS_SHARED]
 /* Both return: 0 if OK, error number on failure */
+
+#include <pthread.h>
 int pthread_mutexattr_gettype(const pthread_mutexattr_t * restrict attr, int *restrict type);
-int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type); /* type :: [PTHREAD_MUTEX_NORMAL,
-                                                                     *          PTHREAD_MUTEX_ERRORCHECK,
-                                                                     *          PTHREAD_MUTEX_RECURSIVE,
-                                                                     *          PTHREAD_MUTEX_DEFAULT]
-                                                                     */
-
-/* The only attribute supported for reader–writer locks is the process-shared attribute */
+int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type);
+// type :: [PTHREAD_MUTEX_NORMAL, PTHREAD_MUTEX_ERRORCHECK, PTHREAD_MUTEX_RECURSIVE, PTHREAD_MUTEX_DEFAULT]
 /* Both return: 0 if OK, error number on failure */
-int pthread_rwlockattr_init(pthread_rwlockattr_t *attr);
-int pthread_rwlockattr_destroy(pthread_rwlockattr_t*attr);
 
+
+/* ============== RWLock Attributes ============== */
+
+#include <pthread.h>
+int pthread_rwlockattr_init(pthread_rwlockattr_t *attr);
+int pthread_rwlockattr_destroy(pthread_rwlockattr_t *attr);
+/* Both return: 0 if OK, error number on failure */
+
+#include <pthread.h>
 int pthread_rwlockattr_getpshared(const pthread_rwlockattr_t * restrict attr, int *restrict pshared);
 int pthread_rwlockattr_setpshared(pthread_rwlockattr_t *attr, int pshared);
-
 /* Both return: 0 if OK, error number on failure */
+
+
+/* ============== Condition Variables Attributes ============== */
+
+#include <pthread.h>
 int pthread_condattr_init(pthread_condattr_t *attr);
 int pthread_condattr_destroy(pthread_condattr_t *attr);
-
 /* Both return: 0 if OK, error number on failure */
+
+#include <pthread.h>
 int pthread_condattr_getpshared(const pthread_condattr_t * restrict attr, int *restrict pshared);
 int pthread_condattr_setpshared(pthread_condattr_t *attr, int pshared);
+/* Both return: 0 if OK, error number on failure */
 
-/*********************** Synchronization Attributes *************************/
+
+
+
+
+
+
+
+
+
+
+
 
 /* Thread-Specific Data */
 
@@ -288,3 +314,17 @@ int pthread_kill(pthread_t thread, int signo);
 /*********************** Thread and Fork *************************/
 /* Returns: 0 if OK, error number on failure */
 int pthread_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void));
+
+
+
+
+
+/* ============== File Lock ============== */
+
+/* This allows applications to compose multiple calls
+   to standard I/O functions into atomic sequences */
+#include <stdio.h>
+int ftrylockfile(FILE *fp);
+/* Returns: 0 if OK, nonzero if lock can't be acquired */
+void flockfile(FILE *fp);
+void funlockfile(FILE *fp);
