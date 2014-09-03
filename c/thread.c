@@ -104,8 +104,8 @@ int pthread_cond_timedwait(pthread_cond_t *restrict cond, pthread_mutex_t *restr
 /* Both return: 0 if OK, error number on failure */
 
 struct timespec {
-    time_t tv_sec; /* seconds     */
-    long tv_nsec;  /* nanoseconds */
+    time_t tv_sec;   /* seconds     */
+    long   tv_nsec;  /* nanoseconds */
 };
 
 /* Use 'gettimeofday' to get the current time expressed as a timeval structure and
@@ -141,8 +141,8 @@ int pthread_attr_init(pthread_attr_t *attr);
 int pthread_attr_destroy(pthread_attr_t *attr);
 /* Both return: 0 if OK, error number on failure */
 
-/*
- * POSIX.1 thread attributes: (represented by pthread_attr_t structure)
+
+/* POSIX.1 thread attributes: (represented by pthread_attr_t structure)
  * Name        |  Description
  * ------------|---------------------------------------------------
  * detachstate |  detached thread attribute
@@ -194,29 +194,36 @@ int pthread_attr_setguardsize(pthread_attr_t *attr, size_t guardsize);
 
 
 
-/* Set concurrency leval */
+/* Set concurrency level */
 #include <pthread.h>
 int pthread_getconcurrency(void);
 /* Returns: current concurrency level */
 int pthread_setconcurrency(int level);
 /* Returns: 0 if OK, error number on failure */
 
-/* Two thread attributes that are not included in the pthread_attr_t structure are the cancelability state and the
-   cancelability type. These attributes affect the behavior of a thread in response to a call to pthread_cancel */
-/* Returns: 0 if OK, error number on failure */
-int pthread_setcancelstate(int state, int *oldstate); /* state :: [PTHREAD_CANCEL_ENABLE, PTHREAD_CANCEL_DISABLE] */
 
+
+/*  cancelability state & cancelability type affect the behavior
+    of a thread in response to a call to pthread_cancel */
+/* Set cancelability state */
+#include <pthread.h>
+int pthread_setcancelstate(int state, int *oldstate);
+// state :: [PTHREAD_CANCEL_ENABLE, PTHREAD_CANCEL_DISABLE]
+/* Returns: 0 if OK, error number on failure */
+
+#include <pthread.h>
 void pthread_testcancel(void);
 
+
+
+
+/* Set cancelability type */
 /* The default cancellation type we have been describing is known as deferred cancellation.
    We can change the cancellation type by calling pthread_setcanceltype */
-/* Returns: 0 if OK, error number on failure */
+#include <pthread.h>
 int pthread_setcanceltype(int type, int *oldtype);
-
-
-
-
-
+// type :: [PTHREAD_CANCEL_DEFERRED, PTHREAD_CANCEL_ASYNCHRONOUS]
+/* Returns: 0 if OK, error number on failure */
 
 
 
@@ -269,52 +276,69 @@ int pthread_condattr_setpshared(pthread_condattr_t *attr, int pshared);
 
 
 
+/* ============== Thread-Specific Data ============== */
 
-
-
-
-
-
-
-
-
-/* Thread-Specific Data */
-
-/* Returns: 0 if OK, error number on failure */
+#include <pthread.h>
 int pthread_key_create(pthread_key_t *keyp, void (*destructor)(void *));
-
 /* Returns: 0 if OK, error number on failure */
+/* When the thread exits, if the thread-specific data address has been set to a non-null value,
+   the destructor function is called with the data address as the only argument */
+/* destructor is called when:
+   1, calls pthread_exit
+   2, exits normally by returning */
+/* destructor is not called when:
+   1, calls exit, _exit, _Exit
+   2, calls abort
+   3, exits abnormally */
+
+#include <pthread.h>
+void *pthread_getspecific(pthread_key_t key);
+/* Returns: thread-specific data value or NULLif no value has been associated with the key */
+
+#include <pthread.h>
+int pthread_setspecific(pthread_key_t key, const void *value);
+/* Returns: 0 if OK, error number on failure */
+
+#include <pthread.h>
 int pthread_key_delete(pthread_key_t *key);
-
 /* Returns: 0 if OK, error number on failure */
+
+
+
+
+/* ============== Pthread Once ============== */
+#include <pthread.h>
 pthread_once_t initflag = PTHREAD_ONCE_INIT;
 int pthread_once(pthread_once_t *initflag, void (*initfn)(void));
-
-/* Returns: thread-specific data value or NULLif no value has been associated with the key */
-void *pthread_getspecific(pthread_key_t key);
-
 /* Returns: 0 if OK, error number on failure */
-int pthread_setspecific(pthread_key_t key, const void *value);
+/* The initflag must be a nonlocal variable (i.e., global or static)
+   and initialized to PTHREAD_ONCE_INIT */
 
-/*********************** Thread and Signal *************************/
 
-/* Returns: 0 if OK, error number on failure */
+
+
+
+/* ============== Signal in Thread ============== */
+
+#include <signal.h>
 int pthread_sigmask(int how, const sigset_t *restrict set, sigset_t *restrict oset);
-
-/* A thread can wait for one or more signals to occur by calling sigwait */
-#include <signal.h>
 /* Returns: 0 if OK, error number on failure */
+
+#include <signal.h>
 int sigwait(const sigset_t *restrict set, int *restrict signop);
+/* Returns: 0 if OK, error number on failure */
 
-/* To send a signal to a thread, we call pthread_kill */
 #include <signal.h>
-/* Returns: 0 if OK, error number on failure */
 int pthread_kill(pthread_t thread, int signo);
-
-/*********************** Thread and Fork *************************/
 /* Returns: 0 if OK, error number on failure */
-int pthread_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void));
 
+
+
+
+/* ============== Thread and Fork ============== */
+
+int pthread_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void));
+/* Returns: 0 if OK, error number on failure */
 
 
 
