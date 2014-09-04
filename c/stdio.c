@@ -40,8 +40,17 @@ FILE *fdopen(int filedes, const char *type);
  * a+/a+b/ab+ |  open or create for reading and writing at end of file
  */
 
-/* Returns: 0 if OK, EOF on error */
+/*
+ * You can also append the character ‘x’ after any of the strings in the table above.
+ * This character causes fopen to fail rather than opening the file
+ * if the file already exists.
+ * If you append ‘x’ to any of the arguments above,
+ * you are guaranteed not to clobber (that is,accidentally destroy)
+ * any file you attempt to open.
+ */
+
 int fclose(FILE *fp);
+/* Returns: 0 if OK, EOF on error */
 
 int fflush(FILE *fp);
 /* if fp is NULL, this function causes all output streams to be flushed */
@@ -83,8 +92,8 @@ int putchar(int c);
 
 /* read and write one line at a time */
 
-char *fgets(char *restrict buf, int n, FILE *restrict fp); /* reads up through the next newline */
-char *gets(char *buf);
+char *fgets(char *restrict buf, int n, FILE *restrict fp); /* reads up through the next newline (Deprecated) */
+char *gets(char *buf); // Deprecated
 /* Both return: buf if OK, NULL on end of file or error */
 
 int fputs(const char *restrict str, FILE *restrict fp); /* writes the null-terminated string to the specifiedstream */
@@ -138,14 +147,16 @@ int printf(const char *restrict format, ...);
 int fprintf(FILE *restrict fp, const char *restrictformat, ...);
 /* Both return: number of characters output if OK, negative value if output error */
 
+#include <stdio.h>
 int sprintf(char *restrict buf, const char *restrict format, ...);
 int snprintf(char *restrict buf, size_t n, const char *restrict format, ...);
 /* Both return: number of characters stored in array if OK, negative value if encoding error */
 
-int scanf(const char *restrict format, ...);
+int scanf(const char *restrict format, ...); // Deprecated
 int fscanf(FILE *restrict fp, const char *restrict format, ...);
 int sscanf(const char *restrict buf, const char *restrict format, ...);
 /* All three return: number of input items assigned, EOF if input error or end of file before any conversion */
+
 
 
 
@@ -158,3 +169,17 @@ int sscanf(const char *restrict buf, const char *restrict format, ...);
 
 int fileno(FILE *fp);
 /* Returns: the file descriptor associated with the stream */
+
+#ifdef _GNU_SOURCE
+int asprintf(char **strp, const char *fmt, ...); // more safer than sprintf
+/* Returns the number of characters allocated to the buffer,
+ * or a negative value if an error occurred */
+#endif
+
+ssize_t getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
+ssize_t getline(char **lineptr, size_t *n, FILE *stream);
+/* Both returns the number of characters read, or -1 on failure */
+/* preferred method for reading lines of text from a stream, including standard input */
+/* pointer to the block of memory allocated for getline is merely a suggestion.
+ * getline function will automatically enlarge the block of memory as needed,
+ * via the realloc function, so there is never a shortage of space */
