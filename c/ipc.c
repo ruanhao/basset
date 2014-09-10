@@ -62,3 +62,42 @@ struct sembuf {
     short          sem_op;  /* operation (negative, 0, or positive) */
     short          sem_flg; /* IPC_NOWAIT, SEM_UNDO */
 };
+
+
+/* =============== System V Shared Memory  =============== */
+/* The kernel maintains a structure for each shared memory segment: */
+struct shmid_ds {
+    struct ipc_perm shm_perm;
+    size_t          shm_segsz;   /* size of segment in bytes */
+    pid_t           shm_lpid;    /* pid of last shmop() */
+    pid_t           shm_cpid;    /* pid of creator */
+    shmatt_t        shm_nattch;  /* number of current attaches */
+    time_t          shm_atime;   /* last-attach time */
+    time_t          shm_dtime;   /* last-detach time */
+    time_t          shm_ctime;   /* last-change time */
+};
+
+#include <sys/shm.h>
+int shmget(key_t key, size_t size, int flag);
+/* Returns: shared memory ID if OK, -1 on error */
+/* The size parameter is the size of the shared memory segment in bytes
+ * Implementations will usually round up the size to a multiple of the system's page size,
+ * but if an application specifies size as a value other than an integral multiple of the system's page size,
+ * THE REMAINDER OF THE LAST PAGE WILL BE UNAVAILABLE FOR USE
+ * If we are referencing an existing segment (as client), we can specify size as 0
+ * When a new segment is created, the contents of the segment are initialized with zeros */
+
+#include <sys/shm.h>
+int shmctl(int shmid, int cmd, struct shmid_ds *buf);
+// cmd :: [IPC_STAT, IPC_SET, IPC_RMID, SHM_LOCK(Linux), SHM_UNLOCK(Linux)]
+/* Returns: 0 if OK, -1 on error */
+
+#include <sys/shm.h>
+void *shmat(int shmid, const void *addr, int flag);
+// It is better to specify an addr of 0 and let the system choose the address
+// If the SHM_RDONLY bit is specified in flag, the segment is attached read-only. Otherwise, the segment is attached read-write
+/* Returns: pointer to shared memory segment if OK, -1 on error */
+
+#include <sys/shm.h>
+int shmdt(void *addr);
+/* Returns: 0 if OK, -1 on error */
