@@ -109,6 +109,8 @@ int fcntl(int filedes, int cmd, ... /* int arg */ );
  *   1.  Duplicate an existing descriptor   (cmd = F_DUPFD)
  *   2.  Get/set file descriptor flags      (cmd = F_GETFD or F_SETFD)
  *   3.  Get/set file status flags          (cmd = F_GETFL or F_SETFL)
+ *       The only flags that can be changed are [O_APPEND, O_NONBLOCK, O_SYNC, O_DSYNC,
+ *                                              O_RSYNC, O_FSYNC, O_ASYNC]
  *   4.  Get/set asynchronous I/O ownership (cmd = F_GETOWN or F_SETOWN)
  *   5.  Get/set record locks               (cmd = F_GETLK, F_SETLK, or F_SETLKW)
  */
