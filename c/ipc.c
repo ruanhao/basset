@@ -101,3 +101,27 @@ void *shmat(int shmid, const void *addr, int flag);
 #include <sys/shm.h>
 int shmdt(void *addr);
 /* Returns: 0 if OK, -1 on error */
+
+
+
+
+/* =============== Pipe  =============== */
+#include <unistd.h>
+int pipe(int filedes[2]);
+/* The output of filedes[1] is the input for filedes[0] */
+/* Returns: 0 if OK, -1 on error */
+
+
+#include <stdio.h>
+FILE *popen(const char *cmdstring, const char *type);
+// type :: ["r", "w"]
+/* Returns: file pointer if OK, NULL on error */
+int pclose(FILE *fp);
+/* Returns: termination status of cmdstring, or -1 on error */
+
+/* =============== Fifo  =============== */
+#include <sys/stat.h>
+int mkfifo(const char *pathname, mode_t mode);
+/* The specification of the mode argument for the mkfifo function
+   is the same as for the open function */
+/* Returns: 0 if OK, -1 on error */
