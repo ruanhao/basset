@@ -12,10 +12,19 @@ struct timeval {
 };
 
 #include <sys/select.h>
-int FD_ISSET(int fd, fd_set *fdset);
-/* Returns: nonzero if fd is in set, 0 otherwise */
+void FD_CLR(intfd,fd_set *fdset);    /* turn off the bit for fd in fdset */
+void FD_SET(intfd,fd_set *fdset);    /* turn on the bit for fd in fdset */
+void FD_ZERO(fd_set *fdset);         /* clear all bits in fdset */
+int FD_ISSET(int fd, fd_set *fdset); /* is the bit for fd on in fdset ? */
+/* FD_ISSET returns: nonzero if fd is in set, 0 otherwise */
 /* After declaring a descriptor set, we must zero the set using FD_ZERO
    We then set bits in the set for each descriptor that we're interested in */
+
+
+void FD_ZERO(fd_set *fdset);
+void FD_SET(int fd, fd_set *fdset);
+void FD_CLR(int fd, fd_set *fdset);
+int FD_ISSET(int fd, fd_set *fdset);
 
 #include <sys/select.h>
 int pselect(int                             maxfdp1,
