@@ -33,6 +33,7 @@ int socket (int family, int type, int protocol);
 
 #include <sys/socket.h>
 int bind (int sockfd, const struct sockaddr *myaddr, socklen_t addrlen);
+// myaddr->sin_addr.s_addr = htonl(INADDR_ANY);
 /* Returns: 0 if OK, -1 on error */
 
 #include <sys/socket.h>
