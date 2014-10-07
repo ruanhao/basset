@@ -61,3 +61,63 @@ const char *inet_ntop(int  family,  const void *addrptr,  char *strptr,  size_t 
 /* Returns: pointer to result if OK, NULL on error */
 // family :: [AF_INET, AF_INET6]
 // len :: [INET_ADDRSTRLEN(16), INET6_ADDRSTRLEN(46)] (netinet/in.h)
+
+
+
+/* =============== Name and Address Conversion =============== */
+#include <netdb.h>
+struct hostent *gethostbyname (const char *hostname);
+/* Returns: non-null pointer if OK, NULL on error with h_errno set */
+
+struct hostent {
+    char  *h_name;      /* official (canonical) name of host */
+    char **h_aliases;   /* pointer to array of pointers to alias names */
+    int    h_addrtype;  /* host address type: AF_INET */
+    int    h_length;    /* length of address: 4 */
+    char **h_addr_list; /* ptr to array of ptrs with IPv4 addrs */
+};
+
+/* h_errno:
+       - HOST_NOT_FOUND
+       - TRY_AGAIN
+       - NO_RECOVERY
+       - NO_DATA (identical to NO_ADDRESS) */
+
+
+
+
+#include <netdb.h>
+int getaddrinfo (const char *hostname, const char *service,
+                 const struct addrinfo *hints, struct addrinfo **result) ;
+/* Returns: 0 if OK, nonzero on error */
+
+struct addrinfo {
+    int              ai_flags;     /* AI_PASSIVE, AI_CANONNAME */
+    int              ai_family;    /* AF_xxx */
+    int              ai_socktype;  /* SOCK_xxx */
+    int              ai_protocol;  /* 0 or IPPROTO_xxx for IPv4 and IPv6 */
+    socklen_t        ai_addrlen;   /* length of ai_addr */
+    char            *ai_canonname; /* ptr to canonical name for host */
+    struct sockaddr *ai_addr;      /* ptr to socket address structure */
+    struct addrinfo *ai_next;      /* ptr to next structure in linked list */
+};
+
+/* The members of the hints structure that can be set by the caller are:
+      - ai_flags    (zero or more AI_XXX values OR'ed together)
+      - ai_family   (an AF_xxx value)
+      - ai_socktype (a SOCK_xxx value)
+      - ai_protocol */
+
+/* ai_flags: [AI_PASSIVE,  AI_CANONNAME, AI_NUMERICHOST, AI_NUMERICSERV,
+              AI_V4MAPPED, AI_ALL, AI_ADDRCONFIG]
+*/
+
+
+/* ====== Four types of network-related information =================== */
+
+Info      | Data file      | Structure  | Keyed lookup functions
+----------|----------------|------------|---------------------------------
+Hosts     | /etc/hosts     | hostent    | gethostbyaddr,  gethostbyname
+Networks  | /etc/networks  | netent     | getnetbyaddr,   getnetbyname
+Protocols | /etc/protocols | protoent   | getprotobyname, getprotobynumber
+Services  | /etc/services  | servent    | getservbyname,  getservbyport
