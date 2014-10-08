@@ -118,12 +118,23 @@ src host 10.7.2.12 and not dst net 10.200.0.0/16
 ```bash
 tshark -r diameter.cap -R 'diameter.cmd.code == 271'
 tshark -a duration:10 -q -z io,stat,1
+
+
+tshark -z io,phs[,filter] # 统计和filter有关的frame数量
+tshark -z io,stat,interval[,filter][,filter][,filter]...
+tshark -z io,stat,interval,"[COUNT|SUM|MIN|MAX|AVG|LOAD](field)filter"
+tshark -z 'io.stat,0.010,smb.time&&ip.addr==192.168.1.100,MIN(smb.time)smb.time&&ip.addr==192.168.1.100,MAX(smb.time)smb.time&&ip.addr==192.168.1.100,AVG(smb.time)smb.time&&ip.addr==192.168.1.100' # 四行显示：封包和字节统计，最小，最大，平均回应事件
+
+tshark -z proto,colinfo,filter,field # 加协议信息至显示 (field值一定要在filter栏位: tshark -z proto,colinfo,tcp.len,tcp.len)
+tshark -z proto,colinfo,"tcp.len&&ip.src==192.168.1.10",tcp.len
+
+-o 'tcp.relative_sequence_numbers:FALSE'
 ```
 
 
 
 
 ## Ref
->  http://blog.sina.com.cn/s/blog_5919b8b10100064e.html
->  http://wiki.wireshark.org/CaptureFilters
+>  http://blog.sina.com.cn/s/blog_5919b8b10100064e.html  
+>  http://wiki.wireshark.org/CaptureFilters  
 >  http://openmaniak.com/cn/wireshark_filters.php
