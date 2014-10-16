@@ -94,3 +94,10 @@ defvar有文档字符串
 lambda表达式最常用的是作为参数传递给其它函数，比如mapc  
 ```
 
+
+```bash
+C-x 8 C-h                   # 特殊字符
+C-x [ENTER] f unix [ENTER]  # dos2unix
+C-x i	                    # insert-file
+C-_                         # redo
+```
