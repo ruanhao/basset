@@ -131,4 +131,64 @@ echo ${var^^}                 ## 这样也可以, 反之: echo ${var,,}
 > disown 的作用是使一个后台进程不属于当前 shell 的管辖，可能使这个后台进程变成 orphan process  
 > 可以使用 wait 命令来防止在后台作业没完成之前退出脚本，wait可以接受一个作业标示符作为参数，比如 wait %1 或者 wait $PPID
 
+
+
+mount | column -t ## currently mounted filesystems in nice layout
+
+while sleep 1;do tput sc;tput cup 0 $(($(tput cols)-29));date;tput rc;done &
+## Put a console clock in top right corner
+
+lsof -i ## List programs with open ports and connections
+lsof -P -i -n ## show apps that use internet connection at the moment
+lsof -i tcp:80 ## which program is this port belongs to
+lsof -c <command> ## list all files opened by a particular command
+
+ss -p # show apps that use internet connection at the moment
+
+nc -v -l 80 < file.ext ## sharing file through http 80 port
+
+rm !(*.foo|*.bar|*.baz)
+
+
+fuser -k filename ## kill a process that is locking a file  
+
+
+strace -ff -e trace=write -e write=1,2 -p SOME_PID
+## intercept stdout/stderr of another process
+
+
+script -qf | tee >(nc -kl 5000) >(nc -kl 5001) >(nc -kl 5002)
+## run 'nc yourip 5000', 'nc yourip 5001' or 'nc yourip 5002' elsewhere
+## will produce an exact same mirror of your shell.
+## This is handy when you want to show someone else some amazing stuff
+## in your shell without giving them control over it.
+mkfifo foo; script -f foo
+
+
+lsmod | perl -e 'print "digraph \"lsmod\" {";<>;while(<>){@_=split/\s+/; print "\"$_[0]\" -> \"$_\"\n" for split/,/,$_[3]}print "}"' | dot -Tpng | display -
+##  Draw kernel module dependancy graph. parse `lsmod' output and pass to `dot' drawing utility then finally pass it to an image viewer
+
+
+find . -type d -empty -delete
+
+cp /work/host/phone/ui/main.cpp !#$:s/host/target
+## using `!#$' to referance backward-word
+
+grep ^Dirty /proc/meminfo ## find out how much data is waiting to be written to disk
+
+
+showkey -a  ## Quick access to ASCII code of a key
+
+bind -x '"\C-l":ls -l' ## bind a key with a command
+
+file -s /dev/sd*
+## use file to view device information
+
+nmap -sP 192.168.1.0/24  ## list alive hosts in specific subnet
+
+ps hax -o user | sort | uniq -c   ## process per user counter
+
+strings /dev/mem  ## A fun thing to do with ram is actually open it up and take a peek. This command will show you all the string (plain text) values in ram
+
+
 ------

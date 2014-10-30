@@ -100,4 +100,6 @@ C-x 8 C-h                   # 特殊字符
 C-x [ENTER] f unix [ENTER]  # dos2unix
 C-x i	                    # insert-file
 C-_                         # redo
+
+C-x z                       # Repeat the previous emacs command
 ```
