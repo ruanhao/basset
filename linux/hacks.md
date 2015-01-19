@@ -190,5 +190,11 @@ ps hax -o user | sort | uniq -c   ## process per user counter
 
 strings /dev/mem  ## A fun thing to do with ram is actually open it up and take a peek. This command will show you all the string (plain text) values in ram
 
+getconf LONG_BIT ##
+getconf -a
+
+
+
+
 
 ------

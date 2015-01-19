@@ -1,6 +1,12 @@
 ```bash
 
 
+## Location of networking configuration files
+
+Interface definitions                   <=> /etc/sysconfig/network-scripts/ifcfg-*
+Hostname and default gateway definition <=> /etc/sysconfig/network
+
+
 
 ip [-s] link show eth0
 ip      link set  eth0 [up|down]

@@ -102,4 +102,22 @@ C-x i	                    # insert-file
 C-_                         # redo
 
 C-x z                       # Repeat the previous emacs command
+
+C-M-@  # 全选括号表达式
+M-s o  # occurs
+
+
+
 ```
+
+
+```bash
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.milkbox.net/packages/") t)
+;; M-x package-install
+;; use 'i' to mark, use 'x' to execute
+```
+
+
+

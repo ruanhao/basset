@@ -22,6 +22,11 @@ ssh -X user@host                                                     ## 用这�
 * T参数，表示不为这个连接分配TTY。NT参数一起用，代表这个SSH连接至用来传数据，不执行远程操作。如：ssh -NT -D 8080 host
 * f参数，表示SSH连接成功后，转入后台运行，通常和N连用。这样一来，可以在不中断SSH连接的情况下，在本地shell中执行其他操作。如：ssh -f -D 8080 host (要关闭这个后台连接，就只有用kill命令去杀掉进程)
 
+
+
+
+ssh -t reachable_host ssh unreachable_host
+
 ### Reference
 [SSH port forwarding](http://www.liugj.com/2013/04/SSH-port-forwarding)  
 
