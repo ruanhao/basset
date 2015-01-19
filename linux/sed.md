@@ -51,6 +51,35 @@ sed 'n;=' file                             ## 给偶数行打行号
 sed '2,$n;='                               ## 给奇数行打行号
 
 
+
+
+
+
+Flag 'I' makes the pattern match case insensitive. This will match abc, aBc, ABC, AbC, etc.:
+
+sed -n '/abc/I p' <old >new
+
+Note that a space after the '/I' and the 'p' (print) command emphasizes that the 'p' is not a modifier of the pattern matching process, but a command to execute after the pattern matching. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Hold Space
 g:  将hold space中的内容拷贝到pattern space中，原来pattern space里的内容清除
 G:  将hold space中的内容append到pattern space\n后
