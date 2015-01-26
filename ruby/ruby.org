@@ -1,0 +1,115 @@
+#+Title: Ruby
+
+* Array
+** Assign
+   #+BEGIN_SRC ruby
+   a     = [1, 3, 5, 7, 9]    # -> [1, 3, 5, 7, 9]
+   a[1]  = 'bat'              # -> [1, "bat", 5, 7, 9]
+   a[-3] = 'cat'              # -> [1, "bat", "cat", 7, 9]
+   a[3]  = [9, 8]             # -> [1, "bat", "cat", [9, 8], 9]
+   a[6]  = 99                 # -> [1, "bat", "cat", [9, 8], 9, nil, 99]
+   #+END_SRC
+
+   #+BEGIN_SRC ruby
+   a       = [1, 3, 5, 7, 9]  # -> [1, 3, 5, 7, 9]
+   a[2, 2] = 'cat'            # -> [1, 3, "cat", 9]
+   a[2, 0] = 'dog'            # -> [1, 3, "dog", "cat", 9]
+   a[1, 1] = [9, 8, 7]        # -> [1, 9, 8, 7, "dog", "cat", 9]
+   a[0..3] = []               # -> ["dog", "cat", 9]
+   a[5..6] = 99, 98           # -> ["dog", "cat", 9, nil, nil, 99, 98]
+   #+END_SRC
+
+** Functions
+    #+BEGIN_SRC
+## delete_if
+[1,2,3,4,5,6,7].delete_if{|v| v < 4 }
+    #+END_SRC
+
+
+
+* Block
+** Intro
+*** Difference betwen *lambda* and *Proc.new*
+
+    A block created with lambda behaves like a method when you use return and simply exits the block, handing control back to the calling method.
+
+    A block created with Proc.new behaves like it¡¯s a part of the calling method when return is used within it, and returns from both the block itself as well as the calling method.
+    #+BEGIN_SRC ruby
+    def a_method
+      lambda { return "we just returned from the block" }.call
+      return "we just returned from the calling method"
+    end
+    puts a_method
+    #+END_SRC
+
+    #+BEGIN_SRC
+    def a_method
+      Proc.new { return "we just returned from the block" }.call
+      return "we just returned from the calling method"
+    end
+    puts a_method
+    #+END_SRC
+    As a consequence, Proc.new is something that¡¯s hardly ever used to explicitly create blocks because of these surprising return semantics. It is recommended that you avoid using this form unless absolutely necessary.
+** Hacks
+*** ->
+    -> is a shorter version of Kernel#lambda
+    #+BEGIN_SRC ruby
+    ## The following two lines produce identical results.
+    short = ->(a, b) { a + b }
+    puts short.call(2, 3)
+
+    long = lambda { |a, b| a + b }
+    puts long.call(2, 3)
+    #+END_SRC
+*** Kernel#proc
+    Kernel#proc factory method is identical to Proc.new
+    #+BEGIN_SRC
+    ## The following two lines produce identical results.
+    short = proc { |a, b| a + b }
+    puts short.call(2, 3)
+
+    long = Proc.new { |a, b| a + b }
+    puts long.call(2, 3)
+    #+END_SRC
+
+
+* String
+
+* Regex
+** BackRef
+   #+BEGIN_SRC
+## \&: last match
+## \+: last matched group
+## \`: string before match
+## \': string after match
+s = "taipei hello world shanghai"
+puts s.gsub(/(hello) (world)/, %q/\& \&/) ## taipei hello world hello world shanghai
+puts s.gsub(/(hello) (world)/, %q/\+ \+/) ## taipei world world shanghai
+puts s.gsub(/(hello) (world)/, %q/\' \'/) ## taipei  shanghai  shanghai shanghai
+puts s.gsub(/(hello) (world)/, %q/\` \`/) ## taipei taipei  taipei  shanghai
+   #+END_SRC
+
+** Greedy
+   #+BEGIN_SRC
+a = "The moon is made of cheese"
+show_regexp(a, /\w+/)          # -> <<The>> moon is made of cheese
+show_regexp(a, /\s.*\s/)       # -> The<< moon is made of >>cheese
+show_regexp(a, /\s.*?\s/)      # -> The<< moon >>is made of cheese
+show_regexp(a, /[aeiou]{2,99}) # -> The m<<oo>>n is made of cheese
+show_regexp(a, /mo?o/)         # -> The <<moo>>n is made of cheese
+   #+END_SRC
+
+** Global Variable
+    #+BEGIN_SRC
+## $&: Matched
+## $`: Before matched
+## $': After matched
+
+def show_regexp(a, re)
+  if a =~ re
+    "#{$`}<<#{$&}>>#{$'}"
+  else
+    "no match"
+  end
+end
+    #+END_SRC
