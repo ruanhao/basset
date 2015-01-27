@@ -1,0 +1,37 @@
+#+Title: Class
+#+OPTIONS: ^:nil
+
+* Class
+** Class methods
+#+BEGIN_SRC ruby
+## How to define class methods
+
+class Demo
+  def Demo.method1
+    # ...
+  end
+
+  def self.method2
+    # ...
+  end
+
+  class <<self
+    def method3
+      # ...
+    end
+  end
+end
+#+END_SRC
+** Singleton
+#+BEGIN_SRC ruby
+## Singleton (not thread safe)
+
+class MyLogger
+  private_class_method :new
+  @@logger = nil
+  def MyLogger.create
+    @@logger = new unless @@logger
+    @@logger
+  end
+end
+#+END_SRC

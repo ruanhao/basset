@@ -1,0 +1,64 @@
+#+Title: Regex
+#+OPTIONS: ^:nil
+
+
+
+* Regex
+** Functions
+*** match
+#+BEGIN_SRC ruby
+re = /(\d)+:(\d+)/
+md = re.match("Time: 12:34am")
+md.class                       ## MatchData
+md[0]                          ## "12:34"
+md[1]                          ## "12"
+md[2]                          ## "34"
+md.pre_match                   ## "Time: "
+md.post_match                  ## "am"
+
+## After every pattern match, Ruby stores a reference to the result (nil or a MatchData object) in a thread-local variable (accessible using $~)
+## All the other regular expression variables are then derived from this object
+re = /(\d+):(\d+)/
+md1 = re.match("Time: 12:34am")
+md2 = re.match("Time: 10:30pm")
+[$1, $2]   # last successful match ["10", "30"]
+$~ = md1
+[$1, $2]   # previous successful match ["12", "34"]
+#+END_SRC
+** BackRef
+#+BEGIN_SRC ruby
+## \&: last match
+## \+: last matched group
+## \`: string before match
+## \': string after match
+s = "taipei hello world shanghai"
+puts s.gsub(/(hello) (world)/, %q/\& \&/) ## taipei hello world hello world shanghai
+puts s.gsub(/(hello) (world)/, %q/\+ \+/) ## taipei world world shanghai
+puts s.gsub(/(hello) (world)/, %q/\' \'/) ## taipei  shanghai  shanghai shanghai
+puts s.gsub(/(hello) (world)/, %q/\` \`/) ## taipei taipei  taipei  shanghai
+#+END_SRC
+
+** Greedy
+#+BEGIN_SRC ruby
+a = "The moon is made of cheese"
+show_regexp(a, /\w+/)          # -> <<The>> moon is made of cheese
+show_regexp(a, /\s.*\s/)       # -> The<< moon is made of >>cheese
+show_regexp(a, /\s.*?\s/)      # -> The<< moon >>is made of cheese
+show_regexp(a, /[aeiou]{2,99}) # -> The m<<oo>>n is made of cheese
+show_regexp(a, /mo?o/)         # -> The <<moo>>n is made of cheese
+#+END_SRC
+
+** Global Variable
+ #+BEGIN_SRC ruby
+## $&: Matched
+## $`: Before matched
+## $': After matched
+
+def show_regexp(a, re)
+  if a =~ re
+    "#{$`}<<#{$&}>>#{$'}"
+  else
+    "no match"
+  end
+end
+#+END_SRC
