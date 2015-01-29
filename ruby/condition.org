@@ -1,0 +1,114 @@
+#+Title: Condition
+#+OPTIONS: ^:nil
+* if
+#+BEGIN_SRC ruby
+if count > 10
+  puts 'a'
+elsif tries == 3
+  puts 'b'
+else
+  puts 'c'
+end
+
+puts "hello" if 2 > 1
+#+END_SRC
+* while
+#+BEGIN_SRC ruby
+while 1 < 2 and 2 > 1
+  puts 'hello'
+end
+
+while line = gets
+  pusts line.downcase
+end
+
+square = 2
+square = square * square while square < 1000
+#+END_SRC
+#+BEGIN_SRC ruby
+## There's one wrinkle when while and until are used as statement modifiers.
+## If the statement they are modifying is a begin/end block,
+## the code in the block will always execute at least one time,
+## regardless of the value of the boolean expression.
+puts 'hello' while false
+begin
+  puts 'Goodbye'
+end while false
+## => Goodbye
+#+END_SRC
+* case
+#+BEGIN_SRC ruby
+leap = case
+       when year % 400 == 0: true
+       when year %100  == 0: false
+       else year % 4   == 0
+       end
+#+END_SRC
+#+BEGIN_SRC ruby
+case inputLine
+  when "debug"
+    dumpDebugInfo
+    dumpSymbols
+  when /p\s+(\w+)/
+    dumpVariable($1)
+  when "quit", "exit"
+    exit
+  else
+    print "Illegal command: #{inputLine}"
+end
+#+END_SRC
+#+BEGIN_SRC
+kind = case year
+         when 1850..1889: "Blues"
+         when 1890..1909: "Ragtime"
+         when 1910..1929: "New Orleans Jazz"
+         when 1930..1939: "Swing"
+         when 1940..1950: "Bebop"
+         else             "Jazz"
+       end
+## case operates by comparing the target (the expression after the keyword case) with each of the comparison expressions after
+## the when keywords.
+## This test is done using comparison === target.
+## As long as a class defines meaningful semantics for === (and all the built-in classes do),
+## objects of that class can be used in case expressions.
+##
+For example, regular expressions define === as a simple pattern match.
+case line
+  when /title=(.*)/
+    puts "Title is #$1"
+  when /track=(.*)/
+    puts "Track is #$1"
+  when /artist=(.*)/
+    puts "Artist is #$1"
+end
+#+END_SRC
+* defined?
+#+BEGIN_SRC ruby
+## If the argument is yield, defined? returns the string `yield' if a code block is associated with the current context
+defined? 1             ## "expression"
+defined? dummy         ## nil
+defined? printf        ## "method"
+defined? String        ## "constant"
+defined? $&            ## nil
+defined? $_            ## "global-variable"
+defined? Math::PI      ## "constant"
+defined? 42.abs        ## "method"
+#+END_SRC
+* Comparison operators
+#+BEGIN_SRC ruby
+==	         Test for equal value.
+===	         Used to test equality within a when clause of a case statement.
+<=>	         General comparison operator. Returns -1, 0, or +1, depending on whether its receiver is less than, equal to, or greater than its argument.
+<, <=, >=, >	 Comparison operators for less than, less than or equal, greater than or equal, and greater than.
+=~	         Regular expression pattern match.
+eql?	         True if the receiver and argument have both the same type and equal values. 1 == 1.0 returns true, but 1.eql?(1.0) is false.
+equal?	         True if the receiver and argument have the same object id.
+#+END_SRC
+
+* Variable scope
+#+BEGIN_VERSE
+The while, until, and for loops are built into the language and do not introduce new scope;
+previously existing locals can be used in the loop, and any new locals created will be available afterward.
+The blocks used by iterators (such as loop and each) are a little different.
+Normally, the local variables created in these blocks are not accessible outside the block.
+#+END_VERSE

@@ -19,6 +19,28 @@ a[1, 1] = [9, 8, 7]        # -> [1, 9, 8, 7, "dog", "cat", 9]
 a[0..3] = []               # -> ["dog", "cat", 9]
 a[5..6] = 99, 98           # -> ["dog", "cat", 9, nil, nil, 99, 98]
 #+END_SRC
+   + Parallel Assignment
+#+BEGIN_SRC ruby
+## if the rvalue is the only thing on the right-hand side, the array will be expanded automatically
+a = [1, 2, 3, 4]
+b,  c = a		## b == 1,  c == 2
+b, *c = a		## b == 1,  c == [2, 3, 4]
+b,  c = 99,  a		## b == 99, c == [1, 2, 3, 4]
+b, *c = 99,  a		## b == 99, c == [[1, 2, 3, 4]]
+b,  c = 99, *a		## b == 99, c == 1
+b, *c = 99, *a		## b == 99, c == [1, 2, 3, 4]
+#+END_SRC
+
+#+BEGIN_SRC ruby
+## The left-hand side of an assignment may contain a parenthesized list of terms.
+## Ruby treats these terms as if they were a nested assignment statement.
+## It extracts out the corresponding rvalue, assigning it to the parenthesized terms, before continuing with the higher-level assignment.
+b, (c, d), e = 1,2,3,4        b == 1, c == 2, d == nil,    e == 3
+b, (c, d), e = [1,2,3,4]      b == 1, c == 2, d == nil,    e == 3
+b, (c, d), e = 1,[2,3],4      b == 1, c == 2, d == 3,      e == 4
+b, (c, d), e = 1,[2,3,4],5    b == 1, c == 2, d == 3,      e == 5
+b, (c,*d), e = 1,[2,3,4],5    b == 1, c == 2, d == [3, 4], e == 5
+#+END_SRC
 
 ** Functions
 *** delete_if
