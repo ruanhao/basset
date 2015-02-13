@@ -1,0 +1,69 @@
+#+TITLE: GCC
+#+OPTIONS: ^:nil
+
+* Print lib search path
+=gcc --print-search-dirs=
+
+
+* Check CFLAGS and LDFLAGS needed if linking to that lib
+#+BEGIN_SRC sh
+pkg-config --cflags --libs <libname>
+## All libname can be found by `pkg-config --list-all`
+## .pc file can be found under /usr/lib/pkgconfig if it exists
+#+END_SRC
+
+
+* Check the location of a dynamic link library
+=ldconfig -p | grep <libname>=
+
+
+* How to create library
+#+BEGIN_SRC sh
+gcc -Wall -fPIC -c *.c
+
+
+gcc -shared -Wl,-soname,libctest.so.1 -o libctest.so.1.0 *.o   ## soname   : libctest.so.1
+                                                               ## real name: libctest.so.1.0
+
+mv libctest.so.1.0 /opt/lib
+
+$ ln -sf /opt/lib/libctest.so.1.0 /opt/lib/libctest.so.1       ## soname is a symbolic link to the real name
+
+$ ln -sf /opt/lib/libctest.so.1 /opt/lib/libctest.so           ## linker name is a symbolic link to the soname
+
+## Programs, when they internally list the shared libraries they need, should only list the soname they need.
+## Conversely, when you create a shared library,
+## you only create the library with a specific filename (with more detailed version information).
+## When you install a new version of a library, you install it in one of a few special directories and then run the program ldconfig(8).
+## Ldconfig examines the existing files and creates the sonames as symbolic links to the real names,
+## as well as setting up the cache file /etc/ld.so.cache. ldconfig doesn’t set up the linker names;
+## typically this is done during library installation, and the linker name is simply created as a symbolic to the latest soname or the latest real name.
+#+END_SRC
+
+
+* Show where include file is
+=echo '#include <stdbool.h>' | cpp -H -o /dev/null 2>&1 | head -n1=
+
+* GCC environment variables
+
+- LD_LIBRARY_PATH (non-gcc)
+  Used by your program to search for directories containing the libraries after it has been successfully compiled and linked
+  #+BEGIN_SRC sh
+LD_DEBUG=libs <Command>                                  ## Check load process info when executing <Command>
+LD_LIBRARY_PATH=/path/to/lib:$LD_LIBRARY_PATH <Command>  ## Specify dynamic load library searching paths when executing <Command>
+  #+END_SRC
+
+- CPATH / C_INCLUDE_PATH / CPLUS_INCLUDE_PATH
+  Header files searching path
+
+- LIBRARY_PATH
+  Used by gcc before compilation to search for directories containing libraries that need to be linked to your program
+
+* Configure
+** Normal compiling process
+#+BEGIN_SRC sh
+  DIR=/path/to/lib
+  CFLAGS="-I$DIR/include" LDFLAGS="-L$DIR/lib" ./configure
+  ## CFLAGS and LDFLAGS do not belong to standard GCC system
+  ## They are valid only if they are supported (like in 'configure')
+#+END_SRC
