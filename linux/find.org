@@ -9,12 +9,14 @@
 ** Find files accessed (read) less then 1 minute
 =find . -amin -1=
 
+
 * Find by filesystem
 ** Don't find other filesystem
 =find / -name "*.txt" -mount=
 =find / -name "*.txt" -xdev=
 ** Specify a certain filesystem
 =find / -name "*.txt" -fstype vfat=
+
 
 * Find by size
 ** By byte
@@ -31,3 +33,68 @@
 * Find by directory
 ** Specify multiple directories
 =find /usr /home /tmp -name \*.jar=
+
+* Find with =-prune=
+#+BEGIN_EXAMPLE
+-prune   True; if the file is a directory, do not descend into it.
+         If -depth is given, false; no effect.
+         Because -delete implies -depth, you cannot usefully use -prune and -delete together.
+#+END_EXAMPLE
+
+* Find with =-exec=
+=find -iname "myprogram.c" -exec md5sum {} \;=
+
+* Find with =-inum=
+=find -inum 888888 -delete=
+
+* Find with =newer=
+** newer (mtime)
+=find . -newer file1.txt -not -newer file2.txt=
+** anewer (atime)
+** cnewer (ctime)
+
+
+-----
+
+* Recipe
+** Find 5 max file
+=find . -type f -exec ls -s {} \; | sort -n -r | head -5=
+** Find 5 min file
+=find . -type f -exec ls -s {} \; | sort -n | head -5=
+** Find using =touch=
+#+BEGIN_SRC bash
+touch -t 05042140 stampfile
+find . -newer stampfile
+#+END_SRC
+
+
+
+* Gotcha
+** Default behavior
+If the given expression to find does not contain any of the “action” primaries ‑exec, ‑ok, or ‑print,
+then the given expression is effectively replaced by:
+=find \( expression \) -print=
+The implied parenthesis can cause unexpected results.
+For example, consider these two similar commands:
+#+BEGIN_SRC bash
+  $ find -name tmp -prune -o -name \*.txt
+  ./bin/data/secret.txt
+  ./tmp
+  ./missingEOL.txt
+  ./public_html/graphics/README.txt
+  ./datafile.txt
+
+  $ find -name tmp -prune -o -name \*.txt -print
+  ./bin/data/secret.txt
+  ./missingEOL.txt
+  ./public_html/graphics/README.txt
+  ./datafile.txt
+#+END_SRC
+The lack of an action in the first command means it is equivalent to:
+=find . \( -name tmp -prune -o -name \*.txt \) -print=
+This causes tmp to be included in the output.
+However for the second find command the normal rules of Boolean operator precedence apply,
+so the pruned directory does not appear in the output.
+
+** Precedence
+OR has lower precedence than AND, and NOT has the highest precedence.
