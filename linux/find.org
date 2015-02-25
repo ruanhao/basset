@@ -1,7 +1,7 @@
 #+TITLE: GNU find
 #+OPTIONS: ^:nil
 
-* Find by time
+* Find with =-mtime, -mmin, -atime, -amin, -ctime, -cmin=
 ** Find files modified less than 10 minutes ago
 =find / -mmin -10=
 ** Find files modified less than 1 hour
@@ -10,15 +10,15 @@
 =find . -amin -1=
 
 
-* Find by filesystem
+* Find with =-mount, -xdev, -fstype=
 ** Don't find other filesystem
 =find / -name "*.txt" -mount=
+
 =find / -name "*.txt" -xdev=
 ** Specify a certain filesystem
 =find / -name "*.txt" -fstype vfat=
 
-
-* Find by size
+* Find with =-size, -empty=
 ** By byte
 =find . -size +1024c=
 ** By 512 bytes (block)
@@ -27,12 +27,13 @@
 =find . -size +1k=
 ** Find empty file
 =find . -size 0=
-** Find empty directory
+** Find empty directory or file
 =find . -empty=
 
-* Find by directory
+* Find with directory
 ** Specify multiple directories
 =find /usr /home /tmp -name \*.jar=
+
 
 * Find with =-prune=
 #+BEGIN_EXAMPLE
@@ -41,11 +42,14 @@
          Because -delete implies -depth, you cannot usefully use -prune and -delete together.
 #+END_EXAMPLE
 
+
 * Find with =-exec=
 =find -iname "myprogram.c" -exec md5sum {} \;=
 
+
 * Find with =-inum=
 =find -inum 888888 -delete=
+
 
 * Find with =newer=
 ** newer (mtime)
@@ -55,6 +59,7 @@
 
 
 -----
+
 
 * Recipe
 ** Find 5 max file
