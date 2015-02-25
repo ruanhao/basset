@@ -1,41 +1,42 @@
 #+TITLE: GNU find
 #+OPTIONS: ^:nil
 
-* Find with =-mtime, -mmin, -atime, -amin, -ctime, -cmin=
-** Find files modified less than 10 minutes ago
+** Find with =-mtime, -mmin, -atime, -amin, -ctime, -cmin=
+*** Find files modified less than 10 minutes ago
 =find / -mmin -10=
-** Find files modified less than 1 hour
+*** Find files modified less than 1 hour
 =find / -mtime -1=
-** Find files accessed (read) less then 1 minute
+*** Find files accessed (read) less then 1 minute
 =find . -amin -1=
 
 
-* Find with =-mount, -xdev, -fstype=
-** Don't find other filesystem
+** Find with =-mount, -xdev, -fstype=
+*** Don't find other filesystem
 =find / -name "*.txt" -mount=
 
 =find / -name "*.txt" -xdev=
 ** Specify a certain filesystem
 =find / -name "*.txt" -fstype vfat=
 
-* Find with =-size, -empty=
-** By byte
+
+** Find with =-size, -empty=
+*** By byte
 =find . -size +1024c=
-** By 512 bytes (block)
+*** By 512 bytes (block)
 =find . -size +2=
-** By 1024 byte
+*** By 1024 byte
 =find . -size +1k=
-** Find empty file
+*** Find empty file
 =find . -size 0=
-** Find empty directory or file
+*** Find empty directory or file
 =find . -empty=
 
-* Find with directory
-** Specify multiple directories
+** Find with directory
+*** Specify multiple directories
 =find /usr /home /tmp -name \*.jar=
 
 
-* Find with =-prune=
+** Find with =-prune=
 #+BEGIN_EXAMPLE
 -prune   True; if the file is a directory, do not descend into it.
          If -depth is given, false; no effect.
@@ -43,30 +44,28 @@
 #+END_EXAMPLE
 
 
-* Find with =-exec=
+** Find with =-exec=
 =find -iname "myprogram.c" -exec md5sum {} \;=
 
 
-* Find with =-inum=
+** Find with =-inum=
 =find -inum 888888 -delete=
 
 
-* Find with =newer=
-** newer (mtime)
+** Find with =newer=
+*** newer (mtime)
 =find . -newer file1.txt -not -newer file2.txt=
-** anewer (atime)
-** cnewer (ctime)
+*** anewer (atime)
+*** cnewer (ctime)
 
 
------
 
-
-* Recipe
-** Find 5 max file
+** Recipe
+*** Find 5 max file
 =find . -type f -exec ls -s {} \; | sort -n -r | head -5=
-** Find 5 min file
+*** Find 5 min file
 =find . -type f -exec ls -s {} \; | sort -n | head -5=
-** Find using =touch=
+*** Find using =touch=
 #+BEGIN_SRC bash
 touch -t 05042140 stampfile
 find . -newer stampfile
@@ -74,8 +73,8 @@ find . -newer stampfile
 
 
 
-* Gotcha
-** Default behavior
+** Gotcha
+*** Default behavior
 If the given expression to find does not contain any of the “action” primaries ‑exec, ‑ok, or ‑print,
 then the given expression is effectively replaced by:
 =find \( expression \) -print=
@@ -101,5 +100,5 @@ This causes tmp to be included in the output.
 However for the second find command the normal rules of Boolean operator precedence apply,
 so the pruned directory does not appear in the output.
 
-** Precedence
+*** Precedence
 OR has lower precedence than AND, and NOT has the highest precedence.
