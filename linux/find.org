@@ -2,38 +2,38 @@
 #+OPTIONS: ^:nil
 
 ** Find with =-mtime, -mmin, -atime, -amin, -ctime, -cmin=
-*** Find files modified less than 10 minutes ago
-=find / -mmin -10=
-*** Find files modified less than 1 hour
-=find / -mtime -1=
-*** Find files accessed (read) less then 1 minute
-=find . -amin -1=
++ Find files modified less than 10 minutes ago
+  =find / -mmin -10=
++ Find files modified less than 1 hour
+  =find / -mtime -1=
++ Find files accessed (read) less then 1 minute
+  =find . -amin -1=
 
 
 ** Find with =-mount, -xdev, -fstype=
-*** Don't find other filesystem
-=find / -name "*.txt" -mount=
++ Don't find other filesystem
+  =find / -name "*.txt" -mount=
 
-=find / -name "*.txt" -xdev=
-** Specify a certain filesystem
-=find / -name "*.txt" -fstype vfat=
+  =find / -name "*.txt" -xdev=
++ Specify a certain filesystem
+  =find / -name "*.txt" -fstype vfat=
 
 
 ** Find with =-size, -empty=
-*** By byte
-=find . -size +1024c=
-*** By 512 bytes (block)
-=find . -size +2=
-*** By 1024 byte
-=find . -size +1k=
-*** Find empty file
-=find . -size 0=
-*** Find empty directory or file
-=find . -empty=
++ By byte
+  =find . -size +1024c=
++ By 512 bytes (block)
+  =find . -size +2=
++ By 1024 byte
+  =find . -size +1k=
++ Find empty file
+  =find . -size 0=
++ Find empty directory or file
+  =find . -empty=
 
 ** Find with directory
-*** Specify multiple directories
-=find /usr /home /tmp -name \*.jar=
++ Specify multiple directories
+  =find /usr /home /tmp -name \*.jar=
 
 
 ** Find with =-prune=
@@ -53,34 +53,34 @@
 
 
 ** Find with =newer=
-*** newer (mtime)
-=find . -newer file1.txt -not -newer file2.txt=
-*** anewer (atime)
-*** cnewer (ctime)
++ newer (mtime)
+  =find . -newer file1.txt -not -newer file2.txt=
++ anewer (atime)
++ cnewer (ctime)
 
 
 
 ** Recipe
-*** Find 5 max file
-=find . -type f -exec ls -s {} \; | sort -n -r | head -5=
-*** Find 5 min file
-=find . -type f -exec ls -s {} \; | sort -n | head -5=
-*** Find using =touch=
-#+BEGIN_SRC bash
-touch -t 05042140 stampfile
-find . -newer stampfile
-#+END_SRC
++ Find 5 max file
+  =find . -type f -exec ls -s {} \; | sort -n -r | head -5=
++ Find 5 min file
+  =find . -type f -exec ls -s {} \; | sort -n | head -5=
++ Find using =touch=
+  #+BEGIN_SRC bash
+    touch -t 05042140 stampfile
+    find . -newer stampfile
+  #+END_SRC
 
 
 
 ** Gotcha
-*** Default behavior
-If the given expression to find does not contain any of the “action” primaries ‑exec, ‑ok, or ‑print,
-then the given expression is effectively replaced by:
-=find \( expression \) -print=
-The implied parenthesis can cause unexpected results.
-For example, consider these two similar commands:
-#+BEGIN_SRC bash
++ Default behavior
+  If the given expression to find does not contain any of the “action” primaries ‑exec, ‑ok, or ‑print,
+  then the given expression is effectively replaced by:
+  =find \( expression \) -print=
+  The implied parenthesis can cause unexpected results.
+  For example, consider these two similar commands:
+  #+BEGIN_SRC bash
   $ find -name tmp -prune -o -name \*.txt
   ./bin/data/secret.txt
   ./tmp
@@ -93,12 +93,12 @@ For example, consider these two similar commands:
   ./missingEOL.txt
   ./public_html/graphics/README.txt
   ./datafile.txt
-#+END_SRC
-The lack of an action in the first command means it is equivalent to:
-=find . \( -name tmp -prune -o -name \*.txt \) -print=
-This causes tmp to be included in the output.
-However for the second find command the normal rules of Boolean operator precedence apply,
-so the pruned directory does not appear in the output.
+  #+END_SRC
+  The lack of an action in the first command means it is equivalent to:
+  =find . \( -name tmp -prune -o -name \*.txt \) -print=
+  This causes tmp to be included in the output.
+  However for the second find command the normal rules of Boolean operator precedence apply,
+  so the pruned directory does not appear in the output.
 
-*** Precedence
-OR has lower precedence than AND, and NOT has the highest precedence.
++ Precedence
+  OR has lower precedence than AND, and NOT has the highest precedence.
