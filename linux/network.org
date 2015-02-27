@@ -1,0 +1,199 @@
+#+TITLE: Network
+#+OPTIONS: ^:nil
+
+
+
+** ARP
+
+- Show entries
+
+  =arp -a [host]=
+
+  =ip n=
+
+  =ip n show dev [name]=
+
+- Remove ARP cache entry
+
+  =arp -d [ip_addr]=
+
+  =ip n del [ip_addr] dev [name]=
+
+  =ip n flush all # remove all=
+
+- Uses the hardware address associated with the specified interface
+
+  #+BEGIN_SRC bash
+  $ arp -D
+  Address                  HWtype  HWaddress           Flags Mask            Iface
+  10.137.0.50              ether   00:23:33:53:61:80   C                     eth1.1403
+  10.137.48.34             ether   00:23:33:53:61:80   C                     eth1.1553
+  dls2304-2.ln.sw.bete.er  ether   00:25:b3:26:04:6e   C                     eth0.27
+  10.184.27.1              ether   30:37:a6:90:d0:42   C                     eth0.27
+  #+END_SRC
+
+- Show entries in default style
+
+  #+BEGIN_SRC bash
+  $ arp -e
+  Address                  HWtype  HWaddress           Flags Mask            Iface
+  10.137.0.50              ether   00:23:33:53:61:80   C                     eth1.1403
+  10.137.48.34             ether   00:23:33:53:61:80   C                     eth1.1553
+  dls2304-2.ln.sw.bete.er  ether   00:25:b3:26:04:6e   C                     eth0.27
+  10.184.27.1              ether   30:37:a6:90:d0:42   C                     eth0.27
+  #+END_SRC
+
+- Manually create ARP address mapping
+
+  =arp -s [ip_addr] [hw_addr]=
+
+  Manually creates a static ARP address mapping entry for host *[ip_addr]* with the hardware address set to *[hw_addr]*.
+
+- Manually create ARP address mapping by file
+
+  =arp -f [filename]=
+
+  Similar to the *-s* option, only this time the address info is taken from the file that *[filename]* set up. If no *[filename]* is specified, */etc/ethers* is used as default.
+
+- Specify class of entry
+
+  =arp -H <class>=
+
+  When setting or reading the ARP cache, this optional parameter tells *arp* which class of entries it should check for. The default value of this parameter is *ether* (i.e. hardware code 0x01 for IEEE 802.3 10Mbps Ethernet).
+
+- Select interface
+
+  =arp -i [if]=
+
+  Selects an interface. When dumping the ARP cache only entries matching the specified interface will be printed. For example, =arp -i eth0 -s 10.21.31.41 A321.ABCF.321A= creates a static ARP entry associating IP address 10.21.31.41 with MAC address A321.ABCF.321A on *eth0*.
+
+  #+BEGIN_SRC bash
+  ip n [add | chg | del | repl] dev [name]
+  ip n add 10.1.2.3 lladdr 1:2:3:4:5:6 dev eth0 nud perm
+
+  ## Adds a *permanent* ARP cache entry for host 10.1.2.3 device *eth0*.
+  ## The Neighbor Unreachability Detection (*nud*) state can be one of the following:
+
+     noarp     – entry is valid.
+                 No attempts to validate this entry will be made but it can be removed when its lifetime expires.
+     permanent – entry is valid forever and can be only be removed administratively.
+     reachable – entry is valid until the reachability timeout expires.
+     stale     – entry is valid but suspicious.
+     delay     - a packet has been sent to the stale neighbour and the kernel is waiting for confirmation.
+  #+END_SRC
+
+- Don't query DNS
+
+  =arp -n=
+
+- Verbose mode
+
+  Uses verbose mode to provide more details.
+
+  =arp -v=
+
+  =ip -s n ## ip -stats n=
+
+
+** Network States
+
+- Show both listening and no-listening sockets
+
+  =netstat -a=
+
+  =ss -a=
+
+- Specify family
+
+  #+BEGIN_SRC bash
+  netstat -A [family]
+  ## Specifies the address families for which connections are to be shown.
+  ## *[family]* is a comma separated list of address family keywords like *inet*, *unix*, *ipx*, *ax25*, *netrom*, and *ddp*.
+  ## This has the same effect as using the *--inet*, *--unix (-x)*, *--ipx*, *--ax25*, *--netrom*, and *--ddp* options.
+
+  ss -f [family]
+  ## Families: *unix*, *inet*, *inet6*, *link*, *netlink*
+  #+END_SRC
+
+- Prints routing information from the route cache
+
+  =netstat -C=
+
+  =ip route list cache=
+
+
+- Displays multicast group membership information for IPv4 and IPv6
+
+  =netstat -g=
+
+  =ip maddr=
+
+  =ip maddr show [if]=
+
+- Displays a table of all network interfaces
+
+  =netstat -i=
+
+  =netstat --interface=[name]=
+
+  =ip -s link=
+
+- Shows only listening sockets
+
+  =netstat -l ## omitted by *netstat* to be default=
+
+  =ss -l=
+
+- Displays a list of masqueraded connections (connections being altered by Network Address Translation)
+
+  =netstat -M=
+
+- Show numerical addresses instead of trying to determine symbolic host, port or user names (skips DNS translation)
+
+  =netstat -n=
+
+  =ss -n=
+
+- Displays the symbolic host, port, or user names instead of numerical representations
+
+  =netstat -N=
+
+  =ss -r=
+
+- Shows the process ID (PID) and name of the program to which each socket belongs
+
+  =netstat -p=
+
+  =ss -p=
+
+- Shows the kernel routing tables
+
+  =netstat -r=
+
+  =ip route=
+
+  =ip route show all=
+
+- Displays summary statistics for each protocol
+
+  =netstat -s=
+
+  =ss -s=
+
+- Filters results to display TCP only
+
+  =netstat -t=
+
+  =ss -t=
+
+- Filters results to display UDP only
+
+  =netstat -u=
+
+  =ss -u=
+
+- Filter results to display raw sockets only
+
+  =netstat -w=
+
+  =ss -w=
