@@ -1,0 +1,62 @@
+#+TITLE: Memory
+#+OPTIONS: ^:nil
+
+
+
+** free
+
+=free -g=
+
+|   |                    |     1 |    2 |    3 |      4 |       5 |      6 |
+| 1 |                    | total | used | free | shared | buffers | cached |
+| 2 | Mem:               |   252 |  208 |   43 |      0 |       3 |    181 |
+| 3 | -/+ buffers/cache: |       |   23 |  228 |        |         |        |
+| 4 | Swap:              |     3 |    0 |    3 |        |         |        |
+
+=F[2][1] = F[2][2] + F[2][3]=
+
+=F[3][2] = F[2][2] - F[2][5] -  F[2][6]=
+
+=F[3][3] = F[2][3] +F[2][5] + F[2][6]=
+
+*** Mem
+
+从OS的角度来看
+
+- *total*
+
+  物理内存总量
+
+- *used*
+
+  总计分配给缓存(包含buffers与cache)使用的数量(_其中部分缓存并未实际使用_)
+
+  =used = used[kernel] + used[application] + F[2][5] + F[2][6]=
+
+  F[2][5]和F[2][6]是可用于分配的内存数量
+
+- *shared*
+
+  Deprecated
+
+- *buffers*
+
+  Something that has yet to be "written" to disk
+
+- *cached*
+
+  Something that has been "read" from the disk and stored for later use
+
+  也就是说buffer是用于存放要输出到块设备的数据, 而cache是存放从块设备上读出的数据, buffer和cache是为了提高IO的性能, 并由OS管理
+
+*** -/+ buffers/cache
+
+从Application的角度看
+
+- *used*
+
+  表示一个应用程序认为系统被用掉多少内存
+
+- *free*
+
+  表示一个应用程序认为系统还有多少内存
