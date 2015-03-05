@@ -1,4 +1,3 @@
-#+TITLE:     Signal
 #+AUTHOR:    Hao Ruan
 #+EMAIL:     ruanhao1116@gmail.com
 #+OPTIONS: H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
@@ -6,16 +5,16 @@
 
 
 
-* signal
+** signal
 
-** prototype
+*** prototype
 
 #+BEGIN_SRC c
   void (*signal(int signo, void (*func)(int)))(int);
 #+END_SRC
 
 
-** constants
+*** constants
 
 #+BEGIN_SRC c
   #define SIG_ERR (void (*)())-1
@@ -24,9 +23,9 @@
 #+END_SRC
 
 
-* sigprocmask
+** sigprocmask
 
-** snippets
+*** snippets
 
 - pr_mask
 
@@ -40,38 +39,38 @@
   #+END_SRC
 
 
-* sigaction
+** sigaction
 
-** prototype
+*** prototype
 
 #+BEGIN_SRC c
   int sigaction(int signo, const struct sigaction *restrict act, struct sigaction *restrict oact);
 
   struct sigaction {
-      void (*sa_handler)(int);                           /* addr of signal handler, */
-                                                         /* or SIG_IGN, or SIG_DFL */
-      sigset_t sa_mask;                                  /* additional signals to block */
-                                                         /* operating system includes the signal being delivered
-                                                            in the signal mask when the handler is invoked */
-      int sa_flags;                                      /* signal options */
-      void (*sa_sigaction)(int, siginfo_t *, void *);    /* alternate handler */
+      void (*sa_handler)(int);   /* addr of signal handler,                              */
+                                 /* or SIG_IGN, or SIG_DFL                               */
+      sigset_t sa_mask;          /* additional signals to block                          */
+                                 /* operating system includes the signal being delivered
+                                    in the signal mask when the handler is invoked       */
+      int sa_flags;                                      /* signal options               */
+      void (*sa_sigaction)(int, siginfo_t *, void *);    /* alternate handler            */
   };
 
   struct siginfo {
-      int si_signo;  /* signal number */
-      int si_errno;  /* if nonzero, errno value from <errno.h> */
-      int si_code;   /* additional info (dependson signal) */
-      pid_t si_pid;  /* sending process ID */
-      uid_t si_uid;  /* sending process real user ID */
-      void *si_addr; /* address that caused the fault */
-      int si_status; /* exit value or signal number */
-      long si_band;  /* band number for SIGPOLL */
+      int   si_signo;  /* signal number                          */
+      int   si_errno;  /* if nonzero, errno value from <errno.h> */
+      int   si_code;   /* additional info (dependson signal)     */
+      pid_t si_pid;    /* sending process ID                     */
+      uid_t si_uid;    /* sending process real user ID           */
+      void *si_addr;   /* address that caused the fault          */
+      int   si_status; /* exit value or signal number            */
+      long  si_band;   /* band number for SIGPOLL                */
       /* possibly other fields also */
   };
 #+END_SRC
 
 
-** reliable =signal=
+*** reliable =signal=
 
 #+BEGIN_SRC c
   /* Reliable version of signal(), using POSIX sigaction(). */
@@ -95,7 +94,8 @@
   }
 #+END_SRC
 
-** interupted =signal=
+
+*** interupted =signal=
 
 #+BEGIN_SRC c
   void (*signal_intr(int signo, void (*func)(int)))(int) {
@@ -113,9 +113,9 @@
 #+END_SRC
 
 
-* siglongjmp
+** siglongjmp
 
-** snippets
+*** snippets
 
 - protection mechanism
 
@@ -152,18 +152,18 @@
 
 
 
-* Gotcha
+** Gotcha
 
-** *SIGKILL* and *SIGSTOP* can not be ignored
+*** *SIGKILL* and *SIGSTOP* can not be ignored
 
-** =exec= function will change the disposition of any signals being caught to their default action
+*** =exec= function will change the disposition of any signals being caught to their default action
 
-** =sigprocmask= function is defined only for single-threaded processes
+*** =sigprocmask= function is defined only for single-threaded processes
 
 A separate function is provided to manipulate a thread’s signal mask in a multithreaded process
 
-** save and restore /errno/ signal handler
+*** save and restore /errno/ signal handler
 
-** =sigsetjmp=
+*** =sigsetjmp=
 
-While catching signals that cause =sigsetjmp= to be executed, an application needs to block the signals _while updating the data structures_
+While catching signals that cause =sigsetjmp= to be executed, an application needs to block the signals *while updating the data structures*
