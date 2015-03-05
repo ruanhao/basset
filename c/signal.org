@@ -7,14 +7,14 @@
 
 ** signal
 
-+ prototype
+*** prototype
 
 #+BEGIN_SRC c
   void (*signal(int signo, void (*func)(int)))(int);
 #+END_SRC
 
 
-+ constants
+*** constants
 
 #+BEGIN_SRC c
   #define SIG_ERR (void (*)())-1
@@ -27,7 +27,7 @@
 
 *** snippets
 
-- pr_mask
+  + pr_mask
 
   #+BEGIN_SRC c
     void pr_mask() {
@@ -69,8 +69,9 @@
   };
 #+END_SRC
 
+*** snippets
 
-*** reliable =signal=
++ reliable =signal=
 
 #+BEGIN_SRC c
   /* Reliable version of signal(), using POSIX sigaction(). */
@@ -95,7 +96,7 @@
 #+END_SRC
 
 
-*** interupted =signal=
++ interupted =signal=
 
 #+BEGIN_SRC c
   void (*signal_intr(int signo, void (*func)(int)))(int) {
@@ -117,7 +118,7 @@
 
 *** snippets
 
-- protection mechanism
++ protection mechanism
 
   #+BEGIN_SRC c
     static sigjmp_buf            jmpbuf;
@@ -146,24 +147,24 @@
     }
   #+END_SRC
 
-  This program demonstrates another technique that should be used whenever =siglongjmp= is called from a signal handler. We set the variable =canjump= to a nonzero value only after we’ve called =sigsetjmp=. This variable is examined in the signal handler, and =siglongjmp= is called only if the flag =canjump= is nonzero. /This technique provides protection against the signal handler being called at some earlier or later time, when the jump buffer hasn’t been initialized by/ =sigsetjmp=.
+  This program demonstrates another technique that should be used whenever =siglongjmp= is called from a signal handler. We set the variable =canjump= to a nonzero value only after we’ve called =sigsetjmp=. This variable is examined in the signal handler, and =siglongjmp= is called only if the flag =canjump= is nonzero. *This technique provides protection against the signal handler being called at some earlier or later time, when the jump buffer hasn’t been initialized by* =sigsetjmp=.
 
-  Here, we use the data type =sig_atomic_t=, which is defined by the ISO C standard to be the type of variable that can be written without being interrupted. We always include the ISO type qualifier =volatile= for these data types as well, since the variable is _being accessed by two different threads of control:_ the main function and the asynchronously executing signal handler.
+  Here, we use the data type =sig_atomic_t=, which is defined by the ISO C standard to be the type of variable that can be written without being interrupted. We always include the ISO type qualifier =volatile= for these data types as well, since the variable is *being accessed by two different threads of control:* the main function and the asynchronously executing signal handler.
 
 
 
 ** Gotcha
 
-*** *SIGKILL* and *SIGSTOP* can not be ignored
++ *SIGKILL* and *SIGSTOP* can not be ignored
 
-*** =exec= function will change the disposition of any signals being caught to their default action
++ =exec= function will change the disposition of any signals being caught to their default action
 
-*** =sigprocmask= function is defined only for single-threaded processes
++ =sigprocmask= function is defined only for single-threaded processes
 
-A separate function is provided to manipulate a thread’s signal mask in a multithreaded process
+  A separate function is provided to manipulate a thread’s signal mask in a multithreaded process
 
-*** save and restore /errno/ signal handler
++ save and restore /errno/ signal handler
 
-*** =sigsetjmp=
++ =sigsetjmp=
 
-While catching signals that cause =sigsetjmp= to be executed, an application needs to block the signals *while updating the data structures*
+  While catching signals that cause =sigsetjmp= to be executed, an application needs to block the signals *while updating the data structures*
