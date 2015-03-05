@@ -8,6 +8,162 @@
 
 * signal
 
+** prototype
+
 #+BEGIN_SRC c
   void (*signal(int signo, void (*func)(int)))(int);
 #+END_SRC
+
+
+** constants
+
+#+BEGIN_SRC c
+  #define SIG_ERR (void (*)())-1
+  #define SIG_DFL (void (*)())0
+  #define SIG_IGN (void (*)())1
+#+END_SRC
+
+
+* sigprocmask
+
+** snippets
+
+- pr_mask
+
+  #+BEGIN_SRC c
+    void pr_mask() {
+        sigset_t sigset;
+        sigemptyset(&sigset);
+        if (sigprocmask(0, NULL, &sigset) < 0)
+            exit(1);
+    }
+  #+END_SRC
+
+
+* sigaction
+
+** prototype
+
+#+BEGIN_SRC c
+  int sigaction(int signo, const struct sigaction *restrict act, struct sigaction *restrict oact);
+
+  struct sigaction {
+      void (*sa_handler)(int);                           /* addr of signal handler, */
+                                                         /* or SIG_IGN, or SIG_DFL */
+      sigset_t sa_mask;                                  /* additional signals to block */
+                                                         /* operating system includes the signal being delivered
+                                                            in the signal mask when the handler is invoked */
+      int sa_flags;                                      /* signal options */
+      void (*sa_sigaction)(int, siginfo_t *, void *);    /* alternate handler */
+  };
+
+  struct siginfo {
+      int si_signo;  /* signal number */
+      int si_errno;  /* if nonzero, errno value from <errno.h> */
+      int si_code;   /* additional info (dependson signal) */
+      pid_t si_pid;  /* sending process ID */
+      uid_t si_uid;  /* sending process real user ID */
+      void *si_addr; /* address that caused the fault */
+      int si_status; /* exit value or signal number */
+      long si_band;  /* band number for SIGPOLL */
+      /* possibly other fields also */
+  };
+#+END_SRC
+
+
+** reliable =signal=
+
+#+BEGIN_SRC c
+  /* Reliable version of signal(), using POSIX sigaction(). */
+  void (*signal(int signo, void (*func)(int)))(int) {
+      struct sigaction act, oact;
+      act.sa_handler = func;
+      sigemptyset(&act.sa_mask);
+      act.sa_flags = 0;
+      if (signo == SIGALRM) {
+  #ifdef SA_INTERRUPT
+          act.sa_flags |= SA_INTERRUPT;
+  #endif
+      } else {
+  #ifdef SA_RESTART
+          act.sa_flags |= SA_RESTART;
+  #endif
+      }
+      if (sigaction(signo, &act, &oact) < 0)
+          return(SIG_ERR);
+      return(oact.sa_handler);
+  }
+#+END_SRC
+
+** interupted =signal=
+
+#+BEGIN_SRC c
+  void (*signal_intr(int signo, void (*func)(int)))(int) {
+      struct sigaction act, oact;
+      act.sa_handler = func;
+      sigemptyset(&act.sa_mask);
+      act.sa_flags = 0;
+  #ifdef SA_INTERRUPT
+      act.sa_flags |= SA_INTERRUPT;
+  #endif
+      if (sigaction(signo, &act, &oact) < 0)
+          return(SIG_ERR);
+      return(oact.sa_handler);
+  }
+#+END_SRC
+
+
+* siglongjmp
+
+** snippets
+
+- protection mechanism
+
+  #+BEGIN_SRC c
+    static sigjmp_buf            jmpbuf;
+    static volatile sig_atomic_t canjump;
+
+    static void sig_usr1(int signo) {
+        if (canjump == 0)
+            return;              /* unexpected signal, ignore */
+
+        /* TO DO WHAT YOU WANT TO DO HERE */
+
+        canjump = 0;
+        siglongjmp(jmpbuf, 1);   /* jump back to main, don't return */
+    }
+
+    int main(void) {
+        if (signal(SIGUSR1, sig_usr1) == SIG_ERR)
+            exit(1);
+        if (sigsetjmp(jmpbuf, 1)) {
+            printf("The end");
+            exit(0);
+        }
+        canjump = 1;             /* it means now sigsetjmp() is ready */
+        for ( ; ; )
+            pause();
+    }
+  #+END_SRC
+
+  This program demonstrates another technique that should be used whenever =siglongjmp= is called from a signal handler. We set the variable =canjump= to a nonzero value only after we’ve called =sigsetjmp=. This variable is examined in the signal handler, and =siglongjmp= is called only if the flag =canjump= is nonzero. /This technique provides protection against the signal handler being called at some earlier or later time, when the jump buffer hasn’t been initialized by/ =sigsetjmp=.
+
+  Here, we use the data type =sig_atomic_t=, which is defined by the ISO C standard to be the type of variable that can be written without being interrupted. We always include the ISO type qualifier =volatile= for these data types as well, since the variable is _being accessed by two different threads of control:_ the main function and the asynchronously executing signal handler.
+
+
+
+* Gotcha
+
+** *SIGKILL* and *SIGSTOP* can not be ignored
+
+** =exec= function will change the disposition of any signals being caught to their default action
+
+** =sigprocmask= function is defined only for single-threaded processes
+
+A separate function is provided to manipulate a thread’s signal mask in a multithreaded process
+
+** save and restore /errno/ signal handler
+
+** =sigsetjmp=
+
+While catching signals that cause =sigsetjmp= to be executed, an application needs to block the signals _while updating the data structures_
