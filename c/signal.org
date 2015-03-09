@@ -25,6 +25,14 @@
 
 ** sigprocmask
 
+**** prototype
+
+#+BEGIN_SRC c
+  #include <signal.h>
+  int sigprocmask(int how, const sigset_t *set,
+                  sigset_t *oset);
+#+END_SRC
+
 **** snippets
 
   + pr_mask
@@ -114,6 +122,106 @@
   }
 #+END_SRC
 
+** sigsuspend
+
+**** prototype
+
+#+BEGIN_SRC c
+#include <signal.h>
+int sigsuspend(const sigset_t *sigmask)
+#+END_SRC
+
+**** snippets
+
++ protect a critical region of code from a specific signal
+
+  #+BEGIN_SRC c
+    extern void sig_int(int);
+
+    int main(void) {
+        sigset_t newmask, oldmask, waitmask;
+
+        if (signal(SIGINT, sig_int) == SIG_ERR)
+            err_sys("signal(SIGINT) error");
+
+        sigemptyset(&waitmask);
+        sigaddset(&waitmask, SIGUSR1);
+        sigemptyset(&newmask);
+        sigaddset(&newmask, SIGINT);
+
+        /*
+         * Block SIGINT and save current signal mask.
+         */
+        if (sigprocmask(SIG_BLOCK, &newmask, &oldmask) < 0)
+            err_sys("SIG_BLOCK error");
+
+        /*
+         * Critical region of code.
+         */
+
+        /*
+         * Pause, allowing all signals except SIGUSR1.
+         */
+        if (sigsuspend(&waitmask) != -1)
+            err_sys("sigsuspend error");
+
+
+        /*
+         * Reset signal mask which unblocks SIGINT.
+         */
+        if (sigprocmask(SIG_SETMASK, &oldmask, NULL) < 0)
+            err_sys("SIG_SETMASK error");
+
+        exit(0);
+    }
+
+  #+END_SRC
+
++ wait for a signal handler to set a global variable
+
+  #+BEGIN_SRC c
+    volatile sig_atomic_t quitflag; /* set nonzero by signal handler */
+
+    static void sig_int(int signo)  /* one signal handler for SIGINT and SIGQUIT */
+    {
+        if (signo == SIGQUIT)
+            quitflag = 1;           /* set flag for main loop */
+    }
+
+    int main(void) {
+        sigset_tnewmask, oldmask, zeromask;
+
+        if (signal(SIGQUIT, sig_int) == SIG_ERR)
+            err_sys("signal(SIGQUIT) error");
+
+        sigemptyset(&zeromask);
+        sigemptyset(&newmask);
+        sigaddset(&newmask, SIGQUIT);
+
+        /*
+         * Block SIGQUIT and save current signal mask.
+         */
+        if (sigprocmask(SIG_BLOCK, &newmask, &oldmask) < 0)
+            err_sys("SIG_BLOCK error");
+
+        while (quitflag == 0)  /* wake up the main routine only when the quit signal is caught */
+            sigsuspend(&zeromask);
+
+        /*
+         * SIGQUIT has been caught and is now blocked; do whatever.
+         */
+        quitflag = 0;
+
+        /*
+         * Reset signal mask which unblocks SIGQUIT.
+         */
+        if (sigprocmask(SIG_SETMASK, &oldmask, NULL) < 0)
+            err_sys("SIG_SETMASK error");
+
+        exit(0);
+    }
+
+  #+END_SRC
 
 ** siglongjmp
 
@@ -152,6 +260,22 @@
 
   Here, we use the data type =sig_atomic_t=, which is defined by the ISO C standard to be the type of variable that can be written without being interrupted. We always include the ISO type qualifier =volatile= for these data types as well, since the variable is *being accessed by two different threads of control:* the main function and the asynchronously executing signal handler.
 
+** Utils
+
++ sys_siglist[]
+
+  =extern char *sys_siglist[]=
+
+  #+BEGIN_SRC c
+    int i;
+    for (i = 1; i <= 32; i++) {
+        H_DEBUG_MSG("SIGNAL(%d): %s", i, sys_siglist[i]);
+    }
+  #+END_SRC
+
++ strsignal
+
+  =char *strsignal(int signo);=
 
 
 ** Gotcha
