@@ -1,0 +1,57 @@
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+** pthread_create
+
+**** prototype
+
+#+BEGIN_SRC c
+  #include <pthread.h>
+
+  int pthread_create(pthread_t *tidp, const pthread_attr_t *attr,
+      void *(*start_rtn)(void *), void *arg);
+#+END_SRC
+
+**** snippets
+
++ MkThrd
+
+  #+BEGIN_SRC c
+    pthread_t MkThrd(void *(*fn)(void *), void *arg) {
+        pthread_t tid;
+        pthread_attr_t attr;
+
+        if (pthread_attr_init(&attr) != 0)
+            err_sys("pthread_attr_init() error");
+        if (pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED) != 0)
+            err_sys("pthread_attr_setdetachstate() error");
+        if (pthread_create(&tid, &attr, fn, arg) != 0)
+            err_sys("pthread_create() error");
+        pthread_attr_destroy(&attr);
+        return tid;
+    }
+  #+END_SRC
+
+
+
+** Gotcha
+
++ The newly created thread inherits the calling thread’s floating-point environment and signal mask ::
+
+  *However, the set of pending signals for the thread is cleared.*
+
++ There is a copy of *errno* per thread ::
+
++ Dead lock ::
+
+  Deadlock only happens when one thread attempts to lock the mutexes *in the opposite order from another thread.*
+
++ Reader–writer locks are well suited for situations in which data structures are read more often than they are modified ::
+
++ Condition variable itself is protected by a mutex ::
+
+  A thread must first lock the mutex to change the condition state.
