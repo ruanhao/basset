@@ -38,6 +38,41 @@
 
 
 
+** Condition Variables
+
+条件变量的意义在于: 仅当条件满足时, 才去争夺互斥锁, 并提供原子化操作
+
+**** snippets
+
++ use condition variable to synchronize threads
+
+  #+BEGIN_SRC c
+    DATA data;
+    pthread_cond_t  data_ready = PTHREAD_COND_INITIALIZER;
+    pthread_mutex_t data_lock  = PTHREAD_MUTEX_INITIALIZER;
+
+    void process_data() {
+      pthread_mutex_lock(&data_lock);
+      while (!is_data_ready(data)) {
+        pthread_cond_wait(&data_ready, &data_lock);
+      }
+
+      /*
+       * now process with data
+       */
+
+      pthread_mutex_unlock(&data_lock);
+    }
+
+    void make_data() {
+      pthread_mutex_lock(&data_lock);
+      initialize(&data);
+      pthread_mutex_unlock(&data_lock);
+      pthread_cond_signal(&data_ready);
+    }
+
+  #+END_SRC
+
 ** Gotcha
 
 + The newly created thread inherits the calling thread’s floating-point environment and signal mask ::
