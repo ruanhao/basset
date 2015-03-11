@@ -73,11 +73,48 @@
 
   #+END_SRC
 
+** Spin Lock
+
+A spin lock is like a mutex, except that instead of blocking a process by sleeping, the process is blocked by busy-waiting (spinning) until the lock can be acquired. A spin lock could be used in situations where locks are held for short periods of times and threads don’t want to incur the cost of being descheduled.
+
+Besides providing a mutual exclusion mechanism, they block interrupts so an interrupt handler can’t deadlock the system by trying to acquire a spin lock that is already locked.
+
+We need to be careful not to call any functions that might sleep while holding the spin lock. If we do, then we’ll waste CPU resources by extending the time other threads will spin if they try to acquire it.
+
+Spin locks are useful when used in a nonpreemptive kernel where interrupt handlers can’t sleep, so the only synchronization primitives they can use are spin locks.
+
+Because advances in modern processors makes context switch be at faster and faster rates, spin lock is useful only in limited circumstances.
+
+**** protocol
+
+#+BEGIN_SRC c
+  #include <pthread.h>
+  int pthread_spin_init(pthread_spinlock_t *lock, int pshared);
+  int pthread_spin_destroy(pthread_spinlock_t *lock);
+  int pthread_spin_lock(pthread_spinlock_t *lock);
+  int pthread_spin_trylock(pthread_spinlock_t *lock);
+  int pthread_spin_unlock(pthread_spinlock_t *lock);
+#+END_SRC
+
+** Barrier
+
+**** protocol
+
+#+BEGIN_SRC c
+  #include <pthread.h>
+  int pthread_barrier_wait(pthread_barrier_t *barrier);
+  /* Returns: 0 or PTHREAD_BARRIER_SERIAL_THREAD if OK, error number on failure */
+
+  /* To one arbitrary thread, it will appear as if the pthread_barrier_wait function returned a value of PTHREAD_BARRIER_SERIAL_THREAD.
+     The remaining threads see a return value of 0.
+     This allows one thread to continue as the master to act on the results of the work done by all of the other threads. */
+#+END_SRC
+
 ** Gotcha
 
 + The newly created thread inherits the calling thread’s floating-point environment and signal mask ::
 
-  *However, the set of pending signals for the thread is cleared.*
+  However, the set of pending signals for the thread is cleared.
 
 + There is a copy of *errno* per thread ::
 
