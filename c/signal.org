@@ -260,6 +260,35 @@ int sigsuspend(const sigset_t *sigmask)
 
   Here, we use the data type =sig_atomic_t=, which is defined by the ISO C standard to be the type of variable that can be written without being interrupted. We always include the ISO type qualifier =volatile= for these data types as well, since the variable is *being accessed by two different threads of control:* the main function and the asynchronously executing signal handler.
 
+
+**** subtle problem with siglongjmp
+
+The =longjmp= from the =sleep2= function aborted the other signal handler, =sig_int=, even though it wasn’t finished.
+
+#+BEGIN_SRC c
+  int main(void) {
+      unsigned int unslept;
+      if (signal(SIGINT, sig_int) == SIG_ERR)
+          err_sys("signal(SIGINT) error");
+      unslept = sleep2(5);
+      printf("sleep2 returned: %u\n", unslept);
+      exit(0);
+  }
+
+  static void sig_int(int signo) {
+      int i, j;
+      volatile int k;
+  /*
+   ,* Tune these loops to run for more than 5 seconds
+   ,* on whatever system this test program is run.
+   ,*/
+      printf("\nsig_int starting\n");
+      for (i = 0; i < 300000; i++)
+          for (j = 0; j < 4000; j++)
+              k += i * j;
+      printf("sig_int finished\n");
+  }
+#+END_SRC
 ** Utils
 
 + sys_siglist[]
@@ -293,3 +322,7 @@ int sigsuspend(const sigset_t *sigmask)
 + rule of =sigsetjmp= ::
 
   While catching signals that cause =sigsetjmp= to be executed, an application needs to block the signals while updating the data structures.
+
++ POSIX.1要求 =system= (调用者) 忽略SIGINT和SIGQUIT, 阻塞SIGCHLD ::
+
++ 直接调用 =fork=, =exec= and =wait=, 其终止状态与调用 =system= 是不同的 ::

@@ -38,6 +38,49 @@
 
 
 
+** pthread_once
+
+This routine can be used to ensure that a key we allocate by =pthread_key_create=  doesn’t change because of a race during initialization.
+
+**** protocol
+
+#+BEGIN_SRC c
+#include <pthread.h>
+pthread_once_t initflag = PTHREAD_ONCE_INIT;
+int pthread_once(pthread_once_t *initflag, void (*initfn)(void));
+#+END_SRC
+
+
+** sigwait
+
+可以使用sigwait在一个单独的线程中处理信号, 这是一种同步处理的方式
+
+**** snippets
+
++ handle signal in one thread
+
+  #+BEGIN_SRC c
+    void *thr_fn(void *arg) {
+        int err, signo;
+        for (;;) {
+            err = sigwait(&mask, &signo);
+            if (err != 0)
+                err_exit(err, "sigwait failed");
+            switch (signo) {
+            case SIGINT:
+                /* TODO */
+                break;
+            case SIGQUIT:
+                /* TODO */
+                break;
+            default:
+                /* TODO */
+                exit(1);
+            }
+        }
+    }
+  #+END_SRC
+
 ** Condition Variables
 
 条件变量的意义在于: 仅当条件满足时, 才去争夺互斥锁, 并提供原子化操作
@@ -73,6 +116,7 @@
 
   #+END_SRC
 
+
 ** Spin Lock
 
 A spin lock is like a mutex, except that instead of blocking a process by sleeping, the process is blocked by busy-waiting (spinning) until the lock can be acquired. A spin lock could be used in situations where locks are held for short periods of times and threads don’t want to incur the cost of being descheduled.
@@ -96,7 +140,10 @@ Because advances in modern processors makes context switch be at faster and fast
   int pthread_spin_unlock(pthread_spinlock_t *lock);
 #+END_SRC
 
+
 ** Barrier
+
+Barriers allow an arbitrary number of threads to wait until all of the threads have completed processing, but the threads don’t have to exit. They can continue working after all threads have reached the barrier.
 
 **** protocol
 
@@ -109,6 +156,78 @@ Because advances in modern processors makes context switch be at faster and fast
      The remaining threads see a return value of 0.
      This allows one thread to continue as the master to act on the results of the work done by all of the other threads. */
 #+END_SRC
+
+**** snippets
+
++ barrier is used to synchronize threads cooperating on a single task
+
+#+BEGIN_SRC c
+  #define NTHR 8             /* number of threads */
+  #define NUMNUM 8000000L    /* number of numbers to sort */
+  #define TNUM (NUMNUM/NTHR) /* number to sort per thread */
+
+  long nums[NUMNUM];
+  long snums[NUMNUM];
+  pthread_barrier_t b;
+
+  #ifdef SOLARIS
+  #define heapsort qsort
+  #else
+  extern int heapsort(void *, size_t, size_t, int (*)(const void *, const void *));
+  #endif
+
+  /*
+   * Compare two long integers (helper function for heapsort)
+   */
+  extern int complong(const void *arg1, const void *arg2);
+
+  /*
+   * Worker thread to sort a portion of the set of numbers.
+   */
+  void *thr_fn(void *arg)
+  {
+      long idx = (long)arg;
+      heapsort(&nums[idx], TNUM, sizeof(long), complong);
+      pthread_barrier_wait(&b);
+  /*
+   * Go off and perform more work ...
+   */
+      return((void *)0);
+  }
+
+  /*
+   * Merge the results of the individual sorted ranges.
+   */
+  extern void merge();
+
+  int main() {
+      unsigned long i;
+      int err;
+      pthread_t tid;
+  /*
+   * Create the initial set of numbers to sort.
+   */
+      srandom(1);
+      for (i = 0; i < NUMNUM; i++)
+          nums[i] = random();
+  /*
+   * Create 8 threads to sort the numbers.
+   */
+      pthread_barrier_init(&b, NULL, NTHR+1);
+      for (i = 0; i < NTHR; i++) {
+          err = pthread_create(&tid, NULL, thr_fn, (void *)(i * TNUM));
+          if (err != 0)
+              err_exit(err, "can’t create thread");
+      }
+      pthread_barrier_wait(&b);
+      merge();
+  }
+#+END_SRC
+
+
+** Signal
+
+Signals are delivered to a single thread in the process. If the signal is related to a hardware fault, the signal is usually sent to the thread whose action caused the event. Other signals, on the other hand, are delivered to an arbitrary thread.
 
 ** Gotcha
 
@@ -127,3 +246,7 @@ Because advances in modern processors makes context switch be at faster and fast
 + Condition variable itself is protected by a mutex ::
 
   A thread must first lock the mutex to change the condition state.
+
++ Alarm timers are a process resource ::
+
+  It is not possible for multiple threads in a process to use alarm timers without interfering with one another
