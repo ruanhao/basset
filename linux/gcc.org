@@ -1,11 +1,11 @@
 #+TITLE: GCC
 #+OPTIONS: ^:nil
 
-* Print lib search path
+*** Print lib search path
 =gcc --print-search-dirs=
 
 
-* Check CFLAGS and LDFLAGS needed if linking to that lib
+*** Check CFLAGS and LDFLAGS needed if linking to that lib
 #+BEGIN_SRC sh
 pkg-config --cflags --libs <libname>
 ## All libname can be found by `pkg-config --list-all`
@@ -13,11 +13,11 @@ pkg-config --cflags --libs <libname>
 #+END_SRC
 
 
-* Check the location of a dynamic link library
+*** Check the location of a dynamic link library
 =ldconfig -p | grep <libname>=
 
 
-* How to create library
+*** How to create library
 #+BEGIN_SRC sh
 gcc -Wall -fPIC -c *.c
 
@@ -41,10 +41,10 @@ $ ln -sf /opt/lib/libctest.so.1 /opt/lib/libctest.so           ## linker name is
 #+END_SRC
 
 
-* Show where include file is
+*** Show where include file is
 =echo '#include <stdbool.h>' | cpp -H -o /dev/null 2>&1 | head -n1=
 
-* GCC environment variables
+*** GCC environment variables
 
 - LD_LIBRARY_PATH (non-gcc)
   Used by your program to search for directories containing the libraries after it has been successfully compiled and linked
@@ -59,7 +59,7 @@ LD_LIBRARY_PATH=/path/to/lib:$LD_LIBRARY_PATH <Command>  ## Specify dynamic load
 - LIBRARY_PATH
   Used by gcc before compilation to search for directories containing libraries that need to be linked to your program
 
-* Configure
+*** Configure
 ** Normal compiling process
 #+BEGIN_SRC sh
   DIR=/path/to/lib
@@ -67,3 +67,7 @@ LD_LIBRARY_PATH=/path/to/lib:$LD_LIBRARY_PATH <Command>  ## Specify dynamic load
   ## CFLAGS and LDFLAGS do not belong to standard GCC system
   ## They are valid only if they are supported (like in 'configure')
 #+END_SRC
+
+*** show preprocessed text
+
+=gcc -E -P source.c=

@@ -16,6 +16,7 @@
       void *(*start_rtn)(void *), void *arg);
 #+END_SRC
 
+
 **** snippets
 
 + MkThrd
@@ -42,7 +43,7 @@
 
 This routine can be used to ensure that a key we allocate by =pthread_key_create=  doesn’t change because of a race during initialization.
 
-**** protocol
+**** prototype
 
 #+BEGIN_SRC c
 #include <pthread.h>
@@ -81,9 +82,72 @@ int pthread_once(pthread_once_t *initflag, void (*initfn)(void));
     }
   #+END_SRC
 
+
+** Mutex
+
+**** prototype
+
+#+BEGIN_SRC c
+#include <pthread.h>
+int pthread_mutex_init(pthread_mutex_t *restrict mutex, const pthread_mutexattr_t *restrict attr);
+// pthread_mutex_t pmutex = PTHREAD_MUTEX_INITIALIZER;
+int pthread_mutex_destroy(pthread_mutex_t *mutex);
+/* Both return: 0 if OK, error number on failure */
+
+#include <pthread.h>
+int pthread_mutex_lock(pthread_mutex_t *mutex);
+int pthread_mutex_trylock(pthread_mutex_t *mutex);
+int pthread_mutex_unlock(pthread_mutex_t *mutex);
+/* All return: 0 if OK, error number on failure */
+#+END_SRC
+
+
+** R-W Lock
+
+**** prototype
+
+#+BEGIN_SRC c
+#include <pthread.h>
+int pthread_rwlock_init(pthread_rwlock_t *restrict rwlock, const pthread_rwlockattr_t *restrict attr);
+// pthread_rwlock_t prwl = PTHREAD_RWLOCK_INITIALIZER;
+int pthread_rwlock_destroy(pthread_rwlock_t *rwlock);
+/* Both return: 0 if OK, error number on failure */
+
+#include <pthread.h>
+int pthread_rwlock_rdlock(pthread_rwlock_t *rwlock);
+int pthread_rwlock_wrlock(pthread_rwlock_t *rwlock);
+int pthread_rwlock_unlock(pthread_rwlock_t *rwlock);
+/* All return: 0 if OK, error number on failure */
+
+#include <pthread.h>
+int pthread_rwlock_tryrdlock(pthread_rwlock_t *rwlock);
+int pthread_rwlock_trywrlock(pthread_rwlock_t *rwlock);
+/* Both return: 0 if OK, error number on failure */
+#+END_SRC
+
+
 ** Condition Variables
 
 条件变量的意义在于: 仅当条件满足时, 才去争夺互斥锁, 并提供原子化操作
+
+**** prototype
+
+#+BEGIN_SRC c
+#include <pthread.h>
+int pthread_cond_init(pthread_cond_t *restrict cond, pthread_condattr_t *restrict attr);
+// pthread_cond_t pcond = PTHREAD_COND_INITIALIZER;
+int pthread_cond_destroy(pthread_cond_t *cond);
+/* Both return: 0 if OK, error number on failure */
+
+int pthread_cond_wait(pthread_cond_t *restrict cond, pthread_mutex_t *restrict mutex);
+int pthread_cond_timedwait(pthread_cond_t *restrict cond, pthread_mutex_t *restrict mutex,
+                           const struct timespec *restrict timeout);
+/* Both return: 0 if OK, error number on failure */
+
+int pthread_cond_signal(pthread_cond_t *cond);
+int pthread_cond_broadcast(pthread_cond_t *cond);
+/* Both return: 0 if OK, error number on failure */
+#+END_SRC
 
 **** snippets
 
@@ -129,7 +193,7 @@ Spin locks are useful when used in a nonpreemptive kernel where interrupt handle
 
 Because advances in modern processors makes context switch be at faster and faster rates, spin lock is useful only in limited circumstances.
 
-**** protocol
+**** prototype
 
 #+BEGIN_SRC c
   #include <pthread.h>
@@ -145,7 +209,7 @@ Because advances in modern processors makes context switch be at faster and fast
 
 Barriers allow an arbitrary number of threads to wait until all of the threads have completed processing, but the threads don’t have to exit. They can continue working after all threads have reached the barrier.
 
-**** protocol
+**** prototype
 
 #+BEGIN_SRC c
   #include <pthread.h>
