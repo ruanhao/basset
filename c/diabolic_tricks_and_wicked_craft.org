@@ -1,0 +1,50 @@
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+
+** three tuple expression
+
+=int a = val ? : default;=
+
+** Duff's Device
+
+#+BEGIN_SRC c
+  switch (count % 8) {
+  case 0: do {  *to = *from++;
+  case 7:       *to = *from++;
+  case 6:       *to = *from++;
+  case 5:       *to = *from++;
+  case 4:       *to = *from++;
+  case 3:       *to = *from++;
+  case 2:       *to = *from++;
+  case 1:       *to = *from++;
+          } while ((count -= 8) > 0);
+  }
+#+END_SRC
+
+** 确保宏可以出现在if..else之间 (do..while)
+
+#+BEGIN_SRC c
+  #define FUN(i,x) do { return 8; } while (0)
+#+END_SRC
+
+** co-routine
+
+[[http://www.chiark.greenend.org.uk/~sgtatham/coroutines.html][Coroutines in C]]
+
+协程: 协同执行的程序(函数)
+
+#+CAPTION: How co-routine works
+#+LABEL: fig:SED-HR40
+[[./pic/co-routine.png][How co-routine works]]
+
+#+BEGIN_SRC c
+  #define crBegin static int state=0; switch(state) { case 0:
+  #define crReturn(x) do { state=__LINE__; return x; \
+                           case __LINE__:; } while (0)
+  #define crFinish }
+#+END_SRC
