@@ -1,13 +1,11 @@
-#+TITLE:     Make
 #+AUTHOR:    Hao Ruan
 #+EMAIL:     ruanhao1116@gmail.com
-#+LANGUAGE:  en
 #+LINK_HOME: http://www.github.com/ruanhao
 #+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
 #+STARTUP:   showall
 
 
-* make kernel
+** make kernel
 
 1. =cd /usr/src/linux=
 
@@ -40,3 +38,162 @@
    安装内核
 
 9. =reboot=
+
+** Internal varibles
+
+**** $?
+
+代表已被更新的 dependencies 的值, 也就是 dependencies 中, 比 targets 還新的值.
+
+**** $@
+
+代表 targets 的值.
+
+**** $<
+
+代表第一個 dependencies 的值.
+
+**** $*
+
+代表 targets 所指定的檔案, 但不包含后缀名.
+
+** Implicit rule
+
+1.
+
+   #+BEGIN_SRC makefile-gmake
+     #=bebin of Makefile=#
+     main: main.o
+     #=end of Makefile=#
+
+     ## By default, it behaves just like:
+     main: main.o
+
+     main.o: main.c
+             cc -c -o main.o main.c
+     ## 即當你根本沒有定義main.o這個target時, make會自動找main.c來編譯
+   #+END_SRC
+
+2.
+
+   例:
+
+   #+BEGIN_SRC makefile-gmake
+     foo.o: common.h
+             gcc -c foo.c
+   #+END_SRC
+
+   由於產生 foo.o 的指令就是 gcc -c foo.c, 因此在 Makefile 裡可以將其簡化為:
+
+   #+BEGIN_SRC makefile-gmake
+     foo.o: common.h
+   #+END_SRC
+
+   此時 make 會依據 target 的副檔名來猜測該如何編譯 target. 如此可以讓 Makefile 更為簡潔.
+
+   可以利用 *空白指令* 來避免 make 依據隱性法則而進行編譯. 例:
+
+   #+BEGIN_SRC makefile-gmake
+     foo.o: common.h
+     <Tab>
+   #+END_SRC
+
+3.
+
+   #+BEGIN_SRC makefile-gmake
+   main:
+   #+END_SRC
+
+  当不使用 *空白指令* , 则默认会生成二进制文件main(target).
+
+  为了生成main会去寻找main.o, 继而寻找main.c, 然后自动执行:
+
+  #+BEGIN_SRC sh
+  cc $CFLAGS   -c -o main.o            main.c
+  cc $LDFLAGS        main.o $LDLIBS -o main
+
+  # CFLAGS  = -D_GNU_SOURCE
+  # LDFLAGS = -L/home/eruahao/local/lib
+  # LDLIBS  = -lpthread
+  #+END_SRC
+
+  可见, CFLAGS用于编译阶段, LDFLAGS和LDLIBS用于链接阶段.
+
+  [[https://www.gnu.org/software/make/manual/html_node/Implicit-Variables.html][Implicit variables in makefile]]
+
+
+
+
+
+
+
+** Shortcuts
+
+#+BEGIN_SRC makefile-gmake
+.c.o:
+	@ do command
+
+## =.c.o:= is a short hand for =%.o: %.c=
+## 通常和.SUFFIXES结合起来使用
+#+END_SRC
+
+** Gotcha
+
+**** :=
+
+注意到, make 會將整個 Makefile 展開後, 再決定變數的值. 也就是說, 變數的值將會是整個 Mackfile 中最後被指定的值, 例:
+
+#+BEGIN_SRC makefile-gmake
+x = foo
+y = $(x) bar
+x = xyz
+# y 的值為 xyz bar
+#+END_SRC
+
+可以利用 := 來避開這個問題. := 表示變數的值決定於它在 Makefile 中的位置, 而不是整個 Makefile 展開後最終的值, 例:
+
+#+BEGIN_SRC makefile-gmake
+x := foo
+y := $(x) bar
+x := xyz
+# y 的值為 foo bar
+#+END_SRC
+
+**** ?=
+
+?= 是一個簡化的語法: 若變數未定義, 則替它指定新的值. 否則, 採用原有的值, 例:
+
+#+BEGIN_SRC makefile-gmake
+FOO ?= bar
+#+END_SRC
+
+**** wildcard
+
+搭配 wildcard 指令在變數裡展開 * ? [...] 等萬用字元, 例:
+
+#+BEGIN_SRC makefile-gmake
+objects=$(wildcard *.o)
+#+END_SRC
+
+**** .PHONY
+
+#+BEGIN_SRC makefile-gmake
+.PHONY: clean
+clean:
+    rm *.o
+#+END_SRC
+
+若不使用 .PHONY 來指定 clean 為 fake 項目的話, 若目錄中同時存在了一個名為 clean 的檔案, 則 clean 這個項目將被視為 *要建立 clean 這個檔案*, 但 clean 這個項目卻又沒有任何的 dependencies, 因此, clean 項目將永遠被視為 *up-to-date*, *永遠不會被執行*.
+
+**** .SUFFIXES
+
+#+BEGIN_SRC makefile-gmake
+  .SUFFIXES:       ## 先清除suffixes
+  .SUFFIXES: .c .o ## 将.c档编译成.o档
+  .SUFFIXES: .a .c ## 将.a档编译成.c档
+#+END_SRC
+
+**** @ / -
+
+@ 表示不要顯示執行的指令.
+- 表示即使該行指令出錯, 也不會中斷執行.
