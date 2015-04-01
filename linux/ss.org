@@ -85,3 +85,73 @@ slabstat.tcp_syns (grep -o 'tcp_open_request\s*[0-9]*' /proc/slabinfo)
 **** ports 831
 
 slabstat.tcp_ports (grep -o 'tcp_bind_bucket\s*[0-9]*' /proc/slabinfo)
+
+
+** Examples
+
+**** ss state established '( dport = :http or sport = :http )'
+
+显示所有已建立的HTTP连接
+
+常用state:
+
+#+BEGIN_EXAMPLE
+established
+syn-sent
+syn-recv
+fin-wait-1
+fin-wait-2
+time-wait
+closed
+close-wait
+last-ack
+listen
+closing
+all : All of the above states
+connected : All the states except for listen and closed
+synchronized : All the connected states except for syn-sent
+bucket : Show states, which are maintained as minisockets, i.e. time-wait and syn-recv
+big : Opposite to bucket state
+#+END_EXAMPLE
+
+
+**** ss -o
+
+显示keepalive信息
+
+
+**** ss -w
+
+Filter results to display raw sockets only
+
+**** ss src <IP>
+
+**** ss dport OP PORT
+
+OP是运算符, PORT表示端口, dport表示过滤目标端口, OP运算符如下:
+
+#+BEGIN_SRC
+<= or le  : 小于等于
+>= or ge  : 大于等于
+== or eq  : 等于
+!= or ne  : 不等于端口
+<  or lt  : 小于这个端口
+>  or gt  : 大于端口
+#+END_SRC
+
+#+BEGIN_SRC sh
+ss sport = :http 也可以是 ss sport = :80
+ss dport = :http
+ss dport \> :1024
+ss sport \> :1024
+ss sport \< :32000
+ss sport eq :22
+ss dport != :22
+ss state connected sport = :http
+ss \( sport = :http or sport = :https \)
+ss -o state fin-wait-1 \( sport = :http or sport = :https \) dst 192.168.1/24
+#+END_SRC
+
+**** ss -p
+
+显示使用套接字的进程信息
