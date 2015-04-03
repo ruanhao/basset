@@ -22,7 +22,7 @@ MSL指的是报文段的最大生存时间，如果报文段在网络活动了MS
 #define TCP_TIMEWAIT_LEN (60*HZ)
 #+END_SRC
 
-**** 为什么会存在TIME_WATI
+**** 为什么会存在TIME_WAIT
 
 为什么主动关闭的一方不直接进入CLOSED状态，而是进入TIME_WAIT状态，并且停留两倍的MSL时长呢？这是因为TCP是建立在不可靠网络上的可靠的协议。
 
@@ -85,6 +85,8 @@ tcp_tw_recycle=1 <服务器端> and tcp_timestamps=0 <客户端> (两者不要�
 不过需要注意的是在哪里使用，既然我们要复用连接， *那么当然应该在连接的发起方使用，* 而不能在被连接方使用。举例来说：客户端向服务端发起HTTP请求，服务端响应后主动关闭连接，于是TIME_WAIT便留在了服务端，此类情况使用 =tcp_tw_reuse= 是无效的，因为服务端是被连接方，所以不存在复用连接一说。让我们延伸一点来看，比如说服务端是PHP，它查询另一个MySQL服务端，然后主动断开连接，于是TIME_WAIT就落在了PHP一侧，此类情况下使用 =tcp_tw_reuse= 是有效的，因为此时PHP相对于MySQL而言是客户端，它是连接的发起方，所以可以复用连接。
 
 *说明：如果使用tcp_tw_reuse，请激活tcp_timestamps，否则无效。*
+
+重用TIME_WAIT的条件是收到最后一个包后超过1s。
 
 (*待验证*)tcp_tw_reuse即便不开timestamp也是会生效的，开了timestamp只是增大了重用的概率，触发重用满足两个条件之一即可:
 
