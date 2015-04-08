@@ -62,6 +62,7 @@
   dd bs=1M if=/dev/sda | gzip | ssh user@remote 'dd of=sda.gz'
   #+END_SRC
 
+
 ** Network
 
 - Show state of eth0
@@ -189,6 +190,10 @@
 - Show thread info for certain PID
 
   =ps -p <pid> -L -o pid,tid,pcpu,state=
+
+- intercept stdout/stderr of another process
+
+  strace -ff -e trace=write -e write=1,2 -p SOME_PID
 
 
 
