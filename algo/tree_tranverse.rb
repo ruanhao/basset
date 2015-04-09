@@ -1,4 +1,5 @@
 #! /usr/bin/env ruby
+# coding: utf-8
 
 
 
@@ -61,8 +62,28 @@ def pre_tranverse2(tree)
       return
     end
     print "#{root.value} "
+    @stack << root.right if not root.right.nil?
+    @stack << root.left if not root.left.nil?
+  end
+end
+
+## 因为后序遍历的顺序是：左子树->右子树->根节点
+## 在前序遍历的代码中，当访问完当前节点后，先把当前节点的左子树入栈，再把右子树入栈，这样最终得到的顺序为：根节点->右子树->左子树，刚好是后序遍历倒过来的版本
+## 于是把这个结果做一次翻转即为真正的后序遍历
+def post_tranverse2(tree)
+  @stack ||= [tree]
+  result = []
+  while true
+    root = @stack.pop
+    if root.nil?
+      break
+    end
+    result << root
     @stack << root.left if not root.left.nil?
     @stack << root.right if not root.right.nil?
+  end
+  for n in result.reverse
+    print "#{n.value} "
   end
 end
 
@@ -90,5 +111,10 @@ if __FILE__ == $0
   puts 'in tranverse:'
   in_tranverse(@tree)
   puts
-  pre_tranverse2 @tree
+  #puts 'pre tranverse 2:'
+  #pre_tranverse2 @tree
+  #puts
+  puts 'post tranverse 2:'
+  post_tranverse2(@tree)
+  puts
 end
