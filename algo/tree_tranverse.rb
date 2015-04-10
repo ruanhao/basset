@@ -53,17 +53,32 @@ def in_tranverse(tree)
   in_tranverse(tree.right)
 end
 
+def in_tranverse2(tree)
+  stack = []
+  root = tree
+  while (not stack.length.zero?) or (not root.nil?)
+    if root.nil?
+      root =  stack.pop
+      print "#{root.value} "
+      root = root.right
+    else
+      stack.push(root)
+      root = root.left
+    end
+  end
+end
+
 
 def pre_tranverse2(tree)
-  @stack ||= [tree]
+  stack ||= [tree]
   while true
-    root = @stack.pop
+    root = stack.pop
     if root.nil?
       return
     end
     print "#{root.value} "
-    @stack << root.right if not root.right.nil?
-    @stack << root.left if not root.left.nil?
+    stack << root.right if not root.right.nil?
+    stack << root.left if not root.left.nil?
   end
 end
 
@@ -71,16 +86,16 @@ end
 ## 在前序遍历的代码中，当访问完当前节点后，先把当前节点的左子树入栈，再把右子树入栈，这样最终得到的顺序为：根节点->右子树->左子树，刚好是后序遍历倒过来的版本
 ## 于是把这个结果做一次翻转即为真正的后序遍历
 def post_tranverse2(tree)
-  @stack ||= [tree]
+  stack ||= [tree]
   result = []
   while true
-    root = @stack.pop
+    root = stack.pop
     if root.nil?
       break
     end
     result << root
-    @stack << root.left if not root.left.nil?
-    @stack << root.right if not root.right.nil?
+    stack << root.left if not root.left.nil?
+    stack << root.right if not root.right.nil?
   end
   for n in result.reverse
     print "#{n.value} "
@@ -100,21 +115,29 @@ def seq(n)
 end
 
 if __FILE__ == $0
-  seq 32
   init_tree
-  puts 'pre tranverse:'
+  print 'pre  tranverse:   '
   pre_tranverse(@tree)
   puts
-  puts 'post tranverse:'
+  print 'pre  tranverse2:  '
+  pre_tranverse2 @tree
+  puts
+  print 'post tranverse:   '
   post_tranverse(@tree)
   puts
-  puts 'in tranverse:'
-  in_tranverse(@tree)
-  puts
-  #puts 'pre tranverse 2:'
-  #pre_tranverse2 @tree
-  #puts
-  puts 'post tranverse 2:'
+  print 'post tranverse2:  '
   post_tranverse2(@tree)
   puts
+  print 'in   tranverse:   '
+  in_tranverse(@tree)
+  puts
+  print 'in   tranverse2:  '
+  in_tranverse2(@tree)
+  puts
+
+  seq 32
+
+
+
+
 end
