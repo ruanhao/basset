@@ -1,7 +1,16 @@
-##  Tshark
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
 
-```bash
-##  抓包接口设置
+
+** 抓包接口设置
+
+**** Options
+
+#+BEGIN_SRC
+
 -D: 查看网络接口的编号以供-i参数使用
 -f: 设定抓包过滤表达式
 -s: 设置每个抓包的大小, 默认为65535
@@ -11,8 +20,16 @@
 -y: 设置抓包的数据链路层协议, 不设置则默认为-L找到的第一个协议
 -L: 列出本机支持的数据链路层协议, 供-y参数使用
 
+#+END_SRC
 
-##  抓包停止条件
+
+
+** 抓包停止条件
+
+**** Options
+
+#+BEGIN_SRC
+
 -c: 抓取的packet数, 在处理一定数量的packet后, 停止抓取, 程序退出
 -a: 设置tshark抓包停止向文件书写的条件
     写为test:value的形式, 如:
@@ -20,8 +37,16 @@
     -a filesize:10 表示tshark在输出文件达到10KB后停止
     -a files:n 表示tshark在写满n个文件后停止
 
+#+END_SRC
 
-##  文件输出控制
+
+
+** 文件输出控制
+
+**** Options
+
+#+BEGIN_SRC
+
 -b: 设置ring buffer文件参数
     ring buffer的文件名由-w参数决定
     -b参数采用test:value的形式书写, 如:
@@ -29,12 +54,28 @@
     -b filesize:5 表示每达到5KB写下一个ring buffer文件
     -b files:7 表示ring buffer文件最多7个, 周而复始地使用, 如果这个参数不设定, tshark会将磁盘写满为止
 
-##  输入控制
+#+END_SRC
+
+
+** 输入控制
+
+**** Options
+
+#+BEGIN_SRC
+
 -r: 设置tshark分析的输入文件
     tshark既可以抓取分析即时的网络流量, 又可以分析dump在文件中的数据
     -r不能是命名管道和标准输入
 
-##  处理
+#+END_SRC
+
+
+** 处理
+
+**** Options
+
+#+BEGIN_SRC
+
 -R: 设置读取(显示)过滤表达式
     不符合此表达式的流量同样不会被写入文件
     注意, 读取(显示)过滤表达式的语法和底层相关的抓包过滤表达式语法不相同, 它的语法表达要丰富得多, 请参考:
@@ -45,7 +86,15 @@
 -d: 将指定的数据按有关协议解包输出
     如要将tcp 8888端口的流量按http解包, 写为-d 'tcp.port==8888,http' (注意选择子和解包协议之间不能留空格)
 
-##  输出类
+#+END_SRC
+
+
+** 输出类
+
+**** Options
+
+#+BEGIN_SRC
+
 -w: 设置raw数据的输出文件
     这个参数不设置, tshark将会把解码结果输出到stdout
     -w-表示把raw输出到stdout
@@ -63,20 +112,38 @@
 -q: 设置安静的stdout输出, 例如做统计时
 -z: 设置统计参数
 
-##  其它
+#+END_SRC
+
+
+** 其它
+
+**** Options
+
+#+BEGIN_SRC
+
 -h: 显示命令行帮助
 -v: 显示tshark的版本信息
 -o: 重载选项
 
+#+END_SRC
 
-```
 
 
-## Capture filter
-```
+
+** Capture filter
+
+**** Syntax
+
+#+BEGIN_EXAMPLE
+
 Syntax:  | Protocol | Direction |  Host(s) | Value | Logical Operation |    Other expression   |
 Example: |   tcp    |    dst    | 10.1.1.1 |   80  |       and         | tcp dst 10.2.2.2 3128 |
 
+#+END_EXAMPLE
+
+**** Examples
+
+#+BEGIN_SRC
 
 tcp dst port 3128
 显示目的TCP端口为3128的封包
@@ -111,11 +178,16 @@ src host 10.7.2.12 and not dst net 10.200.0.0/16
 可以在"ip"或"ether"后面使用"multicast"及"broadcast"关键字
 当您想排除广播请求时, "no broadcast"就会非常有用
 
-```
+#+END_SRC
 
 
-## Example
-```bash
+
+
+
+** Examples
+
+#+BEGIN_SRC
+
 tshark -r diameter.cap -R 'diameter.cmd.code == 271'
 tshark -a duration:10 -q -z io,stat,1
 
@@ -129,12 +201,41 @@ tshark -z proto,colinfo,filter,field # 加协议信息至显示 (field值一定�
 tshark -z proto,colinfo,"tcp.len&&ip.src==192.168.1.10",tcp.len
 
 -o 'tcp.relative_sequence_numbers:FALSE'
-```
+
+tshark -s 512 -i eth0 -n -f 'tcp dst port 80' -R 'http.host and http.request.uri' -T fields -e http.host -e http.request.uri -l | tr -d '\t'
+## 实时打印当前http请求的url(包括域名)
+## -s 512 :只抓取前512个字节数据
+## -i eth0 :捕获eth0网卡
+## -n :禁止网络对象名称解析
+## -f 'tcp dst port 80' :只捕捉协议为tcp,目的端口为80的数据包
+## -R 'http.host and http.request.uri' :过滤出http.host和http.request.uri
+## -T fields -e http.host -e http.request.uri :打印http.host和http.request.uri
+## -l ：输出到标准输出
+
+tshark -s 512 -i eth0 -n -f 'tcp dst port 3306' -R 'mysql.query' -T fields -e mysql.query
+## 实时打印当前mysql查询语句
+## -s 512 :只抓取前512个字节数据
+## -i eth0 :捕获eth0网卡
+## -n :禁止网络对象名称解析
+## -f 'tcp dst port 3306' :只捕捉协议为tcp,目的端口为3306的数据包
+## -R 'mysql.query' :过滤出mysql.query
+## -T fields -e mysql.query :打印mysql查询语句
+
+tshark -i eth1 -f 'icmp[0] == 0 or icmp[0] == 8'
+## 亦可:
+tshark -i eth1 icmp[0] == 8
+tshark -f icmp -i eth1 icmp[0] == 8
+
+tshark -G protocols  ## show all protocols supported
+
+
+#+END_SRC
 
 
 
 
-## Ref
->  http://blog.sina.com.cn/s/blog_5919b8b10100064e.html  
->  http://wiki.wireshark.org/CaptureFilters  
->  http://openmaniak.com/cn/wireshark_filters.php
+
+** Ref
+-  http://blog.sina.com.cn/s/blog_5919b8b10100064e.html
+-  http://wiki.wireshark.org/CaptureFilters
+-  http://openmaniak.com/cn/wireshark_filters.php

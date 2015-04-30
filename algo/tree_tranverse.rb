@@ -59,9 +59,9 @@ def in_tranverse(tree)
 end
 
 def in_tranverse2(tree)
-  stack = []
   root = tree
-  while (not stack.length.zero?) or (not root.nil?)
+  stack = [root]
+  while (not stack.length.zero?)
     if root.nil?
       root =  stack.pop
       print "#{root.value} "
@@ -146,15 +146,25 @@ def seq(n)
 end
 
 
+
+
 def transpose(pre, mid)
   #pre = 'EDBACHFG'
   #mid = 'ABCDEFGH'
-  root = pre[0]
-  idx = mid.index(root)
-  left = transpose(pre[1..(idx)], mid[0..(idx-1)])
+
+  root = Node.new(pre[0])
+  return root if (pre == mid) and (pre.length == 1)
+  idx = mid.index(pre[0])
+  if idx == 0
+    left = nil ## in case pre='AC' and mid='AC'
+  else
+    left = transpose(pre[1..(idx)], mid[0..(idx-1)])
+  end
+
   right = transpose(pre[(idx+1)..-1], mid[(idx+1)..-1])
   root.left = left
   root.right = right
+  return root
 end
 
 if __FILE__ == $0
@@ -183,5 +193,10 @@ if __FILE__ == $0
   print 'layer tranverse :  '
   layer_tranverse @tree
   puts
+  print 'transpose post  :  '
+  #r = transpose 'EDBACHFG', 'ABCDEFGH'
+  r = transpose 'AC', 'AC'
+  puts
+  post_tranverse r
 
 end
