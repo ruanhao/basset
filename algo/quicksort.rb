@@ -1,34 +1,39 @@
 #! /usr/bin/env ruby
 
-def partition(array, l, r)
-  i = l
-  j = r-1
-  v = array[r]
+def partition(a, l, r)
+  i = l-1; j = r; v = a[r]
   while true
-    while array[i] < v
-      i += 1
-    end
-    while v < array[j]
-      break if j == 1
-      j -= 1
-    end
+    while a[i+=1] < v; end
+    while v < a[j-=1]; break if j == l; end
     break if i >= j
-    array[i], array[j] = array[j], array[i]
+    a[i], a[j] = a[j], a[i]
   end
-  array[i], array[r] = array[r], array[i]
+  a[i], a[r] = a[r], a[i]
   return i
 end
 
-def quicksort(array, l, r)
+def quicksort(a, l, r)
   return if r <= l
-  i = partition(array, l, r)
-  quicksort(array, l, i-1)
-  quicksort(array, i+1, r)
+  i = partition(a, l, r)
+  quicksort(a, l, i-1)
+  quicksort(a, i+1, r)
+end
+
+def quicksort2(a, l, r)
+  s = []
+  s.push r; s.push l
+  while not s.empty?
+    l = s.pop; r = s.pop
+    next if r <= l
+    i = partition(a, l, r)
+    s.push i-1; s.push l
+    s.push r; s.push i+1
+  end
 end
 
 
 if __FILE__ == $0
   ary = [1, 7, 3, 9, 3, 98, 2, 99]
-  quicksort(ary, 0, ary.length-1)
+  quicksort2(ary, 0, ary.length-1)
   puts ary.to_s
 end
