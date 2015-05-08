@@ -10,9 +10,17 @@ def mscreen(ary1, ary2)
     k += 1
   end
   ary[k..-1] = ary1[i..-1]  if i < ary1.length
-  puts ary.to_s
+  return ary
+end
+
+def worker(ary)
+  return ary if ary.length == 1
+  m = ary.length/2 - 1
+  ary1 = worker(ary[0..m])
+  ary2 = worker(ary[m+1..-1])
+  return mscreen(ary1, ary2)
 end
 
 if __FILE__ == $0
-  mscreen([11], [2, 4, 6])
+  puts worker([9, 1,2, 5, 3]).to_s
 end
