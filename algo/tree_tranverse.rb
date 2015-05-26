@@ -91,14 +91,14 @@ end
 
 def pre_tranverse2(tree)
   stack = [tree]
-  while true
+  while not stack.length.zero?
     root = stack.pop
     if root.nil?
-      return
+      next
     end
     print "#{root.value} "
-    stack << root.right if not root.right.nil?
-    stack << root.left if not root.left.nil?
+    stack << root.right
+    stack << root.left
   end
 end
 
@@ -172,7 +172,7 @@ if __FILE__ == $0
   print 'pre   tranverse :  '
   pre_tranverse(@tree)
   puts
-  print 'pre   tranverse2:  '
+  print 'pre   tranverse2:  ==============='
   pre_tranverse2 @tree
   puts
   print 'post  tranverse :  '
