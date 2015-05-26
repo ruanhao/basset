@@ -109,14 +109,14 @@ end
 def post_tranverse2(tree)
   stack = [tree]
   result = []
-  while true
+  while not stack.length.zero?
     root = stack.pop
     if root.nil?
-      break
+      next
     end
     result << root
-    stack << root.left if not root.left.nil?
-    stack << root.right if not root.right.nil?
+    stack << root.left
+    stack << root.right
   end
   for n in result.reverse
     print "#{n.value} "
@@ -178,7 +178,7 @@ if __FILE__ == $0
   print 'post  tranverse :  '
   post_tranverse(@tree)
   puts
-  print 'post  tranverse2:  '
+  print 'post  tranverse2:  **************'
   post_tranverse2(@tree)
   puts
   print 'in    tranverse :  '
