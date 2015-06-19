@@ -1,0 +1,65 @@
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+
+** Deep copy
+
+=a[:]= is not deep copy
+#+BEGIN_SRC python
+a = [1, 2, [3, 4]]
+b = a[:]
+b[2][0] = 6 # a is affected
+import copy
+b = copy.deepcopy(a) # it is a deep copy
+#+END_SRC
+
+** DefaultDict
+
+#+BEGIN_SRC python
+from collections import defaultdict
+d = defaultdict(lambda: 0, {})
+#+END_SRC
+
+** Init list
+
+#+BEGIN_SRC python
+l = [None] * 1000
+#+END_SRC
+
+** Enumerate list
+
+#+BEGIN_SRC python
+a = [1, 2, 3, 4, 5]
+for i,v in enumerate(a):
+    logging.debug("i: %d, v: %d", i, v)
+#+END_SRC
+
+** itertools.izip
+
+#+BEGIN_SRC python
+  import itertools
+
+  a = [1, 2, 3, 4, 5]
+  b = [11, 22, 33, 44, 55]
+  ## itertools.izip is better than just zip
+  for i,j in itertools.izip(a, b):
+      logging.debug("i: %d, j: %d", i, j)
+#+END_SRC
+
+** Python2 nonlocal simulation
+
+#+BEGIN_SRC python
+def outer():
+    def inner():
+        inner.y += 1
+        return inner.y
+    inner.y = 0
+    return inner
+
+f = outer()
+g = outer()
+print(f(), f(), g(), f(), g()) # prints (1, 2, 1, 3, 2)
+#+END_SRC

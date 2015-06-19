@@ -1,14 +1,19 @@
-## Misc
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
 
-```bash
+#+BEGIN_SRC shell
+
+
 : ${variable?error_msg} ## 一种检查变量是否设置的方法，
                         ## 若没有设置，则error_msg会输出到std_err中
-                        
-num=$#; ${!num}         ## 最后一个参数  
-                        ## 不能直接写作${!$#}，这是一种**间接引用**  
+
+num=$#; ${!num}         ## 最后一个参数
+                        ## 不能直接写作${!$#}，这是一种**间接引用**
                         ## ruanhao: ${$num}是不允许的，因为变量替换不能嵌套，
                         ## 但是类似${var:$len}是可行的
-                        
+
 ## **赋值时变量不扩展**
 var1="hello world"
 var2=$var1    ## var2: "hello world"
@@ -36,4 +41,9 @@ echo hello | (cat; a=888)
 echo $a  ## 3
 echo hello | {cat; a=888}
 echo $a  ## 888
-```
+
+for i in {0..100..3}; do
+    echo $i
+done
+
+#+END_SRC
