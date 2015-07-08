@@ -1,0 +1,62 @@
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+** 定义枚举类型
+
+#+BEGIN_SRC python
+from enum import Enum
+
+Month = Enum('Month', ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'))
+#+END_SRC
+
+这样我们就获得了=Month类型=的枚举类，可以直接使用=Month.Jan=来引用一个常量，或者枚举它的所有成员：
+
+#+BEGIN_SRC python
+for name, member in Month.__members__.items():
+    print(name, '=>', member, ',', member.value)
+## value属性则是自动赋给成员的int常量，默认从1开始计数
+#+END_SRC
+
+如果需要更精确地控制枚举类型，可以从Enum派生出自定义类：
+
+#+BEGIN_SRC python
+from enum import Enum, unique
+## @unique装饰器可以帮助我们检查保证没有重复值
+@unique
+class Weekday(Enum):
+    Sun = 0 # Sun的value被设定为0
+    Mon = 1
+    Tue = 2
+    Wed = 3
+    Thu = 4
+    Fri = 5
+    Sat = 6
+#+END_SRC
+
+访问这些枚举类型可以有若干种方法：
+
+#+BEGIN_SRC python
+day1 = Weekday.Mon
+print(day1)                ## Weekday.Mon
+print(Weekday.Tue)         ## Weekday.Tue
+print(Weekday['Tue'])      ## Weekday.Tue
+print(Weekday.Tue.value)   ## 2
+print(day1 == Weekday.Mon) ## True
+print(day1 == Weekday.Tue) ## False
+print(Weekday(1))          ## Weekday.Mon
+print(day1 == Weekday(1))  ## True
+
+for name, member in Weekday.__members__.items():
+    print(name, '=>', member)
+
+## Sun => Weekday.Sun
+## Mon => Weekday.Mon
+## Tue => Weekday.Tue
+## Wed => Weekday.Wed
+## Thu => Weekday.Thu
+## Fri => Weekday.Fri
+## Sat => Weekday.Sat
+#+END_SRC

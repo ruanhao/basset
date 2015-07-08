@@ -44,9 +44,10 @@ MyClass.__mro__
 #+END_EXAMPLE
 
 #+BEGIN_EXAMPLE
-__slots__与继承的配合使用需要一定的技巧
-如何类继承自使用__slots__的基类，那么它也需要定义__slots__来存储自己的属性（即使它不会添加任何属性也是如此），这样才能充分利用__slots__提供的优势。
+__slots__与继承的配合使用需要一定的技巧，因为__slots__定义的属性仅对当前类实例起作用，对继承的子类是不起作用的。
+如果类继承自使用__slots__的基类，那么它也需要定义__slots__来存储自己的属性（即使它不会添加任何属性也是如此），这样才能充分利用__slots__提供的优势。
 如果忘记这一点，派生类的运行速度将更慢，占用的内存也比未在任何类上使用__slots__时多。
+另外，如果在子类中也定义了__slots__，那么，子类实例允许定义的属性就是自身的__slots__加上父类的__slots__。
 #+END_EXAMPLE
 
 ** Create class
@@ -90,4 +91,40 @@ __slots__与继承的配合使用需要一定的技巧
   m.__dict__['name'] = Name("instance messi")
   print Myclass.name
   print m.name
+#+END_SRC
+
+** 给实例绑定一个方法
+
+#+BEGIN_SRC python
+def set_age(self, age): # 定义一个函数作为实例方法
+    self.age = age
+from types import MethodType
+s = Student()
+s.set_age = MethodType(set_age, s) # 给实例绑定一个方法
+s.set_age(25)
+#+END_SRC
+
+注意：给一个实例绑定的方法，对另一个实例是不起作用的
+
+为了给所有实例都绑定方法，可以给class绑定方法：
+
+#+BEGIN_SRC python
+def set_score(self, score):
+    self.score = score
+Student.set_score = set_score
+#+END_SRC
+
+** Inspect
+
+*** dir()
+
+获得一个对象的所有属性和方法。这其实包含自身的属性和在类中定义的描述符。
+
+*** hasattr 正确应用场景
+
+#+BEGIN_SRC python
+def readImage(fp):
+    if hasattr(fp, 'read'):
+        return readData(fp)
+    return None
 #+END_SRC
