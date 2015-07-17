@@ -1,0 +1,109 @@
+** Basics
+
+- Web应用开发好，若想供外界访问，需要把web应用所在的目录交给web服务器管理，*这个过程称为虚拟目录的映射*
+
+** Env variables
+
+*** CATALINA_HOME
+
+Say where tomcat directory is. so it is ok to have multiple tomcat directories.
+
+
+** Directories
+
+|---------+----------------------------------------------|
+| bin     | scripts                                      |
+| conf    | configuration                                |
+| lib     | jars needed by tomcat                        |
+| logs    | loggings                                     |
+| temp    | temp files                                   |
+| webapps | web projects                                 |
+| work    | tomcat workspace (eg. servlet made from JSP) |
+|---------+----------------------------------------------|
+
+
+** Engine 参数 (in server.xml)
+
+*** defaultHost
+
+设置默认主机
+
+#+BEGIN_SRC xml
+<Engine name="Catalina" defaultHost="localhost"/>
+#+END_SRC
+
+
+
+** web.xml
+
+*** 配置首页
+
+#+BEGIN_SRC xml
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+#+END_SRC
+
+
+
+
+** server.xml
+
+*** Modify port
+#+BEGIN_SRC xml
+  <Connector port="8080" protocol="HTTP/1.1"
+             connectionTimeout="20000"
+             redirectPort="8443" />
+#+END_SRC
+
+*** 指定web app目录
+在<Host></Host>标签对中添加：
+#+BEGIN_SRC xml
+  <Context path="/shanghai" docBase="/path/to/webapp"/>
+  <!--
+
+      path: access pattern (也称作为虚拟目录)
+      docBase: directory in filesystem
+      此方式需要重启服务器
+  -->
+#+END_SRC
+具体可以参考: http://tomcathost:8080/docs/config/context.html
+
+*** 配置缺省web app
+
+#+BEGIN_SRC xml
+  <Context path="" docBase="/path/to/webapp" />
+  <!--
+      path写成空字符串就可以
+      也可以写在: conf/<engine>/<host>/ROOT.xml
+  -->
+#+END_SRC
+
+** 配置虚拟主机
+
+在一个tomcat服务器中可以放置多个网站，所谓虚拟主机，就是在tomcat服务器中配置一个网站
+
+配置的主机（网站）要被外部访问，必须在DNS服务器中注册
+
+如需在WEB服务器中配置一个网站，需使用Host元素进行配置：
+
+#+BEGIN_SRC xml
+  <!-- in server.xml -->
+  <Host name="site1" appBase="/path/to/appBase">
+    <Context path="" docBase="/path/to/webapp" />
+  </Host>
+#+END_SRC
+
+** Context 参数
+
+Context 可以理解成一个 Web App (环境)
+
+*** 在 conf/context.xml 中配置的 Context 信息被全局 Web Apps 共享
+
+*** reloadable
+java class 更新不用重启加载，debug 时可以使用
+#+BEGIN_SRC xml
+<Context reloadable="true"/>
+#+END_SRC

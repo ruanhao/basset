@@ -107,6 +107,7 @@ C-x z                       # Repeat the previous emacs command
 C-M-@  # 全选括号表达式
 M-s o  # occurs
 
+C-x <tab> # 整体缩进
 
 
 ```
