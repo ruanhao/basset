@@ -1,0 +1,76 @@
+** Install
+
+*** Jars
+
+http://www.springsource.org/download
+
+- dist/spring.jar
+- lib/jakarta-commons/commons-logging.jar
+- lib/aspectj/aspectjweaver.jar, aspectjrt.jar, lib/cglib/cglib-nodep.jar (如果使用AOP)
+- lib/j2ee/common-annotations.jar (如果使用了JSR-250中的注解，如@Resource/@PostConstruct/@PreDestroy)
+
+** 实例化bean的方式
+
+*** 使用类构造器实例化
+
+#+BEGIN_SRC xml
+  <bean id="myBean" class="com.hao.MyBean"/>
+#+END_SRC
+
+*** 使用静态工厂方法实例化
+
+#+BEGIN_SRC xml
+<bean id="myBean" class="com.hao.MyBeanFactory" factory-method="createBean"/>
+#+END_SRC
+
+#+BEGIN_SRC java
+  public class MyBeanFactory {
+      public static MyBean createBean() {
+          return new MyBean();
+      }
+  }
+#+END_SRC
+
+*** 使用工厂方法实例化
+
+#+BEGIN_SRC xml
+  <bean id="myBeanFactory" class="com.hao.MyBeanFactory"/>
+  <bean id="myBean" factory-bean="myBeanFactory" factory-method="createBean"/>
+#+END_SRC
+
+#+BEGIN_SRC java
+  public class MyBeanFactory {
+        public MyBean createBean() {
+            return new MyBean();
+        }
+  }
+#+END_SRC
+
+
+** Bean作用域
+
+*** singleton
+*** prototype
+<bean scope="prototype"/>
+*** request
+*** session
+*** global session
+
+** Bean初始化
+
+*** 延迟初始化
+
+<bean lazy-init="true"/>          ;; 针对单个bean进行延迟初始化
+<beans default-lazy-init="true"/> ;; 针对所有bean
+
+*** 指定初始化方法
+
+<bean init-method="init"/>
+
+#+BEGIN_SRC java
+  public class ServiceBean implements Service {
+      public void init() {
+          System.out.println("init...");
+      }
+  }
+#+END_SRC

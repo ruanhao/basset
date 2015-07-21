@@ -109,7 +109,7 @@ M-s o  # occurs
 
 C-x <tab> # 整体缩进
 
-
+C-x r N # insert line nums
 ```
 
 
@@ -119,6 +119,7 @@ C-x <tab> # 整体缩进
              '("melpa" . "http://melpa.milkbox.net/packages/") t)
 ;; M-x package-install
 ;; use 'i' to mark, use 'x' to execute
+
 ```
 
 
