@@ -1,0 +1,20 @@
+** Usage
+
+*** 定义
+
+#+BEGIN_SRC java
+  @Retention(RetentionPolicy.RUNTIME)
+  @Target({ElementType.FIELD, Elementtype.METHOD})
+  public @interface MyAnnotation {
+      String name() default "";
+  }
+#+END_SRC
+
+*** 使用
+
+#+BEGIN_SRC java
+  Method setter = beanProperty.getWriteMethod();
+  if (setter.isAnnotationPresent(MyAnnotation.class)) {
+      System.out.println(setter.getAnnotation(MyAnnotation.class).name());
+  }
+#+END_SRC

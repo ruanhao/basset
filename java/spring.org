@@ -56,12 +56,15 @@ http://www.springsource.org/download
 *** session
 *** global session
 
+
+
 ** Bean初始化
 
 *** 延迟初始化
 
 <bean lazy-init="true"/>          ;; 针对单个bean进行延迟初始化
 <beans default-lazy-init="true"/> ;; 针对所有bean
+
 
 *** 指定初始化方法
 
@@ -74,3 +77,142 @@ http://www.springsource.org/download
       }
   }
 #+END_SRC
+
+** 注入依赖
+
+*** 普通方式(setter方式)
+
+#+BEGIN_SRC xml
+  <bean id="personDao1" class="com.hao.dao.impl.PersonDaoBean"/>
+  <bean id="personService" class="com.hao.service.impl.PersonServiceBean">
+    <property name="personDao" ref="personDao1"/> <!-- name 是用来指定属性的 -->
+  </bean>
+#+END_SRC
+
+*** 使用内部bean (该bean不能被其他bean使用)
+
+#+BEGIN_SRC xml
+  <bean id="orderService" class="com.hao.service.OrderServiceBean">
+    <property name="orderDao">
+      <bean class="com.hao.service.OrderDaoBean"/>
+    </property>
+  </bean>
+#+END_SRC
+
+*** 使用构造器进行注入
+
+#+BEGIN_SRC xml
+  <bean id="personDao1" class="com.hao.dao.impl.PersonDaoBean"/>
+  <bean id="personService" class="com.hao.service.impl.PersonServiceBean">
+    <constructor-arg index="0" type="com.hao.dao.PersonDao" ref="personDao1"/>
+    <!-- type指的是参数类型，一般是抽象类型或接口类型 -->
+    <!-- 还有value属性可以用来设置，value一般是设置基本类型数据，当设置基本类型时，type可以省略 -->
+  </bean>
+
+#+END_SRC
+
+*** 为基本类型属性注入值(比如String)
+
+#+BEGIN_SRC xml
+  <property name="name" value="helloworld"/>
+  <property name="age" value="30"/> <!-- 可以注入整型，这样定义属性：Integer age; -->
+#+END_SRC
+
+*** 注入集合
+
+**** Set类型
+
+#+BEGIN_SRC xml
+  <bean id="hello" class="com.hao.Hello">
+    <property naem="sets">
+      <set>
+        <value>1</value>
+        <value>2</value>
+        <value>3</value>
+      </set>
+    </property>
+  </bean>
+#+END_SRC
+
+**** ArrayList类型
+
+#+BEGIN_SRC xml
+  <bean id="hello" class="com.hao.Hello">
+      <property naem="list">
+        <list>
+          <value>1</value>
+          <value>2</value>
+          <value>3</value>
+        </list>
+      </property>
+  </bean>
+#+END_SRC
+
+**** Properties类型
+
+#+BEGIN_SRC xml
+  <bean id="hello" class="com.hao.Hello">
+        <property naem="property">
+          <props>
+            <prop key="key0">1</prop>
+            <prop key="key1">2</prop>
+            <prop key="key2">3</prop>
+          </props>
+        </property>
+  </bean>
+#+END_SRC
+
+**** Map类型
+
+#+BEGIN_SRC xml
+  <bean id="hello" class="com.hao.Hello">
+          <property naem="map">
+            <map>
+              <entry key="key-0" value="value-0"></entry>
+              <entry key="key-1" value="value-1"></entry>
+              <entry key="key-2" value="value-2"></entry>
+            </map>
+          </property>
+  </bean>
+#+END_SRC
+
+
+*** 使用注解方式
+
+在java代码中使用@Autowired或@Resource注解方式进行装配，需要在xml配置文件中配置一下信息：
+
+#+BEGIN_SRC xml
+  <beans xmlns="http://www.springframework.org/shema/beans"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:context="http://www.springframework.org/schema/context" <!-- 关键 -->
+         xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframeworkorg/schema/context <!-- 关键 -->
+    http://www.springframeworkorg/schema/context/spring-context-2.5.xsd"> <!-- 关键 -->
+    <context:annotation-config/>  <!-- 关键 -->
+  </beans>
+#+END_SRC
+
+这个配置隐式注册了多个对注解进行解析处理的处理器：AutowiredAnnotationBeanPostProcessor, CommonAnnotationBeanPostProcessor, PersistenceAnnotationBeanPostProcessor, RequiredAnnotationBeanPostProcessor
+
+@Autowired和@Resource两个注解的区别是：@Autowired默认按类型装配，@Resource默认按名称装配，当找不到与名称匹配的bean时才会按类型装配
+
+**** @Autowired
+
+按类型装配依赖对象，默认情况下它要求依赖对象必须存在，如果允许null值，可以设置它required属性为false。如果希望按名称装配，可以结合@Qualifier注解一起使用：
+
+#+BEGIN_SRC java
+@Autowired @Qualifier("personDaoBean")
+private PersonDao personDao;
+#+END_SRC
+
+**** @Resource
+
+默认按名称装配，名称可以通过name属性指定。如果没有指定name属性，当注解标注在字段上，默认取字段名称作为bean名称寻找依赖对象；当注解标注在setter方法上，默认取属性名作为bean名称寻找依赖对象：
+
+#+BEGIN_SRC java
+@Resource(name="personDaoBean")
+private PersonDao personDao;
+#+END_SRC
+
+如果没有指定name属性，按默认名称找不到对象时，会回退到按类型装配；但是一旦指定name属性，就只能按名称装配了
