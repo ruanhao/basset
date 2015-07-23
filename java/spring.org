@@ -9,6 +9,7 @@ http://www.springsource.org/download
 - lib/aspectj/aspectjweaver.jar, aspectjrt.jar, lib/cglib/cglib-nodep.jar (如果使用AOP)
 - lib/j2ee/common-annotations.jar (如果使用了JSR-250中的注解，如@Resource/@PostConstruct/@PreDestroy)
 
+
 ** 实例化bean的方式
 
 *** 使用类构造器实例化
@@ -78,6 +79,7 @@ http://www.springsource.org/download
   }
 #+END_SRC
 
+
 ** 注入依赖
 
 *** 普通方式(setter方式)
@@ -89,6 +91,8 @@ http://www.springsource.org/download
   </bean>
 #+END_SRC
 
+
+
 *** 使用内部bean (该bean不能被其他bean使用)
 
 #+BEGIN_SRC xml
@@ -98,6 +102,8 @@ http://www.springsource.org/download
     </property>
   </bean>
 #+END_SRC
+
+
 
 *** 使用构造器进行注入
 
@@ -111,12 +117,16 @@ http://www.springsource.org/download
 
 #+END_SRC
 
+
+
 *** 为基本类型属性注入值(比如String)
 
 #+BEGIN_SRC xml
   <property name="name" value="helloworld"/>
   <property name="age" value="30"/> <!-- 可以注入整型，这样定义属性：Integer age; -->
 #+END_SRC
+
+
 
 *** 注入集合
 
@@ -177,6 +187,8 @@ http://www.springsource.org/download
 #+END_SRC
 
 
+
+
 *** 使用注解方式
 
 在java代码中使用@Autowired或@Resource注解方式进行装配，需要在xml配置文件中配置一下信息：
@@ -216,3 +228,111 @@ private PersonDao personDao;
 #+END_SRC
 
 如果没有指定name属性，按默认名称找不到对象时，会回退到按类型装配；但是一旦指定name属性，就只能按名称装配了
+
+
+*** 自动装配对象（不推荐）
+
+<bean id="..." class="..." autowire="byType"/>
+
+autowire属性取值如下:
+
+- byType
+
+  按类型装配，可以根据属性的类型，在容易中寻找跟该类型匹配的bean。如果发现多个，将会抛出异常。如果没有找到，则属性值为null。
+
+- byName
+
+  按名称装配，可以根据属性的名称，在容器中寻找跟该属性名相同的bean。如果没有找到，则属性值为null。
+
+- contructor
+
+  与byType的方式类似，不同之处在于它应用于构造器参数。如果在容器中没有找到与构造器参数类型一致的bean，则抛出异常。
+
+- autodetect
+
+  通过bean类的自省机制来决定是使用constructor还是byType方式进行自动装配。如果发现默认的构造器，那么将使用byType方式。
+
+
+
+*** 通过在classpath自动扫描方式把组件纳入Spring容器中管理
+
+在类路径下寻找标注了@Component, @Service, @Controller, @Repository注解的类，并把这些类纳入Spring容器中管理。其作用和在xml文件中使用bean节点配置组件是一样的。
+要使用自动扫描机制，我们需要打开以下配置信息:
+
+#+BEGIN_SRC xml
+<context:component-scan base-package="com.hao"/>
+<!-- 有了这个配置,  <context:annotation-config/>可以省略，因为前者包含后者所有的注解处理器 -->
+#+END_SRC
+
+其中base-package为需要扫描的包（含子包）
+
+
+- @Service
+
+  用于标注业务层组件
+
+  #+BEGIN_SRC java
+@Service("beanName")
+public class xxx {}
+
+  #+END_SRC
+
+#+BEGIN_SRC java
+@Service("name") @Scope("prototype")
+public class xxx {}
+#+END_SRC
+
+#+BEGIN_SRC java
+  @Service("name")
+  public class xxx {
+      @PostContruct // 指定bean初始化函数
+      public void init() {}
+      @PreDestroy
+      public void destroy() {}
+
+  }
+#+END_SRC
+
+- @Controller
+
+  用于标注控制层组件
+
+- @Repository
+
+  用于标注数据访问组件，即DAO组件
+
+- @CoMponent
+
+  泛指组件，当组件不好归类时，可以使用这个注解进行标注
+
+** AOP
+
+*** 概念
+
+**** Aspect（切面）
+
+横切性关注点的抽象即为切面
+
+**** joinpoint（连接点）
+
+所谓连接点是指那些被拦截到的点。在Spring中，这些点指的是方法，因为Spring只支持方法类型的连接点，广义上joinpoint还可以是field或类构造器
+
+**** Pointcut（切入点）
+
+指对那些jointpoint进行拦截的定义
+
+**** Advice（通知）
+
+指拦截到jointpoint后所要做的事情就是通知，通知分为前置通知，后置通知，异常通知，最终通知，环绕通知
+
+**** Target（目标对象）
+
+代理的目标对象
+
+**** Weave（织入）
+
+指将aspects应用到target对象并导致proxy对象创建的过程称为织入
+
+**** Introduction（引入）
+
+再不修改类代码的前提下，Introduction可以在运行期为类动态地添加一些方法或Field

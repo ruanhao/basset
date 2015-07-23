@@ -1,0 +1,54 @@
+** Proxy
+
+*** JDK native
+
+#+BEGIN_SRC java
+  public class JDKProxyFactory implements InvocationHandler {
+      private Object targetObject;
+
+      // Implements
+      public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+          Object result = null;
+          // advice(); 前置通知
+          try {
+              result = method.invoke(targetObject, args);
+              // after_advice(); 后置通知
+          } catch (RuntimeException e) {
+              // excetion_advice(); 例外通知
+          } finally {
+              // finally_advice(); 最终通知
+          }
+
+
+          return result;
+      }
+
+      pubilc Object createProxyInstance(Object targetObject) {
+          this.targetObject = targetObject;
+          Proxy.newProxyInstance(this.targetObject.getClass().getClassLoader(), this.targetObject.getClass().getInterfaces(), this);
+      }
+  }
+#+END_SRC
+
+*** CGLIB
+
+#+BEGIN_SRC java
+  public class CGlibProxyFactory implements MethodInterceptor {
+      private Object targetObject;
+
+      public Object createProxyInstance(Object targetObject) {
+          this.targetObject = targetObject;
+          Enhancer enhancer = new Enhancer();
+          enhancer.setsSuperclass(this.targetObject.getClass()); // CGLIB可以生成目标类的子类，并重写父类非final修饰符的方法
+          enhancer.setCallback(this);
+          return enhancer.create();
+      }
+
+      // Implements
+      public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
+          // you can do something here
+          return methodProxy.invoke(this.targetObject, args);
+          // you can do something here, too
+      }
+  }
+#+END_SRC
