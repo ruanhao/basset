@@ -64,6 +64,7 @@ http://www.springsource.org/download
 *** 延迟初始化
 
 <bean lazy-init="true"/>          ;; 针对单个bean进行延迟初始化
+
 <beans default-lazy-init="true"/> ;; 针对所有bean
 
 
@@ -305,6 +306,7 @@ public class xxx {}
 
   泛指组件，当组件不好归类时，可以使用这个注解进行标注
 
+
 ** AOP
 
 *** 概念
@@ -333,6 +335,80 @@ public class xxx {}
 
 指将aspects应用到target对象并导致proxy对象创建的过程称为织入
 
-**** Introduction（引入）
+**** Ifntroduction（引入）
 
 再不修改类代码的前提下，Introduction可以在运行期为类动态地添加一些方法或Field
+
+
+*** 各类通知的位置参考
+
+参考 reflect.org
+
+
+*** 使用注解方式声明切面
+
+#+BEGIN_EXAMPLE
+\*   com.hao.service. .  *  . *   (..)
+-1-  --------2-------   -3-  -4-  -5-
+1: 返回类型，*表示任意，如需要明确指明，则要给出类的全称，如java.lang.String
+2: 表示对哪些包下的类进行拦截，最后一个点表示包括子包
+3: 表示所有类
+4: 表示所有方法
+5: 表示参数可任意
+
+#+END_EXAMPLE
+
+#+BEGIN_SRC xml
+<aop:aspectj-autoproxy/>
+#+END_SRC
+
+#+BEGIN_SRC java
+  @Aspect @Component
+  public class MyInterceptor {
+      @Pointcut("execution(* com.hao.service..*.*(..))")
+      private void anyMethod() {} // 声明一个切入点（为这个切入点定义名称，叫anyMethod）
+
+      @Before ("anyMethod() && args(userName)") // 表示：使用名为anyMethod()的切入点，同时在原切入点表达式的基础上，再加入额外限制：只有一个参数，且参数类型为String
+      public void doCheck(String userName) {
+          System.out.println("beforeCheck");
+      }
+
+
+      @AfterReturning(pointcut="anyMethod()", returning="revalue") // 定义后置通知，且可以获得切入点的返回结果
+      public void doReturnCheck(String revalue) {
+
+      }
+
+
+      @AfterThrowing(pointcut="anyMethod()", throwing="ex") // 定义例外通知
+      public void doExceptionAction(Exception ex) {
+
+      }
+
+      @After("anyMethod()") // 定义最终通知
+      public void doReleaseAction() {
+
+      }
+
+      @Around("anyMethod()") // 环绕通知
+      public Object doBasicProfiling(ProceedingJoinPoint pjp) throws Throwable {
+          return pjp.proceed();
+      }
+  }
+#+END_SRC
+
+*** 使用XML方式声明切面
+
+#+BEGIN_SRC xml
+  <bean id="log" class="com.hao.LogPrint"/>
+  <aop:config>
+    <aop:aspect id="myaop" ref="log">
+      <aop:pointcut id="mycut" expression="execution(* com.hao..*.*(..))"/>
+      <aop:before pointcut-ref="mycut" method="doAccessCheck"/>
+      <aop:after-returning pointcut-ref="mycut" method="doReturnCheck"/>
+      <aop:after-throwing pointcut-ref="mycut" method="doExcepitonAction"/>
+      <aop:after pointcut-ref="mycut" method="doReleaseAction"/>
+      <aop:around pointcut-ref="mycut" method="doBasicProfiling"/>
+    </aop:aspect>
+  </aop:config>
+#+END_SRC
