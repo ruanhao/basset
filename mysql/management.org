@@ -1,0 +1,159 @@
+** 创建账号
+
+#+BEGIN_SRC sql
+  GRANT ALL ON <dbname>.* TO 'newuser'@'localhost' IDENTIFIED BY 'password';
+
+  GRANT ALL ON *.* TO 'newuser'@'localhost' IDENTIFIED BY 'password';
+#+END_SRC
+
+
+** 从文件读入数据
+
+=mysql dbname < crete_table.sql=
+
+
+** 创建表实例
+
+#+BEGIN_SRC sql
+  DROP TABLE IF EXISTS item;
+  #@ _CREATE_TABLE_
+  CREATE TABLE item
+  (
+    id      INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    name    CHAR(20),
+    colors  SET('chartreuse','mauve','lime green','puce') DEFAULT 'puce',
+    PRIMARY KEY (id)
+  );
+  #@ _CREATE_TABLE_
+
+#+END_SRC
+
+
+** 向表中插入数据
+
+INSERT INTO table_name SET column_name = value;
+
+
+** 向表中更新数据
+
+UPDATE talbe_name SET column_name = column_name+1;
+
+
+** 导入数据
+
+#+BEGIN_SRC sh
+mysal dbname < backup.sql
+cat backup.sql | mysql dbname
+mysqldump dbname | mysql -h some.other.host new_dbname
+generate-test-data | mysql dbname
+#+END_SRC
+
+
+** 在bash下执行
+
+#+BEGIN_SRC sh
+mysql -e "SELECT * FROM table" dbname   ## with table line
+mysql dbname <<<  "SELECT * FROM table" ## without table line
+mysql -t dbname <<<  "SELECT * FROM table" ## with table line
+mysql -ss dbname <<<  "SELECT * FROM table" ## skip column names
+mysql -E dbname <<<  "SELECT * FROM table" ## vertical output
+mysql --tee=/tmp/tmp.out dbname <<<  "SELECT * FROM table" ## log of session
+#+END_SRC
+
+
+** 获取各类信息
+
+#+BEGIN_SRC sql
+SHOW FULL COLUMNS FROM table;
+SHOW STATUS;
+STATUS;
+#+END_SRC
+
+显示table信息：
+
+#+BEGIN_SRC sql
+SHOW TABLE STATUS;
+SHOW TABLE STATUS LIKE 'tbl_name'\G;
+#+END_SRC
+
+显示table创建语句信息：
+
+#+BEGIN_SRC sql
+SHOW CREATE TABLE tbl_name\G;
+#+END_SRC
+
+获取连接标识符：
+
+#+BEGIN_SRC sql
+SELECT CONNECTION_ID();
+#+END_SRC
+
+查询需用的字符集：
+
+#+BEGIN_SRC sql
+  SET @s1 = 'my string';
+  SET @s2 = CONVERT(@s1, USING utf8);
+  SELECT CHARSET(@s1), CHARSET(@s2);
+#+END_SRC
+
+
+** 使用变量
+
+#+BEGIN_SRC sql
+SELECT @id:=3
+SELECT @id:=cust_id FROM customers WHERE cust_name="name"
+SET @id=3
+SET @id:=3 ## same as above
+
+SET @n=0
+SELECT @n:=@n+1 AS rownum FROM table_name
+#+END_SRC
+
+
+** 克隆表
+
+1. 新建一张和现有某张表结构一致的表：
+
+   #+BEGIN_SRC sql
+   CREATE TABLE new_tbl LIKE original_tbl
+   #+END_SRC
+
+   克隆的表除了不克隆外键定义，不克隆源表可能使用的DATA DIRECTORY和INDEX DIRECTORY表选项，其余的都和源表一样
+
+2. 向新表中插入数据：
+
+   #+BEGIN_SRC sql
+   INSERT INTO new_tbl SELECT * FROM original_tbl; ## 如果只想复制源表的部分数据，可以加上相应的WHERE子句
+   #+END_SRC
+
+
+** 将查询结果保存到表中
+
+如果用来保存查询结果的表已经存在，可以使用INSERT INTO ... SELECT 语句将查询结果插入表中。如果所要使用的表还不存在，需要使用CREATE TABLE ... SELECT语句根据查询结果新建一张表
+
+#+BEGIN_SRC sql
+CREATE TABLE dst_tbl SELECT * FROM src_tbl WHERE 0; ## 创建一个空目的表
+#+END_SRC
+
+如果只复制部分列，需要在SELECT子句中指明需要复制的列名。例如，src_tbl中有列a, b, c, d，可以只复制b和d两列到目的表：
+
+#+BEGIN_SRC sql
+CREATE TABLE dst_tbl SELECT b, d FROM src_tbl;
+#+END_SRC
+
+如果希望目的表中列的顺序和源表不同，则需要在SELECT子句中显示的指明各列间的顺序。如果源表中列a，b，c按顺序出现，而用户希望复制完成后各列在目的表中出现顺序为c，a和b，可以使用如下语句：
+
+#+BEGIN_SRC sql
+CREATE TABLE dst_tbl SELECT c, a, b FROM src_tbl;
+#+END_SRC
+
+在CREATE TABLE子句部分插入列定义，可以在目的表中加入查询结果中没有的列：
+
+#+BEGIN_SRC sql
+  CRETE TABLE dst_tbl
+  (
+    id INT NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (id)
+  )
+  SELECT a, b, c FROM  src_tbl;
+#+END_SRC

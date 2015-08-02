@@ -1,0 +1,42 @@
+** LIKE / NOT LIKE
+
+为了在搜索子句中使用通配符，必须使用LIKE操作符。LIKE指示MySQL，后跟的搜索模式利用通配符匹配而不是直接相等匹配进行比较 （LIKE实际上不是操作符，而是谓词）
+
+基于SQL模式的匹配过程要求字符串与模式串完全匹配，匹配才会成功。如下，第一个匹配返回假，第二个匹配才是成功的：
+
+#+BEGIN_SRC
+'abc' LIKE 'b'
+'abc' LIKE '%b%'
+#+END_SRC
+
+
+*** SELECT name FROM students WHERE name LIKE 'Rooney%';
+
+%表示任何字符出现任意次数
+
+例外：不能匹配NULL，如果是WHERE name LIKE '%'不能匹配name为NULL的行
+
+
+*** SELECT name FROM students WHERE name LIKE '_ooney';
+
+_匹配单个字符而不是多个字符
+
+
+** REGEXP / NOT REGEXP
+
+与SQL模式不同，正则表达式匹配不要求目标串与模式串完全匹配。下面两个正则表达式都与至少含有一个b的字符串匹配，前者更简单，更高效：
+
+#+BEGIN_SRC
+'abc' REGEXP 'b'
+'abc' REGEXP '^.*b.*$'
+#+END_SRC
+
+NULL通过REGEXP和NOT REGEXP匹配的结果都是NULL
+
+正则表达式与SQL模式相比有一点不足：正则表达式只能作用于单字节字符集，对于utf8等多字节字符集，正则表达式就不能发挥作用了
+
+*** SELECT name FROM students WHERE name REGEXP 'jetpack'
+
+默认不区分大小写，为区分大小写，使用BINARY关键字：
+
+SELECT name FROM students WHERE name REGEXP BINARY 'JetPack'

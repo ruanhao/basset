@@ -1,0 +1,25 @@
+** 将二进制字符串转变为非二进制字符串或者反向转换
+
+#+BEGIN_SRC sql
+  SET @s1 = "my string";
+  SET @s2 = CONVERT(@s1 USING binary);
+  SET @s3 = CONVERT(@s2 USING utf8);
+  SELECT CHARSET(@s1), CHARSET(@s2), CHARSET(@s3);
+  ## 使用binary可以产生二进制字符串，使用字符集名可以产生非二进制字符串
+#+END_SRC
+
+#+BEGIN_SRC sql
+  SET @s1 = "my string";
+  SET @s2 = BINARY @s2;
+  SELECT CHARSET(@s1), CHARSET(@s2);
+#+END_SRC
+
+** 定义函数
+
+#+BEGIN_SRC sql
+  CREATE FUNCTION initial_cap (s VARCHAR(255))
+  RETURNS VARCHAR(255) DETERMINISTIC
+  RETURNS CONCAT(UPPER(LEFT(s, 1), MID(s, 2)));
+
+  SELECT thing, initial_cap(thing) FROM tbl;
+#+END_SRC

@@ -412,3 +412,109 @@ public class xxx {}
     </aop:aspect>
   </aop:config>
 #+END_SRC
+
+** JDBC
+
+*** 配置数据源
+
+#+BEGIN_SRC xml
+  <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+    <property name="driverClassName" value="org.gjt.mm.mysql.Driver"/>
+    <property name="url" value="jdbc:mysql://localhost:3306/mydb?useUnicode=true&amp;characterEncoding=UTF-8"/>
+    <property name="username" value="root"/>
+    <property name="password" value="123456"/>
+  </bean>
+#+END_SRC
+
+也可以使用配置文件结合属性占位符:
+
+#+BEGIN_SRC xml
+<context:property-placeholder location="jdbc.properties"/>
+#+END_SRC
+
+
+*** 配置事务
+
+**** XML方式
+
+#+BEGIN_SRC xml
+  <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="dataSource"/>
+  </bean>
+
+  <aop:config>
+    <aop:pointcut id="transactionPointcut" expression="execution(* com.hao.servie..*.*(..))"/>
+    <aop:advisor advice-ref="txAdvice" pointcut-ref="transactionPointcut"/>
+  </aop:config>
+
+  <tx:advice id="txAdvice" transaction-manager="txManager">
+    <tx:attributes>
+      <tx:method name="get*" read-only="true" propagation="NOT_SUPPORTED"/>
+      <tx:method name="*"/>
+    </tx:attributes>
+  </tx:advice>
+#+END_SRC
+
+
+**** 注解方式
+
+#+BEGIN_SRC xml
+  <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="dataSource"/>
+  </bean>
+
+  <tx:annotation-driver transaction-manager="txManager"/>
+#+END_SRC
+
+#+BEGIN_SRC java
+@Service @Transactional
+public class PersonServiceBean implement PersonService { }
+#+END_SRC
+
+
+*** 事务
+
+如果抛出RuntimeException，则Spring默认将会回滚事务，RuntimeException称为unchecked例外
+
+#+BEGIN_SRC java
+public void delete(Integer id) {
+    throw new RuntimeException("wrong");
+}
+
+// 如果想改变这种默认行为，希望不回滚，则需改为：
+@Transactional(noRollbackFor=RuntimeException.class)
+public void delete(Integer id) {
+    throw new RuntimeException("wrong");
+}
+#+END_SRC
+
+如果抛出checked例外，则Spring默认不会自动回滚事务，如：
+
+#+BEGIN_SRC java
+public void delete(Integer id) throws Exception {
+    throw new Exception("wrong");
+}
+
+// 如果想改变这种默认行为，希望支持回滚，则需改为：
+@Transactional(rollbackFor=Exception.class)
+public void delete(Integer id) throws Exception {
+    throw new Exception("wrong");
+}
+#+END_SRC
+
+取消对事务的支持：
+
+#+BEGIN_SRC java
+@Transactional(propagation=Propagation.NOT_SUPPORTED)
+public Person getPerson(Integer id) {}
+
+/*
+Propagation.REQUIRED: 业务方法需要在一个事务中运行，如果该方法运行时，已经处在一个事务中，那么加入到该事务，否则为自己创建一个新的事务 (这是Spring的默认值)
+Propagation.NOT_SUPPORTED: 声明方法不需要事务，如果方法没有关联到一个事务，容器不会为它开启事务。如果方法在一个事务中被调用，该事务会被挂起，在方法调用结束后，原先的事务便会恢复执行
+Propagation.REQUIRENEW: 表明不管是否存在事务，业务方法总会为自己发起一个新的事务。如果方法已经运行在一个事务中，则原有事务会被挂起，新的事务会被创建，直到方法执行结束，新事物才算结束，原先的事务才会恢复执行
+Propagation.MANDATORY: 该属性指定业务方法只能在一个已经存在的事务中执行，业务方法不能发起自己的事务。如果业务方法在没有事务的环境下调用，容器就会抛出例外
+Propagation.SUPPORTS: 如果业务方法在某个事务范围内被调用，则方法称为该事务的一部分。如果业务方法在事务范围外被调用，则方法在没有事务的环境下执行
+Propagation.Never: 指定业务方法绝对不能再事务范围内后执行。如果业务方法在某个事务中执行，容器会抛出例外，只用业务方法没有关联到任何事务，才能正常执行
+Propagation.NESTED: 如果一个活动的事务存在，则运行在一个嵌套的事务中，如果没有活动事务，则按REQUIRED属性执行，它使用一个单独的事务，这个事务拥有多个可以回滚的保存点。内部事务的回滚不会对外部事务造成影响。它只对DataSourceTransactionManager事务管理器起效
+*/
+#+END_SRC
