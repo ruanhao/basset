@@ -1,0 +1,31 @@
+** 获取当前日期或时间
+
+#+BEGIN_SRC sql
+  SELECT CURDATE(), CURTIME(), NOW();
+
+|------------+-----------+---------------------|
+|  CURDATE() | CURTIME() | NOW()               |
+|------------+-----------+---------------------|
+| 2006-06-03 |  09:41:50 | 2006-06-03 09:41:50 |
+|------------+-----------+---------------------|
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+current_date()      等价于  current_time()
+curdate()           等价于  curtime()
+current_timestamp() 等价于  now()
+#+END_EXAMPLE
+
+** 自动记录一行记录的创建和修改时间
+
+将列值设为它的当前值不会更新TIMESTAMP
+
+#+BEGIN_SRC sql
+  CREATE TABLE t
+  (
+          ts timestamp NOT NULL
+          DEFAULT CURRENT_TIMESTAMP   ## 记录创建时填写的时间戳
+          ON UPDATE CURRENT_TIMESTAMP ## 记录更新时填写的时间戳
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+#+END_SRC

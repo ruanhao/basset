@@ -14,6 +14,7 @@
   SELECT CHARSET(@s1), CHARSET(@s2);
 #+END_SRC
 
+
 ** 定义函数
 
 #+BEGIN_SRC sql
@@ -22,4 +23,67 @@
   RETURNS CONCAT(UPPER(LEFT(s, 1), MID(s, 2)));
 
   SELECT thing, initial_cap(thing) FROM tbl;
+#+END_SRC
+
+
+** ENUM和SET这两种值类型在数据库中被当做字符串来保存，因此可以用于CONCAT()函数
+
+
+** FULLTEXT检索
+
+SELECT * FROM tbl_name WHERE MATCH(column) AGAINST('my string');
+
+FULLTEXT查询中的查询字符串可以包含多个单词，但是查询过程对每个单词进行OR查询：
+
+SELECT * FROM tbl_name WHERE MATCH(vtext) AGAINST('Abraham Sarah');
+
+如果想使用FULLTEXT同时对多列进行查询，需要在建立索引时指定所有需要被查询的列，同时在MATCH()参数列表中指定所有列:
+
+#+BEGIN_SRC sql
+ALTER TABLE tbl_name ADD FULLTEXT (col1, col2, col3);
+SELECT * FROM tbl_name WHERE MATCH(col1, col2, col3) AGAINST('search string');
+#+END_SRC
+
+*** Boolean模式查询
+
+#+BEGIN_SRC sql
+  SELECT COUNT(*) FROM tbl
+  WHERE MATCH(vtext) AGAINST('+David +Goliath' IN BOOLEAN MODE); ## 同时包含 David 和 Goliath 的行
+#+END_SRC
+
+#+BEGIN_SRC sql
+  SELECT COUNT(*) FROM tbl
+  WHERE MATCH(vtext) AGAINST('+David -Goliath' IN BOOLEAN MODE); ## 包含 David 但是不包含 Goliath 的行
+#+END_SRC
+
+#+BEGIN_SRC sql
+  SELECT COUNT(*) FROM tbl
+  WHERE MATCH(vtext) AGAINST('whirl*' IN BOOLEAN MODE);
+  ## 不仅可以包含 whirl，也可以包含 whirls, whirleth 和 whirlwind 等单词
+#+END_SRC
+
+#+BEGIN_SRC sql
+  SELECT COUNT(*) FROM tbl
+  WHERE MATCH(vtext) AGAINST('"still small voice"' IN BOOLEAN MODE); ## 词组搜索
+#+END_SRC
+
+**
+
+** 将字符串转换为数值
+
+加0:
+
+SELECT * FROM tbl ORDER BY score_str+0;
+
+** 强制转换为字符串
+
+#+BEGIN_SRC sql
+  CREATE TABLE weekday
+  (
+      day ENUM('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday')
+  );
+
+  ## 希望按照词汇方式排序 ENUM 数值：
+  SELECT day, day+0 FROM weekday ORDER BY CAST(day AS CHAR);
+
 #+END_SRC

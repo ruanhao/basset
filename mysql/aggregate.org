@@ -1,0 +1,38 @@
+
+聚合函数不能用于 WHERE 子句之后
+
+** COUNT()
+
+没有 WHERE 子句的 COUNT(*) 对 MyISAM 表来说是非常快的。然而，对于 InnoDB 表而言，因为要执行完整的表扫描，对于巨大的表而言会非常慢。一个避免完整扫描存储引擎的工作方法是从 INFORMATION_SCHEMA 数据库中提取 TABLE_ROWS 数值：
+
+#+BEGIN_SRC sql
+  SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES
+  WHERE TABLE_SCHEMA = 'dbname' AND TABLE_NAME = 'tblname';
+#+END_SRC
+
+*** COUNT(expr)
+
+接受一个数据列名或者表达式参数，并计算所有非空值数目
+
+#+BEGIN_SRC sql
+  SELECT COUNT(*), COUNT(mycol) FROM mytbl;
+  ## 显示所有行数和其中一个数据列的非空值数量
+#+END_SRC
+
+COUNT(expr) 不计数空值的事实对于从同一个数据行集合中生成多重计数非常有用：
+
+#+BEGIN_SRC sql
+  SELECT
+  COUNT(IF(DAYOFWEEK(trav_date)=7,1,NULL)) AS 'Saturday trips',
+  COUNT(IF(DAYOFWEEK(trav_date)=1,1,NULL)) AS 'Sunday trips'
+  FROM tbl;
+#+END_SRC
+
+
+** SUM()
+
+#+BEGIN_SRC sql
+  SELECT SUM(TIME_TO_SEC(t1)) AS 'total seconds',
+  SEC_TO_TIME(SUM(TIME_TO_SEC(t1))) AS 'total time'
+  FROM time_val;
+#+END_SRC

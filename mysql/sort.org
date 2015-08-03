@@ -1,0 +1,46 @@
+** 隐式排序
+
+即不对具体的列进行排序：
+
+SELECT date, description FROM event ORDER BY MONTH(date), DAYOFMONTH(date);
+
+** Floating values to the head or tail of the sort order
+
+#+BEGIN_SRC sql
+  mysql > SELECT val FROM t;
+
+  |------|
+  |  val |
+  |------|
+  |    3 |
+  |  100 |
+  | NULL |
+  | NULL |
+  |    9 |
+  |------|
+
+  ## 正常情况下，升序排序时空值将被放置在排序结果的一开始
+  ## 为了将它们放置在结束位置，可以引入一个额外的ORDER BY数据列将空值映射为比非空值更高的数值:
+
+  mysql > SELECT val FROM t ORDER BY IF(val IS NULL,1,0), val;
+
+  |------|
+  |  val |
+  |------|
+  |    3 |
+  |    9 |
+  |  100 |
+  | NULL |
+  | NULL |
+  |------|
+#+END_SRC
+
+
+** 自定义排序顺序
+
+FIELD() 函数可以按照任意你想要的顺序排序任一数据集
+
+#+BEGIN_SRC sql
+  ## 按照 Henry, Suzi, Ben的顺序显示 driver_log 表：
+  SELECT * FROM driver_log ORDER BY FIELD(name,'Henry','Suzi','Ben');
+#+END_SRC
