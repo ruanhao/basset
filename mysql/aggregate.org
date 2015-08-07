@@ -1,5 +1,7 @@
 
-聚合函数不能用于 WHERE 子句之后
+** 聚合函数不能用于 WHERE 子句之后
+
+因为 WHERE 指明的初始约束条件确定了那些数据行应该被选择，但是聚合函数的数值只能在数据行被选中之后才能确定。正确做法是将聚合函数放置到 HAVING 子句中。
 
 ** COUNT()
 
@@ -35,4 +37,22 @@ COUNT(expr) 不计数空值的事实对于从同一个数据行集合中生成�
   SELECT SUM(TIME_TO_SEC(t1)) AS 'total seconds',
   SEC_TO_TIME(SUM(TIME_TO_SEC(t1))) AS 'total time'
   FROM time_val;
+#+END_SRC
+
+** 和 ORDER BY 子句一样，GROUP BY 子句也能够引用表达式
+
+** 使用聚合函数的列，之间是独立的
+
+#+BEGIN_SRC sql
+  SELECT COUNT(pop), COUNT(DISTINCT pop) FROM states;
+#+END_SRC
+
+** 按照数量级进行分类
+
+将 mail 表中的数据行按照 1000,000 字节的量级分类：
+
+#+BEGIN_SRC sql
+  SELECT FLOOR((size+99999)/100000) AS 'size (100KB)',
+  COUNT(*) AS 'number of messages'
+  FROM mail GROUP BY 'size (100KB)';
 #+END_SRC

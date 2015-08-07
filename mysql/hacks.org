@@ -69,11 +69,13 @@ SELECT * FROM tbl_name WHERE MATCH(col1, col2, col3) AGAINST('search string');
 
 **
 
+
 ** 将字符串转换为数值
 
 加0:
 
 SELECT * FROM tbl ORDER BY score_str+0;
+
 
 ** 强制转换为字符串
 
@@ -86,4 +88,30 @@ SELECT * FROM tbl ORDER BY score_str+0;
   ## 希望按照词汇方式排序 ENUM 数值：
   SELECT day, day+0 FROM weekday ORDER BY CAST(day AS CHAR);
 
+#+END_SRC
+
+** CASE
+
+#+BEGIN_SRC sql
+SELECT name, salary,
+    CASE
+    WHEN salary >= 3000 THEN 'A'
+    WHEN salary >= 1000 AND salary <= 2000 THEN 'B'
+    WHEN salary < 1000 THEN 'C'
+    END SalaryGrade
+FROM tbl;
+#+END_SRC
+
+#+BEGIN_SRC sql
+  SELECT Name, Continent,
+      CASE Continent
+          WHEN 'Asia' THEN 'AS'
+          WHEN 'Europe' THEN 'EU'
+          WHEN 'Africa' THEN 'AF'
+          WHEN 'Oceania' THEN 'OA'
+          WHEN 'Antarctica' THEN 'AN'
+          WHEN 'North America' THEN 'NA'
+          WHEN 'South America' THEN 'SA'
+      END ContinentCode
+  FROM country;
 #+END_SRC

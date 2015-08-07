@@ -1,0 +1,35 @@
+** INNER JOIN & USING
+
+若两个表匹配列名字相同，并且是使用 = 操作符进行比较的话，可以使用 INNER JOIN 并搭配 USING 子句作为代替，从而不需要表修饰符，而且连接列只会被列出一次：
+
+#+BEGIN_SRC sql
+  SELECT * FROM artist INNER JOIN painting USING(a_id);
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+ON, USING, WHERE 中的任何一个都可以包含比较操作，如何知道每个子句中该放入什么样的连接条件？
+根据经验规则，通常使用 ON 或 USING 来指定如何连接表，而使用 WHERE 子句限制选择哪些已连接的行
+#+END_EXAMPLE
+
+** LEFT JOIN
+
+当面对在某个表中寻找与另一个表不匹配（即另一个表所缺少）的值的问题时，应有此思维习惯 --> 这是一个 LEFT JOIN 问题
+
+LEFT JOIN 是外部连接的一种，它与内部连接类似，即试图将第一个（left）表和第二个（right）表中的行相匹配。如果 left 表中没有与 right 表相匹配的行，LEFT JOIN 仍将产生一行，该行中所有来自 right 表的列被设为 NULL。这意味着可以通过查找 NULL 来发现 right 表中所缺少的值
+
+** 自连接
+
+需要与表自身进行比较的问题涉及自连接操作
+
+“哪些值与表中其他行匹配”问题 -> 自连接
+
+“哪些值与表中其他行不匹配”问题 -> 自左连接
+
+
+** 关于 “A LEFT JOIN B ON 条件表达式” 的一点提醒
+
+ON 条件（“A LEFT JOIN B ON 条件表达式”中的ON）用来决定如何从 B 表中检索数据行。
+
+***如果 B 表中没有任何一行数据匹配 ON 的条件,将会额外生成一行所有列为 NULL 的数据*** (这就是 ON 和 WHERE 的区别)
+
+在匹配阶段 WHERE 子句的条件都不会被使用。仅在匹配阶段完成以后，WHERE 子句条件才会被使用。它将从匹配阶段产生的数据中检索过滤。
