@@ -31,7 +31,54 @@
 
 ** 向表中插入数据
 
+#+BEGIN_SRC sql
 INSERT INTO table_name SET column_name = value;
+#+END_SRC
+
+#+BEGIN_SRC sql
+  ## 使用 DEFAULT 是写入预设值
+  INSERT INTO tbl VALUES (1, 2, DEFAULT);
+
+  ## 对于没有指定的栏位一律写入 NULL
+  INSERT INTO tbl (col1, col2) VALUES (1, 2);
+
+  ## 所有栏位都使用预设值
+  INSERT INTO tbl () VALUES ();
+#+END_SRC
+
+#+BEGIN_SRC sql
+INSERT INT tbl VALUES (1, 2, 3)
+ON DUPLICATE KEY UPDATE col = col + 1;
+#+END_SRC
+
+#+BEGIN_SRC sql
+## 当索引值重复值不报错，也不执行插入操作
+INSERT IGNORE INTO tbl VALUES (1, 2, 3);
+
+## 当索引值不重复时，和 INSERT 一样
+## 当索引值重复值时，执行修改操作
+REPLACE INTO tbl VALUES (1, 2, 3);
+#+END_SRC
+
+#+BEGIN_SRC sql
+  INSERT INTO table
+      VALUES
+      (7900, 'BOSTON', 1)
+  ON DUPLICATE KEY UPDATE counter = counter + 1;
+  ## 若id为7900与现有主键冲突，则对现有记录的counter加1
+#+END_SRC
+
+
+** 从表中删除数据
+
+#+BEGIN_SRC sql
+DELETE FROM tble;
+
+TRUNCATE TABLE tbl;
+
+## 两个语句都是删除表中所有数据
+## 当数据较多时，TRUNCATE 效率较高
+#+END_SRC
 
 
 ** 向表中更新数据

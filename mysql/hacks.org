@@ -77,6 +77,15 @@ SELECT * FROM tbl_name WHERE MATCH(col1, col2, col3) AGAINST('search string');
 SELECT * FROM tbl ORDER BY score_str+0;
 
 
+** 字符串拼接
+
+#+BEGIN_SRC sql
+  SELECT 'Hello' || 'MySQL'; ## Error
+  SET sql_mode = 'PIPES_AS_CONCAT';
+  SELECT 'Hello' || 'MySQL'; ## Correct
+#+END_SRC
+
+
 ** 强制转换为字符串
 
 #+BEGIN_SRC sql
@@ -89,6 +98,24 @@ SELECT * FROM tbl ORDER BY score_str+0;
   SELECT day, day+0 FROM weekday ORDER BY CAST(day AS CHAR);
 
 #+END_SRC
+
+
+** 字符串左右对齐可以使用 LPAD/RPAD 函数
+
+
+** SELECT CONCAT_WS(', ', Name, Continent, Region) FROM country;
+
+「CONCAT」與「CONCAT_WS」兩個函式的參數可以接受任何型態的資料，它們都會把全部的資料轉為字串後連接起來；「CONCAT」函式的參數中如果有「NULL」值，結果會是「NULL」；「CONCAT_WS」函式的參數中如果有「NULL」值，「NULL」值會被忽略
+
+
+** GROUP_CONCAT
+
+GROUP_CONCAT ( [DISTINCT] col [ORDER BY xxx] [SEPARATOR s])
+
+#+BEGIN_SRC sql
+  SELECT GROUP_CONCAT(dname ORDER BY dname SEPARATOR '|') FROM tbl;
+#+END_SRC
+
 
 ** CASE
 
@@ -114,4 +141,40 @@ FROM tbl;
           WHEN 'South America' THEN 'SA'
       END ContinentCode
   FROM country;
+#+END_SRC
+
+
+** LIMIT 搭配 UPDATE 使用时只能跟一个数字
+
+#+BEGIN_SRC sql
+UPDATE tbl
+SET salary = salary + 1000
+ORDER BY salary
+LIMIT 3 ## 不能写成 LIMIT 0,3 这样子
+#+END_SRC
+
+** 随机查询
+
+#+BEGIN_SRC sql
+    SELECT name FROM country
+    ORDER BY RAND()
+    LIMIT 1
+#+END_SRC
+
+** CURRENT_TIMESTAMP
+
+在一個表格中，MySQL限制「CURRENT_TIMESTAMP」只能在一個欄位出現。如果在同一筆紀錄中，要使用一個欄位記錄新增資料的日期與時間，而使用另一個欄位記錄修改資料的日期與時間。為了應付這樣的需求，必須使用MySQL提供給你的特殊設定方式來解決：
+
+#+BEGIN_SRC sql
+  CREATE TABLE IF NOT EXISTS table_name
+      (
+          created TIMESTAMP DEFAULT 0,
+          updated TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          );
+#+END_SRC
+
+當你指定「created」欄位的值為「NULL」的時候，MySQL會自動為你填入目前的日期與時間：
+
+#+BEGIN_SRC sql
+INSERT INTO table_name (created) VALUES (NULL);
 #+END_SRC

@@ -1,0 +1,24 @@
+** index
+
+#+BEGIN_SRC sql
+CREATE TABLE addressbook (
+    address VARCHAR(80),
+    INDEX (address (5) DESC) ## 使用address的前5个字符制作索引，而且由大到小排列
+)
+#+END_SRC
+
+註：只有「CHAR」、「VARCHAR」、「BINARY」與「VARBINARY」型態的欄位可以指定製作索引的長度。「ASC」或「DESC」可以使用在任何型態的欄位
+
+
+** 算法
+
+預設的「HASH」演算法適合用在主索引鍵和唯一索引，這種演算法在搜尋不能重複的資料時，效率會比較好；而「BTREE」演算法適合用在可以允許重複資料的一般索引，在搜尋上會比「HASH」有更好的效率
+
+** FULLTEXT
+
+「FULLTEXT」索引只能用在「CHAR」、「VARCHAR」與「TEXT」型態的欄位，而且表格使用的儲存引擎必須是「MyISAM」
+
+
+** SPATIAL
+
+「SPATIAL」索引是「SPATIAL」型態欄位專用的，而且表格使用的儲存引擎必須是「MyISAM」

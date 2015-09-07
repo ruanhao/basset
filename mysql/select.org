@@ -2,6 +2,7 @@
 
 DISTINCT 关键字应用于所有列而不仅是前置它的列
 
+
 *** SELECT <col> FROM <table> LIMIT <lineno>[,<lines>]
 
 
@@ -10,6 +11,7 @@ DISTINCT 关键字应用于所有列而不仅是前置它的列
 SELECT name,score FROM students ORDER BY name DESC, score;
 
 DESC关键词只应用于直接位于其前面的列名
+
 
 *** 将列与NULL进行比较
 
@@ -22,6 +24,7 @@ SELECT name, IF(id IS NULL, 'Unknown', id) AS 'id' FROM tbl_name;
 SELECT name, IFNULL(id, 'Unknown') AS 'id' FROM tbl_name;
 #+END_SRC
 
+
 *** WHERE表达式中不能使用别名
 
 只能使用原始的列名
@@ -31,12 +34,14 @@ SELECT size/1024 AS kilobytes FROM tbl_name WHERE kilobytes > 500; ## ERROR
 SELECT size/1024 AS kilobytes FROM tbl_name WHERE size/1024 > 500;
 #+END_SRC
 
+
 *** 返回查询结果总行数
 
 #+BEGIN_SRC sql
 SELECT SQL_CALC_FOUND_ROWS * FROM taxpayer;
 SELECT FOUND_ROWS();
 #+END_SRC
+
 
 *** 建立临时查询表
 
@@ -47,3 +52,7 @@ SELECT FOUND_ROWS();
 #+END_SRC
 
 在查询语句中，FROM子句之后必须是表名，因此在上例中使用AS t对子查询结果赋予别名，作为FROM的一个临时表名。（类似建立一个视图）
+
+*** SELECT * FROM tbl WHERE col BETWEEN a AND b;
+
+等效于 col >= a AND col <= b
