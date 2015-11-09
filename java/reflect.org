@@ -1,54 +1,93 @@
-** Proxy
+#+TITLE:     Reflect
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
 
-*** JDK native
+** 获取 Class 对象的方式
 
 #+BEGIN_SRC java
-  public class JDKProxyFactory implements InvocationHandler {
-      private Object targetObject;
-
-      // Implements
-      public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-          Object result = null;
-          // advice(); 前置通知
-          try {
-              result = method.invoke(targetObject, args);
-              // after_advice(); 后置通知
-          } catch (RuntimeException e) {
-              // excetion_advice(); 例外通知
-          } finally {
-              // finally_advice(); 最终通知
-          }
-
-
-          return result;
-      }
-
-      pubilc Object createProxyInstance(Object targetObject) {
-          this.targetObject = targetObject;
-          Proxy.newProxyInstance(this.targetObject.getClass().getClassLoader(), this.targetObject.getClass().getInterfaces(), this);
-      }
-  }
+Class clazz0 = java.lang.String.class;
+Class clazz1 = "hello".getClass();
+Class clazz2 = Class.forName("java.lang.String");
 #+END_SRC
 
-*** CGLIB
+只要是在源程序中出现的类型，都有各自的 Class 实例对象，例如 int[], void ...
+
+
+** Constructor
 
 #+BEGIN_SRC java
-  public class CGlibProxyFactory implements MethodInterceptor {
-      private Object targetObject;
+  Constructor<String> cons = String.class.getConstructor(StringBuffer.class); // 根据参数列表来取得相应的 Constructor
+  String str = cons.newInstance(new StringBuffer("hello"));
+  String str2 = String.class.newInstance(); // Equal to: String str2 = new String();
+#+END_SRC
 
-      public Object createProxyInstance(Object targetObject) {
-          this.targetObject = targetObject;
-          Enhancer enhancer = new Enhancer();
-          enhancer.setsSuperclass(this.targetObject.getClass()); // CGLIB可以生成目标类的子类，并重写父类非final修饰符的方法
-          enhancer.setCallback(this);
-          return enhancer.create();
-      }
 
-      // Implements
-      public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
-          // you can do something here
-          return methodProxy.invoke(this.targetObject, args);
-          // you can do something here, too
-      }
-  }
+** Fields
+
+#+BEGIN_SRC java
+public class Point {
+
+    public int x;
+
+    private int y;
+
+    Point(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+#+END_SRC
+
+Test:
+
+#+BEGIN_SRC java
+  Point p = new Point(1, 2);
+  Field fieldX = p.getClass().getField("x");
+  System.out.println(fieldX.get(p));
+  Field fieldY = p.getClass().getDeclaredField("y"); // Can get PUBLIC or PRIVATE field by getDeclaredField()
+  fieldY.setAccessible(true);
+  System.out.println(fieldY.get(p));
+
+#+END_SRC
+
+
+** Methods
+
+#+BEGIN_SRC java
+  String s = "abc";
+  Method mCharAt = String.class.getMethod("charAt", int.class);
+  char c = (char) mCharAt.invoke(s, 2);
+  System.out.println(c);
+  Method mValueOf = String.class.getMethod("valueOf", double.class);
+  String doubleStr = (String) mValueOf.invoke(null, 3.14); // Way to call STATIC method
+  System.out.println(doubleStr);
+#+END_SRC
+
+
+** Usefuls
+
+#+BEGIN_SRC java
+Class strClazz = Class.forName("java.lang.String");
+strClazz.isPrimitive(); // False
+int.class == Integer.class; // False
+int.class == Integer.TYPE; // True
+int[].class.isArray(); // True
+#+END_SRC
+
+#+BEGIN_SRC java
+    public void printObj(Object obj) {
+        if (obj.getClass().isArray()) {
+            int length = Array.getLength(obj); // 利用反射获取数组对象的长度
+            for (int i = 0; i < length; ++i) {
+                System.out.println(Array.get(obj, i)); // 利用反射获取数组元素
+            }
+        } else {
+            System.out.println(obj);
+        }
+    }
 #+END_SRC
