@@ -1,0 +1,56 @@
+#+TITLE:     Generic
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+* 获得参数的泛型类型
+
+直接通过变量无法获得泛型参数类型，只能通过方法
+
+#+BEGIN_SRC java
+  public class MyClass {
+      public void foo(Vector<Date> v) {}
+  }
+#+END_SRC
+
+#+BEGIN_SRC java
+  Method mFoo = MyClass.class.getMethod("foo", Vector.class);
+  Type[] types = mFoo.getGenericParameterTypes();
+  ParameterizedType pType = (ParameterizedType) types[0];
+  System.out.println(pType.getRawType());
+  System.out.println(pType.getActualTypeArguments()[0]);
+
+#+END_SRC
+
+* 通配符
+
+** ?
+
+使用 ? 通配符可以引用其他各种参数化的类型，? 通配符定义的变量主要用作引用，可以调用与参数化无关的方法，不能调用与参数化有关的方法
+
+#+BEGIN_SRC java
+public void printCollection(Collection<?> c) {
+    c.add("string"); // Wrong 因为它不知道将来匹配的一定是 String
+    c.size(); // Right 此方法与类型参数没有关系
+}
+#+END_SRC
+
+
+* Caveats
+
++ 数组元素不能用参数化类型
+
+  #+BEGIN_SRC java
+  Vector<Integer> list[] = new Vector<Integer>[10]; // Wrong
+  #+END_SRC
+
++ 类型兼容
+
+  #+BEGIN_SRC java
+  Collection<?> c = new HashSet<Date>(); // Right
+  Collection<Object> c = new HashSet<Date>(); // Wrong
+  #+END_SRC

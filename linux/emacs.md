@@ -110,6 +110,9 @@ M-s o  # occurs
 C-x <tab> # 整体缩进
 
 C-x r N # insert line nums
+
+M-C-o  # Split line at cursor into two lines...  weird.
+
 ```
 
 

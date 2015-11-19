@@ -1,0 +1,79 @@
+#+TITLE:     Class Loader
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+
+** 类加载器加载文件
+
+#+BEGIN_SRC java
+InputStream ips = ClassName.class.getClassLoader().getResource("resourse-file-name"); // Way 1 需指定相对 classpath 的路径
+
+InputStream ips = ClassName.class.getResourceAsStream("resourse-file-name"); // Way 2 需指定相对包的路径
+
+#+END_SRC
+
+
+* ClassLoader
+
+类加载器是一个用来加载类文件的类。Java源代码通过javac编译器编译成类文件。类加载器负责加载文件系统、网络或其他来源的类文件。有三种默认使用的类加载器：Bootstrap类加载器、Extension类加载器和System类加载器（或者叫作Application类加载器）。*每个类加载器负责加载特定位置的类*
+
+*** Bootstrap
+
+Bootstrap 类加载器负责加载rt.jar中的JDK类文件，它是所有类加载器的父加载器。Bootstrap类加载器没有任何父类加载器，如果你调用String.class.getClassLoader()，会返回null。Bootstrap加载器被称为初始类加载器。
+
+
+*** Extension
+
+而Extension将加载类的请求先委托给它的父加载器，也就是Bootstrap，如果没有成功加载的话，再从jre/lib/ext目录下或者java.ext.dirs系统属性定义的目录下加载类。Extension加载器由sun.misc.Launcher$ExtClassLoader实现。
+
+
+*** System
+
+第三种默认的加载器就是System类加载器（又叫作Application类加载器）了。它负责从classpath环境变量中加载某些应用相关的类，classpath环境变量通常由-classpath或-cp命令行选项来定义，或者是JAR中的Manifest的classpath属性。Application类加载器是Extension类加载器的子加载器。通过sun.misc.Launcher$AppClassLoader实现。
+
+
+*** 类加载过程
+
+1. 首先由当前线程的类加载器( Thread.getContextClassLoader() )来完成加载
+
+2. 如果类 A 引用了类 B ，JVM将使用加载类 A 的类加载器来加载类 B
+
+3. 也可以直接调用 ClassLoader.loadClass() 方法来指定某个类加载器去加载某个类
+
+*** Summary
+
+除了Bootstrap类加载器是大部分由C来写的，其他的类加载器都是通过java.lang.ClassLoader来实现的。
+
+下面是三种类加载器加载类文件的地方：
+
+- Bootstrap类加载器   - JRE/lib/rt.jar
+
+- Extension类加载器   - JRE/lib/ext或者java.ext.dirs指向的目录
+
+- Application类加载器 - CLASSPATH环境变量, 由-classpath或-cp选项定义,或者是JAR中的Manifest的classpath属性定义.
+
+* 编写自定义 ClassLoader
+
+** 继承 ClassLoader 抽象类
+
+
+** loadClass(String name)
+
+#+BEGIN_EXAMPLE
+该方法内部实现了父委托机制，一般情况下不用覆写
+当父类加载器无法加载时，将调用 findClass(String name)
+#+END_EXAMPLE
+
+** findClass(String name)
+
+#+BEGIN_EXAMPLE
+需要覆写该方法
+需实现找到 class 文件，并转换成字节流
+将字节流传入 defineClass(String binaryName, byte[] stream, int off, int len) 即返回 Class 对象引用
+#+END_EXAMPLE
