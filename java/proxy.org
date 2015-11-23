@@ -7,41 +7,104 @@
 #+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
 #+STARTUP:   showall
 
+* 原理
+
+- JVM 可以在运行期动态生成类的字节码，这种动态生成的类被用作代理，即动态代理类
+
+- JVM 生成的动态类必须实现一个或多个接口，所以 JVM 生成的动态类只能用作具有相同接口的目标类的代理
+
+- CGLIB 库可以动态生成一个类的子类，而一个类的子类也可以用作该类的代理，所以，如果要为一个没有实现接口的类生成动态代理类，需要使用 CGLIB 库
 
 
+* 位置
 
-** JDK native
+- 调用目标方法之前
+
+- 调用目标方法之后
+
+- 调用目标方法前后
+
+- 处理目标方法异常的 catch 块中
+
+  #+BEGIN_SRC java
+    public void sayHello() {
+        .....
+        try {
+            target.sayHello();
+        } catch (Exception e) {
+            .....
+        }
+        .....
+    }
+  #+END_SRC
+
+
+* APIs
+
+- Proxy.getProxyClass(ClassLoader loader, Class<?>... interfaces)
+
+  返回运行期动态生成的字节码对象
+
+- Proxy.newProxyInstance(ClassLoader loader, Class<?>[] interfaces, InvocationHandler h)
+
+  直接返回代理类生成的实例对象
+
+
+* Caveats
+
+- 当代理对象（ proxyObj ）调用 hashCode ， equals ，toString 这三个从 Object 类继承的方法时，将调用实际对象的对应方法，而其他从 Object 类继承的方法则不会派发给实际对象
+
+
+* Examples
 
 #+BEGIN_SRC java
-  public class JDKProxyFactory implements InvocationHandler {
-      private Object targetObject;
+  interface Advice {
 
-      // Implements
-      public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-          Object result = null;
-          // advice(); 前置通知
-          try {
-              result = method.invoke(targetObject, args);
-              // after_advice(); 后置通知
-          } catch (RuntimeException e) {
-              // excetion_advice(); 例外通知
-          } finally {
-              // finally_advice(); 最终通知
-          }
+      public void before();
 
+      public void after();
+  }
 
-          return result;
+  public class ProxyTest {
+
+      @SuppressWarnings("unchecked")
+      public static <T> T getProxy(final T target, final Advice advice) {
+          return (T) Proxy.newProxyInstance(target.getClass().getClassLoader(),
+                                            target.getClass().getInterfaces(),
+                                            new InvocationHandler(){
+                                                @Override
+                                                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                                                    advice.before();
+                                                    Object result = method.invoke(target, args);
+                                                    advice.after();
+                                                    return result;
+
+                                                }});
       }
 
-      pubilc Object createProxyInstance(Object targetObject) {
-          this.targetObject = targetObject;
-          Proxy.newProxyInstance(this.targetObject.getClass().getClassLoader(), this.targetObject.getClass().getInterfaces(), this);
+      public static void main(String[] args) {
+
+          List<String> list = new ArrayList<>();
+
+          List<String> proxyList = getProxy(list, new Advice() {
+
+                  @Override
+                  public void before() {
+                      System.out.println("do before");
+                  }
+
+                  @Override
+                  public void after() {
+                      System.out.println("do after");
+                  }});
+
+          proxyList.add("hello");
       }
   }
 #+END_SRC
 
 
-** CGLIB
+* CGLIB
 
 #+BEGIN_SRC java
   public class CGlibProxyFactory implements MethodInterceptor {

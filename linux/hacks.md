@@ -29,7 +29,6 @@ netstat -tuln                 ## 查询目前主机所有开启的网络服务�
 ## 查看连接某服务端口最多的IP地址
 netstat -nat | grep "192.168.1.15:22" | awk '{print $5}' | awk -F: '{print $1}' | sort | uniq -c | sort -nr | head -20
 
-lsof -i                       ## 实时查看本机网络服务的活动状态
 
 kill -s <Signal> <Pid>
 kill -0 <Pid>                 ## 可用来测试process是否还在运行，如果process终止了，则$?不为0
@@ -138,10 +137,6 @@ mount | column -t ## currently mounted filesystems in nice layout
 while sleep 1;do tput sc;tput cup 0 $(($(tput cols)-29));date;tput rc;done &
 ## Put a console clock in top right corner
 
-lsof -i ## List programs with open ports and connections
-lsof -P -i -n ## show apps that use internet connection at the moment
-lsof -i tcp:80 ## which program is this port belongs to
-lsof -c <command> ## list all files opened by a particular command
 
 ss -p # show apps that use internet connection at the moment
 

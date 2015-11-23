@@ -1,0 +1,82 @@
+#+TITLE:     Thread
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+* Timer
+
+** delay
+
+#+BEGIN_SRC java
+  long delay  = 1000;
+  new Timer().schedule(new TimerTask() {
+          @Override
+          public void run() {
+              System.out.println("Time is up");
+          }
+      }, delay);
+#+END_SRC
+
+** delay and period
+
+#+BEGIN_SRC java
+  long delay  = 1000;
+  long period = 1000;
+  new Timer().schedule(new TimerTask() {
+          @Override
+          public void run() {
+              System.out.println("Time is up");
+          }
+      }, delay, period);
+#+END_SRC
+
+** scheduleAtFixedRate
+
+** 递归调用会导致 "unable to create new native thread"
+
+#+BEGIN_SRC java
+class MyTimerTask extends TimerTask {
+    @Override
+    public void run() {
+        new Timer().schedule(new MyTimerTask(), 300);
+    }
+}
+
+public class TimerTest {
+    public static void main(String[] args) {
+        new Timer().schedule(new MyTimerTask(), 0);
+    }
+}
+#+END_SRC
+
+
+* Notes
+
+** wait 需要放在 while 语句块中
+
+#+BEGIN_QUOTE
+A thread can also wake up without being notified, interrupted, or timing out, a so-sclled spurious wakeup. While this will rarely occur in practice, applications must guard against it by testing for the condition that should have caused the thread to be awakened, and continuing to wait if the condition is not satisfied. In other words, waits should always occru in loops, like this one:
+#+END_QUOTE
+
+#+BEGIN_SRC java
+synchronized (obj) {
+    while (<condition dose not hold>)
+        obj.wait(timeout);
+    ... // Perform action appropriate to condition
+}
+#+END_SRC
+
+** synchronized & wait()
+
+#+BEGIN_EXAMPLE
+synchronized 代码块会在退出代码块时主动释放锁，也会在进入代码块时主动请求锁
+#+END_EXAMPLE
+
+#+BEGIN_EXAMPLE
+wait() 方法调用后将主动让出锁，线程进入等待状态，当出现可用的锁时，并不主动获取锁，必须调用 notify() 唤醒线程
+wait() 方法主要作用是使当前线程进入等待状态, notify() 方法则是唤醒处于等待状态中的线程，取得锁的功能则交给 synchronized 关键字完成
+#+END_EXAMPLE
