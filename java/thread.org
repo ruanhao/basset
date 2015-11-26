@@ -21,6 +21,7 @@
       }, delay);
 #+END_SRC
 
+
 ** delay and period
 
 #+BEGIN_SRC java
@@ -34,7 +35,9 @@
       }, delay, period);
 #+END_SRC
 
+
 ** scheduleAtFixedRate
+
 
 ** 递归调用会导致 "unable to create new native thread"
 
@@ -53,6 +56,265 @@ public class TimerTest {
 }
 #+END_SRC
 
+
+* ThreadLocal
+
+线程范围变量共享，一个 ThreadLocal 代表一个变量，其中智能存放一个数据。若有多个变量需要共享，则可以使用一个对象来封装多个变量，并使用 ThreadLocal 来存储这个对象
+
+线程结束后 ThreadLocal 将自动释放内存，也可以调用 remove() 方法主动释放
+
+*** Examples
+
+#+BEGIN_SRC java
+  static ThreadLocal<Integer> local = new ThreadLocal();
+
+  public void threadLocalTest() {
+      new Thread(new Runnable() {
+              int data = 123;
+              int val;
+              local.set(data);
+              val = local.get();
+          }).start();
+  }
+#+END_SRC
+
+#+BEGIN_SRC java
+  class ThreadLocalData {
+
+      public int data1 = 1;
+      public int data2 = 2;
+      public int data3 = 3;
+
+      private ThreadLocalData() {}
+      private static ThreadLocalData data;
+      private static ThreadLocal<ThreadLocalData> localData = new ThreadLocal<>();
+
+      public static ThreadLocalData getThreadLocalData() {
+          data = localData.get();
+          if (data == null) {
+              data = new ThreadLocalData();
+              localData.set(data);
+          }
+          return data;
+      }
+
+      public static void main(String[] args) {
+          public static void main(String[] args) {
+              new Thread(new Runnable() {
+                      @Override
+                      public void run() {
+                          System.out.println(ThreadLocalData.getThreadLocalData().data1);
+                          System.out.println(ThreadLocalData.getThreadLocalData().data2);
+                          System.out.println(ThreadLocalData.getThreadLocalData().data3);
+                      }}).start();
+          }
+      }
+  }
+
+#+END_SRC
+
+
+
+* Executors （线程池）
+
+** Executors.newFixedThreadPool(int nThreads)
+
+** Executors.newCachedThreadPool()
+
+Calls to `execute` will reuse previously constructed threads if available. If no existing thread is available, a new thread will be created and added to the pool.
+
+Threads that have not been used for sixty seconds are terminated and removed from the cache. Thus, a pool that remains idle for long enough will not consume any resources.
+
+** Executors.newSingleThreadExecutor()
+
+** Executors.newScheduledThreadPool(int nThreads)
+
+可以实现与 Timer 类似的功能
+
+*** Schedule at a certain future date
+
+#+BEGIN_SRC java
+  Executors.newScheduledThreadPool(1)
+      .schedule(task,
+                date.getTime() - System.currentTimeMillis(),
+                TimeUnit.MILLISECONDS);
+#+END_SRC
+
+
+** Examples
+
+#+BEGIN_SRC java
+  public class ExecutorsTest {
+      public static void main(String[] args) {
+          // ExecutorService pool =  Executors.newSingleThreadExecutor();
+          // ExecutorService pool =  Executors.newFixedThreadPool(6);
+          ExecutorService pool =  Executors.newCachedThreadPool();
+          for (int i = 0; i < 10; ++i) {
+              final int i0 = i;
+              pool.execute(new Runnable() {
+                      @Override
+                      public void run() {
+                          try {
+                              Thread.sleep(100*i0);
+                          } catch (Exception e) {
+                              e.printStackTrace();
+                          }
+                          System.out.println(Thread.currentThread());
+                      }
+                  });
+          }
+          // pool.shutdown();    // when all tasks are done
+          // pool.shutdownNow(); // shutdown immediately
+
+          ScheduledExecutorService schedPool = Executors.newScheduledThreadPool(3);
+          // schedPool.schedule(Runnable command, long delay, TimeUnit unit)
+          // schedPool.scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit)
+          schedPool.schedule(new Runnable() {
+                  @Override
+                  public void run() {
+                      System.out.println("hello world");
+                  }
+              }, 6, TimeUnit.SECONDS);
+      }
+  }
+#+END_SRC
+
+
+* Callable & Future
+
+** 实现原理
+
+#+BEGIN_SRC java
+  interface MyCallable<T> {
+      public T call() throws Exception;
+  }
+
+  class MyFuture<T> {
+      T result;
+
+      boolean isDone = false;
+
+      public T getResult() {
+          return result;
+      }
+
+      public void setResult(T result) {
+          this.result = result;
+      }
+
+      public T get() {
+          synchronized (this) {
+              while (! isDone) {
+                  try {
+                      this.wait();
+                  } catch (Exception e) {
+                      e.printStackTrace();
+                  }
+              }
+              return result;
+          }
+      }
+
+      public void setDone(boolean isDone) {
+          this.isDone = isDone;
+      }
+
+      public boolean getDone() {
+          return this.isDone;
+      }
+  }
+
+  public class CallableTest {
+
+      public static <T> MyFuture<T> submit(final MyCallable<T> callable) {
+
+          final MyFuture<T> f = new MyFuture<>();
+
+          new Thread(new Runnable() {
+                  @Override
+                  public void run() {
+                      synchronized (f) {
+                          try {
+                              T result = callable.call();
+                              f.setResult(result);
+                          } catch (Exception e) {
+                              e.printStackTrace();
+                          } finally {
+                              f.setDone(true);
+                              f.notify();
+                          }
+                      }
+                  }
+              }).start();
+
+          return f;
+      }
+
+      public static void main(String[] args) {
+          MyFuture<String> myFuture = submit(new MyCallable<String>() {
+                  @Override
+                  public String call() throws Exception {
+                      Thread.sleep(3000);
+                      return "hello";
+                  }
+              });
+          System.out.println("[CallableTest.java:79] " + myFuture.get());
+      }
+  }
+#+END_SRC
+
+
+** CompletionService （先执行完先返回）
+
+** Examples
+
+*** Callable & Future
+
+#+BEGIN_SRC java
+  ExecutorService pool = Executors.newSingleThreadExecutor();
+  Future<String> future = pool.submit(new Callable<String> () {
+          @Override
+          public String call() throws Exception {
+              Thread.sleep(3000);
+              return "value";
+          }
+      });
+  try {
+      System.out.println(future.get());
+  } catch (Exception e) {
+      e.printStackTrace();
+  }
+#+END_SRC
+
+
+
+
+*** CompletionService
+
+#+BEGIN_SRC java
+  ExecutorService pool = Executors.newCachedThreadPool();
+  CompletionService<Integer> service = new ExecutorCompletionService<>(pool);
+  int numOfTasks = 10;
+  for (int i = 0; i < numOfTasks; ++i) {
+      service.submit(new Callable<Integer>() {
+              @Override
+              public Integer call() throws Exception {
+                  int random = new Random().nextInt(5000);
+                  Thread.sleep(random);
+                  return random;
+              }
+          });
+  }
+  for (int i = 0; i < numOfTasks; ++i) {
+      int result = 0;
+      try {
+          result = service.take().get();
+      } catch (Exception e) {
+          e.printStackTrace();
+      }
+      System.out.println(result);
+  }
+#+END_SRC
 
 * Notes
 
