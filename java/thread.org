@@ -38,7 +38,6 @@
 
 ** scheduleAtFixedRate
 
-
 ** 递归调用会导致 "unable to create new native thread"
 
 #+BEGIN_SRC java
@@ -119,13 +118,16 @@ public class TimerTest {
 
 ** Executors.newFixedThreadPool(int nThreads)
 
+
 ** Executors.newCachedThreadPool()
 
 Calls to `execute` will reuse previously constructed threads if available. If no existing thread is available, a new thread will be created and added to the pool.
 
 Threads that have not been used for sixty seconds are terminated and removed from the cache. Thus, a pool that remains idle for long enough will not consume any resources.
 
+
 ** Executors.newSingleThreadExecutor()
+
 
 ** Executors.newScheduledThreadPool(int nThreads)
 
@@ -287,8 +289,6 @@ Threads that have not been used for sixty seconds are terminated and removed fro
 #+END_SRC
 
 
-
-
 *** CompletionService
 
 #+BEGIN_SRC java
@@ -316,6 +316,427 @@ Threads that have not been used for sixty seconds are terminated and removed fro
   }
 #+END_SRC
 
+
+
+* Lock
+
+由某个线程上的锁必须由该线程解锁。
+
+** ReentrantLock
+
+ReentrantLock 和 synchronized  都是可重入锁，两者效果类似
+
+#+BEGIN_SRC java
+  Lock lock = new REentrantLock();
+  public void foo() {
+      lock.lock();
+      try {
+          doSomething();
+      } finally {
+          lock.unlock();
+      }
+  }
+#+END_SRC
+
+
+** ReadWriteLock
+
+同一线程中，在获得读锁的情况下，写锁不能获得；而在获得写锁的情况下，仍然可以获得写锁
+
+#+BEGIN_SRC java
+  public class LockTest {
+
+      public static void main(String[] args) {
+          final Record record = new Record();
+          for (int i = 0; i < 3; ++i) {
+              new Thread(new Runnable() {
+                      @Override
+                      public void run() {
+                          record.read();
+                      }
+                  }).start();
+          }
+          for (int i = 0; i < 3; ++i) {
+              new Thread(new Runnable() {
+                      @Override
+                      public void run() {
+                          record.write();
+                      }
+                  }).start();
+          }
+      }
+
+  }
+
+
+  class Record {
+      private ReadWriteLock rwLock;
+
+      public Record() {
+          this.rwLock = new ReentrantReadWriteLock();
+      }
+
+      public void read() {
+          try {
+              rwLock.readLock().lock();
+              System.out.println("begin to read");
+              Thread.sleep(new Random().nextInt(5000));
+              System.out.println("finish to read");
+          } catch (Exception e) {
+              e.printStackTrace();
+          } finally {
+              rwLock.readLock().unlock();
+          }
+      }
+
+      public void write() {
+          try {
+              rwLock.writeLock().lock();
+              System.out.println("begin to write");
+              Thread.sleep(new Random().nextInt(5000));
+              System.out.println("finish to write");
+          } catch (Exception e) {
+              e.printStackTrace();
+          } finally {
+              rwLock.writeLock().unlock();
+          }
+      }
+  }
+#+END_SRC
+
+*** Best Practice
+
+It is better than just `public synchronized String readData()`
+
+#+BEGIN_SRC java
+  class CacheData {
+      private String data = null;
+      private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
+      private final Lock r = rwLock.readLock();
+      private final Lock w = rwLock.writeLock();
+
+      public String readData() {
+          r.lock();
+          try {
+              if (data == null) {
+                  r.unlock();
+                  w.lock();
+                  try {
+                      if (data == null) {
+                          data = String.valueOf(new Random().nextInt());
+                      }
+                  } finally {
+                      r.lock();
+                      w.unlock();
+                  }
+              }
+              return data;
+          } finally {
+              r.unlock();
+          }
+      }
+  }
+#+END_SRC
+
+
+
+** Condition
+
+Condition 的功能类似传统线程技术中的 Object.wait() 和 Object.notify() 的功能。在等待 Condition 时，允许发生 =虚假唤醒= ，这通常作为对基础平台语义的让步。对于应用程序而言，这带来的影响很小，因为 Condition 应该总是在一个循环中被等待，并测试正被等待的状态声明。
+
+一个 Lock 对象内部可以有多个 Condition ，以实现多路等待通知。= 一个 Condition 对象可用于控制一个线程的调度 =
+
+*** Best Practice
+
+使用 Condition 的生产消费模式
+
+#+BEGIN_SRC java
+  class Apple {
+
+      Lock lock = new ReentrantLock();
+      private Condition full = lock.newCondition();
+      private Condition empty = lock.newCondition();
+      private int amount = 0;
+
+      public void eat() {
+          lock.lock();
+          try {
+              while (amount == 0) {
+                  empty.await();
+              }
+              amount--;
+              System.out.println("eat " + amount);
+              full.signal();
+          } catch (Exception e) {
+              e.printStackTrace();
+          } finally {
+              lock.unlock();
+          }
+      }
+
+      public void buy() {
+          lock.lock();
+          try {
+              while (amount > 10) {
+                  full.await();
+              }
+              amount++;
+              System.out.println("buy " + amount);
+              empty.signal();
+          } catch (Exception e) {
+              e.printStackTrace();
+          } finally {
+              lock.unlock();
+          }
+      }
+  }
+#+END_SRC
+
+
+
+* Synchronizer
+
+** Semaphore
+
+Semaphore 可以控制同时访问资源的线程个数，例如实现一个文件允许的并发访问数。
+
+单个信号量的 Semaphore 对象可以实现互斥锁的功能，并且可以是由一个线程获得了锁，再由另一个线程释放锁，可应用于死锁恢复的场合。（这是与 Lock 对象的不同之处）
+
+*** public Semaphore(int permits, boolean fair)
+
+fair : first-in first-out
+
+
+*** Best Practice
+
+#+BEGIN_SRC java
+class Worker {
+    private Semaphore sp = new Semaphore(3);
+
+    public void doWork() {
+        try {
+            sp.acquire();
+            System.out.println(Thread.currentThread() + "is in, all: " + (3-sp.availablePermits()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            sp.release();
+        }
+    }
+}
+#+END_SRC
+
+
+** CyclicBarrier
+
+*** Best Practice
+
+#+BEGIN_SRC java
+class Sodier {
+    CyclicBarrier cb = new CyclicBarrier(3);
+
+    public void marshall() {
+        try {
+            Thread.sleep(new Random().nextInt(5000));
+            if (cb.getNumberWaiting() == 2) {
+                System.out.println("let's go together");
+            } else {
+                System.out.println("i am waiting here");
+            }
+            cb.await();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+#+END_SRC
+
+
+** CountDownLatch
+
+可以实现一个对象通知多个对象，或多个对象通知一个对象的效果，如运动员与发令员的场景。
+
+#+BEGIN_SRC java
+  class Referee {
+      private CountDownLatch start;
+      private CountDownLatch finish;
+
+      public Referee(CountDownLatch start, CountDownLatch finish) {
+          this.start = start;
+          this.finish = finish;
+      }
+
+      public void sendOrder() {
+          start.countDown();
+          System.out.println("Referee is waiting for all athletes to finish...");
+          try {
+              finish.await();
+          } catch (Exception e) {
+              e.printStackTrace();
+          }
+          System.out.println("Game is over");
+      }
+  }
+
+  class Athlete {
+      private CountDownLatch start;
+      private CountDownLatch finish;
+
+      public Athlete(CountDownLatch start, CountDownLatch finish) {
+          this.start = start;
+          this.finish = finish;
+      }
+
+      public void sprint() {
+          try {
+              System.out.println(Thread.currentThread() + " ready ...");
+              start.await();
+              Thread.sleep(new Random().nextInt(10000));
+              System.out.println(Thread.currentThread() + " finished !");
+              finish.countDown();
+          } catch (Exception e) {
+              e.printStackTrace();
+          }
+      }
+  }
+
+  public class CountDownLatchTest {
+      public static void main(String[] args) {
+          int numOfAthlete = 5;
+          final CountDownLatch start = new CountDownLatch(1);
+          final CountDownLatch finish = new CountDownLatch(numOfAthlete);
+          for (int i = 0; i < numOfAthlete; i++) {
+              new Thread(new Runnable() {
+                      @Override
+                      public void run() {
+                          new Athlete(start, finish).sprint();
+                      }
+                  }).start();
+          }
+          try {
+              Thread.sleep(1000);
+          } catch (Exception e) {
+              e.printStackTrace();
+          }
+          new Referee(start, finish).sendOrder();
+      }
+  }
+#+END_SRC
+
+
+** Exchanger
+
+用于实现两个线程之间的数据交换
+
+#+BEGIN_SRC java
+  class Bundle {
+      private Integer money;
+      private String drug;
+
+      public Bundle(Integer money, String drug) {
+          this.money = money;
+          this.drug = drug;
+      }
+
+      public Integer getMoney() {
+          return money;
+      }
+
+      public void setMoney(Integer money) {
+          this.money = money;
+      }
+
+      public String getDrug() {
+          return drug;
+      }
+
+      public void setDrug(String drug) {
+          this.drug = drug;
+      }
+  }
+
+  class DrugDealer {
+      private Exchanger<Bundle> ex;
+
+      public DrugDealer(Exchanger<Bundle> ex) {
+          this.ex = ex;
+      }
+
+      public void deal() {
+          try {
+              System.out.println("drug dealer is waiting for customer ...");
+              int money = ex.exchange(new Bundle(null, "a bag of drug")).getMoney();
+              System.out.println("drug dealer gets " + money + " dollars");
+          } catch (Exception e) {
+              e.printStackTrace();
+          }
+      }
+  }
+
+  class DrugAddict {
+      private Exchanger<Bundle> ex;
+
+      public DrugAddict(Exchanger<Bundle> ex) {
+          this.ex = ex;
+      }
+
+      public void deal() {
+          try {
+              Thread.sleep(3000);
+              System.out.println("addict is searching for drug dealer");
+              String drug = ex.exchange(new Bundle(1000, null)).getDrug();
+              System.out.println("addict gets " + drug);
+          } catch (Exception e) {
+              e.printStackTrace();
+          }
+      }
+  }
+
+  public class ExchangerTest {
+      public static void main(String[] args) {
+          final Exchanger<Bundle> ex = new Exchanger<>();
+          new Thread(new Runnable() {
+                  @Override
+                  public void run() {
+                      new DrugDealer(ex).deal();
+                  }
+              }).start();
+          new Thread(new Runnable() {
+                  @Override
+                  public void run() {
+                      new DrugAddict(ex).deal();
+                  }
+              }).start();
+      }
+  }
+#+END_SRC
+
+
+* Queues
+
+** BlockingQueue
+
+|         | Throws exception | Special value | BlocksTimes out |                      |
+| Insert  | add(e)           | offer(e)      | put(e)          | offer(e, time, unit) |
+| Remove  | remove()         | poll()        | take()          | poll(time, unit)     |
+| Examine | element()        | peek()        | not applicable  | not applicable       |
+
+
+* Concurrent Collections
+
+** ConcurrentHashMap
+
+
+** CopyOnWriteArrayList / CopyOnWriteArraySet
+
+传统的集合迭代器，迭代的同时不能修改集合数据， CopyOnWrite 类型的集合支持迭代时修改。
+
+
+** ConcurrentSkipListMap / ConcurrentSkipListSet
+
+支持跳表（排序）的 List 和 Set
+
+
 * Notes
 
 ** wait 需要放在 while 语句块中
@@ -331,6 +752,7 @@ synchronized (obj) {
     ... // Perform action appropriate to condition
 }
 #+END_SRC
+
 
 ** synchronized & wait()
 
