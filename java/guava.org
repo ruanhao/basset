@@ -1,0 +1,116 @@
+#+TITLE:     Guava
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* Charsets
+
+#+BEGIN_SRC java
+Charsets.ISO_8859_1
+Charsets.US_ASCII
+Charsets.UTF_16
+Charsets.UTF_16BE
+Charsets.UTF_16LE
+Charsets.UTF_8
+#+END_SRC
+
+
+* Joiner
+
+#+BEGIN_SRC java
+  String[] strList = {"a", "b", "c", null, "d", "e", null, null};
+  Joiner.on("|").skipNulls().join(strList);      // a|b|c|d|e
+  Joiner.on("|").useForNull("NA").join(strList); // a|b|c|NA|d|e|NA|NA
+#+END_SRC
+
+
+* Splitter
+
+#+BEGIN_SRC java
+  Splitter.on("|").split("boo|bar|baz");                    // [boo, bar, baz]
+  Splitter.on("|").split("boo|bar||baz||");                 // [boo, bar, , baz, , ]
+  Splitter.on("|").trimResults().split("boo|bar|baz");      // [boo, bar, baz]
+  Splitter.on(CharMatcher.JAVA_DIGIT).split("boo1bar2baz"); // [boo, bar, baz]
+#+END_SRC
+
+
+* Collections
+
+** List
+
+#+BEGIN_SRC java
+ImmutableList<String> of = ImmutableList.of("a", "b", "c", "d");
+#+END_SRC
+
+#+BEGIN_SRC java
+  List<ToClass> toList = Lists.transform(fromList, new Function<FromClass, ToClass>() {
+      @Override
+      public ToClass apply(FromClass from) {
+          ToClass to = new ToClass();
+          to.setX(from.getX());
+          to.setY(from.getY());
+          to.setZ(from.getZ());
+          return to;
+      }});
+#+END_SRC
+
+
+** Map
+
+#+BEGIN_SRC java
+ImmutableMap<String,String> map = ImmutableMap.of("key1", "value1", "key2", "value2");
+#+END_SRC
+
+
+** Snippets
+
+*** Filter Nulls
+
+#+BEGIN_SRC java
+  Iterable<String> filterStrings = Iterables.filter(values, Predicates.notNull());
+#+END_SRC
+
+#+BEGIN_SRC java
+  List<String> filterStrings = FluentIterable.from(origins).filter(Predicates.notNull()).toList();
+#+END_SRC
+
+#+BEGIN_SRC java
+  Collection<String> filterStrings = Collections2.filter(valuse, Predicates.notNull());
+#+END_SRC
+
+* Strings
+
+#+BEGIN_SRC java
+  Strings.padEnd("foo", 6, 'x');  // fooxxx
+
+  Strings.nullToEmpty("");        // ""
+  Strings.nullToEmpty(null);      // ""
+  Strings.nullToEmpty("hello");   // "hello"
+
+  Strings.emptyToNull("");        // null
+  Strings.emptyToNull(null);      // null
+  Strings.emptyToNull("hello");   // "hello"
+
+  Strings.isNullOrEmpty(null);    // true
+  Strings.isNullOrEmpty("");      // true
+  Strings.isNullOrEmpty("hello"); // false
+#+END_SRC
+
+
+* CharMatcher
+
+#+BEGIN_SRC java
+  String stringWithLinebreaks = "hello\nworld";
+  String tabsAndSpaces        = "       String with   spaces   and \t tabs";
+
+  CharMatcher.BREAKING_WHITESPACE.replaceFrom(stringWithLinebreaks, ' '); // "hello world"
+  CharMatcher.WHITESPACE.collapseFrom(tabsAndSpaces, ' ');                // " String with spaces and tabs"
+  CharMatcher.WHITESPACE.trimAndCollapseFrom(tabsAndSpaces, ' ');         // "String with spaces and tabs"
+  CharMatcher.JAVA_DIGIT.retainFrom("foo989yxbar234");                    // "989234"
+  CharMatcher.DIGIT.removeFrom("some text 89983 and more");               // "some text  and more"
+#+END_SRC

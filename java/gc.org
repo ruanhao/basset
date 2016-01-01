@@ -1,0 +1,17 @@
+#+TITLE:     GC
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+- 每个对象只能调用 finalize() 方法一次。如果在 finalize() 方法执行时产生异常 (exception) ，则该对象仍可以被垃圾收集器收集
+
+- 垃圾收集器跟踪每一个对象，收集那些不可触及的对象（即该对象不再被程序引用了），回收其占有的内存空间。但在进行垃圾收集的时候，垃圾收集器会调用该对象的 finalize() 方法（如果有）。如果在 finalize() 方法中，又使得该对象被程序引用（复活了），则该对象就变成了可触及的对象，暂时不会被垃圾收集了。但是由于每个对象只能调用一次 finalize() 方法，所以每个对象也只可能“复活”一次。
+
+- Java 语言允许程序员为任何方法添加 finalize() 方法，该方法会在垃圾收集器交换回收对象之前被调用。但不要过分依赖该方法对系统资源进行回收和再利用，因为该方法调用后的执行结果是不可预知的。
+
+- 垃圾收集器不可以被强制执行

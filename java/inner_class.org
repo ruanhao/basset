@@ -1,0 +1,94 @@
+#+TITLE:     Inner Class
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 静态方法中不能创建内部类的实例对象
+
+这是由于内部来可以访问外部类的成员变量，而成员变量必须在对象实例生成之后方能访问，因此不能在静态方法中创建内部类的实例对象
+
+
+* 静态内部类
+
+- 内部类可以访问外部类的成员变量，静态内部类不可以
+
+- 静态内部类只能访问外部类中 static 类型的变量（方法）
+
+- 静态内部类作用相当于外部类
+
+
+* 在方法中定义内部类
+
+- 内部类理论上可以在类的任意位置进行定义
+
+- 若内部类中需要访问方法的局部变量，则局部变量需要 final 关键字修饰
+
+#+BEGIN_SRC java
+  class Out {
+      public void foo(final String name) {
+          class In {
+              public void fun() {
+                  System.out.println(name);
+              }
+          }
+          new In().fun();
+      }
+  }
+
+  public class InnerClassInMethodTest {
+      public static void main(String[] args) {
+          new Out().foo("Shanghai");
+      }
+  }
+#+END_SRC
+
+
+* 变量互访
+
+内部类可以访问外部类的私有变量（方法），反之亦然
+
+#+BEGIN_SRC java
+  class Outter {
+      // 私有变量内部部类可以直接访问
+      private String outterStr = "outter String";
+
+      // 私有方法内部类可以直接访问
+      private void outterSay() {
+          System.out.println("outter say");
+      }
+
+      public void fun() {
+          Inner in = new Inner();
+          System.out.println(in.innerStr);
+          in.bar();
+      }
+
+      class Inner {
+          // 私有变量外部类可以直接访问
+          private String innerStr = "inner String";
+
+          // 私有方法外部类可以直接访问
+          private void bar() {
+              System.out.println("inner bar");
+          }
+
+          public void foo() {
+              outterSay();
+              Outter.this.outterSay();
+              System.out.println(outterStr);
+          }
+      }
+  }
+
+  public class InnerClassTest {
+      public static void main(String[] args) {
+          new Outter().new Inner().foo();
+          new Outter().fun();
+      }
+  }
+#+END_SRC

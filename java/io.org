@@ -7,14 +7,59 @@
 #+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
 #+STARTUP:   showall
 
-* ByteArrayOutputStream
+* 操作内存数据
 
-可以将字节流转换为数组
+** 操作基本数据类型
+
+DataInputStream / DataOutputStream
+
+** 操作字节数组（内存流）
+
+ByteArrayInputStream / ByteArrayOutputStream
+
+由于这两个流对象操作的是数组，并没有使用系统资源，所以无需使用 close 关闭
+
+*** Best Practice
 
 #+BEGIN_SRC java
+/*
+  ByteArrayOutputStream 实现了一个输出流，其中的数据被写入一个 byte 数组
+  缓冲区会随着数据的写入而自动增长
+  可使用 toByteArray() 和 toString() 获取数据
+*/
 ByteArrayOutputStream s = new ByteArrayOutputStream();
 s.write(1);
 s.write(2);
 s.write(3);
 byte[] bytes = s.toByteArray();
 #+END_SRC
+
+#+BEGIN_SRC java
+  String str = "abc";
+  // ByteArrayOutputStream 在构造时需要接收数据源，且数据源是一个字节数组
+  InputStream input = new ByteArrayInputStream(str.getBytes());
+  OutputStream output = new ByteArrayOutputStream();
+  int temp;
+  while ((temp=input.read()) != -1) {
+      output.write((char) Character.toUpperCase(temp));
+  }
+  String newStr = output.toString();
+  output.close();
+  input.close();
+  System.out.println(newStr);
+#+END_SRC
+
+
+** 操作字符数组
+
+CharArrayReader / CharArrayWriter
+
+** 操作字符串
+
+StringReader / StringWriter
+
+* Reader & Writer
+
+Reader 和 Writer 是针对内存（缓存）操作，若不执行 flush() 或 close() 则数据不会写到磁盘上
+
+相反 InputStream 和 OutputStream 是直接针对磁盘进行读写，即使不执行flush() 或 close() 也会将数据记录在磁盘上

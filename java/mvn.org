@@ -14,3 +14,53 @@ mvn help:effective-pom ## Show effective pom
 mvn eclipse:eclipse
 
 #+END_SRC
+
+
+* Disable a Maven plugin defined in a parent POM
+
+#+BEGIN_SRC xml
+  <plugin>
+     <groupId>group</groupId>
+     <artifactId>artifact</artifactId>
+     <configuration>
+       <skip>true</skip>
+     </configuration>
+  </plugin>
+#+END_SRC
+
+Can also use:
+
+#+BEGIN_SRC xml
+<plugin>
+<groupId>group</groupId>
+ <artifactId>artifact</artifactId>
+<executions>
+     <execution>
+       <id>TheNameOfTheRelevantExecution</id>
+       <phase>none</phase>
+     </execution>
+</executions>
+</plugin>
+#+END_SRC
+
+
+* Mechanism
+
+** Dependency
+
+#+BEGIN_SRC xml
+  <dependency>
+    <groupId>org.opendaylight.dlux</groupId>groupId>
+    <artifactId>features-dlux</artifactId>artifactId>
+    <version>0.2.1-Lithium-SR1</version>version>
+    <classifier>features</classifier>classifier>
+    <type>xml</type>type>
+    <scope>runtime</scope>scope>
+  </dependency>
+#+END_SRC
+
+实际只会下载 *features-dlux-0.2.1-Lithium-SR1-features.xml* 和 *features-dlux-0.2.1-Lithium-SR1.pom* 两个文件和 pom 文件中定义的各个依赖
+
+*features-dlux-0.2.1-Lithium-SR1.jar 不会下载*
+
+*scope 的值应该是在各类打包插件中使用*
