@@ -29,7 +29,8 @@ ssh -t reachable_host ssh unreachable_host
 
 
 
-ssh -R 2222:archlinux:22 user@macbook  // Then I can ssh -p 2222 archuser@localhost in order to connect archlinux
+ssh -R 2222:loacalhost:22 user@macbook  // At archlinux side
+// (At Mac side) Then I can ssh -p 2222 archuser@localhost in order to connect archlinux
 
 ### Reference
 [SSH port forwarding](http://www.liugj.com/2013/04/SSH-port-forwarding)  
