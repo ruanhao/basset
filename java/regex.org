@@ -1,0 +1,28 @@
+#+TITLE:     Regex
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* IP Regex
+
+#+BEGIN_SRC java
+  Pattern IPV4_PATTERN = Pattern.compile("(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(%[\\p{N}\\p{L}]+)?");
+  Pattern IPV6_PATTERN1 = Pattern.compile("((:|[0-9a-fA-F]{0,4}):)([0-9a-fA-F]{0,4}:){0,5}((([0-9a-fA-F]{0,4}:)?(:|[0-9a-fA-F]{0,4}))|(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])))(%[\\p{N}\\p{L}]+)?");
+  Pattern IPV6_PATTERN2 = Pattern.compile("(([^:]+:){6}(([^:]+:[^:]+)|(.*\\..*)))|((([^:]+:)*[^:]+)?::(([^:]+:)*[^:]+)?)(%.+)?");
+  Pattern DOMAIN_PATTERN = Pattern.compile("((([a-zA-Z0-9_]([a-zA-Z0-9\\-_]){0,61})?[a-zA-Z0-9]\\.)*([a-zA-Z0-9_]([a-zA-Z0-9\\-_]){0,61})?[a-zA-Z0-9]\\.?)|\\.");
+
+  String defaultValue = "localhost";
+
+  Matcher ipv4Matcher = IPV4_PATTERN.matcher(defaultValue);
+  Matcher ipv6Matcher1 = IPV6_PATTERN1.matcher(defaultValue);
+  Matcher ipv6Matcher2 = IPV6_PATTERN2.matcher(defaultValue);
+  Matcher domainMatcher = DOMAIN_PATTERN.matcher(defaultValue);
+
+  System.out.println(ipv4Matcher.matches());
+  System.out.println(domainMatcher.matches());
+#+END_SRC

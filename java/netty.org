@@ -1,0 +1,46 @@
+#+TITLE:     Netty
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* Transparent Zero Copy
+
+#+BEGIN_SRC java
+
+ByteBuf message = Unpooled.wrappedBuffer(header, body);
+
+// 可以混合复合类型与普通缓冲区来创建一个新的复合类型。
+ByteBuf messageWithFooter = Unpooled.wrappedBuffer(message, footer);
+
+// 访问的区域可以是跨组件的
+// 这里的无符号整数读取位于 body 和 footer 之间
+messageWithFooter.getUnsignedInt(
+     messageWithFooter.readableBytes() - footer.readableBytes() - 1);
+)
+
+#+END_SRC
+
+* Automatic Capacity Extension
+
+#+BEGIN_SRC java
+
+// 在内部，缓冲区是被“懒”创建
+ByteBuf b = Unpooled.buffer(4);
+
+// 当第一次执行写操作，初始容量为4的缓冲区被创建
+b.writeByte('1');
+
+b.writeByte('2');
+b.writeByte('3');
+b.writeByte('4');
+
+// 当写入的字节数超过初始容量时，
+// 内部缓冲区自动分配更大的容量
+b.writeByte('5');
+
+#+END_SRC

@@ -1,0 +1,56 @@
+#+TITLE:     Socat
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 监听端口
+
+socat tcp-l:12345 -
+
+#+BEGIN_EXAMPLE
+tcp-l 是 tcp-listen 的简写, tcp 是 tcp-connect 的简写
+udp-l 是 udp-listen 的简写, udp 是 udp-connect 的简写
+unix-l 是 unix-listen 的简写, unix 是 unix-connect 的简写
+#+END_EXAMPLE
+
+* 发送文件
+
+** Server side
+
+=socat -u open:filename,binary tcp-listen:12345=
+
+** Client side
+
+=socat -u tcp:serverip:12345 open:localfilename,create,binary=
+
+#+BEGIN_EXAMPLE
+
+-u 表示数据单向传送，从第一个参数传递到第二个参数，如果是-U则表示从第二个参数传送到第一个参数
+open 表示使用系统调用open()打开文件，不能打开unix域socket
+binary 表示以二进制方式打开文件。以文本方式打开使用text
+tcp-listen 表示监听tcp端口
+create 表示如果文件不存在则创建
+传输结束后两端均退出
+
+#+END_EXAMPLE
+
+* 读写分离
+
+socat支持打开端的读写分离，使用!!符号，左侧表示读，右侧表示写
+
+=socat open:hello.html\!\!open:log.txt,create,append tcp-listen:12345,reuseaddr,fork=
+
+#+BEGIN_EXAMPLE
+
+open:hello.html 表示读hello.html文件
+open:log.txt 表示收到的数据写入log.txt文件
+reuseaddr 见socket的SO_REUSEADDR
+fork 请求到达时，fork一个进程进行处理
+在bash下，需要用\对!进行转义
+
+#+END_EXAMPLE

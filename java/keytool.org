@@ -1,0 +1,24 @@
+#+TITLE:     Keytool
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+* Generate private key
+
+keytool -genkey -alias cisco -keysize 2048 -validity 3650 -keyalg RSA -dname "CN=www.cisco.com" -keypass 123456 -storepass 123456 -keystore kstore.jks
+
+* Export a certificate (public key) from a keystore
+
+keytool -export -alias cisco -file cisco.crt -keystore kstore.jks -keypass 123456 -storepass 123456
+
+* Import a trusted certificate to an existing server keystore
+
+keytool -import -trustcacerts -alias eircsson -file ericsson.crt -keystore kstore.jks -storepass 123456
+
+* Show info
+
+keytool -list -keystore kstore.jks -storepass 123456

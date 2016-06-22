@@ -9,6 +9,19 @@
 
 
 
+* Create Class Without Unchecked Cast
+
+#+BEGIN_SRC java
+  Class<? extends MyClass> clazz = null;
+  try {
+      clazz = Class.forName("MyClass", true, ClassLoader.getSystemClassLoader()).asSubclass(MyClass.class);
+  } catch (Exception e) {
+      e.printStackTrace();
+  }
+#+END_SRC
+
+
+
 * 类加载器加载文件
 
 #+BEGIN_SRC java
@@ -35,7 +48,7 @@ Bootstrap 类加载器负责加载rt.jar中的JDK类文件，它是所有类加�
 
 *** System
 
-第三种默认的加载器就是System类加载器（又叫作Application类加载器）了。它负责从classpath环境变量中加载某些应用相关的类，classpath环境变量通常由-classpath或-cp命令行选项来定义，或者是JAR中的Manifest的classpath属性。Application类加载器是Extension类加载器的子加载器。通过sun.misc.Launcher$AppClassLoader实现。
+第三种默认的加载器就是System类加载器（又叫作Application类加载器）。它负责从classpath环境变量中加载某些应用相关的类，classpath环境变量通常由-classpath或-cp命令行选项来定义，或者是JAR中的Manifest的classpath属性。Application类加载器是Extension类加载器的子加载器。通过sun.misc.Launcher$AppClassLoader实现。
 
 
 *** 类加载过程
