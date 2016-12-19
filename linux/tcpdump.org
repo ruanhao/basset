@@ -237,6 +237,7 @@ tcpdump -i eth1 'ip[2:2] > 600'
 
 #+BEGIN_SRC
 tcpdump -i eth1 'tcp[0:2] > 1024'
+tcpdump -i eth1 'portrange 21-23'
 #+END_SRC
 
 *** 2.2.2, 过滤特殊标记
@@ -307,4 +308,10 @@ tcpdump -i eth1 'tcp[13] & 4 = 4'
   #+BEGIN_SRC
   time tcpdump -nn -i eth0 'tcp[tcpflags] = tcp-syn' -c 10000 > /dev/null
   ## 计算抓 10000 个 SYN 包花费多少时间，可以判断访问量大概是多少
+  #+END_SRC
+
+- 从 pcap 文件读取内容
+
+  #+BEGIN_SRC
+  tcpdump -nvvvs 0 -X -r data.pcap
   #+END_SRC
