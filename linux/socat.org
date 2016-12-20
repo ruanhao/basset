@@ -8,49 +8,57 @@
 #+STARTUP:   showall
 
 
-* 监听端口
+* 一, 基本用法
 
+#+BEGIN_SRC
 socat tcp-l:12345 -
+#+END_SRC
 
 #+BEGIN_EXAMPLE
-tcp-l 是 tcp-listen 的简写, tcp 是 tcp-connect 的简写
-udp-l 是 udp-listen 的简写, udp 是 udp-connect 的简写
-unix-l 是 unix-listen 的简写, unix 是 unix-connect 的简写
+tcp-l   : tcp-listen 的简写
+udp-l   : udp-listen 的简写
+unix-l  : unix-listen 的简写
+
+tcp     : tcp-connect 的简写
+udp     : udp-connect 的简写
+unix    : unix-connect 的简写
 #+END_EXAMPLE
 
-* 发送文件
 
-** Server side
+* 二, 常用功能
+
+** 2.1, 发送文件
+
+*** 2.1.1, 方式一
+
+- 服务器端
 
 =socat -u open:filename,binary tcp-listen:12345=
 
-** Client side
+
+- 客户端
 
 =socat -u tcp:serverip:12345 open:localfilename,create,binary=
 
 #+BEGIN_EXAMPLE
-
--u 表示数据单向传送，从第一个参数传递到第二个参数，如果是-U则表示从第二个参数传送到第一个参数
-open 表示使用系统调用open()打开文件，不能打开unix域socket
-binary 表示以二进制方式打开文件。以文本方式打开使用text
-tcp-listen 表示监听tcp端口
+-u 表示数据单向传送，从第一个参数传递到第二个参数，如果是-U 则表示从第二个参数传送到第一个参数
+open 表示使用系统调用 open() 打开文件，不能打开 unix socket
+binary 表示以二进制方式打开文件 (若以文本方式打开使用text)
+tcp-listen 表示监听 tcp 端口
 create 表示如果文件不存在则创建
 传输结束后两端均退出
-
 #+END_EXAMPLE
 
-* 读写分离
 
-socat支持打开端的读写分离，使用!!符号，左侧表示读，右侧表示写
+** 2.2, 读写分离
+
+socat 支持打开端的读写分离，使用 !! 符号，左侧表示读，右侧表示写
 
 =socat open:hello.html\!\!open:log.txt,create,append tcp-listen:12345,reuseaddr,fork=
 
 #+BEGIN_EXAMPLE
-
-open:hello.html 表示读hello.html文件
-open:log.txt 表示收到的数据写入log.txt文件
-reuseaddr 见socket的SO_REUSEADDR
-fork 请求到达时，fork一个进程进行处理
-在bash下，需要用\对!进行转义
-
+open:hello.html 表示读 hello.html 文件
+open:log.txt 表示收到的数据写入 log.txt 文件
+fork 请求到达时，fork 一个进程进行处理
+在 bash 下，需要用 \ 对 ! 进行转义
 #+END_EXAMPLE
