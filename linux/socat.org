@@ -11,17 +11,19 @@
 * 一, 基本用法
 
 #+BEGIN_SRC
-socat tcp-l:12345 -
+socat [options] <address1> <address2>
 #+END_SRC
 
 #+BEGIN_EXAMPLE
-tcp-l   : tcp-listen 的简写
-udp-l   : udp-listen 的简写
-unix-l  : unix-listen 的简写
+简写:
 
-tcp     : tcp-connect 的简写
-udp     : udp-connect 的简写
-unix    : unix-connect 的简写
+tcp-l   : tcp-listen
+udp-l   : udp-listen
+unix-l  : unix-listen
+
+tcp     : tcp-connect
+udp     : udp-connect
+unix    : unix-connect
 #+END_EXAMPLE
 
 
@@ -35,12 +37,13 @@ unix    : unix-connect 的简写
 
 =socat -u open:filename,binary tcp-listen:12345=
 
-
 - 客户端
 
 =socat -u tcp:serverip:12345 open:localfilename,create,binary=
 
 #+BEGIN_EXAMPLE
+说明:
+
 -u 表示数据单向传送，从第一个参数传递到第二个参数，如果是-U 则表示从第二个参数传送到第一个参数
 open 表示使用系统调用 open() 打开文件，不能打开 unix socket
 binary 表示以二进制方式打开文件 (若以文本方式打开使用text)
@@ -50,6 +53,17 @@ create 表示如果文件不存在则创建
 #+END_EXAMPLE
 
 
+*** 2.1.2, 方式二
+
+- 服务器端
+
+  =socat tcp-l:12345,reuseaddr,fork open:<filename>=
+
+- 客户端
+
+  =socat tcp:<ip>:12345 open:<filename>,create=
+
+
 ** 2.2, 读写分离
 
 socat 支持打开端的读写分离，使用 !! 符号，左侧表示读，右侧表示写
@@ -57,8 +71,47 @@ socat 支持打开端的读写分离，使用 !! 符号，左侧表示读，右�
 =socat open:hello.html\!\!open:log.txt,create,append tcp-listen:12345,reuseaddr,fork=
 
 #+BEGIN_EXAMPLE
+说明:
+
 open:hello.html 表示读 hello.html 文件
 open:log.txt 表示收到的数据写入 log.txt 文件
 fork 请求到达时，fork 一个进程进行处理
 在 bash 下，需要用 \ 对 ! 进行转义
 #+END_EXAMPLE
+
+
+** 2.3, TLS 连接
+
+=socat -U openssl-listen:8443,reuseaddr,cert=server.crt.pem,key=server.key.pem,verify=0,fork open:<filename>=
+
+
+** 2.4, 监听端口
+
+#+BEGIN_SRC
+# 监听端口，并输出到控制台
+socat tcp-l:<port> -
+#+END_SRC
+
+
+** 2.5, 端口重定向
+
+#+BEGIN_SRC
+socat tcp-l:80,reuseaddr,fork tcp:<dst-ip>:<dst-port>
+#+END_SRC
+
+
+** 2.6, 发送消息
+
+#+BEGIN_SRC
+echo "content" | socat - tcp-connect:1.2.3.4:12345
+#+END_SRC
+
+** 2.7, Telnet
+
+- 服务器端
+
+  =socat tcp-listen:8888 exec:'bash -i',pty,setsid,stderr,echo=0=
+
+- 客户端
+
+  =socat readline <server-ip>:8888=
