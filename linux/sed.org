@@ -1,0 +1,191 @@
+#+TITLE:     sed
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 一, 基本原理
+
+** 1.1, 元字符
+
+*** 1.1.1, 不使用扩展正则表达式
+
+- 元字符
+
+  = . * ^ $ [ ] \ =
+
+- 字面字符
+
+  = ( ) + ? | { } < > =
+
+  有些字面字符在表达元字符时需要转义，比如 =\<abc= 表示以 abc 为首的词，=\>= 表示词尾
+
+*** 1.1.2, 使用扩展正则表达式 (-r)
+
+- 元字符
+
+  = . * ^ $ [ ] \ ( ) + ? | { } =
+
+
+
+** 1.2, 知识点
+
+*** 1.2.1, Patter Space
+
+原理伪码:
+
+#+BEGIN_SRC
+
+foreach line in file {
+    // 把行放入 panttern_space
+    pattern_space = line;
+
+    // 对每个 pattern space 执行 sed 命令
+    pattern_space = EXEC(sed_cmd, pattern_space);
+
+    // 如果没有指定 -n 则输出处理后的 pattern_space
+    if ( sed_option.notInclude("-n") )  {
+       print pattern_space;
+    }
+}
+
+#+END_SRC
+
+*** 1.2.2, Address
+
+sed 语句模式( 其中 ! 表示匹配成功后是否执行命令 ):
+
+=[address[,address]][!]{cmd}=
+
+address 可以是一个数字，也可以是一个模式，可以通过逗号要分隔两个 address 表示两个 address 的区间
+
+address 可以使用相对位置，如:
+
+#+BEGIN_SRC
+## 其中 +3 表示后面连续 3 行
+sed '/dog/,+3s/^/# /g' text.txt
+#+END_SRC
+
+
+*** 1.2.3, Cmd
+
+cmd 可以是多个，它们可以用分号分开，可以用大括号括起来作为嵌套命令
+
+#+BEGIN_SRC
+
+## 对 3 行到第 6 行执行命令 /This/d
+sed '3,6{/This/d}' pets.txt
+
+## 对 3 行到第 6 行，匹配 /This/ 成功后，再匹配 /fish/，成功后执行 d 命令
+sed '3,6{/This/{/fish/d}}' pets.txt
+
+## 从第一行到最后一行，如果匹配到 This ，则删除之；如果前面有空格，则去除空格
+sed '1,${/This/d;s/^ *//g}' pets.txt
+
+#+END_SRC
+
+**** 1.2.3.1, 常用 Cmd
+
+- N
+
+  把下一行的内容纳入当成缓冲区做匹配，相当于两行合成一行 (line1\nline2) 进行处理
+
+- a
+
+  append，在后面追加一行
+
+- i
+
+  insert，在前面插入一行
+
+- c
+
+  替换匹配行
+
+- d
+
+  删除匹配行
+
+- p
+
+  打印匹配行
+
+
+*** 1.2.4, Hold Space
+
+Hold Space 是一个和 Pattern Space 类似的变量空间，涉及到的命令有:
+
+- g ::  将 hold space 中的内容拷贝到 pattern space中，原来 pattern space 里的内容清除
+
+- G ::  将 hold space 中的内容 append 到 pattern space\n 后
+
+- h ::  将 pattern space 中的内容拷贝到 hold space 中，原来的 hold space 里的内容被清除
+
+- H ::  将 pattern space 中的内容 append 到 hold space\n 后
+
+- x ::  交换 pattern space 和 hold space 的内容
+
+
+* 二, 常见用法
+
+- 反序文件
+
+  #+BEGIN_SRC
+  sed '1!G;h;$!d' t.txt
+  #+END_SRC
+
+- 替换
+
+  #+BEGIN_SRC
+  ## 替换每一行的第一个 s
+  sed 's/s/S/1' my.txt
+
+  ## 替换每一行的第二个 s
+  sed 's/s/S/2' my.txt
+
+  ## 替换每一行的第三个及以后所有的 s
+  sed 's/s/S/3g' my.txt
+  #+END_SRC
+
+- 使用匹配到的字符串
+
+  #+BEGIN_SRC
+  ## 使用 & 来当做被匹配的变量
+  sed 's/my/[&]/g' my.txt
+
+  ## 使用圆括号
+  sed 's/This is my \([^,]*\),.*is \(.*\)/\1:\2/g' my.txt
+  #+END_SRC
+
+- 两行合并一行
+
+  #+BEGIN_SRC
+  sed 'N;s/\n/ /' pets.txt
+  #+END_SRC
+
+- 行 ( 前 / 后 ) 进行 ( 插入 / 追加 ) 一行内容
+
+  #+BEGIN_SRC
+  ## 第 1 行前插入一行
+  sed "1 i helloworld" my.txt
+
+  ## 在最后一行后追加一行
+  sed "$ a helloworld" my.txt
+
+  ## 匹配到 /fish/ 后就追加一行
+  sed "/fish/a helloworld" my.txt
+  #+END_SRC
+
+- 替换匹配行
+
+  #+BEGIN_SRC
+  ## 替换第二行
+  sed "2 c helloworld" my.txt
+
+  ## 替换匹配到的行
+  sed "/fish/c helloworld" my.txt
+  #+END_SRC
