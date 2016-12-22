@@ -10,6 +10,8 @@
 
 * 一, 基本原理
 
+sed 只有贪婪模式
+
 ** 1.1, 元字符
 
 *** 1.1.1, 不使用扩展正则表达式
@@ -55,21 +57,64 @@ foreach line in file {
 
 #+END_SRC
 
+
 *** 1.2.2, Address
 
-sed 语句模式( 其中 ! 表示匹配成功后是否执行命令 ):
+**** 1.2.2.1, 对于像 "addr1,addr2" 这种形式的地址匹配
 
-=[address[,address]][!]{cmd}=
+如果 addr1 匹配，则匹配成功，“开关”打开，在该行上执行命令，此时不管 addr2 是否匹配，即使 addr2 在 addr1 这一行之前
 
-address 可以是一个数字，也可以是一个模式，可以通过逗号要分隔两个 address 表示两个 address 的区间
+接下来读入下一行，看 addr2 是否匹配:
 
-address 可以使用相对位置，如:
+- 如果 addr2 在 addr1 之前，则不匹配，不执行命令，关闭“开关”；
+- 如果 addr2 匹配，则执行命令，同样开关“关闭”；
+- 如果 addr2 在 addr1 之后，则一直处理到匹配为止，换句话说，如果 addr2 一直不匹配，则开关一直不关闭，因此会持续执行命令到最后一行
 
-#+BEGIN_SRC
-## 其中 +3 表示后面连续 3 行
-sed '/dog/,+3s/^/# /g' text.txt
-#+END_SRC
+**** 1.2.2.2, 地址形式
 
+- number
+
+  略
+
+- first~step
+
+  从first行开始，每隔step行执行一次命令
+
+  #+BEGIN_SRC
+  ## 从第一行起每隔两行
+  sed -n '1~2p' input.file ## 输出奇数行
+  #+END_SRC
+
+- /regex/
+
+  略
+
+- 0,/regex/
+
+  这种形式的地址对，默认第一个地址是匹配的，也就是匹配开关打开，直到找到匹配 /regex/ 的那行为止，匹配开关关闭。
+  大多数情况下和 1, /regex/ 是一样的，除非 /regex/ 匹配文件的第一行，在这种时候，0, /regex/ 就在第一行就关闭了，而 1, /regex/ 会继续往下找匹配的行。
+
+- addr1,+N
+
+  从匹配的 addr1 行开始，连续 N 行，包括 addr1 这一行
+
+  #+BEGIN_SRC
+  ## 其中 +3 表示后面连续 3 行
+  sed '/dog/,+3s/^/# /g' text.txt
+  #+END_SRC
+
+- addr1,~N
+
+  从匹配的 addr1 行开始，直到某一行，该行的行号是 N 的倍数为止
+
+
+
+**** 1.2.2.3, 总结
+
+   a. 地址对 addr1, addr2 的匹配方式，从匹配 addr1 的那行开始，打开匹配开关，直到匹配 addr2 的那行结束，关闭匹配开关，
+      之后的行会忽略这个地址对，不再做匹配
+
+   b. 地址对 addr1, addr2 的匹配方式，假设 addr1 是 number ，即行号，如果新读入行的行号“大于” addr1，则匹配；小于 addr1，则不匹配
 
 *** 1.2.3, Cmd
 
@@ -101,11 +146,15 @@ sed '1,${/This/d;s/^ *//g}' pets.txt
 
 - c :: 替换匹配行
 
-- d :: 删除匹配行
+- d :: 删除匹配行，同时不会执行接下来的命令，类似 break
 
-- D :: 只会删除模式空间的第一行，而且删除后会重新在模式空间的内容上执行_整个_编辑命令，类似形成一个循环
+- D :: 只会删除模式空间的第一行，而且删除后会重新在模式空间的内容上执行“整个”编辑命令，类似形成一个循环
 
 - p :: 打印匹配行
+
+- P :: 仅打印模式空间的第一行内容。很多情况下，P 命令都是用在 N 命令之后，D 命令之前的。
+       这三个命令合起来，可以形成一个输入输出的循环，并且每次只打印一行：
+       “读入一行后，N 继续读下一行，P 命令打印第一行，D 命令删除第一行，执行流程回到最开始重复该过程”
 
 - y :: 字符按照一对一的方式从左到右进行转换
 
@@ -115,20 +164,22 @@ sed '1,${/This/d;s/^ *//g}' pets.txt
 
 - l :: 同 p，同时打印控制字符
 
+- I :: 忽略大小写
+
 
 *** 1.2.4, Hold Space
 
 Hold Space 是一个和 Pattern Space 类似的变量空间，涉及到的命令有:
 
-- g ::  将 hold space 中的内容拷贝到 pattern space中，原来 pattern space 里的内容清除
+- g (get) ::  将 hold space 中的内容拷贝到 pattern space中，原来 pattern space 里的内容清除
 
 - G ::  将 hold space 中的内容 append 到 pattern space\n 后
 
-- h ::  将 pattern space 中的内容拷贝到 hold space 中，原来的 hold space 里的内容被清除
+- h (hold) ::  将 pattern space 中的内容拷贝到 hold space 中，原来的 hold space 里的内容被清除
 
 - H ::  将 pattern space 中的内容 append 到 hold space\n 后
 
-- x ::  交换 pattern space 和 hold space 的内容
+- x (exchange) ::  交换 pattern space 和 hold space 的内容
 
 
 * 二, 常见用法
@@ -196,3 +247,39 @@ Hold Space 是一个和 Pattern Space 类似的变量空间，涉及到的命令
   #+BEGIN_SRC
   sed 'y/abcde/ABCDE/' text.txt
   #+END_SRC
+
+- 压缩多行空行为一行
+
+  #+BEGIN_SRC
+  sed '/^$/{N;/^\n$/D}' text.txt
+  cat -s text.txt
+  #+END_SRC
+
+- 每行后添加一空行
+
+  #+BEGIN_SRC
+  sed G file.txt
+  #+END_SRC
+
+- 删除偶数行
+
+  #+BEGIN_SRC
+  sed 'n;d' file.txt
+  sed '2~2d' file.txt
+  ## 删除奇数行
+  sed '2,$n;d' file.txt
+  #+END_SRC
+
+- 忽略大小写匹配
+
+  #+BEGIN_SRC
+  sed -n '/abc/I p' file.txt
+  #+END_SRC
+
+- 不执行匹配
+
+  =[address[,address]][!]{cmd}=
+
+* 参考列表
+
+[[http://kodango.com/][团子的小窝]]
