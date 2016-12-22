@@ -280,6 +280,51 @@ Hold Space 是一个和 Pattern Space 类似的变量空间，涉及到的命令
 
   =[address[,address]][!]{cmd}=
 
+- 匹配行之前添加空行
+
+  #+BEGIN_SRC
+  sed '/regex/{x;p;x}' test.txt
+  #+END_SRC
+
+- 匹配行之前之后添加空行
+
+  #+BEGIN_SRC
+  sed '/regex/{x;p;x;G;}' test.txt
+
+  #+END_SRC
+
+- 每一行后添加两行
+
+  #+BEGIN_SRC
+  sed 'G;G'
+  #+END_SRC
+
+- 每 5 行添加一个空行
+
+  #+BEGIN_SRC
+  sed '0~5G' test.txt
+  #+END_SRC
+
+- 打印匹配 /regex/ 之前的那一行
+
+  #+BEGIN_SRC
+  sed -n '/regex/{g;1!p;};h'
+  #+END_SRC
+
+- 打印匹配 /regex/ 之后的那一行
+
+  #+BEGIN_SRC
+  sed -n '/regex/{n;p}' test.txt
+  #+END_SRC
+
+- 打印长于 65 个字符的行
+
+  #+BEGIN_SRC
+  sed -n '/^.{65}/p' test.txt
+  #+END_SRC
+
+
+
 * 参考列表
 
 [[http://kodango.com/][团子的小窝]]
