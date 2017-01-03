@@ -3,28 +3,46 @@
 #+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
 #+STARTUP:   showall
 
-** Usage
+* 一, 基本用法
 
-#+BEGIN_SRC sh
-cut -f1-  -d':' -s --output-delimiter='/' sample.txt
-cut -f1,2 -d' ' -s --output-delimiter='/' sample.txt
-cut -f3   --complement sample.txt
-## -b：指定范围提取字节
-## -c：指定范围提取字符
-## -f：指定范围提取字段
-## -d：指定分隔符默认是TAB
-## -s：不包括那些不含分隔符的行(去掉标题和注释)
-##     如果没有这个参数，没有定界符的行也会照原样打印出来
-#+END_SRC
+必须指定 -b，-c 或 -f 选项之一（这三个选项都可以使用 Range 表达式）
 
+* 二, 示例
 
+- 以字节（长度）切分
 
-** Range
+  可以配合 Range 表达式
 
-#+BEGIN_SRC sh
-N     ## 第N项
-N-    ## 第N项到行尾
-N-M   ## N到M
--M    ## 行始到M
--     ## 一行所有项
-#+END_SRC
+  #+BEGIN_SRC
+  cut -b 3     sample.txt    ## 输出第 3 字节
+  cut -b 3-    sample.txt    ## 输出第 3 字节及以后所有数据
+  cut -b 1-3   sample.txt    ## 输出第 1 至第 3 字节
+  cut -b -3    sample.txt    ## 同上
+  cut -b 1-3,5 sample.txt    ## 输出第 1 至第 3 字节与第 5 字节
+  #+END_SRC
+
+- 指定输出分隔符
+
+  #+BEGIN_SRC
+  cut -d' ' -f1,3 --output-delimiter=':'   sample.txt
+  cut -d' ' -f1,3 --output-delimiter=$'\n' sample.txt
+  #+END_SRC
+
+- 忽略没有分隔符的行
+
+  #+BEGIN_SRC
+  cut -d' ' -f1,3 -s --output-delimiter=':' sample.txt
+  ## 如果没有 -s 参数，则没有定界符的行也会打印出来
+  #+END_SRC
+
+- 反向选择
+
+  #+BEGIN_SRC
+  cut -b 3 --complement sample.txt  ## 输出除第 3 字节之外的所有内容
+  #+END_SRC
+
+- 获取最后一栏内容
+
+  #+BEGIN_SRC
+  echo 'maps.google.com' | rev | cut -d'.' -f1 | rev
+  #+END_SRC
