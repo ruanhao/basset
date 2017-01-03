@@ -23,3 +23,25 @@
 =nc -lU /var/tmp/dsocket=
 
 client: =nc -U /var/tmp/dsocket=
+
+
+** 传输文件
+
+nc -v -l 80 < file.ext ## sharing file through http 80 port
+
+** 共享屏幕
+
+*** 一对多
+#+BEGIN_SRC
+script -qf | tee >(nc -kl 5000) >(nc -kl 5001) >(nc -kl 5002)
+## run 'nc yourip 5000', 'nc yourip 5001' or 'nc yourip 5002' elsewhere
+## will produce an exact same mirror of your shell.
+## This is handy when you want to show someone else some amazing stuff
+## in your shell without giving them control over it.
+#+END_SRC
+
+*** 一对一
+#+BEGIN_SRC
+mkfifo foo; script -f foo ## master
+cat foo ## slaver
+#+END_SRC
