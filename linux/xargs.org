@@ -3,32 +3,55 @@
 #+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
 #+STARTUP:   showall
 
+* 一，基本原理
+
+xargs 默认命令是 echo
+
+- I<replace_str> :: 指定替换的字符串
+- 0              :: 使用 \0 作为定界符
+- n              :: 指定每行参数的数量
+- d              :: 指定定界符
+- r              :: 如果没有参数传入，就不执行后面的命令
+- p              :: 交互处理
 
 
-** Examples
+* 二，应用实例
 
-**** ls *.bak | xargs -I % cp % /tmp/test
+- 多行转单行
 
-等同 xargs -i cp {} /tmp/test
+  #+BEGIN_SRC
+  $cat example.txt
+  a b c
+  d e
+  f
+  $cat example.txt | xargs
+  a b c d e f
+  #+END_SRC
 
-**** xargs -r
+- 单行转多行
 
-## --no-run-if-empty
+  #+BEGIN_SRC
+  $cat example.txt | xargs -n 2
+  a b
+  c d
+  e f
+  #+END_SRC
 
-**** xargs -d'\n'
+- 与 find 联用
 
-## delimiter
+  #+BEGIN_SRC
+  find . -type f -name “*.txt” -print  | xargs     rm -f
+  find . -type f -name “*.txt” -print0 | xargs -r0 rm -f
+  #+END_SRC
 
-**** find . -name "*.c" -print0 | xargs -0 rm -rf
+- 参数替换
 
-## 如果檔名包含空白，會造成 rm 指令無法正確刪除該檔案
+  =ls *.bak | xargs -I{} cp {} /tmp=
 
-## 可以將 find 指令加上 -print0 參數，另外將 xargs 指令加上 -0 參數
+- 查看操作系统对命令列长度的限制
 
+  =xargs --show-limits=
 
+- 查找文件并压缩
 
-**** xargs --show-limits
-
-## 使用 --show-limits 參數可以查看系統對於命令列長度的限制
-
-## 這些限制會跟 xargs 的運作情況有關，如果要處理很大量的資料時，這些限制要注意一下
+  =find . -name *.jpg -type f -print | xargs tar -cvzf images.tar.gz=
