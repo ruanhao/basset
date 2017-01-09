@@ -68,7 +68,7 @@
   -o 'tcp.relative_sequence_numbers:FALSE'
   #+END_SRC
 
-- 过滤 Http 信息
+- 过滤 http 信息
 
   #+BEGIN_SRC
   tshark -n -r test.pcap -Tfields -e http.request.uri -e http.host 'http'
@@ -76,4 +76,15 @@
   # /index.html     10.74.68.58:8989
 
   ## -Tfields -e http.request.uri -e http.host : 指定输出项
+  #+END_SRC
+
+- 解密 https
+
+  #+BEGIN_SRC
+  export SSLKEYLOGFILE='<path-to-sslkeylog-file>' ## 浏览器用于记录 (Pre)-Master-Secret
+
+  tshark -r capture.pcap \
+  -o 'http.ssl.port:443,10000-20000' \            ## 指定需要解密的端口
+  -o 'ssl.keylog_file:<path-to-sslkeylog-file>' \
+  'http'
   #+END_SRC
