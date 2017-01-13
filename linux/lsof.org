@@ -1,4 +1,4 @@
-#+TITLE:     lsof (List Open File)
+#+TITLE:     lsof
 #+AUTHOR:    Hao Ruan
 #+EMAIL:     ruanhao1116@gmail.com
 #+LANGUAGE:  en
@@ -8,72 +8,105 @@
 #+STARTUP:   showall
 
 
-* lsof
+* 一，基本原理
 
-列出所有程序打开的文件
+LiSt Open File
 
-* lsof /path/to/file1 /path/to/file2
+** 1.1, 常用选项
 
-列出所有使用这些文件的程序
+- -a :: 进行“与”运算（默认是“或”逻辑）
 
-* lsof +D /path
+- -l :: 显示用户 ID ，而不是用户名
 
-查看指定路径下所有正在被使用的文件
+- -t :: 仅获取进程 ID
 
-* lsof -p <pid>
+- -F :: 格式化输出结果，如 -F pc （列出进程 ID，命令名）
 
-列出被某一进程所使用的文件
+- -n :: 避免域名解析
 
-* lsof -i
+- -P :: 避免端口解析
 
-查看所有开启 socket 的程序
+* 二，用法示例
 
-* lsof -i tcp
+- 列出所有程序打开的文件
 
-查看使用 tcp socket 的程序
+  =lsof=
 
-* lsof -i tcp:80
+- 列出所有使用这些文件的程序
 
-查看使用了 tcp:80 端口的程序
+  =lsof /path/to/file1 /path/to/file2=
 
-* lsof -i :80
+- 查看指定路径下所有正在被使用的文件
 
-查看使用了 80 端口的程序
+  #+BEGIN_SRC
+  lsof +D /path  ## 递归
+  lsof +d /path  ## 非递归
+  #+END_SRC
 
-* lsof -i@10.74.68.81
+- 列出被某一进程所使用的文件
 
-查看使用了 10.74.68.81 地址的程序
+  =lsof -p <pid>=
 
-* lsof -n
 
-避免域名解析
 
-* lsof -P
+- 查看 socket 信息
 
-避免端口解析
+  =lsof -i [46][protocol][@hostname|hostaddr][:service|port]=
 
-* lsof -c <command>
+  #+BEGIN_SRC
+  lsof -i
+  lsof -i 4
+  lsof -i :80
+  lsof -i tcp
+  lsof -i tcp:80
+  lsof -i @<ip>
+  lsof -i @<ip>:<port>
+  #+END_SRC
 
-列出由某个命令打开的所有文件，命令可以先使用 lsof -i 查看
+- 查看各种状态的 TCP 连接
 
-* lsof -d <fd>
+  #+BEGIN_SRC
+  lsof -iTCP -sTCP:LISTEN
+  #+END_SRC
 
-查看指定文件描述符的文件
+  #+BEGIN_QUOTE
+  常见状态有：CLOSED,  IDLE, BOUND, LISTEN, ESTABLISHED, SYN_SENT, SYN_RCDV, ESTABLISHED,
+                       CLOSE_WAIT, FIN_WAIT1, CLOSING, LAST_ACK, FIN_WAIT_2, TIME_WAIT
+  #+END_QUOTE
 
-* lsof -t
+- 查看指定文件描述符的文件
 
-输出使用某文件的程序的 pid
+  =lsof -d <fd>=
 
-* lsof -r <second>
+- 结束所有监听在本地接口的进程
 
-循环监控
+  =kill -9 `lsof -i@127.0.0.1 -t`=
 
-* And & Or
+- 循环监控
 
-lsof -u ruan -c apache    ## 用户是 ruan 或命令是 apache
+  #+BEGIN_SRC
+  lsof -r <second>
+  lsof -i:80 -r 1m"=== %T ==="
+  #+END_SRC
 
-lsof -a -u ruan -c apache ## 用户是 ruan 并且命令是 apache
+- 监控指定用户打开的文件
 
-* lsof -u root / lsof -u ^root
+  #+BEGIN_SRC
+  lsof -u root
+  lsof -u ^root  ## 非
+  #+END_SRC
 
-监控指定用户打开的文件
+- 查看内存映射文件
+
+  =lsof -d mem=
+
+- 恢复误删“日志”文件
+
+  #+BEGIN_SRC
+  ## 第一步：找到使用误删文件的进程及文件描述符
+  $ lsof | grep 'karaf.log'
+  java 1283 root 2w REG 3,3 5381017 1773647 /var/log/karaf.log (deleted)
+
+  ## 第二步：重定向
+  $ cat /proc/1283/fd/2 > /var/log/karaf.log
+  #+END_SRC
