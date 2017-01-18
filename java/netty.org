@@ -7,40 +7,119 @@
 #+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
 #+STARTUP:   showall
 
+* 一，Buffer
 
-* Transparent Zero Copy
+** 1.1，基本原理
 
-#+BEGIN_SRC java
+** 1.2，用法示例
 
-ByteBuf message = Unpooled.wrappedBuffer(header, body);
+- 组合
 
-// 可以混合复合类型与普通缓冲区来创建一个新的复合类型。
-ByteBuf messageWithFooter = Unpooled.wrappedBuffer(message, footer);
+  #+BEGIN_SRC java
 
-// 访问的区域可以是跨组件的
-// 这里的无符号整数读取位于 body 和 footer 之间
-messageWithFooter.getUnsignedInt(
-     messageWithFooter.readableBytes() - footer.readableBytes() - 1);
+  ByteBuf message = Unpooled.wrappedBuffer(header, body);
+
+  // 可以混合复合类型与普通缓冲区来创建一个新的复合类型。
+  ByteBuf messageWithFooter = Unpooled.wrappedBuffer(message, footer);
+
+  // 访问的区域可以是跨组件的
+  // 这里的无符号整数读取位于 body 和 footer 之间
+  messageWithFooter.getUnsignedInt(
+       messageWithFooter.readableBytes() - footer.readableBytes() - 1);
 )
 
 #+END_SRC
 
-* Automatic Capacity Extension
+- 自动扩容
 
-#+BEGIN_SRC java
+  #+BEGIN_SRC java
 
-// 在内部，缓冲区是被“懒”创建
-ByteBuf b = Unpooled.buffer(4);
+  // 在内部，缓冲区是被“懒”创建
+  ByteBuf b = Unpooled.buffer(4);
 
-// 当第一次执行写操作，初始容量为4的缓冲区被创建
-b.writeByte('1');
+  // 当第一次执行写操作，初始容量为4的缓冲区被创建
+  b.writeByte('1');
 
-b.writeByte('2');
-b.writeByte('3');
-b.writeByte('4');
+  b.writeByte('2');
+  b.writeByte('3');
+  b.writeByte('4');
 
-// 当写入的字节数超过初始容量时，
-// 内部缓冲区自动分配更大的容量
-b.writeByte('5');
+  // 当写入的字节数超过初始容量时，
+  // 内部缓冲区自动分配更大的容量
+  b.writeByte('5');
 
-#+END_SRC
+  #+END_SRC
+
+* 二，SSL/TLS
+
+** 2.1，基本原理
+
+** 2.2，用法示例
+
+- 记录 Pre Master Secret
+
+  #+BEGIN_SRC java
+
+    private static final SslContext sslContext = SslContextBuilder
+        .forClient()
+        .sessionCacheSize(8192L)
+        .sessionTimeout(60L)
+        .trustManager(InsecureTrustManagerFactory.INSTANCE)
+        .build();
+
+    public void doConnect() {
+        EventLoopGroup group = new NioEventLoopGroup();
+        Bootstrap b = new Bootstrap();
+        b.group(group)
+            .channel(NioSocketChannel.class)
+            .remoteAddress("127.0.0.1", 30443)
+            .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    public void initChannel(SocketChannel ch) throws Exception {
+                        SSLEngine engine = sslContext.newEngine(ch.alloc());
+
+                        Method initHandshakerMethod = engine.getClass().getDeclaredMethod("initHandshaker");
+                        initHandshakerMethod.setAccessible(true);
+                        initHandshakerMethod.invoke(engine);
+
+                        Field handshakerField = engine.getClass().getDeclaredField("handshaker");
+                        handshakerField.setAccessible(true);
+                        Object handShakerObj = handshakerField.get(engine);
+
+                        SslHandler sslHandler = new SslHandler(engine);
+                        sslHandler.handshakeFuture().addListener(new GenericFutureListener<Future<Channel>>() {
+                                @Override
+                                public void operationComplete(Future<Channel> future) throws Exception {
+                                    if (future.isSuccess()) {
+                                        SSLSession session = engine.getSession();
+                                        Field masterSecretField = session.getClass().getDeclaredField("masterSecret");
+                                        masterSecretField.setAccessible(true);
+                                        SecretKey k = (SecretKey)masterSecretField.get(session);
+                                        String preMasterSecretString = BaseEncoding.base16().encode(k.getEncoded()).toLowerCase();
+
+                                        Class<?> handshakerClass = Class.forName("sun.security.ssl.Handshaker");
+                                        Field clientRandomField = handshakerClass.getDeclaredField("clnt_random");
+                                        clientRandomField.setAccessible(true);
+                                        Object clientRandomObj = clientRandomField.get(handShakerObj);
+                                        Field randomBytesField = clientRandomObj.getClass().getDeclaredField("random_bytes");
+                                        randomBytesField.setAccessible(true);
+                                        byte[] randomBytes = (byte[])randomBytesField.get(clientRandomObj);
+                                        String clientRandom = BaseEncoding.base16().encode(randomBytes).toLowerCase();
+                                        /* this log trace can be used in SSLKEYLOGFILE understood by wireshark */
+                                        log.info("CLIENT_RANDOM {} {}", clientRandom, preMasterSecretString);
+                                    }
+                                }
+                            });
+
+                        ch.pipeline().addLast(sslHandler);
+                        ch.pipeline().addLast(new SimpleChannelInboundHandler<ByteBuf>() {
+                                @Override
+                                protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
+                                    // TODO
+                                }
+                            });
+                    }
+                });
+        b.connect();
+    }
+  #+END_SRC
