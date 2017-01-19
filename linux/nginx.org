@@ -108,6 +108,7 @@ location ^~ <uri> { ... }  ## 降低正则匹配的优先级
     location /world {
         proxy_pass http://127.0.0.1:9999/;  ## 访问 http://<domain>/world ，   转发为 GET / HTTP/1.0
                                             ## 访问 http://<domain>/world/hk ，转发为 GET //hk HTTP/1.0
+                                            ## / + (/world/hk - /world) = / + /hk = //hk
     }
 
     location /world/ {
@@ -118,5 +119,6 @@ location ^~ <uri> { ... }  ## 降低正则匹配的优先级
     location /world/ {
         proxy_pass http://127.0.0.1:9999/;  ## 访问 http://<domain>/world ，   重定向为 http://<domain>/world/ ，转发为 GET / HTTP/1.0
                                             ## 访问 http://<domain>/world/hk ，转发为 GET /hk HTTP/1.0
+                                            ## / + (/workd/hk - /world/) = / + hk = /hk
     }
   #+END_SRC
