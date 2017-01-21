@@ -1,0 +1,44 @@
+#+TITLE:     ngx_http_upstream_module
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+
+* 一，负载均衡
+
+#+BEGIN_SRC sh
+  upstream backends {
+      server 1.2.3.4 weight=5 max_fails=3;
+      server 1.2.3.5:8080;
+      server unix:/tmp/backend.sock;
+      server 1.2.3.6 backup;      # 可以作为 sorry server
+  }
+
+  server {
+      location / {
+          proxy_pass http://backends;
+      }
+  }
+#+END_SRC
+
+- 负载均衡算法
+
+  + round_robin
+
+  + ip_hash
+
+    使用 ip 哈希值作为负载均衡算法，相同的 ip 访问同一个 server， 该选项忽略 weight 选项和 backup 功能
+
+  + least_conn
+
+
+
+
+* 参考资源
+
+[[http://nginx.org/en/docs/http/ngx_http_upstream_module.html][ngx_http_upstream_module]]

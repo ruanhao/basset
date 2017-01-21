@@ -1,0 +1,42 @@
+#+TITLE:     Nginx
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 一，基本原理
+
+** 1.1，设计架构
+
+Nginx 会同时运行多个进程，一个主进程（master）和多个工作进程（worker），配置缓存时还会有缓存加载器进程（cache loader）和
+缓存管理器进程（cache manager）等。所有进程均仅含一个线程，通过共享内存的机制实现进程间通信。主进程以 root 身份运行，
+其余进程以非特权身份运行。
+
+*** 1.1.1，master 进程
+
+- 读取并验证配置信息
+- 创建，绑定及关闭套接字
+- 启动，终止及维护 worker 进程的个数
+- 配置热部署（平滑升级）
+- 编译嵌入式脚本
+- 日志文件管理
+
+
+*** 1.1.2，worker 进程
+
+- 接受并处理客户端连接
+- 提供反向代理及过滤功能
+
+
+*** 1.1.3，cache loader 进程
+
+- 建立内存数据库
+
+
+*** 1.1.4，cache manager 进程
+
+- 缓存失效及过期检查
