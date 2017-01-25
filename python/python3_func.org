@@ -1,0 +1,27 @@
+#+TITLE:     Function
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+* 一，基本知识
+
+** 1.1，使用默认参数的注意事项
+
+#+BEGIN_SRC python
+  def add_end(L=[]):
+      L.append('END')
+      return L
+
+  add_end()                       # ['END']
+  add_end()                       # ['END', 'END']
+  add_end()                       # ['END', 'END', 'END']
+#+END_SRC
+
+原因：
+
+函数在定义的时候，默认参数 L 的值就被计算出来了，即 [] ，因为默认参数 L 也是一个变量，它指向对象 [] ，\
+每次调用该函数，如果改变了 L 的内容，则下次调用时，默认参数的内容就变了，不再是函数定义时的 [] 了
