@@ -10,7 +10,7 @@
 
 * 一，基本知识
 
-* 二，继承
+** 1.1 ，继承
 
 #+BEGIN_SRC python
   class Car():
@@ -23,3 +23,160 @@
       def __init__(self, make, model, year):
           super().__init__(make, model, year)
 #+END_SRC
+
+** 1.2，__slots__
+
+Python 允许在定义 class 的时候，定义一个特殊的 __slots__ 变量，来限制该 class 实例能添加的属性\\
+
+注意：\\
+__slots__ 定义的属性仅对当前类实例起作用，对继承的子类是不起作用的；\\
+除非在子类中也定义 __slots__ ，这样，子类实例允许定义的属性就是自身的 __slots__ 加上父类的 __slots__ 。
+
+** 1.3，Property
+
+Python 内置的 @property 装饰器负责把一个方法变成属性调用
+
+** 1.4，__getattr__
+
+当调用不存在的属性时，比如 score ，Python 解释器会试图调用 __getattr__(self, 'score') 来尝试获得属性
+
+** 1.5，类的动态创建
+
+正常情况下，使用 class 来定义类，但是，type() 函数允许动态创建类。\\
+创建一个 class 对象，type() 函数依次传入 3 个参数：
+
+1. class 名称
+2. 父类集合
+3. 方法名称与函数绑定
+
+通过 type() 函数创建的类和直接写 class 是完全一样的，因为 Python 解释器遇到 class 定义时，仅仅是扫描一下 class 定义的语法，然后调用 type() 函数创建出 class 。
+
+** 1.6，metaclass
+
+除了使用 type() 动态创建类以外，要控制类的 *创建行为* ，还可以使用 metaclass 。
+
+当定义一个 class Audi(Car) 时，Python 解释器首先在当前类 Audi 的定义中查找 metaclass ，\\
+如果没有找到，就继续在父类 Car 中查找 metaclass ，\\
+找到了，就使用 Car 中定义的 metaclass(CarMetaclass) 来创建 Audi 类，\\
+也就是说，metaclass 可以隐式地继承到子类。
+
+
+* 二，常见用法
+
+- 动态给 class 绑定方法
+
+  动态绑定允许我们在程序运行的过程中动态给 class 加上功能，这在静态语言中很难实现
+
+  #+BEGIN_SRC python
+    class Student():
+        pass
+
+    def set_score(self, score):
+        self.score = score
+
+    Student.set_score = set_score
+  #+END_SRC
+
+  - 限制实例的属性
+
+    #+BEGIN_SRC python
+      class Student(object):
+          __slots__ = ('name', 'age')  # 用 tuple 定义允许绑定的属性名称
+
+
+      s = Student()
+      s.name = 'Michael'
+      s.age = 25
+      s.score = 99                    # AttributeError
+
+      class GraduateStudent(Student):
+          pass
+
+      g = GraduateStudent()           # __slots__ 定义的属性仅对当前类实例起作用，对继承的子类不起作用
+      g.score = 9999
+
+    #+END_SRC
+
+    - 设置 Property
+
+      #+BEGIN_SRC python
+        class Student():
+
+            @property
+            def score(self):
+                return self._score
+
+            @score.setter
+            def score(self, value):
+                if not isinstance(value, int):
+                    raise ValueError('score must be an integer!')
+                if value < 0 or value > 100:
+                    raise ValueError('score must between 0 ~ 100!')
+                self._score = value
+      #+END_SRC
+
+      把一个 getter 方法变成属性，只需要加上 @property 就可以了，\\
+      此时，@property 本身又创建了另一个装饰器 @score.setter ，负责把一个 setter 方法变成属性赋值。
+
+      - 创建 Enum
+
+        #+BEGIN_SRC python
+          from enum import Enum
+
+          Month = Enum('Month', ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'))
+
+          for name, member in Month.__members__.items():
+              print(name, '=>', member, ',', member.value)
+        #+END_SRC
+
+        默认从 1 开始计数，如果需要更精确地控制枚举类型，可以从 Enum 派生出自定义类：
+
+        #+BEGIN_SRC python
+          from enum import Enum, unique
+
+          @unique                         # @unique 装饰器用于检查保证没有重复值
+          class Weekday(Enum):
+              Sun = 0                     # Sun 的 value 被设定为 0
+              Mon = 1
+              Tue = 2
+              Wed = 3
+              Thu = 4
+              Fri = 5
+              Sat = 6
+
+        #+END_SRC
+
+        - 使用 type 动态创建类
+
+          #+BEGIN_SRC python
+            def fn(self, name='world'):
+                print('Hello, %s.' % name)
+
+            Hello = type('Hello', (object,), dict(hello=fn))
+
+            h = Hello()
+            h.hello()                       # Hello, world.
+            print(type(Hello))              # <class 'type'>
+            print(type(h))                  # <class '__main__.Hello'>
+          #+END_SRC
+
+        - 使用 metaclass 控制类的创建
+
+          #+BEGIN_SRC python
+            # metaclass 是类的模板，所以必须从 type 类型派生
+            class ListMetaclass(type):      # 按照默认习惯，metaclass 的类名总是以 Metaclass 结尾
+                def __new__(cls, name, bases, attrs):
+                    attrs['add'] = lambda self, value: self.append(value)
+                    return type.__new__(cls, name, bases, attrs)
+
+            # 这个 metaclass 可以给自定义的 MyList 增加 add 方法
+            class MyList(list, metaclass=ListMetaclass):  # 定义类的时候指示使用 ListMetaclass 来定制类，
+                pass                                      # 它指示在创建 MyList 时，要通过 ListMetaclass.__new__() 来创建
+          #+END_SRC
+
+          __new__() 方法接收到的参数依次是：
+
+          1. 当前准备创建的类的对象
+          2. 类的名字
+          3. 类继承的父类集合
+          4. 类的属性和方法集合
