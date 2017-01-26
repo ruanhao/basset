@@ -69,6 +69,7 @@
 在 Python 中定义函数，可以用必选参数、默认参数、可变参数、关键字参数和命名关键字参数，这 5 种参数都可以组合使用。\\
 组合参数定义的顺序必须是：必选参数、默认参数、可变参数、命名关键字参数和关键字参数。
 
+
 ** 1.4，使用闭包的陷阱
 
 #+BEGIN_SRC python
@@ -104,3 +105,75 @@
           fs.append(f(i))
       return fs
 #+END_SRC
+
+** 1.5，Lambda 表达式（匿名函数）
+
+匿名函数有个限制，就是只能有一个表达式，不用写 return，返回值就是该表达式的结果
+
+** 1.6，装饰器
+
+在代码运行期间动态增加函数功能的方式，称之为“装饰器”（Decorator）。\\
+本质上，Decorator 就是一个返回函数的高阶函数。\\
+Python 的 Decorator 可以用函数实现，也可以用类实现。
+
+** 1.7，偏函数
+
+当函数的参数个数太多，需要简化时，使用 functools.partial 可以创建一个新的函数。\\
+这个新函数可以固定住原函数的部分参数，从而在调用时更简单。
+
+* 二，常见用法
+
+- 创建装饰器
+
+  - 不带参数的装饰器
+
+    #+BEGIN_SRC python
+      import functools
+
+      def log(func):
+          @functools.wraps(func)      # 把原始函数的 __name__ 等属性复制到 wrapper 函数中
+          def wrapper(*args, **kw):   # 可以接受任意参数的调用
+              print('call %s():' % func.__name__)
+              return func(*args, **kw)
+          return wrapper
+    #+END_SRC
+
+    #+BEGIN_SRC python
+      @log
+      def now():                      # 相当于：now = log(now)
+          print('2017-01-26')
+    #+END_SRC
+
+  - 带参数的装饰器
+
+      #+BEGIN_SRC python
+        import functools
+
+        def log(text):
+            def decorator(func):
+                @functools.wraps(func)
+                def wrapper(*args, **kw):
+                    print('%s %s():' % (text, func.__name__))
+                    return func(*args, **kw)
+                return wrapper
+            return decorator
+      #+END_SRC
+
+      #+BEGIN_SRC python
+        @log('execute')
+        def now():                      # 相当于：now = log('execute')(now)
+            print('2015-3-25')          # log('execute') 返回的还是一个装饰器
+      #+END_SRC
+
+- 创建装饰器
+
+  #+BEGIN_SRC python
+    import functools
+    int2 = functools.partial(int, base=2)
+    int2('1000000')                 # 64
+    int2('1010101')                 # 85
+
+    # 上面新的 int2 函数，仅仅是把 base 参数重新设定默认值为2
+    # 也可以在函数调用时传入其他值：
+    int2('1000000', base=10)        # 1000000
+  #+END_SRC
