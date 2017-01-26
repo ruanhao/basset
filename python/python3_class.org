@@ -26,10 +26,11 @@
 
 ** 1.2，__slots__
 
-Python 允许在定义 class 的时候，定义一个特殊的 __slots__ 变量，来限制该 class 实例能添加的属性\\
+Python 允许在定义 class 的时候，定义一个特殊的 __slots__ 变量，来限制该 class 实例能添加的属性。
 
-注意：\\
-__slots__ 定义的属性仅对当前类实例起作用，对继承的子类是不起作用的； \\
+注意：
+
+__slots__ 定义的属性仅对当前类实例起作用，对继承的子类是不起作用的，\\
 除非在子类中也定义 __slots__ ，这样，子类实例允许定义的属性就是自身的 __slots__ 加上父类的 __slots__ 。
 
 ** 1.3，Property
@@ -42,7 +43,8 @@ Python 内置的 @property 装饰器负责把一个方法变成属性调用
 
 ** 1.5，类的动态创建
 
-正常情况下，使用 class 来定义类，但是，type() 函数允许动态创建类。\\
+正常情况下，使用 class 来定义类，但是，type() 函数允许动态创建类。
+
 创建一个 class 对象，type() 函数依次传入 3 个参数：
 
 1. class 名称
@@ -55,10 +57,7 @@ Python 内置的 @property 装饰器负责把一个方法变成属性调用
 
 除了使用 type() 动态创建类以外，要控制类的 *创建行为* ，还可以使用 metaclass 。
 
-当定义一个 class Audi(Car) 时，Python 解释器首先在当前类 Audi 的定义中查找 metaclass ，\\
-如果没有找到，就继续在父类 Car 中查找 metaclass ， \\
-找到了，就使用 Car 中定义的 metaclass(CarMetaclass) 来创建 Audi 类， \\
-也就是说，metaclass 可以隐式地继承到子类。
+当定义一个 class Audi(Car) 时，Python 解释器首先在当前类 Audi 的定义中查找 metaclass ，如果没有找到，就继续在父类 Car 中查找 metaclass ，找到了，就使用 Car 中定义的 metaclass(CarMetaclass) 来创建 Audi 类，也就是说，metaclass 可以隐式地继承到子类。
 
 
 * 二，常见用法
@@ -77,7 +76,7 @@ Python 内置的 @property 装饰器负责把一个方法变成属性调用
     Student.set_score = set_score
   #+END_SRC
 
-  - 限制实例的属性
+ - 限制实例的属性
 
     #+BEGIN_SRC python
       class Student(object):
@@ -97,7 +96,7 @@ Python 内置的 @property 装饰器负责把一个方法变成属性调用
 
     #+END_SRC
 
-    - 设置 Property
+ - 设置 Property
 
       #+BEGIN_SRC python
         class Student():
@@ -118,7 +117,7 @@ Python 内置的 @property 装饰器负责把一个方法变成属性调用
       把一个 getter 方法变成属性，只需要加上 @property 就可以了，\\
       此时，@property 本身又创建了另一个装饰器 @score.setter ，负责把一个 setter 方法变成属性赋值。
 
-      - 创建 Enum
+ - 创建 Enum
 
         #+BEGIN_SRC python
           from enum import Enum
@@ -146,7 +145,7 @@ Python 内置的 @property 装饰器负责把一个方法变成属性调用
 
         #+END_SRC
 
-        - 使用 type 动态创建类
+ - 使用 type 动态创建类
 
           #+BEGIN_SRC python
             def fn(self, name='world'):
@@ -160,7 +159,7 @@ Python 内置的 @property 装饰器负责把一个方法变成属性调用
             print(type(h))                  # <class '__main__.Hello'>
           #+END_SRC
 
-        - 使用 metaclass 控制类的创建
+ - 使用 metaclass 控制类的创建
 
           #+BEGIN_SRC python
             # metaclass 是类的模板，所以必须从 type 类型派生
