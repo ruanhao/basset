@@ -25,6 +25,7 @@ Python 虽然不能利用多线程实现多核任务，但可以通过多进程�
 
 Python 语言中，单进程的异步编程模型称为协程，有了协程的支持，就可以基于事件驱动编写高效的多任务程序。
 
+Python 对协程的支持是通过 generator 实现的。
 
 * 二，常见用法
 
@@ -196,3 +197,82 @@ Python 语言中，单进程的异步编程模型称为协程，有了协程的�
 
   ThreadLocal 最常用的地方就是为每个线程绑定一个数据库连接，HTTP 请求，用户身份信息等，\\
   这样一个线程的所有调用到的处理函数都可以非常方便地访问这些资源。
+
+- 协程编写
+
+  Python 的 yield 不但可以返回一个值，它还可以接收调用者发出的参数。
+
+  用协程编写生产消费者模型：
+
+  #+BEGIN_SRC python
+    def consumer():
+        r = ''
+        while True:
+            n = yield r
+            if not n:
+                return
+            print('[CONSUMER] Consuming %s...' % n)
+            r = '200 OK'
+
+    def produce(c):
+        c.send(None)
+        n = 0
+        while n < 5:
+            n = n + 1
+            print('[PRODUCER] Producing %s...' % n)
+            r = c.send(n)
+            print('[PRODUCER] Consumer return: %s' % r)
+        c.close()
+
+    c = consumer()
+    produce(c)
+  #+END_SRC
+
+  生产者生产消息后，直接通过yield跳转到消费者开始执行，待消费者执行完毕后，切换回生产者继续生产。
+
+- asyncio 编程模型
+
+  asyncio 编程模型就是一个消息循环。从 asyncio 模块中获取一个 EventLoop 的引用，然后把需要执行的协程放到 EventLoop 中执行，从而实现了异步 IO。
+
+  #+BEGIN_SRC python
+    import asyncio
+
+    @asyncio.coroutine
+    def hello():
+        print("Hello world!")
+        sleep_coroutine = asyncio.sleep(1)
+        r = yield from sleep_coroutine  # 异步调用 asyncio.sleep(1):
+        print("Hello again!")
+
+    # 获取EventLoop:
+    loop = asyncio.get_event_loop()
+    # 执行coroutine
+    loop.run_until_complete(hello())
+    loop.close()
+
+    # @asyncio.coroutine 把一个 generator 标记为 coroutine 类型，并把这个 coroutine 放到到 EventLoop 中执行。
+
+    # hello() 会首先打印出 Hello world! ，然后，yield from 语法可以方便地调用另一个 generator 。
+    # 由于 asyncio.sleep() 也是一个 coroutine ，所以线程不会等待 asyncio.sleep() ，而是直接中断并执行下一个消息循环。
+    # 当 asyncio.sleep() 返回时，线程就可以从 yield from 拿到返回值（此处是None），然后接着执行下一行语句。
+
+    # 把 asyncio.sleep(1) 看成是一个耗时 1 秒的 IO 操作，在此期间，主线程并未等待，
+    # 而是去执行 EventLoop 中其他可以执行的 coroutine 了，因此可以实现并发执行。
+  #+END_SRC
+
+  1) asyncio 提供了完善的异步 IO 支持
+  2) 异步操作需要在 coroutine 中通过 yield from 完成
+  3) 多个 coroutine 可以封装成一组 Task 然后并发执行
+
+  为了简化并更好地标识异步 IO ，从 Python 3.5 开始引入了新的语法 async 和 await ，可以让 coroutine 的代码更简洁易读。\\
+  要使用新的语法，只需要做两步简单的替换：
+
+  1. 把 @asyncio.coroutine 替换为 async
+  2. 把 yield from 替换为 await
+
+  #+BEGIN_SRC python
+    async def hello():
+        print("Hello world!")
+        r = await asyncio.sleep(1)
+        print("Hello again!")
+  #+END_SRC

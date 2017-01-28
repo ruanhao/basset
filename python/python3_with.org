@@ -1,0 +1,88 @@
+#+TITLE:     With
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 一，基本知识
+
+
+* 二，常见用法
+
+- contextmanager
+
+  当希望在某段代码执行前后自动执行特定代码，可以用 @contextmanager 实现。
+
+  @contextmanager 这个 decorator 接受一个 generator：
+
+  #+BEGIN_SRC python
+    from contextlib import contextmanager
+
+    class Query(object):
+
+        def __init__(self, name):
+            self.name = name
+
+        def query(self):
+            print('Query info about %s...' % self.name)
+
+    @contextmanager
+    def create_query(name):
+        print('Begin')
+        q = Query(name)
+        yield q
+        print('End')
+
+    with create_query('Bob') as q:
+        q.query()
+
+
+    # Begin
+    # Query info about Bob
+    # End
+  #+END_SRC
+
+  #+BEGIN_SRC python
+    @contextmanager
+    def tag(name):
+        print("<%s>" % name)
+        yield
+        print("</%s>" % name)
+
+    with tag("h1"):
+        print("hello")
+        print("world")
+
+    # <h1>
+    # hello
+    # world
+    # </h1>
+  #+END_SRC
+
+- closing
+
+  如果一个对象没有实现上下文，不能把它用于 with 语句。这时，可以用 @closing 来把该对象变为上下文对象：
+
+  #+BEGIN_SRC python
+    from contextlib import closing
+    from urllib.request import urlopen
+
+    with closing(urlopen('https://www.python.org')) as page:
+        for line in page:
+            print(line)
+  #+END_SRC
+
+  closing 也是一个经过 @contextmanager 装饰的 generator ：
+
+  #+BEGIN_SRC python
+    @contextmanager
+    def closing(thing):
+        try:
+            yield thing
+        finally:
+            thing.close()
+  #+END_SRC
