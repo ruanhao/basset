@@ -33,6 +33,8 @@ Python 允许在定义 class 的时候，定义一个特殊的 __slots__ 变量�
 __slots__ 定义的属性仅对当前类实例起作用，对继承的子类是不起作用的，\\
 除非在子类中也定义 __slots__ ，这样，子类实例允许定义的属性就是自身的 __slots__ 加上父类的 __slots__ 。
 
+如果类使用 __slots__ ，就会使用一种更加有效的内部表示，而实例也不会有 __dict__ 属性。
+
 ** 1.3，Property
 
 Python 内置的 @property 装饰器负责把一个方法变成属性调用
@@ -59,6 +61,28 @@ Python 内置的 @property 装饰器负责把一个方法变成属性调用
 
 当定义一个 class Audi(Car) 时，Python 解释器首先在当前类 Audi 的定义中查找 metaclass ，如果没有找到，就继续在父类 Car 中查找 metaclass ，找到了，就使用 Car 中定义的 metaclass(CarMetaclass) 来创建 Audi 类，也就是说，metaclass 可以隐式地继承到子类。
 
+** 1.7，属性应用
+
+*** 1.7.1，从类中获得属性
+
+使用 C.name 引用类对象 C 的一个属性时，查询操作如下：
+
+1. 当 name 是 C.__dict__ 中的一个键时， C.name 将从 C.__dict__['name'] 中提取值 v。\\
+   如果 v 是一个描述器，则 C.name 的值就是 type(v).__get__(v, None, C)，否则，C.name 的值为 v
+2. 否则，C.name 将委托查找 C 的基类
+3. 否则引发 AttributeError
+
+*** 1.7.2，从实例中获得属性
+
+使用 x.name 引用类 C 的实例 x 的一个属性时，查询操作如下：
+
+1. 当 name 作为一个覆盖描述器 v 的名称在类 C （或 C 的某个祖先类）中被找到，x.name 的值就是\\
+   type(v).__get__(v, x, C)
+
+2. 否则，当 name 是 x.__dict__ 中的一个键时，返回 x.__dict__['name']
+3. 否则，x.name 将委托查找 x 的类，即查找 C.name
+4. 如果 C 定义或继承了特殊方法 __getattr__ ，则调用 C.__getattr__(x, 'name') ，而不是引发 AttributeError，\\
+   然后根据 __getattr__ 返回一个合适的值或者引发 AttributeError
 
 * 二，常见用法
 
