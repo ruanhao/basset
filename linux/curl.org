@@ -1,0 +1,50 @@
+#+TITLE:     curl
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 1，基本知识
+
+
+* 2，常见用法
+
+** 2.1，使用 cookie
+
+#+BEGIN_SRC sh
+  -c <cookie-file> # 使用文件保存 cookie
+  -b "name=data"   # 以键值对的形式提供 cookie
+  -b <cookie-file> # 以文件的形式提供 cookie
+#+END_SRC
+
+** 2.2，URL 编码
+
+#+BEGIN_SRC sh
+  curl -G --data-urlencode "search=hello world"
+  # -G 表示指定 GET 方法，并将 payload 追加至 request uri 后（用 ? 分隔)
+#+END_SRC
+
+** 2.3，SSL/TLS
+
+#+BEGIN_SRC sh
+  -E <cert-file>     # 提供证书文件
+  --key <key-file>   # 提供私钥文件
+  --cacert <ca-file> # 提供授信 CA 列表文件，也可由环境变量 CURL_CA_BUNDLE 指定
+  -k                 # 忽略服务器证书的认证
+#+END_SRC
+
+[[http://curl.haxx.se/ca/cacert.pem][授信 CA 列表]]
+
+** 2.4，禁用 Expect 机制
+
+使用 curl 进行上传时，有些服务器会返回 =Expect: 100-continue= ，导致上传失败。
+
+#+BEGIN_SRC sh
+  curl -X PUT -Ss -H 'Expect:' -d@<payload-file> <url>
+#+END_SRC
+
+[[http://www.iandennismiller.com/posts/curl-http1-1-100-continue-and-multipartform-data-post.html][curl: HTTP/1.1 100 CONTINUE and multipart/form-data POST]]
