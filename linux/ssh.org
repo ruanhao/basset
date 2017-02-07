@@ -1,0 +1,47 @@
+#+TITLE:     ssh
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 1，基本知识
+
+* 2，常见用法
+
+** 2.1，远端转发
+
+[[file:./images/ssh-remote-forward.png]]
+
+#+BEGIN_SRC sh
+  ssh -N -f -R <remote-port>:<dest-host>:<dest-host-port> user@remote-host
+#+END_SRC
+
+<remote-port> 监听在 localhost 上，如需要被外部访问，可以在 remote-host 上再添加一个端口转发:
+
+#+BEGIN_SRC sh
+  socat TCP4-LISTEN:8888,reuseaddr,fork TCP4:127.0.0.1:<remote-port> &
+#+END_SRC
+
+这样外部可以通过 <remote-host>:8888 访问 <dest-host>:<dest-host-port>
+
+** 2.2，在远程机器上运行脚本
+
+#+BEGIN_SRC sh
+  ssh user@server bash < /path/to/local/script.sh
+#+END_SRC
+
+** 2.3，将本地文件和远程的比较
+
+#+BEGIN_SRC sh
+  ssh user@host cat /path/to/remotefile | diff /path/to/localfile -
+#+END_SRC
+
+** 2.4，cat 文件
+
+#+BEGIN_SRC sh
+  ssh user@host 'mkdir -p .ssh && cat >> .ssh/authorized_keys' < ~/.ssh/id_rsa.pub
+#+END_SRC
