@@ -1,0 +1,108 @@
+#+TITLE:     top
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 1，基本知识
+
+[[file:images/top.png]]
+
+** 1.1，性能指标
+
+- 如果 *us* 大于 50% ，说明用户进程消耗的 cpu 时间多，需要考虑优化用户的程序
+- 如果 *us+sy* 大于 80% ，说明可能存在 CPU 不足
+- *wa* 显示了 IO 等待所占用的 CPU 时间百分比。如果超过 30% ，说明 IO 等待严重，可能是磁盘大量随机访问造成的，\\
+  也可能磁盘或者磁盘访问控制器的带宽瓶颈造成的（主要是块操作）
+- *st(steal)* 指示在如 Xen 等虚拟环境下 CPU 运行虚拟机时间的百分比，太高表示可能需要停止一些虚拟机
+
+** 1.2，内存数量说明
+
+第四行中使用中的内存 *used* 指的是当前系统內核控制的内存数量，空闲内存 *free* 是内核尚未纳入其管控范围的數量。
+
+纳入内核管理的内存不见得都在使用中，还包括可以被重复利用的内存，内核并不把这些可被重新使用的内存交换到 *free* 中去，\\
+因此在 linux 上 *free* 内存会越来越少，无需担心。
+
+如果第五行 swap used 数值不为零且不断变化，说明内核不断进行内存 swap 操作，这是真正内存告急的征兆。
+
+** 1.3，buffers & cached
+
+buffers 和 cached 是内核管理的可用内存。从应用程序角度来看，buffers/cached 即可用内存。
+
+buffers/cached 可以用来提高文件读写性能，buffers 给块设备做缓冲区，cached 给文件做缓冲区。
+
+** 1.4，内存计算
+
+1. 可用内存
+
+   =free + (buffers + cached)=
+
+2. 已用内存
+
+   =used - (buffers + cached)=
+
+** 1.5，SHR
+
+SHR 是指加载外部动态库 (.so) 或者以共享内存方式进行进程间通信时所使用的共享内存区域。\\
+这部分物理内存空间其实是被多个进程所共享的，所以称为共享内存。
+
+某个进程占用的内存除了和别的进程共享的内存之外就是自己的独占内存了。\\
+所以要计算进程独占内存的大小只要用 RES 的值减去 SHR 值即可。
+
+* 2，常用选项
+
+- 以 CPU 排序
+
+  P
+
+- 以内存排序
+
+  M
+
+- 显示 SMP 负载情况
+
+  1
+
+- 显示线程信息
+
+  H
+
+- 高亮模式
+
+  z
+
+- 显示完整命令名
+
+  c
+
+- kill 指定进程
+
+  k
+
+- 指定排序栏高亮
+
+  x
+
+- 指定排序栏
+
+  <, >
+
+- 显示指定进程
+
+  =top -p=
+
+= 显示一屏信息
+
+  =top -bn 1=
+
+- 使用 megabytes 为单位
+
+  =top -M=
+
+- 监控指定进程和进行内线程信息
+
+  =top -H -p=
