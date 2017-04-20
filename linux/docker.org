@@ -1,0 +1,118 @@
+#+TITLE:     Docker
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 1, 基本原理
+
+* 2, Docker 守护进程
+
+可以使用 -H 标志调整守护进程绑定监听接口的方式
+
+客户端也必须指定接口的变化，如: =docker -H :2375= , 或者设置环境变量 DOCKER_HOST:
+
+#+BEGIN_SRC bash
+export DOCKER_HOST="tcp://0.0.0.0:2375"
+#+END_SRC
+
+** 2.1, 修改守护进程的端口
+
+=docker daemon -H tcp://0.0.0.0:2375=
+
+** 2.2, 修改守护进程的套接字路径
+
+=docker daemon -H unix://home/docker/docker.sock=
+
+* 3, 容器操作
+
+- 运行容器
+
+  #+BEGIN_SRC sh
+  docker run --name my_container -i -t ubuntu /bin/bash
+  # -i:     保证容器中 STDIN 开启
+  # -t:     为容器创建伪终端
+  # --name: 命名必须唯一
+
+  docker run --name my_container -d ubuntu <cmd>
+  # -d: 后台运行
+
+  docker run --name my_container -p 80 -d ubuntu <cmd>
+  # -p: 控制 docker 运行时应公开哪些端口
+  docker run --name my_container -p 8080:80 -d ubuntu <cmd> # 将容器中的80端口绑定到宿主机的8080端口
+  docker run --name my_container -p 127.0.0.1:8080:80 -d ubuntu <cmd>
+  docker run --name my_container -p 127.0.0.1::80 -d ubuntu <cmd> # 随机端口
+  docker run --name my_container -P -d ubuntu <cmd>
+  # -P: 公开在 Dockerfile 中通过 EXPOSE 指令公开的所有端口
+
+  docker run --name my_container -P -d -v $PWD/website:/var/www/html/ ubuntu <cmd> # 卷
+  docker run --name my_container -P -d -v $PWD/website:/var/www/html/:ro ubuntu <cmd> # 只读卷
+
+  docker run --name my_container -P -d --net=<name> ubuntu <cmd>
+  # --net: 表示新容器将在哪个网络中运行
+  #+END_SRC
+
+- 查看容器
+
+  #+BEGIN_SRC sh
+  docker ps          # 正在运行的容器
+  docker ps -a       # 所有容器
+  docker ps -n <x>   # 查看最后 x 个容器，不论运行或停止
+  docker top <cname> # 查看容器中的进程
+  docker stats
+  docker inspect <cname>
+  docker port <image_hash> <port> # 查看容器端口映射情况
+  #+END_SRC
+
+- 删除容器
+
+  #+BEGIN_SRC sh
+  docker rm <cname>
+  docker rm `docker ps -a -q` # 删除所有容器
+  #+END_SRC
+
+* 4, Dockerfile
+
+#+BEGIN_SRC
+FROM ubuntu:14.04
+MAINTAINER Hao Ruan "haoru@cisco.com"
+ENV REFRESHED_DATE 2017-04-19
+COPY tomcat.jar /etc/
+RUN ["apt-get", "-qq", "update"]
+WORKDIR /opt/cisco
+VOLUMN ["/opt/project"]
+ENTRYPOINT ["/usr/sbin/nginx"]
+EXPOSE 8080
+#+END_SRC
+
+- 构建镜像
+
+  #+BEGIN_SRC sh
+  docker build -t "<username>/<image_name>:<tag>" .
+
+  docker images [<username>/<image_name>] # 查看镜像
+
+  docker history <image_hash> # 查看镜像构建过程
+
+  docker rmi # 删除镜像
+  docker rmi `docker images -a -q` # 删除所有镜像
+  #+END_SRC
+
+* 5, Docker Networking
+
+Docker Networking 允许用户创建自己的网络，容器间通过此技术可以相互通信，包括跨越宿主机的通信（overlay 网络）
+
+容器间可通过 <cname>.<net_name> 方式通信
+
+#+BEGIN_SRC sh
+docker network create <net_name> # 创建网络
+docker network inspect <net_name> # 查看网络
+docker network ls
+docker network rm <net_name>
+docker network connect <net_name> <cname> # 将已有容器添加到网络
+docker network disconnect <net_name> <cname>
+#+END_SRC
