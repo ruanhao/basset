@@ -51,9 +51,16 @@ export DOCKER_HOST="tcp://0.0.0.0:2375"
 
   docker run --name my_container -P -d -v $PWD/website:/var/www/html/ ubuntu <cmd> # 卷
   docker run --name my_container -P -d -v $PWD/website:/var/www/html/:ro ubuntu <cmd> # 只读卷
+  docker run --name my_container -P -d --volumes-from <cname> ubuntu <cmd> # 授权一个容器访问另一个容器的 Volume
 
   docker run --name my_container -P -d --net=<name> ubuntu <cmd>
   # --net: 表示新容器将在哪个网络中运行
+
+  docker run --name my_container -P -d --previleged ubuntu <cmd>
+  # --previleged: 容器对于宿主机拥有 root 权限，用于在 Docker 中运行 Docker 的场景
+
+  # --cidfile=/tmp/containerid.txt: 保存容器 ID 到指定文件中
+  # --rm: 进程运行完毕自动删除容器，适用于只用一次的容器
   #+END_SRC
 
 - 查看容器
@@ -65,6 +72,7 @@ export DOCKER_HOST="tcp://0.0.0.0:2375"
   docker top <cname> # 查看容器中的进程
   docker stats
   docker inspect <cname>
+  docker inspct -f "{{ range .Mounts }}{{.}}{{end}}" <cname>
   docker port <image_hash> <port> # 查看容器端口映射情况
   #+END_SRC
 
