@@ -11,7 +11,7 @@ for file in "$@"; do
     # show tails of each in background.
     tail -F $file | awk '
   { flag = 0 }
-  /INFO/    { print "\033[32m" $0 "\033[39m"; flag = 1 }
+  /INFO/    { print "\033[32m" $1 "\033[39m"; flag = 1 }
   /ERROR/   { print "\033[31m" $0 "\033[39m"; flag = 1 }
   flag == 0 { print $0; }
 ' &
