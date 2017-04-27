@@ -110,6 +110,27 @@ EXPOSE 8080
   docker rmi `docker images -a -q` # 删除所有镜像
   #+END_SRC
 
+- 常用指令
+
+  1. CMD
+
+     Dockerfile 中只能有一个 CMD 指令生效， =docker run= 中的 command 会覆盖 Dockerfile 中的 CMD 指令
+
+     #+BEGIN_SRC
+     CMD [ "executable", "param1", "param2" ] # exec 模式
+     CMD command param1 param2                # shell 模式
+     CMD [ "param1", "param2" ]               # 作为 ENTRYPOINT 指令的默认参数
+     #+END_SRC
+
+  2. ENTRYPOINT
+
+     如果要覆盖 Dockerfile 中的 ENTRYPOINT 指令, 则必须由 =docker run -e= 指定
+
+     #+BEGIN_SRC
+     ENTRYPOINT [ "executable", "param1", "param2" ] # exec 模式
+     ENTRYPOINT command param1 param2                # shell 模式
+     #+END_SRC
+
 * 5, Docker Networking
 
 Docker Networking 允许用户创建自己的网络，容器间通过此技术可以相互通信，包括跨越宿主机的通信（overlay 网络）
