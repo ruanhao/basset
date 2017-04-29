@@ -1,0 +1,66 @@
+#+TITLE:     Bridge
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+* 1, 基本原理
+
+网桥工作在数据链路层。在安装了 Docker 的宿主机上的 docker0 设备就是个虚拟网桥：
+
+[[file:images/docker_br.jpg]]
+
+可以使用自定义网桥 br0 ，从而使得宿主机与容器属于同一个网络，架构如图所示：
+
+[[file:images/docker_host_br.jpg]]
+
+* 2, 配置脚本
+
+** 2.1, 添加网桥
+
+在 console 中进行配置，用 SSH 方式进行配置会导致掉线 :)
+
+#+BEGIN_SRC sh
+  # 1, 创建网桥 br0 并启用
+  ip link add name br0 type bridge # 等效于：brctl addbr br0
+  ip link set dev br0 up
+
+  # 2, 添加一个网络接口（比如 eth0）到网桥中，要求先将该端口设置为混杂模式并启动该端口
+  ip link set dev eth0 promisc on
+  # 把物理网卡 eth0 桥接在网桥上，意味着 eth0 将工作在链路层，因此理论上不需要 IP
+  ip addr flush dev eth0
+  ip link set dev eth0 up
+
+  # 3, 把该端口添加到网桥中
+  # master 表示 eth0 现属于 br0 ，并由 br0 控制
+  ip link set dev eth0 master br0 # 等效于：brctl addif br0 eth0
+
+  # 4, 给网桥配置 IP
+  # 理论上网桥不必配置 IP 也完全可以正常转发包，配置 IP 是为了管理网桥主机
+  ip addr add dev br0 192.168.0.1/24 # 也可以：dhclient br0
+
+  # 5, 查看配置情况
+  bridge link show # 等效于：brctl show
+#+END_SRC
+
+
+** 2.2, 删除网桥
+
+
+
+#+BEGIN_SRC sh
+  # 1,
+  # 若要删除网桥，应首先移除它所关联的所有端口，
+  # 同时关闭端口的混杂模式，
+  # 并关闭端口以将其恢复至原始状态
+  ip link set eth0 promisc off
+  ip link set eth0 down
+  ip link set dev eth0 nomaster
+
+  # 2,
+  # 当网桥的配置清空后就可以将其删除
+  ip link delete br0 type bridge
+#+END_SRC
