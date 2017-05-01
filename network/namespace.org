@@ -1,0 +1,92 @@
+#+TITLE:     Namespace
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:3 \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 1, 基本原理
+
+** 1.1, namespace
+
+Linux network namespace 用于创建一个独立的网络环境，包括独立的网卡空间，路由表，ARP 表，iptables，等等。
+
+** 1.2, veth pair
+
+veth pair 功能类似 pipe ，发给 veth pair 一端的数据包可以在另一端收到。\\
+就好像安装了两个网卡，并且之间用网线连接起来了。
+
+veth pair 可以用于将一个 network namespace 数据发往另一个 network namespace ：
+
+[[images/vpair.png]]
+
+*在各个 namespace 中需要注意配置好正确的路由信息（网段出埠口）*
+
+
+* 2, 常用命令
+
+- 创建 namespace
+
+  =ip netns add <name>=
+
+- 查看 namespace
+
+  =ip netns list=
+
+- 在 namespace 中执行命令
+
+  =ip netns exec <spacename> <command>=
+
+  直接进入 namespace 环境：
+
+  =ip netns exec <name> bash=
+
+- 创建 veth pair
+
+  =ip link add <tap1> type veth peer name <tap2>=
+
+- 将 tap 移至 namespace 下
+
+  =ip link set <tap> netns <ns>=
+
+- 在 namespace 下启用 tap
+
+  =ip netns exec <ns> ip link set dev <tap> up=
+
+
+* 3, 常用脚本
+
+- 桥接 namespace
+
+  架构示意图：
+
+  [[images/vpair-br.png]]
+
+  #+BEGIN_SRC sh
+    # 1, 创建网桥 br0
+
+    # 2, 创建 veth pair
+    ip link add tap1 type veth peer name br-tap1
+    ip link add tap2 type veth peer name br-tap2
+
+    # 3, 将 tap 设备添加为网桥的一个接口
+    brctl addif br0 br-tap1
+    brctl addif br0 br-tap2
+
+    # 4, 设置 namespace
+    ip netns add ns1
+    ip netns add ns2
+    ip link set tap1 netns ns1
+    ip link set tap2 netns ns2
+
+    # 5, 启用 tap 设备
+    ip link set dev br-tap1 up
+    ip link set dev br-tap2 up
+    ip netns exec ns1 ip link set dev tap1 up
+    ip netns exec ns2 ip link set dev tap2 up
+
+    # 6, 检查路由信息
+  #+END_SRC
