@@ -59,7 +59,7 @@ veth pair 可以用于将一个 network namespace 数据发往另一个 network 
 
 * 3, 常用脚本
 
-- 桥接 namespace
+1) 桥接 namespace
 
   架构示意图：
 
@@ -90,3 +90,18 @@ veth pair 可以用于将一个 network namespace 数据发往另一个 network 
 
     # 6, 检查路由信息
   #+END_SRC
+
+2) 单机自环
+
+   主机拥有 4 张网卡，要求数据从 eth0 流出，经 eth1，eth2 转发，最终流入 eth1，拓扑如图：
+
+   [[images/ns-interface.png]]
+
+   #+BEGIN_SRC sh
+   # 在 default 中打开转发功能
+   echo 1 > /proc/sys/net/ipv4/ip_forward
+
+   # 为两个 namespace 设置网关
+   ip netns exec t1 route add default gw 192.168.1.1
+   ip netns exec t2 route add default gw 172.16.1.1
+   #+END_SRC
