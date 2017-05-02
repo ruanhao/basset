@@ -105,3 +105,37 @@ veth pair 可以用于将一个 network namespace 数据发往另一个 network 
    ip netns exec t1 route add default gw 192.168.1.1
    ip netns exec t2 route add default gw 172.16.1.1
    #+END_SRC
+
+3) 为应用程序指定不同网关
+
+   运行 P1 和 P2 两个程序，本机所在的局域网有两个出口到达外网，希望 P1 通过 gw1 和外界通信，P2 通过 gw2 和外界通信，约束条件是你的机器只有一张网卡eth0
+
+   - 方案一
+
+     通过 iptables 为 P1 和 P2 的数据包打上不同的 mark ，然后通过 =ip rule= 设置策略路由
+
+   - 方案二
+
+     直接在 P1 和 P2 应用程序中用 setsockopt 设置 ip mark ，这就不需要 iptables 了
+
+   - 方案三
+
+     使用 namespace ，拓扑：
+
+     [[images/multi-gw.png]]
+
+     在 =namespace=default= 中执行：
+
+     #+BEGIN_SRC sh
+     ip route add 10.74.68.0/24 dev br0
+     ip route add default via 10.74.68.1 dev br0
+     #+END_SRC
+
+     在 =namespace=n1= 中执行：
+
+     #+BEGIN_SRC sh
+     ip route add 10.74.68.0/24 dev tap
+     ip route add default via 10.74.68.2 dev tap
+     #+END_SRC
+
+     这样 default 和 n1 中的程序将分别使用 gw1 和 gw2 作为网关。
