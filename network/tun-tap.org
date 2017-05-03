@@ -1,0 +1,44 @@
+#+TITLE:     TUN/TAP
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 1, 基本原理
+
+** 1.1, TUN
+
+TUN devices work at the IP level or *L3* of the network stack and are usually point-to-point connections.
+
+A typical use for a TUN device is establishing VPN connections since it gives the VPN software a chance to \\
+encrypt the data before it gets put on the wire.
+
+Since a TUN device works at layer three it can *only* accept IP packets and in some cases only IPv4. \\
+If you need to run any other protocol over a TUN device you’re out of luck.
+
+Additionally because TUN devices work at L3 they *can't be used in bridges* and don't typically support broadcasting.
+
+** 1.2, TAP
+
+TAP devices work at the Ethernet level or *L2* and therefore behave very much like a real network adaptor.
+
+Since they are running at L2 they *can transport any L3 protocol* and aren't limited to point-to-point connections.
+
+TAP devices can be part of a bridge and are commonly used in virtualization systems to provide virtual network adaptors to multiple guest machines.
+
+Since TAP devices work at L2 they will *forward broadcast traffic* which normally makes them a poor choice for VPN connections \\
+as the VPN link is typically much narrower than a LAN network (and usually more expensive).
+
+
+* 2, 常用命令
+
+** 2.1, 创建/删除虚拟接口
+
+#+BEGIN_SRC sh
+ip tuntap add name tap0 mode tap
+ip tuntap del name tap0 mode tap # 删除时必须同时指定 mode ，因为可以创建同名的 tun 或 tap 设备
+#+END_SRC
