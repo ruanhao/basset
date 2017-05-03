@@ -1,0 +1,103 @@
+#+TITLE:     Network Configuration
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 1, 基本原理
+
+** 1.1, 网关工作原理
+
+当主机发送数据时，检查路由表，若未匹配任何路由规则，则选择通过网关转发：
+
+1. 由网关 IP ，得到网关 MAC 地址
+2. 二层数据源地址写本机 MAC ，目的地址写网关 MAC
+3. 三层数据源地址写本机 IP ，目的地址写目标 IP
+4. 该数据帧通过网口以电信号形式送出
+5. 数据帧到达网关，并进行转发
+
+
+* 2, 路由配置
+
+** 2.1, 添加路由
+
+#+BEGIN_SRC sh
+ip route add 192.168.1.0/24 dev eth1
+ip route add 192.168.2.0/24 via 192.168.5.1 dev eth2
+#+END_SRC
+
+** 2.2, 添加网关（默认路由）
+
+#+BEGIN_SRC sh
+ip route add default via 192.168.1.1 dev eth1 proto static
+
+ip route add default via <router-addr>
+
+ip route add default dev eth1 # 省略 via ，'可能'使用 eth1 上第一个 IP 地址的网段地址 +1 作为网关地址
+                              # 如 eth1 上第一个 IP 地址为 192.168.1.100/24 ，
+                              # 则该命令选用的默认网关为 192.168.1.1
+                              # 尽量不要省略 via ，有不确定性
+#+END_SRC
+
+** 2.3, 查询路由出口
+
+#+BEGIN_SRC
+ip route get 192.168.1.100
+#+END_SRC
+
+
+* 3, IP 配置
+
+** 3.1, 配置 IP
+
+#+BEGIN_SRC sh
+ip addr add 192.168.1.100/24 dev eth0
+ip addr del 192.168.1.100/24 dev eth0
+#+END_SRC
+
+** 3.2, 查看 IP
+
+#+BEGIN_SRC
+ip a
+ip a show eth0
+#+END_SRC
+
+* 4, 链路配置
+
+** 4.1, 查看接口
+
+#+BEGIN_SRC sh
+ip link # 查看所有接口
+ip link show eth0 # 查看指定接口
+#+END_SRC
+
+** 4.2, 查看接口流量信息
+
+#+BEGIN_SRC
+ip -s link show eth0
+netstat -i | column -t
+#+END_SRC
+
+** 4.3, 查看邻居设备 MAC
+
+#+BEGIN_SRC sh
+ip neigh
+ip monitor all
+#+END_SRC
+
+** 4.4, 设置接口属性
+
+#+BEGIN_SRC sh
+ip l set eth0 mtu 1500
+ip l set eth0 name <if-name>
+ip l set eth0 address aa:aa:aa:aa:aa:aa
+ip l set eth0 promisc <on|off>
+#+END_SRC
+
+** 4.5, 启用接口
+
+=ip l set eth0 <up|down>=
