@@ -178,7 +178,33 @@ socat -u TUN:10.0.6.1/24,tun-type=tap,up EXEC:'hexdump -C' # 监听 tap 设备
 socat -u TUN:10.0.6.1/24,iff-no-pi,up EXEC:'hexdump -C' # 监听 tun 设备
 #+END_SRC
 
-** 2.4, 使用 tun 搭建隧道
+** 2.4, 监听设备数据 (python)
+
+[[https://github.com/montag451/pytun][pytun]]
+
+#+BEGIN_SRC python
+  from pytun import TunTapDevice
+
+  tun = TunTapDevice()
+
+  tun.addr = '10.8.0.1'
+  tun.netmask = '255.255.255.0'
+  tun.mtu = 1500
+  tun.up()
+
+  print("tun device (%s) created" % tun.name)
+
+  while True:
+      try:
+          buf = tun.read(tun.mtu)
+          print ("read from %s: %s" % (tun.name, buf))
+      except Exception as e:
+          print(e)
+          tun.close()
+          exit()
+#+END_SRC
+
+** 2.5, 使用 tun 搭建隧道
 
 [[images/tuntap-simple-tunnel.png]]
 
