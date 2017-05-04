@@ -10,6 +10,9 @@
 
 * 1, 基本原理
 
+虚拟网络设备也归内核的网络设备管理子系统管理，对于 Linux 内核网络设备管理模块来说，虚拟设备和物理设备没有区别，都是网络设备，都能配置 IP ，从网络设备来的数据，都会转发给协议栈，协议栈过来的数据，也会交由网络设备发送出去，至于是怎么发送出去的，发到哪里去，那是设备驱动的事情，跟 Linux 内核就没关系了。\\
+*所以说虚拟网络设备的一端也是协议栈，而另一端是什么取决于虚拟网络设备的驱动实现。*
+
 ** 1.1, TUN
 
 TUN devices work at the IP level or *L3* of the network stack and are usually point-to-point connections.
@@ -33,6 +36,47 @@ TAP devices can be part of a bridge and are commonly used in virtualization syst
 Since TAP devices work at L2 they will *forward broadcast traffic* which normally makes them a poor choice for VPN connections \\
 as the VPN link is typically much narrower than a LAN network (and usually more expensive).
 
+** 1.3, 通信架构
+
+#+BEGIN_EXAMPLE
+
++----------------------------------------------------------------+
+|                                                                |
+|  +--------------------+      +--------------------+            |
+|  | User Application A |      | User Application B |<-----+     |
+|  +--------------------+      +--------------------+      |     |
+|               | 1                    | 5                 |     |
+|...............|......................|...................|.....|
+|               ↓                      ↓                   |     |
+|         +----------+           +----------+              |     |
+|         | socket A |           | socket B |              |     |
+|         +----------+           +----------+              |     |
+|                 | 2               | 6                    |     |
+|.................|.................|......................|.....|
+|                 ↓                 ↓                      |     |
+|             +------------------------+                 4 |     |
+|             | Newwork Protocol Stack |                   |     |
+|             +------------------------+                   |     |
+|                | 7                 | 3                   |     |
+|................|...................|.....................|.....|
+|                ↓                   ↓                     |     |
+|        +----------------+    +----------------+          |     |
+|        |      eth0      |    |      tun0      |          |     |
+|        +----------------+    +----------------+          |     |
+|    10.32.0.11  |                   |   192.168.3.11      |     |
+|                | 8                 +---------------------+     |
+|                |                                               |
++----------------|-----------------------------------------------+
+                 ↓
+         Physical Network
+
+#+END_EXAMPLE
+
+tun/tap 设备一端连着协议层，另一端连接用户层的应用程序，协议栈发给 tun/tap 的数据包能被这个应用程序读取到，并且应用程序能直接向 tun/tap 写数据。
+
+用户层程序通过 tun 设备只能读写 IP 数据包，而通过 tap 设备能读写链路层数据包，处理数据包的格式不一样。
+
+
 
 * 2, 常用命令
 
@@ -41,4 +85,95 @@ as the VPN link is typically much narrower than a LAN network (and usually more 
 #+BEGIN_SRC sh
 ip tuntap add name tap0 mode tap
 ip tuntap del name tap0 mode tap # 删除时必须同时指定 mode ，因为可以创建同名的 tun 或 tap 设备
+#+END_SRC
+
+** 2.2, 监听 tun 设备数据 (C)
+
+收到 tun 设备的数据包之后，打印出收到了多少字节的数据包
+
+#+BEGIN_SRC c
+  #include <net/if.h>
+  #include <sys/ioctl.h>
+  #include <sys/stat.h>
+  #include <fcntl.h>
+  #include <string.h>
+  #include <sys/types.h>
+  #include <linux/if_tun.h>
+  #include<stdlib.h>
+  #include<stdio.h>
+
+  int tun_alloc(int flags)
+  {
+
+      struct ifreq ifr;
+      int fd, err;
+      char *clonedev = "/dev/net/tun";
+
+      if ((fd = open(clonedev, O_RDWR)) < 0) {
+          return fd;
+      }
+
+      memset(&ifr, 0, sizeof(ifr));
+      ifr.ifr_flags = flags;
+
+      if ((err = ioctl(fd, TUNSETIFF, (void *) &ifr)) < 0) {
+          close(fd);
+          return err;
+      }
+
+      printf("Open tun/tap device: %s for reading...\n", ifr.ifr_name);
+
+      return fd;
+  }
+
+  int main()
+  {
+
+      int tun_fd, nread;
+      char buffer[1500];
+
+      /* Flags: IFF_TUN   - TUN device (no Ethernet headers)
+       ,*        IFF_TAP   - TAP device
+       ,*        IFF_NO_PI - Do not provide packet information
+       ,*/
+      tun_fd = tun_alloc(IFF_TUN | IFF_NO_PI);
+
+      if (tun_fd < 0) {
+          perror("Allocating interface");
+          exit(1);
+      }
+
+      while (1) {
+          nread = read(tun_fd, buffer, sizeof(buffer));
+          if (nread < 0) {
+              perror("Reading from interface");
+              close(tun_fd);
+              exit(1);
+          }
+
+          printf("Read %d bytes from tun/tap device\n", nread);
+      }
+      return 0;
+  }
+#+END_SRC
+
+#+BEGIN_SRC sh
+gcc tun.c -o tun
+./tun
+
+ip addr add 192.168.3.11/24 dev tun1
+ip link set dev tun1 up
+ip route 192.168.3.0/24 dev tun1
+
+ping 192.168.3.12
+# 能看到 ./tun 程序的输出
+# ping 192.168.3.11 将被路由到 lo ，因此需要使用 192.168.3.11 以外的同网段的其他地址
+#+END_SRC
+
+** 2.3, 监听设备数据 (bash)
+
+#+BEGIN_SRC
+socat -u TUN:10.0.6.1/24,tun-type=tap,up EXEC:'hexdump -C' # 监听 tap 设备
+
+socat -u TUN:10.0.6.1/24,iff-no-pi,up EXEC:'hexdump -C' # 监听 tun 设备
 #+END_SRC
