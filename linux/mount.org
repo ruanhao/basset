@@ -1,0 +1,156 @@
+#+TITLE:     Mount
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 1, 基本原理
+
+=mount -t <type> -o <options> <device> <dir>=
+
+#+BEGIN_EXAMPLE
+device:  要挂载的设备（必填）
+
+dir:     挂载到哪个目录（必填）
+         有些文件系统不需要指定具体的设备，可以随便填一个字符串
+
+type：   文件系统类型（可选）。大部分情况下都不用指定该参数，系统都会自动检测到设备上的文件系统类型
+options：挂载参数（可选）。一般分为两类，一类是 Linux VFS 所提供的通用参数，就是每个文件系统都可以使用这类参数。
+         另一类是每个文件系统自己支持的特有参数，这个需要参考每个文件系统的文档。
+#+END_EXAMPLE
+
+
+* 2, 常用命令
+
+** 2.1, 挂载虚拟文件系统
+
+proc ，tmpfs ，sysfs ，devpts 等都是 Linux 内核映射到用户空间的虚拟文件系统，它们不和具体的物理设备关联，但具有普通文件系统的特征，\\
+应用层程序可以像访问普通文件系统一样来访问它们。
+
+*** 2.1.1, 挂载 proc 文件系统
+
+#+BEGIN_SRC sh
+  mount -t proc none /mnt
+
+  # 将内核的 proc 文件系统挂载到 /mnt
+  # 这样就可以在 /mnt 目录下看到系统当前运行的所有进程的信息
+  # 由于 proc 是内核虚拟的一个文件系统，并没有对应的设备，所以这里 -t 参数必须要指定
+  # 由于没有对应的源设备，这里 none 可以是任意字符串，该字符串用于 mount 命令查看挂载点信息时第一列显示
+
+#+END_SRC
+
+*** 2.1.2, 挂载 tmpfs 文件系统
+
+#+BEGIN_SRC sh
+  mount -t tmpfs -o size=64m tmpfs /mnt
+
+  # 在内存中创建一个 64M 的 tmpfs 文件系统，并挂载到 /mnt 下
+  # 这样所有写到 /mnt 目录下的文件都存储在内存中，速度非常快
+
+#+END_SRC
+
+
+** 2.2, 挂载 loop device
+
+loop device 是虚拟的块设备，loop device 设备的路径一般是 /dev/loop0 , dev/loop1 , ... 等，具体的个数跟内核的配置有关。
+
+*** 2.2.1, 挂载 ISO 文件
+
+#+BEGIN_SRC sh
+
+  # 使用 mkisofs 构建一个用于测试的 iso 文件
+  mkdir -p iso/subdir01
+  mkisofs -o ./test.iso ./iso
+
+  # 将 ISO 挂载到目录 /mnt
+  mount ./test.iso /mnt
+
+  # 通过 losetup 可以看到占用了哪个 loop device 设备
+  losetup -a
+
+#+END_SRC
+
+*** 2.2.2, 挂载虚拟硬盘
+
+#+BEGIN_SRC sh
+
+  # 挂载一个文件系统为 btrfs 的虚拟硬盘：
+
+  # 因为 btrfs 对分区的大小有最小要求，所以利用 dd 命令创建一个 128M 的文件
+  dd if=/dev/zero bs=1M count=128 of=./vdisk.img
+
+  # 在这个文件里面创建 btrfs 文件系统
+  mkfs.btrfs ./vdisk.img
+  # 或者：
+  # losetup /dev/loop1 ./vdisk.img
+  # mkfs.btrfs /dev/loop1
+
+#+END_SRC
+
+** 2.3, bind mount
+
+bind mount 可以将任何一个挂载点，普通目录或者文件挂载到其他地方
+
+*** 2.3.1, 基本功能
+
+#+BEGIN_SRC sh
+  # 准备要用到的目录
+  $ mkdir -p bind/bind1/sub1
+  $ mkdir -p bind/bind2/sub2
+  $ tree bind
+  bind
+  ├── bind1
+  │   └── sub1
+  └── bind2
+      └── sub2
+
+  # bind mount后，bind2 里面显示的就是 bind1 目录的内容
+  $ sudo mount --bind ./bind/bind1/ ./bind/bind2
+  $ tree bind
+  bind
+  ├── bind1
+  │   └── sub1
+  └── bind2
+      └── sub1
+#+END_SRC
+
+*** 2.3.2, readonly bind
+
+=mount -o bind,ro ./bind/bind1/ ./bind/bind2=
+
+让当前目录 readonly ，那么可以 bind 自己，并且指定 readonly 参数：
+
+=mount -o bind,ro ./bind/bind1/ ./bind/bind1=
+
+*** 2.3.3, bind mount 单个文件
+
+这个功能适合需要在不同版本配置文件之间切换
+
+#+BEGIN_SRC sh
+  # 创建两个用于测试的文件
+  $ echo aaaaaa > bind/aa
+  $ echo bbbbbb > bind/bb
+  $ cat bind/aa
+  aaaaaa
+  $ cat bind/bb
+  bbbbbb
+
+  # bind mount 后，bb 里面看到的是 aa 的内容
+  $ sudo mount --bind ./bind/aa bind/bb
+  $ cat bind/bb
+  aaaaaa
+
+  # 即使我们删除 aa 文件，我们还是能够通过 bb 看到 aa 里面的内容
+  $ rm bind/aa
+  $ cat bind/bb
+  aaaaaa
+
+  # umount bb 文件后，bb 的内容出现了，不过 aa 的内容再也找不到了
+  $ sudo umount bind/bb
+  $ cat bind/bb
+  bbbbbb
+#+END_SRC
