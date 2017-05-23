@@ -1,0 +1,52 @@
+#+TITLE:     IPC Namespace
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 1, 基本原理
+
+IPC namespace 用来隔离 System V IPC objects 和 POSIX message queues。\\
+其中 System V IPC objects 包含 Message queues，Semaphore sets 和 Shared memory segments。
+
+* 2, 常用脚本
+
+** 2.1, IPC 及 UTS 的隔离
+
+- shell 1
+
+  #+BEGIN_SRC sh
+    # 确认 hostname
+    $ hostname
+    ubuntu
+
+    # 查看现有的ipc Message Queues，默认情况下没有 message queue
+    $ ipcs -q
+    ------ Message Queues --------
+    key        msqid      owner      perms      used-bytes   messages
+
+    # 创建一个 message queue
+    $ ipcmk -Q
+    Message queue id: 0
+    $ ipcs -q
+    ------ Message Queues --------
+    key        msqid      owner      perms      used-bytes   messages
+    0x12aa0de5 0          dev        644        0            0
+
+  #+END_SRC
+
+- shell 2
+
+  #+BEGIN_SRC sh
+    # 运行 unshare 创建新的 ipc 和 uts namespace，并且在新的 namespace 中启动 bash
+    # -i 表示启动新的 ipc namespace，-u 表示启动新的 utsnamespace
+    $ unshare -iu /bin/bash
+
+    # 设置新的 hostname 以便和第一个 shell 里面的 bash 做区分
+    $ hostname container001
+
+  #+END_SRC

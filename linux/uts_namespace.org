@@ -1,0 +1,36 @@
+#+TITLE:     UTS Namespace
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 1, 基本原理
+
+Namespace 是对全局系统资源的一种封装隔离，使得处于不同 namespace 的进程拥有独立的全局系统资源，\\
+改变一个 namespace 中的系统资源只会影响当前 namespace 里的进程，对其他namespace中的进程没有影响。
+
+UTS namespace 用来隔离系统的 hostname 以及 NIS domain name
+
+术语 UTS 来自于调用函数 uname() 时用到的结构体: struct utsname. 而这个结构体的名字源自于"UNIX Time-sharing System".
+
+- namespace 的本质就是把原来所有进程全局共享的资源拆分成了很多个一组一组进程共享的资源
+
+- 当一个 namespace 里面的所有进程都退出时，namespace 也会被销毁，所以抛开进程谈 namespace 没有意义
+
+- UTS namespace 就是进程的一个属性，属性值相同的一组进程就属于同一个 namespace，跟这组进程之间有没有亲戚关系无关
+
+- clone 和 unshare 都有创建并加入新的 namespace 的功能，他们的主要区别是：
+  - unshare 是使当前进程加入新创建的 namespace
+  - clone 是创建一个新的子进程，然后让子进程加入新的 namespace
+
+- UTS namespace 没有嵌套关系，即不存在说一个 namespace 是另一个 namespace 的父 namespace
+
+* 2, 常用脚本
+
+** 2.1, 查看进程所属的 namespace
+
+=ls -l /proc/$$/ns=
