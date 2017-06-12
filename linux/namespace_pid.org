@@ -1,0 +1,28 @@
+#+TITLE:     PID Namespace
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+* 1, 基本概念
+
+PID namespaces 用来隔离进程的 ID 空间，使得不同 pid namespace 里的进程 ID 可以重复且相互之间不影响。
+
+PID namespace 可以嵌套，也就是说有父子关系，在当前 namespace 里面创建的所有新的 namespace 都是当前 namespace 的子 namespace 。\\
+父 namespace 里面可以看到所有子孙后代 namespace 里的进程信息，且可以发信号给子namespace的进程，而子 namespace 里看不到祖先或者兄弟 namespace 里的进程信息。但进程在不同namespace中的PID是不一样的。
+
+目前 PID namespace 最多可以嵌套 32 层，由内核中的宏 MAX_PID_NS_LEVEL 来定义。
+
+Linux 下的每个进程都有一个对应的 /proc/PID 目录，该目录包含了大量的有关当前进程的信息。\\
+对一个 PID namespace 而言，/proc 目录只包含当前 namespace 和它所有子孙后代 namespace 里的进程的信息。
+
+在 Linux 系统中，进程 ID 从 1 开始往后不断增加，并且不能重复（当然进程退出后，ID 会被回收再利用），进程 ID 为 1 的进程是内核启动的第一个应用层进程，一般是 init 进程（现在采用 systemd 的系统第一个进程是 systemd ），具有特殊意义，当系统中一个进程的父进程退出时，内核会指定 init 进程成为这个进程的新父进程，而当 init 进程退出时，系统也将退出。
+
+除了在 init 进程里指定了 handler 的信号外，内核会帮 init 进程屏蔽掉其他任何信号，这样可以防止其他进程不小心 kill 掉 init 进程导致系统挂掉。不过有了 PID namespace 后，可以通过在父 namespace 中发送 SIGKILL 或者 SIGSTOP 信号来终止子 namespace 中的 ID 为 1 的进程。
+
+由于 ID 为 1 的进程的特殊性，所以每个 PID namespace 的第一个进程的 ID 都是 1 。当这个进程运行停止后，内核将会给这个 namespace 里的所有其他进程发送 SIGKILL 信号，致使其他所有进程都停止，于是 namespace 被销毁掉。
+
+进程所属的 pid namespace 在它创建的时候就确定了，不能更改。
