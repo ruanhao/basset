@@ -1,0 +1,77 @@
+#+TITLE:     free
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+* 1, 基本原理
+
+|   |                    |     1 |    2 |    3 |      4 |       5 |      6 |
+| 1 |                    | total | used | free | shared | buffers | cached |
+| 2 | Mem:               |   252 |  208 |   43 |      0 |       3 |    181 |
+| 3 | -/+ buffers/cache: |       |   23 |  228 |        |         |        |
+| 4 | Swap:              |     3 |    0 |    3 |        |         |        |
+
+=F[2][1] = F[2][2] + F[2][3]=
+
+=F[3][2] = F[2][2] - F[2][5] -  F[2][6]=
+
+=F[3][3] = F[2][3] +F[2][5] + F[2][6]=
+
+*** Mem (从 OS 的角度)
+
+- total
+
+  物理内存总量
+
+- used
+
+  总计分配给缓存(包含 buffers 与 cache )使用的数量(*其中部分缓存并未实际使用*)
+
+  =used = used[kernel] + used[application] + F[2][5] + F[2][6]=
+
+  F[2][5]和F[2][6]是可用于分配的内存数量
+
+- shared
+
+  Deprecated
+
+- buffers
+
+  参见 memory.org
+
+- cached
+
+  参见 memory.org
+
+  buffer 和 cache 是为了提高 IO 性能, 并由 OS 管理
+
+
+*** -/+ buffers/cache (从 Application 的角度)
+
+- used
+
+  表示一个应用程序认为系统被用掉多少内存
+
+- free
+
+  表示一个应用程序认为系统还有多少内存
+
+
+* 2, 分析说明
+
+** 2.1, 判断内存使用情况是否出现异常
+
+- Mem free 的值比较小，并且 buffers/cache 的值也小
+
+  free 的值比较少并不一定代表有问题，因为 Linux 会尽可能多的将内存用于 page cache ，
+  但是如果 buffers/cache 的值也小，就说明内存吃紧了，系统没有足够多的内存用于 cache，
+  如果当前服务器部署是一个需要频繁的读写磁盘的应用，如 FTP 服务器，那么对性能的影响将会非常大。
+
+- Swap used 的值比较大
+
+  这种情况比上面的更严重，正常情况下 swap 应该很少被使用，used 值比较大说明交换空间被使用的比较多，
+  如果通过 vmstat 命令看到 swap in/out 的比较频繁的话，说明系统内存严重不足，整体性能已经受到严重影响。

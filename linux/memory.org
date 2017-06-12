@@ -1,77 +1,86 @@
 #+TITLE: Memory
 #+OPTIONS: ^:nil
 
+* 1, 基本原理
+
+** 1.1, memory mapping
+
+每个 memory mapping 就是对一段虚拟内存的描述，包括虚拟地址的起始位置，长度，权限(比如这段内存里的数据是否可读、写、执行), 以及关联的资源(如物理内存 page ，swap 空间上的 page ，磁盘上的文件内容等)。
+
+每个 memory mapping 都有一个标记，用来表示所关联的物理资源类型，一般分两大类，anonymous 和 file backed ，\\
+在这两大类中，又分了一些小类，比如 anonymous 下面有更具体的 shared 和 copy on write 类型, file backed 下面有更具体的 device backed 类型:
+
+- file backed
+
+  #+BEGIN_EXAMPLE
+  这种类型表示 memory mapping 对应的物理资源存放在磁盘上的文件中，它所包含的信息包括文件的位置、offset、rwx 权限等
+  #+END_EXAMPLE
+
+- device backed
+
+  #+BEGIN_EXAMPLE
+  当物理内存被 swap out 后，将被标记为 device backed
+  #+END_EXAMPLE
+
+- anonymous
+
+  #+BEGIN_EXAMPLE
+  程序自己用到的数据段和堆栈空间，以及通过 mmap 分配的共享内存，它们在磁盘上找不到对应的文件，所以这部分内存页被叫做 anonymous page 。
+  anonymous page 和 file backed 最大的差别是当内存吃紧时，系统会直接删除掉 file backed 对应的物理内存，因为下次需要的时候还能从磁盘加载到内存，
+  但 anonymous page 不能被删除，只能被 swap out 。
+  #+END_EXAMPLE
 
 
-** free
+- shared
 
-=free -g=
+  #+BEGIN_EXAMPLE
+  不同进程的 Page Table 里面的多个 memory mapping 可以映射到相同的物理地址，通过虚拟地址可以访问到相同的内容。
+  当一个进程里面修改内存的内容后，在另一个进程中可以立即读取到。这种方式一般用来实现进程间高速的共享数据（如 mmap ）。
+  当标记为 shared 的 memory mapping 被删除回收时，需要更新物理 page 上的引用计数，便于物理 page 的计数变 0 后被回收。
+  #+END_EXAMPLE
 
-|   |                    |     1 |    2 |    3 |      4 |       5 |      6 |
-| 1 |                    | total | used | free | shared | buffers | cached |
-| 2 | Mem:               |   252 |  208 |   43 |      0 |       3 |    181 |
-| 3 | -/+ buffers/cache: |       |   23 |  228 |        |         |        |
-| 4 | Swap:              |     3 |    0 |    3 |        |         |        |
+- copy on write
 
-=F[2][1] = F[2][2] + F[2][3]=
+  #+BEGIN_EXAMPLE
+  copy on write 基于 shared 技术，当读这种类型的内存时，系统不需要做任何特殊的操作，
+  而当要写这块内存时，系统将会生成一块新的内存并拷贝原来内存中的数据到新内存中，
+  然后将新内存关联到相应的 memory mapping ，然后执行写操作。
+  #+END_EXAMPLE
 
-=F[3][2] = F[2][2] - F[2][5] -  F[2][6]=
 
-=F[3][3] = F[2][3] +F[2][5] + F[2][6]=
+** 1.2, buffer/cached
 
-*** Mem
+为了提高系统性能，Linux 使用了一些跟内存管理相关的 cache ，并且尽量将空闲的内存用于这些 cache 。这些 cache 都是系统全局共享的：
 
-从OS的角度来看
+- buffer (buffer cache)
 
-- *total*
+  #+BEGIN_EXAMPLE
+  Buffer Cache 用来缓冲块设备上的数据，比如磁盘。
+  当读写块设备时，系统会将相应的数据存放到这个 cache 中，等下次再访问时，可以直接从cache中拿数据，从而提高系统效率。
+  它里面的数据结构是一个块设备 ID 和 block 编号到具体数据的映射，只要根据块设备 ID 和块的编号，就能找到相应的数据。
+  #+END_EXAMPLE
 
-  物理内存总量
+- cache (page cache)
 
-- *used*
+  #+BEGIN_EXAMPLE
+  这个 cache 主要用来加快读写磁盘上文件的速度。
+  它里面的数据结构是文件 ID 和 offset 到文件内容的映射，根据文件 ID 和 offset 就能找到相应的数据。
+  #+END_EXAMPLE
 
-  总计分配给缓存(包含buffers与cache)使用的数量(/其中部分缓存并未实际使用/)
+从上面的定义可以看出，page cache 和 buffer cache 有重叠的地方，不过实际情况是 buffer cache 只缓存 page cache 不缓存的那部分内容，
+比如磁盘上 *文件的元数据* 。\\
+所以一般情况下和 page cache 相比，buffer cache 的大小基本可以忽略不计。
 
-  =used = used[kernel] + used[application] + F[2][5] + F[2][6]=
+page cache 的准确值可以通过查看 /proc/meminf 中的 Cached 得到。由于 page cache 是用来缓存磁盘上文件内容的，所以占有空间很大，Linux 一般会尽可能多的将空闲物理内存用于 page cache 。
 
-  F[2][5]和F[2][6]是可用于分配的内存数量
 
-- *shared*
+** 1.3, slab
 
-  Deprecated
+The slab allocator is an abstraction layer to make easier allocation of numerous objects of a same type.
 
-- *buffers*
+Linux 将 kernel object 存放在 cache 中，并透过 slab 来进行管理。当系统创建一个 kernel object 时，就会建立一块 slab cache 来储存。
 
-  Something that has yet to be "written" to disk
-
-- *cached*
-
-  Something that has been "read" from the disk and stored for later use
-
-  也就是说buffer是用于存放要输出到块设备的数据, 而cache是存放从块设备上读出的数据, buffer和cache是为了提高IO的性能, 并由OS管理
-
-*** -/+ buffers/cache
-
-从Application的角度看
-
-- *used*
-
-  表示一个应用程序认为系统被用掉多少内存
-
-- *free*
-
-  表示一个应用程序认为系统还有多少内存
-
-** slab
-
-The slab allocator is an abstraction layer to make easier allocation of numerous objects of a same type
-
-Linux将kernel object存放在cache中，并透过slab来进行管理。当系统执行一个kernel object时，就会建立一块slab cache来储存
-
-專指kernel所使用的記憶體空間(kernel page)。Linux kernel所占用的記憶體空間是無法對應到磁碟上的
-
-active是指使用中的記憶體；而inactive是即將搬到swap上的記憶體
-
-Linux kernel採用slab機制進行記憶體管理，slab是一串連續的記憶體，用來表示cache所占用的空間。一塊cache可能占用一個以上的slab
+active 是指使用中的内存，而 inactive 是即将搬到 swap 上的内存。
 
 #+BEGIN_SRC bash
 
@@ -83,45 +92,17 @@ Linux kernel採用slab機制進行記憶體管理，slab是一串連續的記憶
  Active / Total Size (% used)       : 195789.07K / 198033.17K (98.9%)
  Minimum / Average / Maximum Object : 0.02K / 0.35K / 128.00K
 
-  OBJS ACTIVE  USE OBJ SIZE  SLABS OBJ/SLAB CACHE SIZE NAME
-182970 182511  99%    0.21K  10165      18           40660K dentry_cache
-127170 127145  99%    0.74K  25434        5          101736K ext3_inode_cache
-109040 108938  99%    0.09K   2726      40           10904K buffer_head
- 33762  33723   99%    0.58K   5627       6           22508K proc_inode_cache
- 10913  10911   99%    0.52K   1559        7          6236K radix_tree_node
-  9296   9240   99%     0.55K   1328       7          5312K inode_cache
-  9240   9155   99%     0.09K    210      44          840K sysfs_dir_cache
+  OBJS ACTIVE   USE  OBJ SIZE  SLABS OBJ/SLAB  CACHE SIZE NAME
+182970 182511   99%     0.21K  10165       18      40660K dentry_cache
+127170 127145   99%     0.74K  25434        5     101736K ext3_inode_cache
+109040 108938   99%     0.09K   2726       40      10904K buffer_head
+ 33762  33723   99%     0.58K   5627        6      22508K proc_inode_cache
+ 10913  10911   99%     0.52K   1559        7       6236K radix_tree_node
+  9296   9240   99%     0.55K   1328        7       5312K inode_cache
+  9240   9155   99%     0.09K    210       44        840K sysfs_dir_cache
 
-  ## 圖中的每一行都代表在kernel中執行的process所占用的cache大小
-  ## OBJS   指的是這個process調用了多少個object
-  ## ACTIVE 代表有多少object正在使用中，USE是active的比例
-  ## SLABS  指這個process使用多少個slab來管理，而OBJ/SLAB就是指一個slab擁有多少個object
-#+END_SRC
-
-
-** buddy
-
-*/proc/buddyinfo*紀錄的就是Linux kernel的記憶體管理機制*buddy system*的內容
-
-Linux kernel透過buddy system來對free page進行管理，page是kernel記憶體使用的基本單位
-
-當系統需要一塊page時，會透過buddy system提取，而buddy的管理機制會儘可能地維持記憶體的連續性，以減少fragmentation的情形發生
-
-buddy system管理記憶體的方式是將連續的page指定為一個chunk，而且chunk的大小是以2的次方依序分割。也就是1k, 2k, 4k, 8k, 16k, 32k,... 以此類推。當kernel需要一塊空間時，他會從最小且足夠的chunk中去要一塊。若是不夠，則轉向下一個chunk去要，而且盡可能把切剩餘的空間加到同等級的chunk中，藉此減少用不到的浪費(fragmentation)。譬如說，需要16k，但是16k的chunk沒有剩餘的了，所以就向32k的chunk去要，而切剩的另外16k則計算到16k的chunk中
-
-在/proc/buddyinfo中就是記錄這些chunk的使用情形，依序顯示每個不同大小的chunk還有多少個可用空間
-
-#+BEGIN_SRC bash
-
-$ cat /proc/buddyinfo
-
-Node 0, zone      DMA      5      3      5      2      3      2      1      1      2      2      1
-Node 0, zone   Normal      0      1      5      0      1      1      1      1      1      0    108
-Node 0, zone  HighMem    320    259    147     59     16     11      6      3      1      1    684
-
-## /proc/buddyinfo中將實體記憶體依照其位址(由low至high)分成3個zone
-## 分別是: DMA, Normal與HighMem
-## 而每個zone內的數字代表在這個zone之中依序還有多少可用的chunk數量
-## 像這個例子，在DMA zone中，4k的chunk(由左至右第三個數字)還有5個可用的空間
-
+  ## 每一行都代表在 kernel 中运行的 process 所占用的 cache 大小
+  ## OBJS 指的是该进程创建了多少个 object
+  ## ACTIVE 代表有多少object 正在使用中，USE 是 active 的比例
+  ## SLABS 指这个进程使用多少个slab 来管理，而 OBJ/SLAB 就是指一个 slab 拥有多少个 object
 #+END_SRC
