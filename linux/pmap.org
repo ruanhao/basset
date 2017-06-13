@@ -1,0 +1,41 @@
+#+TITLE:     pmap
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 1, 基本原理
+
+pmap 命令输出的内容来自于 =/proc/[pid]/maps= 和 =/proc/[pid]/smaps= 这两个文件，\\
+第一个文件包含了每段的一个大概描述，而后一个文件包含了更详细的信息。
+
+pmap 输出有很多的 [ anon ] 行，表示在磁盘上没有对应的文件，这些一般都是可执行文件或者动态库里的 bss 段。\\
+当然有对应文件的 mapping 也有可能是 anonymous ，比如文件的数据段。
+
+
+* 2, 常用分析
+
+- 查看详细信息
+
+  =pmap -X=
+
+  #+BEGIN_EXAMPLE
+  权限字段多了一个 s 和 p 的标记，s 表示是和别人共享的内存空间，读写会影响到其他进程，
+  而 p 表示这是自己私有的内存空间，读写这部分内存不会对其他进程造成影响。
+
+  输出标示出了 [heap] 段，并且也说明了后面几个 [anon] 代表的什么意思（ vvar ，vdso ，vsyscall 都是映射到内核的特殊段）。
+
+  writeable/private 主要包含 stack 和 heap 以及可执行文件和动态库的 data 和 bss 段。
+  #+END_EXAMPLE
+
+  SHR ≈ RES - writeable/private ，而 stack+heap 一般占绝大部分，从而 data 和 bss 段可以忽略，\\
+  一般情况下，SHR ≈ RES - [heap] - [stack] ，由于 stack 一般都比较小，可以进一步约等于： *SHR ≈ RES - [heap]* 。
+
+- 性能关注点
+
+  进程占用的虚拟地址空间大小跟程序的规模有关，除了 stack 和 heap 段，其他段的大小基本上都是固定的，并且在程序链接的时候就已经确定了，\\
+  所以基本上只要关注 stack 和 heap 段就可以了，由于 stack 相对 heap 来说很小，所以只要没什么 stack 异常，只需要关注 heap 。
