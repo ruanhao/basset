@@ -9,62 +9,121 @@
 
 * 1, 基本原理
 
-网桥工作在数据链路层：
-
 [[file:images/br.jpg]]
 
-
-* 2, 配置脚本
-
-** 2.1, 添加网桥
-
-应在 console 中进行配置，以 SSH 方式进行配置会导致掉线
+** 1.1, 创建网桥并启用
 
 #+BEGIN_SRC sh
-  # 1, 创建网桥 br0 并启用
   ip link add name br0 type bridge # 等效于：brctl addbr br0
   ip link set dev br0 up
+#+END_SRC
+
+当刚创建一个 bridge 时，它是一个独立的网络设备，只有一个端口连着协议栈，其它的端口啥都没连，这样的 bridge 没有任何实际功能：
+
+[[file:image/bridge-create.png]]
 
 
-  # 2, 添加一个网络接口（比如 eth0）到网桥中，要求先将该端口设置为混杂模式并启动该端口
-  ip link set dev eth0 promisc on
-  # 把物理网卡 eth0 桥接在网桥上，意味着 eth0 将工作在链路层，因此理论上不需要 IP
-  ip addr flush dev eth0           # 可选
+** 1.2, 为网桥添加接口
+
+#+BEGIN_SRC sh
+  ip link set dev eth0 promisc on # 先将该端口设置为混杂模式并启动该端口
+  ip addr flush dev eth0          # 把物理网卡 eth0 桥接在网桥上，意味着 eth0 将工作在链路层，理论上可以不需要 IP
   ip link set dev eth0 up
 
-
-  # 3, 把该端口添加到网桥中
-  # master 表示 eth0 现属于 br0 ，并由 br0 控制
-  # 该脚本执行后，若 eth0 上原本配有 IP 地址，则该地址将无法访问，
-  # 这是因为将 eth0 交由 br0 控制后，eth0 即失去控制权（lose its identity），
-  # 但是路由表中仍然使用 eth0 ，这使得响应报文无法出埠，
-  # 因此需要添加新的路由，并指定 br0 为出埠接口，
-  # 或者执行第四步，将会自动添加路由信息
   ip link set dev eth0 master br0  # 等效于：brctl addif br0 eth0
+#+END_SRC
+
+网络拓扑变为：
+
+file:image/bridge-attach-if.png
+
+br0 和 eth0 相连之后，发生了几个变化：
+
+- br0 和 eth0 之间连接起来了，并且是双向的通道
+- 协议栈和 eth0 之间变成了单通道，协议栈能发数据给 eth0 ，但 eth0 从外面收到的数据不会转发给协议栈
+- br0 的 mac 地址变成了 eth0 的 mac 地址
+
+*** 1.2.1, 测试
+
+**** 1.2.1.1, =ping 10.74.68.47=
+
+路由信息：
+
+#+BEGIN_SRC
+  default dev eth0 scope link
+  192.168.3.0/24 dev br0 proto kernel scope link src 192.168.3.101
+#+END_SRC
+
+ARP Request 从 eth0 发出，br0 收到 ARP Reply ，br0 的 IP 和 arp 应答包中的 IP 不一致，该 Reply 被丢弃。\\
+（该 Reply 也不满足 rp_filter 条件）
+
+**** 1.2.1.2, =ping -I br0 10.74.68.47=
+
+路由信息：
+
+#+BEGIN_SRC
+  default dev eth0 scope link
+  192.168.3.0/24 dev br0 proto kernel scope link src 192.168.3.101
+#+END_SRC
+
+ARP Request 从 br0 发出，br0 收到 ARP Reply ，同时 br0 上能收到 Ping Echo Reply ，但不满足 rp_filter 条件。
+
+**** 1.2.1.3, =ping -I eth0 10.74.68.47=
+
+路由信息：
+
+#+BEGIN_SRC
+  default dev br0 scope link
+  192.168.3.0/24 dev br0 proto kernel scope link src 192.168.3.101
+#+END_SRC
+
+不满足 ARP Reply 过滤。
 
 
-  # 4, 给网桥配置 IP
-  # 理论上网桥不必配置 IP 也完全可以正常转发包，配置 IP 是为了管理网桥主机
-  ip addr add dev br0 192.168.0.1/24 # 也可以：dhclient br0
+** 1.3, 查看网桥配置信息
 
-  # 5, 查看配置情况
+#+BEGIN_SRC sh
   bridge link show # 等效于：brctl show
 #+END_SRC
 
-
-** 2.2, 删除网桥
+** 1.4, 删除网桥
 
 #+BEGIN_SRC sh
-  # 1,
-  # 若要删除网桥，应首先移除它所关联的所有端口，
-  # 同时关闭端口的混杂模式，
+  # 若要删除网桥，应首先移除它所关联的所有端口
+  # 同时关闭端口的混杂模式
   # 并关闭端口以将其恢复至原始状态
   ip link set eth0 promisc off
   ip link set eth0 down
   ip link set dev eth0 nomaster
 
-
-  # 2,
   # 当网桥的配置清空后就可以将其删除
   ip link delete br0 type bridge
 #+END_SRC
+
+** 1.5, 网络知识点
+
+*** 1.3.1, 反向路径过滤 (rp_filter)
+
+#+BEGIN_EXAMPLE
+如果一台主机从接口 A 收到一个包，其源地址为 <srcip>,
+如果启用反向路径过滤功能，它就会以 <srcip> 作为目标 IP 去查找路由表，
+如果得到的输出接口不为 A ，则认为反向路径过滤检查失败，内核就会丢弃该包。
+#+END_EXAMPLE
+
+关闭反向路径过滤功能：
+
+#+BEGIN_SRC sh
+  echo 0 > /proc/sys/net/ipv4/conf/all/rp_filter # 必须先执行
+  echo 0 > /proc/sys/net/ipv4/conf/br0/rp_filter
+#+END_SRC
+
+
+*** 1.3.2, ARP Reply 过滤
+
+ARP Reply 要被协议栈认可，不仅要检查反向路径过滤，还需要经过多层过滤条件，假设在配有网桥 br0 的情况下：
+
+#+BEGIN_EXAMPLE
+1，应答包的目的 mac 地址要和 br0 的 mac 地址匹配，不然就算开了混杂模式，arp 层在收到这样的包时会丢弃掉
+2，若 br0 和 eth0 的 mac 地址一样，应答包到达 arp 层后，如果 br0 上面没有 IP ，则应答包也会被丢弃掉
+3，若 br0 配置了 IP ，若 br0 的 IP 和 arp 应答包中的 IP 不一致，也会被丢弃掉
+#+END_EXAMPLE
