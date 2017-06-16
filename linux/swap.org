@@ -1,0 +1,141 @@
+#+TITLE:     Swap
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 1, 基本原理
+
+Linux 下有两种类型的 swap 空间，swap 分区和 swap 文件。
+
+并不是 swap 空间占用多就一定性能下降，真正影响性能是 swap in 和 out 的频率，频率越高，对系统的性能影响越大。
+
+** 1.1, swap 分区
+
+swap 分区由于没有文件系统，所以相当于内核直接访问连续的磁盘空间，效率相对要高点，
+但由于 swap 分区一般安装系统时就分配好了了，后期要缩减空间和扩容都很不方便。
+
+
+** 1.2, swap 文件
+
+swap 文件放在指定分区的文件系统里面，所以有可能受文件系统性能的影响，但 2.6 版本以后的内核可以直接访问 swap 文件对应的物理磁盘地址，
+相当于跳过了文件系统直接访问磁盘，不过如果 swap 文件在磁盘上的物理位置不连续时，还是会对性能产生不利影响，
+但其优点就是灵活，随时可以增加和移除 swap 文件。
+
+
+* 2, 常用命令
+
+
+** 2.1, 查看 swap 信息
+
+#+BEGIN_EXAMPLE
+root@dev:~# swapon -s
+Filename                Type        Size    Used    Priority
+/dev/dm-1               partition   524284  0       -1
+#+END_EXAMPLE
+
+- Filename
+
+  如果 swap 类型是分区，这里将是分区的路径，如果 swap 类型是文件，这里将是文件的路径
+
+- Type
+
+  swap 的类型，partition 代表这是一个 swap 分区，file 代表这是一个 swap 文件
+
+- Size
+
+  swap 的大小，单位是k
+
+- Used
+
+  已经被使用的大小
+
+- Priority
+
+  优先级，优先级高的 swap 将会被优先使用，同等优先级的 swap 将会被均匀的使用（round-robin），
+  优先级可以通过 =swapon -p= 命令来设置
+
+** 2.2, 查看系统中 swap in/out 的情况
+
+#+BEGIN_SRC sh
+  vmstat 2  # 参数 2 表示每两秒统计一次，si 和 so 两列就是每秒 swap in 和 out 的次数
+#+END_SRC
+
+** 2.3, 添加 swap 分区
+
+在添加 swap 分区前，首先得有一个空闲的分区。
+
+#+BEGIN_SRC sh
+mkswap /dev/sdb1 # /dev/sdb 是一块新加的硬盘并且已经用 fdisk 创建好了一个分区
+swapon /dev/sdb1 # 将新的分区加入到系统中
+echo "/dev/sdb1 none  swap    sw   0    0" >> /etc/fstab # 保证系统重启后会自动加载新的 swap 分区，需要修改 /etc/fstab 文件
+#+END_SRC
+
+** 2.4, 添加 swap 文件
+
+注意：不是所有的文件系统都支持创建 swap 文件，如 btrfs ，在 btrfs 分区里创建 swap 文件将失败
+
+#+BEGIN_SRC sh
+# 先创建一个新的 512M 的文件，用来作为 swap 文件，文件路径随意
+# fallocate 这个命令依赖于文件系统，有些老的文件系统不支持这个命令，比如ext2
+# 这种情况下可以用 dd 来实现同样的效果
+# dd if=/dev/zero of=/mnt/512MiB.swap bs=1024 count=524288
+# fallocate 和 dd 的区别在于
+# fallocate 是先声明这么多，然后在具体用到的时候文件系统才分配真正的物理磁盘空间，就是用一点分配一点
+# 而 dd 是一开始就实实在在的写了 512m 的数据到物理磁盘空间
+fallocate -l 512m /mnt/512MiB.swap
+
+# 修改文件的权限，避免其他用户对这个文件进行误操作
+chmod 600 /mnt/512MiB.swap
+
+# 格式化为 swap 文件
+mkswap /mnt/512MiB.swap
+
+# 将新的文件加入到系统中
+swapon /mnt/512MiB.swap
+
+# 修改 /etc/fstab
+echo "/mnt/512MiB.swap none  swap    sw   0    0" >> /etc/fstab
+#+END_SRC
+
+** 2.5, 删除 swap
+
+#+BEGIN_SRC sh
+# 停掉所有系统正在使用的 swap
+swapoff -a
+
+# 修改 /etc/fstab
+#+END_SRC
+
+* 3, 优化
+
+** 3.1, Rule of Thumb
+
+- 尽量使用 swap 分区，相对于 swap 文件来说，分区肯定是连续的物理磁盘空间，而 swap 文件有可能不是
+- 将 swap 分区和系统所在的分区放在不同的磁盘上，这样就不会和系统盘抢同一个磁盘的 I/O 带宽
+- 如果有多块磁盘的话，可以在每个盘上创建一个 swap 分区，并且将它们的优先级设置的一样，
+  这样内核就会平均的访问这些 swap 分区，性能相当于原来的 N 倍( N 是磁盘的数量)
+
+** 3.2, swappiness
+
+内核中，有一个叫做 *swappiness* 的参数，用于配置需要将内存中不常用的数据移到 swap 中去的紧迫程度。
+
+这个参数的取值范围是 0-100 ，0 告诉内核尽可能的不要将内存数据移到 swap 中，也即只有在迫不得已的情况下才这么做，\\
+而 100 告诉内核只要有可能，尽量的将内存中不常访问的数据移到 swap 中。
+
+查看当前系统中swappiness的值
+dev@dev:~$ cat /proc/sys/vm/swappiness
+60
+- 修改当前系统中 swappiness 的值
+
+  #+BEGIN_SRC sh
+  sysctl vm.swappiness=10
+
+  cat /proc/sys/vm/swappiness
+  #+END_SRC
+
+  通过 sysctl 修改的 swappiness 值在系统重启后会失效，要想重启后继续生效，需要修改配置文件 /etc/sysctl.conf
