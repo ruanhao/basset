@@ -1,0 +1,88 @@
+#+TITLE:     OOM
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+* 1, 基本原理
+
+为了处理内存不足时的问题，Linux 内核发明了一种机制，叫 OOM (Out Of Memory) killer ，通过配置它可以控制内存不足时内核的行为。
+
+当物理内存和交换空间都被用完时，如果还有进程来申请内存，内核将触发 OOM killer ，其行为如下：
+
+1. 如果 =/proc/sys/vm/panic_on_oom= 的值为 2 ，那么系统触发 panic
+2. 如果 =/proc/sys/vm/panic_on_oom= 的值为 1 ，那么系统可能触发 panic
+3. 如果 =/proc/sys/vm/panic_on_oom= 的值为 0 ，或者上一步没有触发 panic ，那么内核继续检查文件 =/proc/sys/vm/oom_kill_allocating_task=
+4. 如果 =/proc/sys/vm/oom_kill_allocating_task= 的值为 1 ，那么内核将 kill 掉当前申请内存的进程
+5. 如果 =/proc/sys/vm/oom_kill_allocating_task= 的值为 0 ，内核将检查每个进程的分数，分数最高的进程将被 kill 掉
+
+进程被 kill 掉之后，如果 =/proc/sys/vm/oom_dump_tasks= 的值为 1 ，且系统的 rlimit 中设置了 core 文件大小，\\
+将会由 =/proc/sys/kernel/core_pattern= 里面指定的程序生成 core dump 文件。
+
+core 文件里将包含 pid, uid, tgid, vm size, rss, nr_ptes, nr_pmds, swapents, oom_score_adj, score, name 等内容。
+
+* 2, 常见设置
+
+** 2.1, panic 后重启系统
+
+panic 后内核的默认行为是停在那里，目的是给开发人员一个连上去 debug 的机会。但对于大多数应用层开发人员来说没啥用，倒是希望它赶紧重启。
+
+为了让内核 panic 后重启，可以修改文件 =/proc/sys/kernel/panic= ，里面表示的是 panic 多少秒后系统将重启，这个文件的默认值是 0 ，表示永远不重启。
+
+** 2.2, 修改配置的方式
+
+#+BEGIN_SRC sh
+# 重启后失效
+echo 2> /proc/sys/vm/panic_on_oom
+
+# 重启后失效
+sysctl vm.panic_on_oom=2
+
+# 重启后仍然生效
+emacs /etc/sysctl.conf # 将 vm.panic_on_oom=2 添加到文件 sysctl.conf 中
+sysctl -p              # 重新加载 sysctl.conf ，使修改立即生效
+#+END_SRC
+
+** 2.3, 日志
+
+一旦 OOM killer 被触发，内核将会生成相应的日志，一般可以在 =/var/log/messages= 里面看到，如果配置了 syslog ，日志可能在 =/var/log/syslog= 里面
+
+#+BEGIN_SRC
+grep oom /var/log/syslog
+#+END_SRC
+
+** 2.4, 测试代码
+
+#+BEGIN_SRC c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#define M (1024 * 1024)
+#define K 1024
+
+int main(int argc, char *argv[])
+{
+    char *p;
+    int size =0;
+    while(1) {
+        p = (char *)malloc(K);
+        if  (p == NULL){
+            printf("memory allocate failed!\n");
+            return -1;
+        }
+        memset(p, 0, K);
+        size += K;
+        if (size%(100*M) == 0){
+            printf("%d00M memory allocated\n", size/(100*M));
+            sleep(1);
+        }
+    }
+
+    return 0;
+}
+#+END_SRC
