@@ -2,17 +2,18 @@
 # -*- coding: utf-8 -*-
 
 function _usage() {
-    echo "usage: COMMAND [-inHhp] -p<pattern1> -p<pattern2> ... <filename>"
+    echo "usage: COMMAND [-inHhpR] -p<pattern1> -p<pattern2> ... <filename>"
     echo "-i : ignore case"
     echo "-n : show line number"
     echo "-H : show filename"
     echo "-h : show header"
     echo "-p : specify pattern"
+    echo "-R : search recursively"
 }
 
 declare -a patterns
 
-while getopts "iHhnp:" opt; do
+while getopts "iHhnRp:" opt; do
     case $opt in
 	i)
 	    ignorecase_flag=true ;;
@@ -24,6 +25,8 @@ while getopts "iHhnp:" opt; do
 	    patterns+=( "$OPTARG" ) ;;
 	h)
 	    header_flag=true ;;
+	R)
+	    recursive_flag=true ;;
 	\?)
 	    _usage
 	    exit 1 ;;
@@ -55,7 +58,21 @@ if [[ ! -t 0 ]]; then 		# pipe case
     cat - | awk "${result}"
 else
     for f in "$@"; do
-	[[ $header_flag == true ]] && echo "########## $f ##########"
-	awk "${result}" $f
+	if [[ -d $f ]]; then # directory
+	    if [[ $recursive_flag == true ]]; then
+		find -L $f -not -path '*/\.*' -type f -print0 2>/dev/null | while IFS= read -r -d '' ff; do
+		    if file "$ff" | grep -q "text"; then # only search text file
+			[[ $header_flag == true ]] && echo "########## processing $ff ##########"
+			awk "${result}" "$ff"
+		    fi
+		done
+	    fi
+	else				  # file
+	    if file "$f" | grep -q "text"; then # only search text file
+		[[ $header_flag == true ]] && echo "########## processing $f ##########"
+		awk "${result}" "$f"
+	    fi
+	fi
+
     done
 fi
