@@ -206,17 +206,3 @@ socat -u TUN:10.0.6.1/24,iff-no-pi,up EXEC:'hexdump -C' # 监听 tun 设备
           tun.close()
           exit()
 #+END_SRC
-
-
-** 2.5, 使用 tun 搭建隧道
-
-[[images/tuntap-simple-tunnel.png]]
-
-#+BEGIN_SRC sh
-# Host 1 上执行：
-socat tcp-l:40839,reuseaddr TUN:10.0.0.2/24,iff-no-pi,up
-# socat 默认将添加路由，否则，需手工添加 10.0.0.0/24 网段路由，经由刚生成的 tun 设备
-
-# Host 2 上执行：
-socat tcp:10.74.68.58:40839 TUN:10.0.0.3/24,iff-no-pi,up
-#+END_SRC

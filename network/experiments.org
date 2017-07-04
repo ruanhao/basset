@@ -8,7 +8,7 @@
 #+STARTUP:   showall
 
 
-* ping successfully _without_ ICMP Echo Reply received
+* 1, ping successfully _without_ ICMP Echo Reply received
 
 [[images/veth-ping-case.png]]
 
@@ -31,7 +31,7 @@ echo 0 > /proc/sys/net/ipv4/conf/veth1/rp_filter
 #+END_EXAMPLE
 
 
-* 桥接 namespace
+* 2, 桥接 namespace
 
 架构示意图：
 
@@ -64,7 +64,7 @@ echo 0 > /proc/sys/net/ipv4/conf/veth1/rp_filter
   #+END_SRC
 
 
-* 单机自环
+* 3, 单机自环
 
 主机拥有 4 张网卡，要求数据从 eth0 流出，经 eth1，eth2 转发，最终流入 eth1，拓扑如图：
 
@@ -80,7 +80,7 @@ echo 0 > /proc/sys/net/ipv4/conf/veth1/rp_filter
    #+END_SRC
 
 
-* 为应用程序指定不同网关
+* 4, 为应用程序指定不同网关
 
 运行 P1 和 P2 两个程序，本机所在的局域网有两个出口到达外网，希望 P1 通过 gw1 和外界通信，P2 通过 gw2 和外界通信，约束条件是你的机器只有一张网卡eth0
 
@@ -115,7 +115,7 @@ echo 0 > /proc/sys/net/ipv4/conf/veth1/rp_filter
   这样 default 和 n1 中的程序将分别使用 gw1 和 gw2 作为网关。
 
 
-* 通过配置路由实现跨主机间的容器通信
+* 5, 通过配置路由实现跨主机间的容器通信
 
 [[images/inter-node-by-route.png]]
 
@@ -135,3 +135,16 @@ ip route add default via 10.10.103.91 dev eth0
 #+END_SRC
 
 host2 和 con2 的设置与上述设置类似
+
+* 6, 使用 tun 搭建隧道
+
+[[images/tuntap-simple-tunnel.png]]
+
+#+BEGIN_SRC sh
+# Host 1 上执行：
+socat tcp-l:40839,reuseaddr TUN:10.0.0.2/24,iff-no-pi,up
+# socat 默认将添加路由，否则，需手工添加 10.0.0.0/24 网段路由，经由刚生成的 tun 设备
+
+# Host 2 上执行：
+socat tcp:10.74.68.58:40839 TUN:10.0.0.3/24,iff-no-pi,up
+#+END_SRC
