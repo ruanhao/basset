@@ -1,0 +1,137 @@
+#+TITLE:     Experiment
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* ping successfully _without_ ICMP Echo Reply received
+
+[[images/veth-ping-case.png]]
+
+=ping -I veth0 192.168.1.3= ，在 veth0 和 veth1 上能抓到 ICMP echo 的请求包，但没有抓到应答包
+
+原理（数据包的流程）：
+
+1. ping 进程构造 ICMP echo 请求包，发给协议栈，协议栈将该数据包交给了 veth0 ，由于 veth0 的另一端连的是 veth1 ，所以 ICMP echo 请求包就转发给了 veth1
+2. veth1 收到 ICMP echo 请求包后，转交给另一端的协议栈，协议栈查看路由表，发现回给 192.168.1.2 的数据包应该走 lo 口（ =ip route get 192.168.1.2= ），于是将应答包交给 lo 设备
+3. lo 接到协议栈的应答包后，转手又把数据包还给了协议栈
+4. 协议栈收到应答包后，发现在同一个 network namespace 下有进程需要该包，于是交给了相应的进程，即 ping  进程收到了应答包
+
+#+BEGIN_EXAMPLE
+因为内核中的一些 ARP 相关配置导致 veth1 不返回 ARP 应答包，从而 ping 不通，解决办法如下：
+echo 1 > /proc/sys/net/ipv4/conf/veth1/accept_local
+echo 1 > /proc/sys/net/ipv4/conf/veth0/accept_local
+echo 0 > /proc/sys/net/ipv4/conf/all/rp_filter
+echo 0 > /proc/sys/net/ipv4/conf/veth0/rp_filter
+echo 0 > /proc/sys/net/ipv4/conf/veth1/rp_filter
+#+END_EXAMPLE
+
+
+* 桥接 namespace
+
+架构示意图：
+
+[[images/vpair-br.png]]
+
+  #+BEGIN_SRC sh
+    # 1, 创建网桥 br0
+
+    # 2, 创建 veth pair
+    ip link add tap1 type veth peer name br-tap1
+    ip link add tap2 type veth peer name br-tap2
+
+    # 3, 将 tap 设备添加为网桥的一个接口
+    brctl addif br0 br-tap1
+    brctl addif br0 br-tap2
+
+    # 4, 设置 namespace
+    ip netns add ns1
+    ip netns add ns2
+    ip link set tap1 netns ns1
+    ip link set tap2 netns ns2
+
+    # 5, 启用 tap 设备
+    ip link set dev br-tap1 up
+    ip link set dev br-tap2 up
+    ip netns exec ns1 ip link set dev tap1 up
+    ip netns exec ns2 ip link set dev tap2 up
+
+    # 6, 检查路由信息
+  #+END_SRC
+
+
+* 单机自环
+
+主机拥有 4 张网卡，要求数据从 eth0 流出，经 eth1，eth2 转发，最终流入 eth1，拓扑如图：
+
+[[images/ns-interface.png]]
+
+   #+BEGIN_SRC sh
+   # 在 default 中打开转发功能
+   echo 1 > /proc/sys/net/ipv4/ip_forward
+
+   # 为两个 namespace 设置网关
+   ip netns exec t1 route add default gw 192.168.1.1
+   ip netns exec t2 route add default gw 172.16.1.1
+   #+END_SRC
+
+
+* 为应用程序指定不同网关
+
+运行 P1 和 P2 两个程序，本机所在的局域网有两个出口到达外网，希望 P1 通过 gw1 和外界通信，P2 通过 gw2 和外界通信，约束条件是你的机器只有一张网卡eth0
+
+- 方案一
+
+  通过 iptables 为 P1 和 P2 的数据包打上不同的 mark ，然后通过 =ip rule= 设置策略路由
+
+- 方案二
+
+  直接在 P1 和 P2 应用程序中用 setsockopt 设置 ip mark ，这就不需要 iptables 了
+
+- 方案三
+
+  使用 namespace ，拓扑：
+
+  [[images/multi-gw.png]]
+
+  在 =namespace=default= 中执行：
+
+     #+BEGIN_SRC sh
+     ip route add 10.74.68.0/24 dev br0
+     ip route add default via 10.74.68.1 dev br0
+     #+END_SRC
+
+  在 =namespace=n1= 中执行：
+
+     #+BEGIN_SRC sh
+     ip route add 10.74.68.0/24 dev tap
+     ip route add default via 10.74.68.2 dev tap
+     #+END_SRC
+
+  这样 default 和 n1 中的程序将分别使用 gw1 和 gw2 作为网关。
+
+
+* 通过配置路由实现跨主机间的容器通信
+
+[[images/inter-node-by-route.png]]
+
+host1 上需设置：
+
+#+BEGIN_SRC sh
+echo 1 > /proc/sys/net/ipv4/ip_forward
+ip route add 172.17.2.0/24 via 10.10.103.92 dev eth0
+ip route add 172.17.1.0/24 dev docker0
+#+END_SRC
+
+con1 中需设置：
+
+#+BEGIN_SRC sh
+ip route add 10.10.103.91 dev eth0
+ip route add default via 10.10.103.91 dev eth0
+#+END_SRC
+
+host2 和 con2 的设置与上述设置类似

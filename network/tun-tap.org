@@ -220,28 +220,3 @@ socat tcp-l:40839,reuseaddr TUN:10.0.0.2/24,iff-no-pi,up
 # Host 2 上执行：
 socat tcp:10.74.68.58:40839 TUN:10.0.0.3/24,iff-no-pi,up
 #+END_SRC
-
-
-* 3, 案例
-
-** 3.1, ping successfully _without_ ICMP Echo Reply received
-
-[[images/veth-ping-case.png]]
-
-=ping -I veth0 192.168.1.3= ，在 veth0 和 veth1 上能抓到 ICMP echo 的请求包，但没有抓到应答包
-
-原理（数据包的流程）：
-
-1. ping 进程构造 ICMP echo 请求包，发给协议栈，协议栈将该数据包交给了 veth0 ，由于 veth0 的另一端连的是 veth1 ，所以 ICMP echo 请求包就转发给了 veth1
-2. veth1 收到 ICMP echo 请求包后，转交给另一端的协议栈，协议栈查看路由表，发现回给 192.168.1.2 的数据包应该走 lo 口（ =ip route get 192.168.1.2= ），于是将应答包交给 lo 设备
-3. lo 接到协议栈的应答包后，转手又把数据包还给了协议栈
-4. 协议栈收到应答包后，发现在同一个 network namespace 下有进程需要该包，于是交给了相应的进程，即 ping  进程收到了应答包
-
-#+BEGIN_EXAMPLE
-因为内核中的一些 ARP 相关配置导致 veth1 不返回 ARP 应答包，从而 ping 不通，解决办法如下：
-echo 1 > /proc/sys/net/ipv4/conf/veth1/accept_local
-echo 1 > /proc/sys/net/ipv4/conf/veth0/accept_local
-echo 0 > /proc/sys/net/ipv4/conf/all/rp_filter
-echo 0 > /proc/sys/net/ipv4/conf/veth0/rp_filter
-echo 0 > /proc/sys/net/ipv4/conf/veth1/rp_filter
-#+END_EXAMPLE
