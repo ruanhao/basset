@@ -1,4 +1,4 @@
-#+TITLE:     Experiment
+#+TITLE:     Experiments
 #+AUTHOR:    Hao Ruan
 #+EMAIL:     ruanhao1116@gmail.com
 #+LANGUAGE:  en
@@ -136,15 +136,54 @@ ip route add default via 10.10.103.91 dev eth0
 
 host2 和 con2 的设置与上述设置类似
 
+
 * 6, 使用 tun 搭建隧道
 
 [[images/tuntap-simple-tunnel.png]]
 
-#+BEGIN_SRC sh
 # Host 1 上执行：
+
+#+BEGIN_SRC sh
 socat tcp-l:40839,reuseaddr TUN:10.0.0.2/24,iff-no-pi,up
 # socat 默认将添加路由，否则，需手工添加 10.0.0.0/24 网段路由，经由刚生成的 tun 设备
+#+END_SRC
 
 # Host 2 上执行：
+
+#+BEGIN_SRC sh
 socat tcp:10.74.68.58:40839 TUN:10.0.0.3/24,iff-no-pi,up
 #+END_SRC
+
+* 7, 搭建 GRE 隧道
+
+[[images/gre-tunnel.png]]
+
+Host 1:
+
+#+BEGIN_SRC sh
+ip tunnel add tunnel mode gre local 10.74.68.58 ttl 255 remote 10.74.68.5 dev eth0
+ip addr add 1.2.3.5/24 dev tunnel      # 默认会建立一条路由，否则需手动添加
+                                       # ip route add 1.2.3.0/24 dev tunnel
+ip route add 192.168.1.0/24 dev tunnel
+#+END_SRC
+
+
+Host 2:
+
+#+BEGIN_SRC sh
+ip tunnel add tunnel mode gre local 10.74.68.5 ttl 255 remote 10.74.68.58 dev eth0
+ip addr add 1.2.3.4/24 dev tunnel      # 默认会建立一条路由，否则需手动添加
+                                       # ip route add 1.2.3.0/24 dev tunnel
+ip route add 192.168.1.0/24 dev tunnel
+#+END_SRC
+
+在 Host2 上执行： =ping 192.168.1.58= ，在 Host1 上抓包，可以观察到 ICMP Echo Request 的 src 为 Host2 上 tunnel 设备的地址，\\
+这就是为什么需要添加 =1.2.3.0/24= 的路由。
+
+Echo Request:
+
+[[images/gre-pcap-request.png]]
+
+Echo Reply:
+
+[[images/gre-pcap-reply.png]]
