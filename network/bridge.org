@@ -11,11 +11,17 @@
 
 [[file:images/br.jpg]]
 
+
 ** 1.1, 创建网桥并启用
 
 #+BEGIN_SRC sh
   ip link add name br0 type bridge # 等效于：brctl addbr br0
   ip link set dev br0 up
+
+  ## 优化：
+  brctl stp br0 off     ##  disable the STP protocol and prevent the switch from disabling ports
+  brctl setfd br0 2     ##  reduce the time taken by the br1 interface to go from blocking to forwarding state
+  brctl setmaxage br0 0
 #+END_SRC
 
 当刚创建一个 bridge 时，它是一个独立的网络设备，只有一个端口连着协议栈，其它的端口啥都没连，这样的 bridge 没有任何实际功能：
@@ -43,6 +49,7 @@ br0 和 eth0 相连之后，发生了几个变化：
 - 协议栈和 eth0 之间变成了单通道，协议栈能发数据给 eth0 ，但 eth0 从外面收到的数据不会转发给协议栈
 - br0 的 mac 地址变成了 eth0 的 mac 地址
 
+
 *** 1.2.1, 测试
 
 **** 1.2.1.1, =ping 10.74.68.47=
@@ -57,6 +64,7 @@ br0 和 eth0 相连之后，发生了几个变化：
 ARP Request 从 eth0 发出，br0 收到 ARP Reply ，br0 的 IP 和 arp 应答包中的 IP 不一致，该 Reply 被丢弃。\\
 （该 Reply 也不满足 rp_filter 条件）
 
+
 **** 1.2.1.2, =ping -I br0 10.74.68.47=
 
 路由信息：
@@ -67,6 +75,7 @@ ARP Request 从 eth0 发出，br0 收到 ARP Reply ，br0 的 IP 和 arp 应答�
 #+END_SRC
 
 ARP Request 从 br0 发出，br0 收到 ARP Reply ，同时 br0 上能收到 Ping Echo Reply ，但不满足 rp_filter 条件。
+
 
 **** 1.2.1.3, =ping -I eth0 10.74.68.47=
 
@@ -86,6 +95,7 @@ ARP Request 从 br0 发出，br0 收到 ARP Reply ，同时 br0 上能收到 Pin
   bridge link show # 等效于：brctl show
 #+END_SRC
 
+
 ** 1.4, 删除网桥
 
 #+BEGIN_SRC sh
@@ -99,6 +109,7 @@ ARP Request 从 br0 发出，br0 收到 ARP Reply ，同时 br0 上能收到 Pin
   # 当网桥的配置清空后就可以将其删除
   ip link delete br0 type bridge
 #+END_SRC
+
 
 ** 1.5, 网络知识点
 
@@ -130,6 +141,7 @@ ARP Reply 要被协议栈认可，不仅要检查反向路径过滤，还需要�
 
 
 * 2, 应用场景
+
 
 ** 2.1, 虚拟机
 
