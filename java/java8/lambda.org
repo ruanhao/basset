@@ -1,0 +1,182 @@
+#+TITLE:     Lambda
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 1, 知识点
+
+** 1.1, 谓词（Predicate）
+
+  返回 boolean 的函数
+
+** 1.2, 函数式接口（Functional Interface）
+
+  只有一个 *抽象* 方法的接口，这种类型的接口也称为 SAM 接口，即 Single Abstract Method interfaces ，主要用在 Lambda 表达式
+
+  #+BEGIN_SRC java
+
+@FunctionalInterface
+interface MyService {
+
+    void test(String s); // 一个抽象方法
+
+    default void defaultWork() {
+        // 函数式接口里可以包含默认方法
+    }
+
+    static void printHello(){
+        // 函数式接口里可以包含静态方法
+    }
+}
+  #+END_SRC
+
+*** 1.2.1, 常见函数式接口
+
+- Comparable
+  #+BEGIN_SRC java
+    @FunctionalInterface
+    public interface Comparator<T> {
+        int compare(T o1, T o2);
+    }
+  #+END_SRC
+- Runnable
+  #+BEGIN_SRC java
+    @FunctionalInterface
+    public interface Runnable {
+        public abstract void run();
+    }
+  #+END_SRC
+- Callable
+  #+BEGIN_SRC java
+    public interface Callable<V> {
+        V call() throws Exception;
+    }
+  #+END_SRC
+- Predicate
+  #+BEGIN_SRC java
+    @FunctionalInterface
+    public interface Predicate<T>{
+        boolean test(T t);
+    }
+  #+END_SRC
+- Consumer
+  #+BEGIN_SRC java
+    @FunctionalInterface
+    public interface Consumer<T>{
+        void accept(T t);
+    }
+  #+END_SRC
+- Function
+  #+BEGIN_SRC java
+    @FunctionalInterface
+    public interface Function<T, R>{
+        R apply(T t);
+    }
+  #+END_SRC
+- Supplier
+  #+BEGIN_SRC java
+    @FunctionalInterface
+    public interface Supplier<T> {
+        T get();
+    }
+  #+END_SRC
+
+** 1.3, 方法引用
+
+| 方法引用                  | Lambda 表达式                           |
+| ClassName::staticMethod   | (args) -> ClassName.staticMethod(args)  |
+| ClassName::instanceMethod | (ins, args) -> ins.instanceMethod(args) |
+| expr::instanceMethod      | (args) -> expr.instanceMethod(args)     |
+
+** 1.4, 构造方法引用
+
+对于一个现有构造函数，可以利用它的名称和关键字 new 来创建它的一个引用: ClassName::new \\
+它的功能与指向静态方法的引用类似
+
+** 1.5, 类型检查与推断
+
+- Lambda 的类型是从使用 Lambda 的上下文推断出来的
+- 同一个 Lambda 表达式就可以与不同的函数式接口联系起来，只要它们的抽象方法签名能够兼容
+- Java 编译器会从上下文（目标类型）推断出用什么函数式接口来配合 Lambda 表达式
+
+* 2, 示例代码
+
+** 2.1, 方法引用
+
+#+BEGIN_SRC java
+  str.sort((s1, s2) -> s1.compareToIgnoreCase(s2)); // =>
+  str.sort(String::compareToIgnoreCase);
+
+  Function<String, Integer> stringToInteger =
+      (String s) -> Integer.parseInt(s); // =>
+  Function<String, Integer> stringToInteger = Integer::parseInt;
+
+  BiPredicate<List<String>, String> contains =
+      (list, element) -> list.contains(element); // =>
+  BiPredicate<List<String>, String> contains = List::contains;
+#+END_SRC
+
+** 2.2, 构造方法引用
+
+#+BEGIN_SRC java
+  Supplier<Apple> a = () -> new Apple(); // =>
+  Supplier<Apple> a = Apple::new;
+
+  Function<Integer,Apple> a = (weight) -> new Apple(weight); // =>
+  Function<Integer,Apple> a = Apple::new;
+
+  BiFunction<String, Integer, Apple> c3 =
+      (color, weight) -> new Apple(color, weight); // =>
+  BiFunction<String, Integer, Apple> c3 = Apple::new;
+#+END_SRC
+
+** 2.3, 排序
+
+#+BEGIN_SRC java
+  // Comparator 具有一个叫作 comparing 的静态辅助方法，
+  // 它可以接受一个 Function 来提取 Comparable 键值，并生成一个 Comparator 对象
+  import static java.util.Comparator.comparing;
+  inventories.sort(comparing((a) -> a.getWeight()));
+  inventories.sort(comparing(Apple::getWeight));
+
+  inventories.sort(comparing(Apple::getWeight).reversed()); // 逆序
+
+  inventories.sort(comparing(Apple::getWeight).thenComparing(Apple::getColour)); // 比较器链
+#+END_SRC
+
+** 2.4, 谓词复合 (negate, and, or)
+
+and 和 or 方法是按照在表达式链中的位置，从左向右确定优先级的。\\
+=a.or(b).and(c)= 可以看作 =(a || b) && c=
+
+#+BEGIN_SRC java
+  Predicate<Apple> notRedApple = redApple.negate();
+
+  Predicate<Apple> redAndHeavyApple =
+      redApple.and(a -> a.getWeight() > 150);
+
+  Predicate<Apple> redAndHeavyAppleOrGreen =
+      redApple.and(a -> a.getWeight() > 150)
+      .or(a -> "green".equals(a.getColor()));
+#+END_SRC
+
+** 2.5, 函数复合
+
+#+BEGIN_SRC java
+  // andThen: g(f(x))
+  Function<Integer, Integer> f = x -> x + 1;
+  Function<Integer, Integer> g = x -> x * 2;
+  Function<Integer, Integer> h = f.andThen(g);
+  int result = h.apply(1); // 4
+
+  // compose: f(g(x))
+  Function<Integer, Integer> f = x -> x + 1;
+  Function<Integer, Integer> g = x -> x * 2;
+  Function<Integer, Integer> h = f.compose(g);
+  int result = h.apply(1); // 3
+#+END_SRC
