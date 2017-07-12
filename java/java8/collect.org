@@ -1,0 +1,120 @@
+#+TITLE:     Collect
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+* 1, 基本原理
+
+传递给 collect 方法的参数是 Collector 接口的一个实现，也就是给 Stream 中元素做汇总的方法。\\
+toList 只是说按顺序用每个元素生成一个列表，groupingBy 说的是生成一个 Map 。
+
+对流调用 collect 方法将对流中的元素触发一个归约操作（由 Collector 来参数化）
+
+一般来说，Collector 会对元素应用一个转换函数（很多时候是不体现任何效果的恒等转换，例如 toList ），\\
+并将结果累积在一个数据结构中，从而产生这一过程的最终输出。
+
+* 2, 代码示例
+
+** 2.1, 归约汇总
+
+#+BEGIN_SRC java
+  // 平均值
+  double avgCalories = menu.stream().collect(averagingInt(Dish::getCalories));
+
+  // 数值统计
+  IntSummaryStatistics menuStatistics = menu.stream().collect(summarizingInt(Dish::getCalories));
+  /*
+    menuStatistics: IntSummaryStatistics{count=9, sum=4300, min=120, average=477.777778, max=800}
+   ,*/
+
+  // 连接字符串
+  String shortMenu = menu.stream().map(Dish::getName).collect(joining(", "));
+#+END_SRC
+
+** 2.2, 分组
+
+#+BEGIN_SRC java
+  // 属性访问器分类
+  Map<Dish.Type, List<Dish>> dishesByType =
+      menu.stream().collect(groupingBy(Dish::getType)); // 普通的单参数 groupingBy(f) (其中 f 是分类函数)实际上是 groupingBy(f, toList()) 的简便写法
+  /*
+    {FISH=[prawns, salmon], OTHER=[french fries, rice, season fruit, pizza], MEAT=[pork, beef, chicken]}
+  ,*/
+
+
+  // 自定义分类条件
+  public enum CaloricLevel { DIET, NORMAL, FAT }
+  Map<CaloricLevel, List<Dish>> dishesByCaloricLevel = menu.stream().collect( groupingBy(dish -> {
+              if (dish.getCalories() <= 400) return CaloricLevel.DIET;
+              else if (dish.getCalories() <= 700) return CaloricLevel.NORMAL;
+              else return CaloricLevel.FAT;
+          } ));
+
+  // 多级分组
+  // 要实现多级分组，可以使用一个由双参数版本的 Collectors.groupingBy 工厂方法创建收集器
+  Map<Dish.Type, Map<CaloricLevel, List<Dish>>> dishesByTypeCaloricLevel =
+      menu.stream().collect(groupingBy(Dish::getType,
+                                       groupingBy(dish -> {
+                                               if (dish.getCalories() <= 400) return CaloricLevel.DIET;
+                                               else if (dish.getCalories() <= 700) return CaloricLevel.NORMAL;
+                                               else return CaloricLevel.FAT; })
+                                       )
+                            );
+  /*
+    {
+      MEAT={DIET=[chicken], NORMAL=[beef], FAT=[pork]},
+      FISH={DIET=[prawns], NORMAL=[salmon]},
+      OTHER={DIET=[rice, seasonal fruit], NORMAL=[french fries, pizza]}
+    }
+   ,*/
+
+  // 子组收集数据
+  Map<Dish.Type, Long> typesCount =
+      menu.stream().collect(groupingBy(Dish::getType, counting()));
+  /*
+    {MEAT=3, FISH=2, OTHER=4}
+  ,*/
+
+  Map<Dish.Type, Optional<Dish>> mostCaloricByType =
+      menu.stream().collect(groupingBy(Dish::getType, maxBy(comparingInt(Dish::getCalories))));
+  /*
+    {FISH=Optional[salmon], OTHER=Optional[pizza], MEAT=Optional[pork]}
+  ,*/
+
+  // 把收集器的结果转换为另一种类型
+  Map<Dish.Type, Dish> mostCaloricByType =
+      menu.stream()
+      .collect(groupingBy(Dish::getType,
+                          collectingAndThen(maxBy(comparingInt(Dish::getCalories)), Optional::get))); // reducing 收集器永远都不会返回 Optional.empty()
+  /*
+    {FISH=salmon, OTHER=pizza, MEAT=pork}
+  ,*/
+
+  // 与 groupingBy 联合使用其他收集器
+  Map<Dish.Type, Set<CaloricLevel>> caloricLevelsByType =
+      menu.stream()
+      .collect(groupingBy(Dish::getType, mapping(dish -> {
+                      if (dish.getCalories() <= 400) return CaloricLevel.DIET;
+                      else if (dish.getCalories() <= 700) return CaloricLevel.NORMAL;
+                      else return CaloricLevel.FAT;
+                  }, toSet() )));
+  /*
+    {OTHER=[DIET, NORMAL], MEAT=[DIET, NORMAL, FAT], FISH=[DIET, NORMAL]}
+   ,*/
+
+  /*
+    上个示例中，对于返回的 Set 是什么类型并没有任何保证
+    但通过使用 toCollection ，可以有更多的控制
+    例如，可以给它传递一个构造函数引用来要求 HashSet
+  ,*/
+  Map<Dish.Type, Set<CaloricLevel>> caloricLevelsByType =
+      menu.stream().collect(groupingBy(Dish::getType, mapping(dish -> {
+                      if (dish.getCalories() <= 400) return CaloricLevel.DIET;
+                      else if (dish.getCalories() <= 700) return CaloricLevel.NORMAL;
+                      else return CaloricLevel.FAT;
+                  }, toCollection(HashSet::new) )));
+#+END_SRC
