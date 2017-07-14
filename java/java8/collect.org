@@ -9,112 +9,340 @@
 
 * 1, 基本原理
 
-传递给 collect 方法的参数是 Collector 接口的一个实现，也就是给 Stream 中元素做汇总的方法。\\
-toList 只是说按顺序用每个元素生成一个列表，groupingBy 说的是生成一个 Map 。
+收集器，也就是那些可以从 Collectors 类提供的工厂方法（例如 groupingBy )创建的收集器。它们主要提供了三大功能:
 
-对流调用 collect 方法将对流中的元素触发一个归约操作（由 Collector 来参数化）
-
-一般来说，Collector 会对元素应用一个转换函数（很多时候是不体现任何效果的恒等转换，例如 toList ），\\
-并将结果累积在一个数据结构中，从而产生这一过程的最终输出。
+- 将流元素归约和汇总为一个值
+- 元素分组
+- 元素分区
 
 * 2, 代码示例
 
-** 2.1, 归约汇总
-
 #+BEGIN_SRC java
-  // 平均值
-  double avgCalories = menu.stream().collect(averagingInt(Dish::getCalories));
+  package com.cisco.ruan.nio;
 
-  // 数值统计
-  IntSummaryStatistics menuStatistics = menu.stream().collect(summarizingInt(Dish::getCalories));
-  /*
-    menuStatistics: IntSummaryStatistics{count=9, sum=4300, min=120, average=477.777778, max=800}
-   ,*/
+  import static java.util.Comparator.*;
+  import static java.util.stream.Collectors.*;
 
-  // 连接字符串
-  String shortMenu = menu.stream().map(Dish::getName).collect(joining(", "));
+  import java.util.Arrays;
+  import java.util.HashSet;
+  import java.util.IntSummaryStatistics;
+  import java.util.List;
+  import java.util.Map;
+  import java.util.Optional;
+  import java.util.Set;
+
+  import lombok.AllArgsConstructor;
+  import lombok.Getter;
+
+  public class Java8 {
+
+      public static List<Dish> menu = Arrays.asList(new Dish("pork", false, 800, Dish.Type.MEAT),
+                                                    new Dish("beef", false, 700, Dish.Type.MEAT),
+                                                    new Dish("chicken", false, 400, Dish.Type.MEAT),
+                                                    new Dish("french fries", true, 530, Dish.Type.OTHER),
+                                                    new Dish("rice", true, 350, Dish.Type.OTHER),
+                                                    new Dish("season fruit", true, 120, Dish.Type.OTHER),
+                                                    new Dish("pizza", true, 550, Dish.Type.OTHER),
+                                                    new Dish("prawns", false, 300, Dish.Type.FISH),
+                                                    new Dish("salmon", false, 450, Dish.Type.FISH));
+
+      public static void main(String[] args) {
+
+          /* Stream Operation */
+          System.out.println("===== getThreeHighCaloricDishNames (sort) =====");
+          getThreeHighCaloricDishNames();
+          System.out.println("===== getDistinctDishType (distinct) =====");
+          getDistinctDishType();
+          System.out.println("===== getAllCalories (reduce) =====");
+          getAllCalories0();
+          System.out.println("===== getAllCalories (mapToInt) =====");
+          getAllCalories1();
+          System.out.println("===== getMaxCalorie (reduce) =====");
+          getMaxCalorie();
+
+          /* Collect (Aggregation) */
+          System.out.println("===== getTotalNumberOfDish (counting) =====");
+          getTotalNumberOfDish();
+          System.out.println("===== getMaxCalorie (maxBy) =====");
+          getMaxCalorieDish();
+          System.out.println("===== getAllCalories (summingInt) =====");
+          getAllCalories2();
+          System.out.println("===== getAverageCalorie (averagingInt) =====");
+          getAverageCalorie();
+          System.out.println("===== getStatistics (summarizingInt) =====");
+          getStatistics();
+          System.out.println("===== getShortMenu (joining) =====");
+          getShortMenu();
+
+          /* Collect (Grouping) */
+          System.out.println("===== groupByCaloricLevel (groupingBy) =====");
+          groupByCaloricLevel();
+          System.out.println("===== groupByDishesAndTypeCaloricLevel (multi-level groupingBy) =====");
+          groupByDishesAndTypeCaloricLevel();
+          System.out.println("===== groupByDishesAndTypeCaloricLevel (counting on substream) =====");
+          getTotalNumberOfDishByType();
+          System.out.println("===== getMostCaloricByType (maxBy on substream) =====");
+          getMostCaloricByType0();
+          System.out.println("===== getMostCaloricByType (collectingAndThen) =====");
+          getMostCaloricByType1();
+          System.out.println("===== getTotalCaloriesByType (summingInt on substream) =====");
+          getTotalCaloriesByType();
+          System.out.println("===== getCaloricLevelsByType (mapping on substream and collect in set) =====");
+          getCaloricLevelsByType();
+          System.out.println("===== getCaloricLevelsByType (mapping on substream and collect in hashset) =====");
+          getCaloricLevelsByType1();
+
+          /* Collect (Partition) */
+          System.out.println("===== getVegetarianDishes (partitioningBy) =====");
+          getVegetarianDishes();
+          System.out.println("===== getMostCaloricPartitionedByVegetarian (multi-level partitioningBy) =====");
+          getMostCaloricPartitionedByVegetarian();
+
+      }
+
+      public static void getThreeHighCaloricDishNames() {
+          menu.stream()
+              .sorted(comparing(Dish::getCalories).reversed())
+              .limit(3)
+              .map(d -> d.getName())
+              .forEach(System.out::println);
+      }
+
+      public static void getDistinctDishType() {
+          menu.stream()
+              .map(d -> d.getType())
+              .distinct()
+              .forEach(System.out::println);
+      }
+
+      public static void getAllCalories0() {
+          int sum = menu.stream()
+              .map(Dish::getCalories)
+              .reduce(0, Integer::sum);
+          System.out.println(sum);
+      }
+
+      public static void getAllCalories1() {
+          int sum = menu.stream()
+              .mapToInt(Dish::getCalories)
+              .sum();
+          System.out.println(sum);
+      }
+
+      public static void getMaxCalorie() {
+          Optional<Integer> maxOp = menu.stream()
+              .map(Dish::getCalories)
+              .reduce(Integer::max);
+          System.out.println(maxOp.orElse(0));
+      }
+
+      public static void getMaxCalorieDish() {
+          Optional<Dish> maxOp = menu.stream()
+              .collect(maxBy(comparingInt(Dish::getCalories)));
+          maxOp.ifPresent(System.out::println);
+      }
+
+      public static void getTotalNumberOfDish() {
+          long total = menu.stream()
+              .collect(counting());
+          System.out.println(total);
+      }
+
+      public static void getAllCalories2() {
+          int sum = menu.stream()
+              .collect(summingInt(Dish::getCalories));
+          System.out.println(sum);
+      }
+
+      public static void getAverageCalorie() {
+          double avg = menu.stream()
+              .collect(averagingInt(Dish::getCalories));
+          System.out.println(avg);
+      }
+
+      public static void getStatistics() {
+          IntSummaryStatistics s = menu.stream()
+              .collect(summarizingInt(Dish::getCalories));
+          System.out.println(s);
+      }
+
+      public static void getShortMenu() {
+          String j = menu.stream()
+              .map(Dish::getName)
+              .collect(joining(", "));
+          System.out.println(j);
+      }
+
+      public static void groupByCaloricLevel() {
+          Map<Dish.CaloricLevel, List<Dish>> dishesByCaloricLevel =
+              menu.stream().collect( groupingBy(dish -> {
+                          if (dish.getCalories() <= 400)
+                              return Dish.CaloricLevel.DIET;
+                          else if (dish.getCalories() <= 700)
+                              return Dish.CaloricLevel.NORMAL;
+                          else
+                              return Dish.CaloricLevel.FAT;
+                      } ));
+          System.out.println(dishesByCaloricLevel);
+      }
+
+      public static void groupByDishesAndTypeCaloricLevel() {
+          Map<Dish.Type, Map<Dish.CaloricLevel, List<Dish>>> dishesByTypeCaloricLevel =
+              menu.stream()
+              .collect(groupingBy(Dish::getType,
+                                  groupingBy(dish -> {
+                                          if (dish.getCalories() <= 400)
+                                              return Dish.CaloricLevel.DIET;
+                                          else if (dish.getCalories() <= 700)
+                                              return Dish.CaloricLevel.NORMAL;
+                                          else
+                                              return Dish.CaloricLevel.FAT;
+                                      }  )
+                                  )
+                       );
+          System.out.println(dishesByTypeCaloricLevel);
+      }
+
+      public static void getTotalNumberOfDishByType() {
+          Map<Dish.Type,Long> typesCount =
+              menu.stream()
+              .collect(groupingBy(Dish::getType,
+                                  counting()));
+          System.out.println(typesCount);
+      }
+
+      public static void getMostCaloricByType0() {
+          Map<Dish.Type, Optional<Dish>> mostCaloricByType =
+              menu.stream()
+              .collect(groupingBy(Dish::getType,
+                                  maxBy(comparingInt(Dish::getCalories))));
+          System.out.println(mostCaloricByType);
+      }
+
+      public static void getMostCaloricByType1() {
+          Map<Dish.Type, Dish> mostCaloricByType =
+              menu.stream()
+              .collect(groupingBy(Dish::getType,
+                                  collectingAndThen(maxBy(comparingInt(Dish::getCalories)),
+                                                    Optional::get)
+                                  ));
+          System.out.println(mostCaloricByType);
+      }
+
+      public static void getCaloricLevelsByType() {
+          Map<Dish.Type, Set<Dish.CaloricLevel>> caloricLevelsByType =
+              menu.stream().collect(groupingBy(Dish::getType,
+                                               mapping( dish -> {
+                                                       if (dish.getCalories() <= 400)
+                                                           return Dish.CaloricLevel.DIET;
+                                                       else if (dish.getCalories() <= 700)
+                                                           return Dish.CaloricLevel.NORMAL;
+                                                       else
+                                                           return Dish.CaloricLevel.FAT;
+                                                   },
+                                                   toSet())));
+          System.out.println(caloricLevelsByType);
+      }
+
+      public static void getCaloricLevelsByType1() {
+          Map<Dish.Type, Set<Dish.CaloricLevel>> caloricLevelsByType =
+              menu.stream().collect(groupingBy(Dish::getType,
+                                               mapping( dish -> {
+                                                       if (dish.getCalories() <= 400)
+                                                           return Dish.CaloricLevel.DIET;
+                                                       else if (dish.getCalories() <= 700)
+                                                           return Dish.CaloricLevel.NORMAL;
+                                                       else
+                                                           return Dish.CaloricLevel.FAT;
+                                                   },
+                                                   toCollection(HashSet::new))));
+          System.out.println(caloricLevelsByType);
+      }
+
+      public static void getTotalCaloriesByType() {
+          Map<Dish.Type, Integer> totalCaloriesByType =
+              menu.stream().collect(groupingBy(Dish::getType,
+                                               summingInt(Dish::getCalories)));
+          System.out.println(totalCaloriesByType);
+      }
+
+      public static void getVegetarianDishes() {
+          Map<Boolean, List<Dish>> partitionedMenu =
+              menu.stream().collect(partitioningBy(Dish::isVegetarian));
+          System.out.println(partitionedMenu.get(true));
+      }
+
+      public static void getMostCaloricPartitionedByVegetarian() {
+          Map<Boolean, String> mostCaloricPartitionedByVegetarian =
+              menu.stream().collect(partitioningBy(Dish::isVegetarian,
+                                                   collectingAndThen(maxBy(comparingInt(Dish::getCalories)),
+                                                                     op -> op.get().getName())));
+          System.out.println(mostCaloricPartitionedByVegetarian);
+      }
+
+  }
+
+  @AllArgsConstructor
+  class Dish {
+
+      @Getter private final String name;
+      @Getter private final boolean vegetarian;
+      @Getter private final int calories;
+      @Getter private final Type type;
+
+      public enum Type { MEAT, FISH, OTHER }
+
+      public enum CaloricLevel { DIET, NORMAL, FAT }
+  }
+
 #+END_SRC
 
-** 2.2, 分组
 
-#+BEGIN_SRC java
-  // 属性访问器分类
-  Map<Dish.Type, List<Dish>> dishesByType =
-      menu.stream().collect(groupingBy(Dish::getType)); // 普通的单参数 groupingBy(f) (其中 f 是分类函数)实际上是 groupingBy(f, toList()) 的简便写法
-  /*
-    {FISH=[prawns, salmon], OTHER=[french fries, rice, season fruit, pizza], MEAT=[pork, beef, chicken]}
-  ,*/
-
-
-  // 自定义分类条件
-  public enum CaloricLevel { DIET, NORMAL, FAT }
-  Map<CaloricLevel, List<Dish>> dishesByCaloricLevel = menu.stream().collect( groupingBy(dish -> {
-              if (dish.getCalories() <= 400) return CaloricLevel.DIET;
-              else if (dish.getCalories() <= 700) return CaloricLevel.NORMAL;
-              else return CaloricLevel.FAT;
-          } ));
-
-  // 多级分组
-  // 要实现多级分组，可以使用一个由双参数版本的 Collectors.groupingBy 工厂方法创建收集器
-  Map<Dish.Type, Map<CaloricLevel, List<Dish>>> dishesByTypeCaloricLevel =
-      menu.stream().collect(groupingBy(Dish::getType,
-                                       groupingBy(dish -> {
-                                               if (dish.getCalories() <= 400) return CaloricLevel.DIET;
-                                               else if (dish.getCalories() <= 700) return CaloricLevel.NORMAL;
-                                               else return CaloricLevel.FAT; })
-                                       )
-                            );
-  /*
-    {
-      MEAT={DIET=[chicken], NORMAL=[beef], FAT=[pork]},
-      FISH={DIET=[prawns], NORMAL=[salmon]},
-      OTHER={DIET=[rice, seasonal fruit], NORMAL=[french fries, pizza]}
-    }
-   ,*/
-
-  // 子组收集数据
-  Map<Dish.Type, Long> typesCount =
-      menu.stream().collect(groupingBy(Dish::getType, counting()));
-  /*
-    {MEAT=3, FISH=2, OTHER=4}
-  ,*/
-
-  Map<Dish.Type, Optional<Dish>> mostCaloricByType =
-      menu.stream().collect(groupingBy(Dish::getType, maxBy(comparingInt(Dish::getCalories))));
-  /*
-    {FISH=Optional[salmon], OTHER=Optional[pizza], MEAT=Optional[pork]}
-  ,*/
-
-  // 把收集器的结果转换为另一种类型
-  Map<Dish.Type, Dish> mostCaloricByType =
-      menu.stream()
-      .collect(groupingBy(Dish::getType,
-                          collectingAndThen(maxBy(comparingInt(Dish::getCalories)), Optional::get))); // reducing 收集器永远都不会返回 Optional.empty()
-  /*
-    {FISH=salmon, OTHER=pizza, MEAT=pork}
-  ,*/
-
-  // 与 groupingBy 联合使用其他收集器
-  Map<Dish.Type, Set<CaloricLevel>> caloricLevelsByType =
-      menu.stream()
-      .collect(groupingBy(Dish::getType, mapping(dish -> {
-                      if (dish.getCalories() <= 400) return CaloricLevel.DIET;
-                      else if (dish.getCalories() <= 700) return CaloricLevel.NORMAL;
-                      else return CaloricLevel.FAT;
-                  }, toSet() )));
-  /*
-    {OTHER=[DIET, NORMAL], MEAT=[DIET, NORMAL, FAT], FISH=[DIET, NORMAL]}
-   ,*/
-
-  /*
-    上个示例中，对于返回的 Set 是什么类型并没有任何保证
-    但通过使用 toCollection ，可以有更多的控制
-    例如，可以给它传递一个构造函数引用来要求 HashSet
-  ,*/
-  Map<Dish.Type, Set<CaloricLevel>> caloricLevelsByType =
-      menu.stream().collect(groupingBy(Dish::getType, mapping(dish -> {
-                      if (dish.getCalories() <= 400) return CaloricLevel.DIET;
-                      else if (dish.getCalories() <= 700) return CaloricLevel.NORMAL;
-                      else return CaloricLevel.FAT;
-                  }, toCollection(HashSet::new) )));
-#+END_SRC
+#+BEGIN_EXAMPLE
+===== getThreeHighCaloricDishNames (sort) =====
+pork
+beef
+pizza
+===== getDistinctDishType (distinct) =====
+MEAT
+OTHER
+FISH
+===== getAllCalories (reduce) =====
+4200
+===== getAllCalories (mapToInt) =====
+4200
+===== getMaxCalorie (reduce) =====
+800
+===== getTotalNumberOfDish (counting) =====
+9
+===== getMaxCalorie (maxBy) =====
+com.cisco.ruan.nio.Dish@27bc2616
+===== getAllCalories (summingInt) =====
+4200
+===== getAverageCalorie (averagingInt) =====
+466.6666666666667
+===== getStatistics (summarizingInt) =====
+IntSummaryStatistics{count=9, sum=4200, min=120, average=466.666667, max=800}
+===== getShortMenu (joining) =====
+pork, beef, chicken, french fries, rice, season fruit, pizza, prawns, salmon
+===== groupByCaloricLevel (groupingBy) =====
+{NORMAL=[com.cisco.ruan.nio.Dish@179d3b25, com.cisco.ruan.nio.Dish@254989ff, com.cisco.ruan.nio.Dish@5d099f62, com.cisco.ruan.nio.Dish@37f8bb67], DIET=[com.cisco.ruan.nio.Dish@49c2faae, com.cisco.ruan.nio.Dish@20ad9418, com.cisco.ruan.nio.Dish@31cefde0, com.cisco.ruan.nio.Dish@439f5b3d], FAT=[com.cisco.ruan.nio.Dish@27bc2616]}
+===== groupByDishesAndTypeCaloricLevel (multi-level groupingBy) =====
+{OTHER={NORMAL=[com.cisco.ruan.nio.Dish@254989ff, com.cisco.ruan.nio.Dish@5d099f62], DIET=[com.cisco.ruan.nio.Dish@20ad9418, com.cisco.ruan.nio.Dish@31cefde0]}, FISH={NORMAL=[com.cisco.ruan.nio.Dish@37f8bb67], DIET=[com.cisco.ruan.nio.Dish@439f5b3d]}, MEAT={NORMAL=[com.cisco.ruan.nio.Dish@179d3b25], DIET=[com.cisco.ruan.nio.Dish@49c2faae], FAT=[com.cisco.ruan.nio.Dish@27bc2616]}}
+===== groupByDishesAndTypeCaloricLevel (counting on substream) =====
+{OTHER=4, FISH=2, MEAT=3}
+===== getMostCaloricByType (maxBy on substream) =====
+{OTHER=Optional[com.cisco.ruan.nio.Dish@5d099f62], FISH=Optional[com.cisco.ruan.nio.Dish@37f8bb67], MEAT=Optional[com.cisco.ruan.nio.Dish@27bc2616]}
+===== getMostCaloricByType (collectingAndThen) =====
+{OTHER=com.cisco.ruan.nio.Dish@5d099f62, FISH=com.cisco.ruan.nio.Dish@37f8bb67, MEAT=com.cisco.ruan.nio.Dish@27bc2616}
+===== getTotalCaloriesByType (summingInt on substream) =====
+{OTHER=1550, FISH=750, MEAT=1900}
+===== getCaloricLevelsByType (mapping on substream and collect in set) =====
+{OTHER=[NORMAL, DIET], FISH=[NORMAL, DIET], MEAT=[NORMAL, DIET, FAT]}
+===== getCaloricLevelsByType (mapping on substream and collect in hashset) =====
+{OTHER=[NORMAL, DIET], FISH=[NORMAL, DIET], MEAT=[NORMAL, DIET, FAT]}
+===== getVegetarianDishes (partitioningBy) =====
+[com.cisco.ruan.nio.Dish@254989ff, com.cisco.ruan.nio.Dish@20ad9418, com.cisco.ruan.nio.Dish@31cefde0, com.cisco.ruan.nio.Dish@5d099f62]
+===== getMostCaloricPartitionedByVegetarian (multi-level partitioningBy) =====
+{false=pork, true=pizza}
+#+END_EXAMPLE
