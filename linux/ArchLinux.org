@@ -20,29 +20,29 @@
     gdisk /dev/sda
   #+END_SRC
 
-- 分区规划
+- 规划分区
 
-#+BEGIN_EXAMPLE
-Number | Size      | Code | Name
------- | --------- | ---- | -----------------------
-1      | +1007K    | EF02 | BIOS Boot partition (GPT)
-2      | +200M     | 8300 | Linux filesystem (/boot)
-3      |           | 8300 | Linux filesystem (/)
-4      | +2G       | 8200 | Linux swap
-#+END_EXAMPLE
+  #+BEGIN_EXAMPLE
+    Number | Size      | Code | Name
+    ------ | --------- | ---- | -----------------------
+    1      | +1007K    | EF02 | BIOS Boot partition (GPT)
+    2      | +200M     | 8300 | Linux filesystem (/boot)
+    3      |           | 8300 | Linux filesystem (/)
+    4      | +2G       | 8200 | Linux swap
+  #+END_EXAMPLE
 
 - 格式化分区
 
-#+BEGIN_SRC sh
-  mkfs.ext4 /dev/sda1
-  mkfs.ext4 /dev/sda2
-  mkfs.ext4 /dev/sda3
-  mkswap    /dev/sda4
+  #+BEGIN_SRC sh
+    mkfs.ext4 /dev/sda1
+    mkfs.ext4 /dev/sda2
+    mkfs.ext4 /dev/sda3
+    mkswap    /dev/sda4
 
-  mount /dev/sda3 /mnt
-  mkdir /mnt/boot
-  mount /dev/sda2 /mnt/boot
-  swapon /dev/sda4                # 开启交换分区，为下面的 fstab 写入做好准备
+    mount /dev/sda3 /mnt
+    mkdir /mnt/boot
+    mount /dev/sda2 /mnt/boot
+    swapon /dev/sda4                # 开启交换分区，为下面的 fstab 写入做好准备
 #+END_SRC
 
 
@@ -67,9 +67,11 @@ Number | Size      | Code | Name
 
   =pacstrap -i /mnt base base-devel=
 
+
 ** 1.3, 生成 fstab
 
 =genfstab -U /mnt >> /mnt/etc/fstab=
+
 
 ** 1.4, chroot
 
@@ -80,6 +82,7 @@ Arch 的安装工具中提供了一个叫 arch-chroot 的脚本，它封装了�
 
 =arch-chroot /mnt=
 
+
 ** 1.5, 设置 Locale
 
 #+BEGIN_SRC sh
@@ -88,13 +91,16 @@ Arch 的安装工具中提供了一个叫 arch-chroot 的脚本，它封装了�
   ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 #+END_SRC
 
+
 ** 1.6, 设置 hostname
 
 =echo 'hao-arch' > /etc/hostname=
 
+
 ** 1.7, 修改密码
 
 =passwd=
+
 
 ** 1.8, 配置 GRUB
 
@@ -104,3 +110,28 @@ Arch 的安装工具中提供了一个叫 arch-chroot 的脚本，它封装了�
   cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
   grub-mkconfig -o /boot/grub/grub.cfg
 #+END_SRC
+
+* 2, 网络配置
+
+** 2.1, 配置静态 IP
+
+- 复制模板
+
+  =cp /etc/netctl/ethernet-static ../hao_network=
+
+- 修改模板
+
+  #+BEGIN_SRC sh
+    Description='A basic static ethernet connection'
+    Interface=ens192                # 网卡名
+    Connection=ethernet
+    IP=static
+    Address=('10.74.68.88/24')
+    #Routes=('10.74.68.88/24 via 10.74.68.1' 'default via 10.74.68.1')
+    Gateway='10.74.68.1'
+    DNS=('64.104.123.144')
+  #+END_SRC
+
+- 使模板生效
+
+  =netctl enable hao_network=
