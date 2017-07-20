@@ -1,0 +1,106 @@
+#+TITLE:     Arch Linux
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+* 1, 系统安装
+
+** 1.1, 分区并格式化
+
+- 配置 MBR/GPT 分区表
+
+  #+BEGIN_SRC sh
+    # MBR 类型使用：
+    fdisk /dev/sda
+    # GPT 类型使用：
+    gdisk /dev/sda
+  #+END_SRC
+
+- 分区规划
+
+#+BEGIN_EXAMPLE
+Number | Size      | Code | Name
+------ | --------- | ---- | -----------------------
+1      | +1007K    | EF02 | BIOS Boot partition (GPT)
+2      | +200M     | 8300 | Linux filesystem (/boot)
+3      |           | 8300 | Linux filesystem (/)
+4      | +2G       | 8200 | Linux swap
+#+END_EXAMPLE
+
+- 格式化分区
+
+#+BEGIN_SRC sh
+  mkfs.ext4 /dev/sda1
+  mkfs.ext4 /dev/sda2
+  mkfs.ext4 /dev/sda3
+  mkswap    /dev/sda4
+
+  mount /dev/sda3 /mnt
+  mkdir /mnt/boot
+  mount /dev/sda2 /mnt/boot
+  swapon /dev/sda4                # 开启交换分区，为下面的 fstab 写入做好准备
+#+END_SRC
+
+
+** 1.2, 安装必要软件包
+
+- 添加 mirrors
+
+  #+BEGIN_EXAMPLE
+  ## ZJU
+  Server = http://mirrors.zju.edu.cn/archlinux/$repo/os/$arch
+  ## USTC
+  Server = http://mirrors.ustc.edu.cn/archlinux/$repo/os/$arch
+  ## 163
+  Server = http://mirrors.163.com/archlinux/$repo/os/$arch
+  #+END_EXAMPLE
+
+- 同步镜像源数据库
+
+  =pacman -Syy=
+
+- 下载软件包
+
+  =pacstrap -i /mnt base base-devel=
+
+** 1.3, 生成 fstab
+
+=genfstab -U /mnt >> /mnt/etc/fstab=
+
+** 1.4, chroot
+
+chroot 的功能就是把一个进程（及其子进程）的根目录改为指定的路径。
+
+为了在进入新的文件系统后仍可以方便地操作内核，要挂载 /proc ，/dev ，/sys 到新的文件系统中。\\
+Arch 的安装工具中提供了一个叫 arch-chroot 的脚本，它封装了这些操作，简化了 chroot 的过程。
+
+=arch-chroot /mnt=
+
+** 1.5, 设置 Locale
+
+#+BEGIN_SRC sh
+  locale-gen
+  echo 'export LANG=en_US.UTF-8' > /etc/locale.conf
+  ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+#+END_SRC
+
+** 1.6, 设置 hostname
+
+=echo 'hao-arch' > /etc/hostname=
+
+** 1.7, 修改密码
+
+=passwd=
+
+** 1.8, 配置 GRUB
+
+#+BEGIN_SRC sh
+  pacman -S grub-bios
+  grub-install --target=i386-pc --recheck /dev/sda
+  cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
+  grub-mkconfig -o /boot/grub/grub.cfg
+#+END_SRC
