@@ -142,3 +142,27 @@ db.food.find({"fruit.2": "peach"})
 #+BEGIN_SRC js
   db.test.find({"x": {"$elemMatch": {"$gt": 1, "$lt": 30}}}) // 匹配：{"x": [5, 25]}
 #+END_SRC
+
+
+* 2, 增
+
+** 2.1, 创建固定集合
+
+#+BEGIN_SRC js
+    db.createCollection("my_collection",
+                       {
+                           "capped": true,
+                           "max": 100,
+                           "size": 100000 // 字节
+                       })
+  #+END_SRC
+
+  为固定集合指定文档数量限制时，必须同时指定固定集合的大小。不论先达到哪个限制，之后插入的新文档就会把最老的文档挤出集合。
+
+*** 用于固定集合的特性
+
+- 自然排序（文档的插入顺序）
+
+  =db.my_collection.find().sort({"$natural": -1})=
+
+- 循环游标
