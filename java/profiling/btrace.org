@@ -1,0 +1,193 @@
+#+TITLE:     Btrace
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 1, 基本原理
+
+** 1.1, 函数签名
+
+- 接口，父类
+
+  @OnMethod(clazz="+com.vip.demo.Filter", method="doFilter")
+
+- Annotation
+
+  @OnMethod(clazz="@javax.jws.WebService", method="@javax.jws.WebMethod")
+
+- 构造函数
+
+  @OnMethod(clazz="java.net.ServerSocket", method="<init>")
+
+- 内部类
+
+  @OnMethod(clazz="com.vip.MyServer$MyInnerClass", method="hello")
+
+* 2, 常用案例
+
+** 2.1, 跟踪行号
+
+-1 表示所有行，也可以指定行号
+
+#+BEGIN_SRC java
+  @OnMethod(clazz="<class-name>", location=@Location(value=Kind.LINE, line=-1))
+  public static void onTriggered(@ProbeClassName String probeClass, @ProbeMethodName String probeMethod, int line) {
+      println("=== " + timestamp("yyyy-MM-dd HH:mm:ss") + " ===");
+      println(probeClass + "."  + probeMethod);
+      println("#" + line);
+  }
+#+END_SRC
+
+** 2.2, 跟踪方法参数
+
+#+BEGIN_SRC java
+  @OnMethod(clazz="<class-name>", method="<method-name>")
+  public static void onTriggered(@ProbeClassName String probeClass, @ProbeMethodName String probeMethod, AnyType[] args) {
+      println("=== " + timestamp("yyyy-MM-dd HH:mm:ss") + " ===");
+      printArray(args);
+  }
+#+END_SRC
+
+** 2.3, 跟踪线程名称
+
+#+BEGIN_SRC java
+  @OnMethod(clazz="<class-name>", method="<method-name>")
+  public static void onTriggered(@ProbeClassName String probeClass, @ProbeMethodName String probeMethod) {
+      println("=== " + timestamp("yyyy-MM-dd HH:mm:ss") + " ===");
+      println(Threads.name(Threads.currentThread()));
+  }
+#+END_SRC
+
+** 2.4, 跟踪死锁
+
+周期性检查，如果存在死锁，则打印
+
+#+BEGIN_SRC java
+  @OnTimer(4000)
+  public static void onTriggered() {
+      println("=== " + timestamp("yyyy-MM-dd HH:mm:ss") + " ===");
+      deadlocks();
+  }
+#+END_SRC
+
+** 2.5, 跟踪对象属性
+
+#+BEGIN_SRC java
+  @OnMethod(clazz="<class-name>", method="<method-name>")
+  public static void onTriggered(@ProbeClassName String probeClass, @ProbeMethodName String probeMethod, @Self Object me) {
+      println("=== " + timestamp("yyyy-MM-dd HH:mm:ss") + " ===");
+      printFields(me);
+      printFields(get(field("<incetance-class-name>", "<field-name>"), me));
+  }
+#+END_SRC
+
+** 2.6, Event
+
+=@OnEvent("<name>")=
+
+#+BEGIN_SRC java
+  @OnEvent
+  public static void onTriggered() {
+      println("=== " + timestamp("yyyy-MM-dd HH:mm:ss") + " ===");
+  }
+#+END_SRC
+
+** 2.7, 打印系统信息（类似 jinfo ）
+
+#+BEGIN_SRC java
+  @OnEvent
+  public static void onTriggered() {
+      println("=== " + timestamp("yyyy-MM-dd HH:mm:ss") + " ===");
+      println("System Properties:");
+      printProperties();
+      println("VM Flags:");
+      printVmArguments();
+      println("OS Enviroment:");
+      printEnv();
+      exit(0);
+  }
+#+END_SRC
+
+** 2.8, Dump heap (jmap -dump)
+
+#+BEGIN_SRC java
+  @OnEvent()
+  public static void onTriggered() {
+      println("=== " + timestamp("yyyy-MM-dd HH:mm:ss") + " ===");
+      String name = "heap.bin";
+      Sys.Memory.dumpHeap(name);
+      println("heap dumped!");
+      Sys.exit(0);
+  }
+#+END_SRC
+
+** 2.9, 监控内存
+
+#+BEGIN_SRC java
+  @OnTimer(4000)
+  public static void printMem() {
+      println("=== " + timestamp("yyyy-MM-dd HH:mm:ss") + " ===");
+      println("Heap:");
+      println(Sys.Memory.heapUsage());
+      println("Non-Heap:");
+      println(Sys.Memory.nonHeapUsage());
+  }
+#+END_SRC
+
+** 2.10, 使用正则表达式进行跟踪
+
+#+BEGIN_SRC java
+  @OnMethod(clazz="/java\\.io\\..*Input.*/", method="/read.*/")
+  public static void onread(@ProbeClassName String pcn) {
+      println("read on " + pcn);
+  }
+#+END_SRC
+
+** 2.11, 打印 uptime
+
+#+BEGIN_SRC java
+  @OnTimer(4000)
+  public static void printMem() {
+      println("=== " + timestamp("yyyy-MM-dd HH:mm:ss") + " ===");
+      println("vm start time: " + Sys.VM.vmStartTime());
+      println("vm uptime: " + Sys.VM.vmUptime());
+  }
+#+END_SRC
+
+** 2.12, 跟踪函数返回值
+
+#+BEGIN_SRC java
+  @OnMethod(clazz="<class-name>", method="<method-name>", location=@Location(Kind.RETURN))
+  public static void onTriggered(@ProbeClassName String probeClass, @ProbeMethodName String probeMethod, @Return String result) {
+      println("=== " + timestamp("yyyy-MM-dd HH:mm:ss") + " ===");
+      println(result);
+  }
+#+END_SRC
+
+** 2.13, 监控函数运行时间
+
+#+BEGIN_SRC java
+  @OnMethod(clazz="<class-name>", method="<method-name>", location=@Location(Kind.RETURN))
+  public static void onTriggered(@Duration long duration) {
+      println("=== " + timestamp("yyyy-MM-dd HH:mm:ss") + " ===");
+      println(strcat("duration(ms): ", str(duration / 1000000)));
+  }
+#+END_SRC
+
+** 2.14, 监控函数内调用其他函数的运行时间
+
+#+BEGIN_SRC java
+  @OnMethod(clazz="<class-name>", method="<method-name>",
+            location=@Location(value=Kind.CALL, clazz="/.*/", method="/.*/", where=Where.AFTER))
+            public static void onTriggered(@Self Object self,
+                                           @TargetInstance Object instance, @TargetMethodOrField String method,
+                                           @Duration long duration) {
+      println("=== " + timestamp("yyyy-MM-dd HH:mm:ss") + " ===");
+      println(Reflective.classOf(instance) + "." + method + ": " + duration/1000000 + " ms");
+  }
+#+END_SRC
