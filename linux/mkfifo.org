@@ -1,0 +1,47 @@
+#+TITLE:     mkfifo
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 常用脚本
+
+1. 使用 FIFO 作为队列控制 shell 多进程并发数量
+
+  [[https://stackoverflow.com/questions/15376562/cant-write-to-named-pipe][Principle]] :
+
+  #+BEGIN_EXAMPLE
+    Attaching the fifo to a file descriptor causes the shell to buffer data written to the fifo.
+    Without it, any write to the fifo blocks until something reads what is written.
+    With the file descriptor, inputs are buffered by the shell, and anything reading from that file descriptor can read them later.
+  #+END_EXAMPLE
+
+  #+BEGIN_SRC sh
+    Njob=100 # job count
+    Nproc=10 # max concurrent proc
+
+    tmp_fifo="fifo.$$"
+    mkfifo $tmp_fifo
+    exec 888<>$tmp_fifo
+
+    # init tmp_fifo
+    for ((i=0; i<$Nproc; i++)); do
+        echo > $tmp_fifo
+    done
+
+    for ((i=0; i<$Njob; i++)); do
+        {
+            read < $tmp_fifo
+
+            ## do_your_job_here
+
+            echo > $tmp_fifo
+        } &
+    done
+
+    wait
+  #+END_SRC
