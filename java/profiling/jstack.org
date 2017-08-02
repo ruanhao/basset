@@ -1,0 +1,24 @@
+#+TITLE:     Jstack
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+* 1, 基本用法
+
+=jstack -l <pid>=
+
+如果 java 程序崩溃生成 core 文件，jstack 也可以从 core 文件 dump 出 java stack 的信息
+
+
+* 2, 常见用法
+
+** 2.1, 找出最耗 CPU 的线程
+
+1. =jps -l= 找出 java 进程
+2. =top -Hp <pid>= 找出最耗 CPU 的 Native 线程
+3. =printf "%x\n" <native-tid>= 转换成 16 进制
+4. =jstack -l <pid> | grep '0x<hex-tid>'= 定位 java 线程
