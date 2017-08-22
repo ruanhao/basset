@@ -1,0 +1,58 @@
+#+TITLE:     Bash
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+* 1, 变量
+
+** 1.1, 变量替换
+
+|------------------+-----------------------+-------------------------+---------------------------|
+|                  | str *not set*         | str *empty*             | str *set & not empty*     |
+|------------------+-----------------------+-------------------------+---------------------------|
+| var=${str-expr}  | var=expr              | var=""                  | var=$str                  |
+| var=${str:-expr} | var=expr              | var=expr                | var=$str                  |
+| var=${str+expr}  | var=""                | var=expr                | var=expr                  |
+| var=${str:+expr} | var=""                | var=""                  | var=expr                  |
+| var=${str=expr}  | str=expr; var=expr    | str `unchanged`; var="" | str `unchanged`; var=$str |
+| var=${str:=expr} | str=expr; var=expr    | str=expr; var=expr      | str `unchanged`; var=$str |
+| var=${str?expr}  | output expr to stderr | var=""                  | var=$str                  |
+| var=${str:?expr} | output expr to stderr | output expr to stderr   | var=$str                  |
+|------------------+-----------------------+-------------------------+---------------------------|
+
+** 1.2, 变量赋值
+
+- 将文件内容赋给变量
+
+`var=$( <filename )`
+
+- 间接引用
+
+  #+BEGIN_SRC sh
+    eval var1=\$$var2  ## 同：var1=${!var2}
+  #+END_SRC
+
+** 1.3, 字符串操作
+
+- 获取长度
+  #+BEGIN_SRC sh
+    ${#var}
+    expr "$var" : '.*'
+  #+END_SRC
+
+- 匹配字符串**开头**的子串长度
+  #+BEGIN_SRC sh
+    stringZ=abcABC123ABCabc
+    echo `expr "$stringZ" : 'abc[A-Z]*.2'` # 8
+  #+END_SRC
+
+- 匹配字符串第一次出现的位置
+  #+BEGIN_SRC sh
+    stringZ=abcABC123ABCabc
+    expr index "$stringZ" C12       # 6
+    expr index "$stringZ" 1c        # 3, 'c' (in #3 position) matches before '1'
+  #+END_SRC
