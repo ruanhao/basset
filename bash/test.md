@@ -48,8 +48,8 @@ Flags  | Comment
 
 Flags             | Comment
 ----------------- | --------------------------------------
-test -s string    | 若string为空字符串，则为true
-test -n string    | 若string为空字符串，则为false，（-n 可省略）
+test -z string    | 若string为空字符串，则为true [z: zero]
+test -n string    | 若string为空字符串，则为false，（-n 可省略）[n: not empty]
 test str1 = str2  | 若str1等于str2，则为true
 test str1 != str2 | 若str1等于str2，则为false
 
