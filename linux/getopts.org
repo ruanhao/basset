@@ -1,0 +1,41 @@
+#+TITLE:     getopts
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+* 基本原理
+
+1. 参数前面必须加上一个减号(-)，这样 getopts 命令把这个参数看作为一个选项。\\
+   事实上，getopts 不会处理不带 - 前缀的参数，如果第一个参数就没有 - ，那么将会结束选项的处理。
+
+2. getopts 的 while 循环模板与标准的 while 循环模板有些不同，没有标准循环中的中括号 [] 判断条件
+
+
+* 常见用法
+
+#+BEGIN_SRC sh
+  while getopts ":abc:" Option
+  # a, b, c 被认为是选项
+  # c 选项后面的 : 提示这个选项需要带一个参数
+  # 如果选项 c 不带参数进行调用的话，会产生一个错误信息
+  # 开头的 : 是用来屏蔽掉这个错误信息的，因为通常都会有默认处理，所以可以不需要显示错误信息
+  do
+      case $Option in
+          a)
+              do_something ;;
+          b)
+              do_something ;;
+          c)
+              echo "传递给选项 e 的参数: $OPTARG" ;;
+          \?)
+              _show_usage
+              return ;;
+      esac
+  done
+
+  shift $(( $OPTIND - 1 )) # 不要忘记这个操作
+#+END_SRC

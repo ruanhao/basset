@@ -1,0 +1,39 @@
+#+TITLE:     exec
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 基本原理
+
+exec 命令能够用来重新分配文件描述符，如 =exec <file= 将用 file 来代替 stdin
+
+|-----------+-----------------------------------------|
+| Flags     | Comment                                 |
+|-----------+-----------------------------------------|
+| n<&-      | 关闭只读文件描述符 n                    |
+| n>&-      | 关闭文件描述符 n (该文件描述符可读可写) |
+| 0<&-, <&- | 关闭 stdin                              |
+| 1>&-, >&- | 关闭 stdout                             |
+|-----------+-----------------------------------------|
+
+
+
+* 常用脚本
+
+- 文件随机写入
+
+=exec n<>filename= 通常是为了随机写入一个文件中指定的地方
+
+#+BEGIN_SRC sh
+  echo 1234576890 > File
+  exec 3<> File
+  read -n 4 <&3  ## 读取 4 个字符
+  echo -n . >&3  ## 写一个小数点
+  exec 3>&-      ## 关闭 fd3
+  cat File       ## 1234.67890
+#+END_SRC
