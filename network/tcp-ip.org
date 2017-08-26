@@ -88,8 +88,12 @@ SYN=0, FIN=0, RST=0, ACK=1 # ESTABLISHED
 
 ** 2.3, 状态图
 
-[[images/tcp_state_machine.jpg]]
-
 [[images/tcp_state_machine2.png]]
 
 [[images/tcp_state_machine3.jpg]]
+
+** 2.4, 状态信息统计
+
+#+BEGIN_SRC sh
+  netstat -n | awk '/^tcp/ {++S[$NF]} END {for(a in S) print a, S[a]}'
+#+END_SRC
