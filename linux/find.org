@@ -1,4 +1,4 @@
-#+TITLE:     GNU find
+#+TITLE:     find
 #+AUTHOR:    Hao Ruan
 #+EMAIL:     ruanhao1116@gmail.com
 #+LANGUAGE:  en
@@ -6,116 +6,130 @@
 #+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
 #+STARTUP:   showall
 
+* 基本用法
 
-* Find with =-mtime, -mmin, -atime, -amin, -ctime, -cmin=
-- Find files modified less than 10 minutes ago
 
-  =find / -mmin -10=
+** 根据时间查询
 
-- Find files modified less than 1 hour
+
+- 最近 10 分钟内修改过的文件
+
+  =find . -mmin -10=
+
+- 最近 1 小时内修改过的文件
 
   =find / -mtime -1=
 
-- Find files accessed (read) less then 1 minute
+- 最近 1 分钟内访问过的文件
 
   =find . -amin -1=
 
+- 最近 1 分钟内创建的文件
 
-* Find with =-mount, -xdev, -fstype=
-+ Don't find other filesystem
+  =find . -cmin -1=
 
-  =find / -name "*.txt" -mount=
+- newer (modify)
 
-  =find / -name "*.txt" -xdev=
+  =find . -newer file1.txt -not -newer file2.txt=
 
-+ Specify a certain filesystem
+- anewer (access)
 
-  =find / -name "*.txt" -fstype vfat=
+- cnewer (create)
 
 
-* Find with =-size, -empty=
-+ By byte
+** 根据大小查询
 
-  =find . -size +1024c=
++ 按字节
 
-+ By 512 bytes (block)
+#+BEGIN_SRC sh
+  find . -size  1024c             # = 1024 bytes
+  find . -size +1024c             # > 1024 bytes
+  find . -size -1024c             # < 1024 bytes
+#+END_SRC
 
-  =find . -size +2=
 
-+ By 1024 byte
++ 按块(512 bytes)
 
-  =find . -size +1k=
+#+BEGIN_SRC sh
+  find . -size  2                  # = 1024 bytes
+  find . -size +2                  # > 1024 bytes
+  find . -size -2                  # < 1024 bytes
+#+END_SRC
 
-+ Find empty file
++ 按 k
+
+#+BEGIN_SRC sh
+  find . -size  1k                # = 1024 bypts
+  find . -size +1k                # > 1024 bypts
+  find . -size -1k                # < 1024 bypts
+#+END_SRC
+
+
++ 空文件
 
   =find . -size 0=
 
-+ Find empty directory or file
++ 空文件或目录
 
   =find . -empty=
 
 
-* Find with directory
-+ Specify multiple directories
+** 指定多个目录查询
 
-  =find /usr /home /tmp -name \*.jar=
+=find /usr /home /tmp -name \*.jar=
 
 
-* Find with =-prune=
+** 使用 -prune
 
 #+BEGIN_EXAMPLE
--prune   True; if the file is a directory, do not descend into it.
-         If -depth is given, false; no effect.
+-prune   If the file is a directory, do not descend into it. Return true.
+         If -depth is given, no effect. Return false.
          Because -delete implies -depth, you cannot usefully use -prune and -delete together.
 #+END_EXAMPLE
 
-- Prune multiple path
+- 忽略路径
+
   =find . \( -path "./path1" -o -path "./path2" \) -prune -o -name "filename" -print=
 
 
-* Find with =-exec=
+** 使用 -exec
 
 =find -iname "myprogram.c" -exec md5sum {} \;=
 
 
-* Find with =-inum=
+** 使用 -inum
 
 =find -inum 888888 -delete=
 
 
-* Find with =newer=
 
-+ newer (mtime)
+* 常用命令
 
-  =find . -newer file1.txt -not -newer file2.txt=
-
-+ anewer (atime)
-
-+ cnewer (ctime)
-
-
-
-* Recipe
-
-+ Find 5 max file
+- 找出 5 个最大的文件
 
   =find . -type f -exec ls -s {} \; | sort -n -r | head -5=
 
-+ Find 5 min file
+- 找出 5 个最小的文件
 
   =find . -type f -exec ls -s {} \; | sort -n | head -5=
 
-+ Find using =touch=
+- 找出某个时间点之后的文件
 
-  #+BEGIN_SRC bash
+  #+BEGIN_SRC sh
     touch -t 05042140 stampfile
     find . -newer stampfile
   #+END_SRC
 
+- 删除空目录
+
+  =find . -type d -empty -delete=
 
 
-* Gotcha
-+ Default behavior
+
+* 注意事项
+
+- 使用 -o 选项时建议明确指明 -print
+
   If the given expression to find does not contain any of the “action” primaries ‑exec, ‑ok, or ‑print, then the given expression is effectively replaced by:
 
   =find \( expression \) -print=
@@ -146,16 +160,3 @@
   This causes tmp to be included in the output.
 
   However for the second find command the normal rules of Boolean operator precedence apply, so the pruned directory does not appear in the output.
-
-+ Precedence
-
-  OR has lower precedence than AND, and NOT has the highest precedence.
-
-
-
-
-
-
-删除空文件
-
-  =find . -type d -empty -delete=
