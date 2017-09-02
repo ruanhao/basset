@@ -1,0 +1,22 @@
+#+TITLE:     tar
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+- 打包目录并传至远端服务器
+
+  #+BEGIN_SRC sh
+    tar -c <dir> | gzip | ssh user@remote 'dd of=dir.tar.gz'
+    tar -c <dir> | ssh -C user@remote 'cd /path && tar -x -p'
+  #+END_SRC
+
+- 打包离散文件
+
+  #+BEGIN_SRC sh
+    find . -name '*.txt' | tar -c --files-from=- | bzip2 > dir_txt.tar.bz2
+  #+END_SRC
