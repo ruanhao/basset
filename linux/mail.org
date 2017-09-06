@@ -1,0 +1,66 @@
+#+TITLE:     mail
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+1. 安装 msmtp
+
+   =brew install msmtp=
+
+   =pacman -S msmtp=
+
+2. 配置
+
+   - ~/.mailrc
+
+     #+BEGIN_SRC sh
+       set sendmail=/usr/local/bin/msmtp
+     #+END_SRC
+
+   - ~/.msmtprc
+
+     #+BEGIN_SRC sh
+       <!-- lang: shell -->
+       # Use an external SMTP server with insecure authentication.
+       # (manually choose an insecure authentication method.)
+       # Note that the password contains blanks.
+
+       defaults
+
+       ####################################################################
+       # A sample configuration using Gmail
+       ####################################################################
+
+       # account name is "gmail".
+       # You can select this account by using "-a gmail" in your command line.
+       account gmail
+       host smtp.gmail.com
+       tls on
+       tls_certcheck off
+       port 587
+       auth login
+       from yourname@gmail.com
+       user yourname
+       password yourpassword           # apply password through: https://security.google.com/settings/security/apppasswords
+
+       # If you don't use any "-a" parameter in your command line,
+       # the default account "gmail" will be used.
+       account default: gmail
+     #+END_SRC
+
+3. 访问权限
+
+   #+BEGIN_SRC sh
+     chmod 600 ~/.msmtprc
+   #+END_SRC
+
+4. 使用
+
+   #+BEGIN_SRC sh
+     echo "Hello world" | mail -s "msmtp test at `date`" yourfriend®@gmail.com
+   #+END_SRC
