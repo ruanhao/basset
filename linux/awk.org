@@ -1,0 +1,105 @@
+#+TITLE:     awk
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 工作方式
+
+awk 的工作方式是读取数据文件，将每一行数据视为一条记录(record)，每笔记录以字段分隔符分成若干字段，然后输出各个字段的值。
+
+awk 对每一条记录，都会套用一个 =/pattern/{operation}= 。如果该行符合 pattern ，就执行指定的 operation 。
+
+pattern 或 operation 之一，可以省略：
+
+- 如果只有 pattern ，表示要显示符合样式的数据行
+- 如果只有 operation ，表示对每一数据行都执行该项操作
+
+awk 常用的格式:
+
+1. =awk /pattern/ <filename>= ：把符合样式的数据行显示出来
+
+2. =awk '{operation}' filename= ：对每一行都执行{}中的操作
+
+3. awk '样式{操作}' 文件：对符合样式的数据行，执行{}中的操作
+
+
+* 脚本范式
+
+- 产生伪随机数
+
+  产生一个范围在 0-1 之间的伪随机数，（同一秒内生成的随机数相同）
+
+  =echo | awk '{ srand(); print rand() }'=
+
+- 打印字段
+
+  #+BEGIN_SRC sh
+    awk '{ print $1, $2, $3 }' <filename>
+    awk '{ print $1$2, $3 }' <filename>
+
+    awk '{ print NF, $1, $(NF-1) }' <filename> # any expression can be after $ to denote a field number
+
+    awk '{ print }' <filename>                               # 相当于 cat
+    awk '{ tmp = $1; $1 = $2; $2 = tmp; print }' <filename>  # 相当于 print $1,$2,...,$NF
+  #+END_SRC
+
+- 字段匹配
+
+  #+BEGIN_SRC sh
+    awk '$3~/hello/ {print NR }' file
+    awk '$3!~/hello/ { print NR }' file
+  #+END_SRC
+
+
+- 行匹配
+
+  #+BEGIN_SRC sh
+    awk '!/hello/' <file>           # 相当于 grep -v
+  #+END_SRC
+
+
+- 内容重定向
+
+  #+BEGIN_SRC sh
+    awk 'NR!=1 { if($6 ~ /TIME|ESTABLISHED/) print > "1.txt";
+                 else if($6 ~ /LISTEN/) print > "2.txt";
+                 else print > "3.txt" }' netstat.txt
+  #+END_SRC
+
+
+- 使用数组
+
+  统计每个用户的进程占了多少内存:
+
+  #+BEGIN_SRC sh
+    ps aux | awk 'NR!=1 { a[$1]+=$6; } END{ for(i in a) print i ", " a[i]"KB"; }'
+  #+END_SRC
+
+- 使用变量
+
+  字符串连接：
+
+  =cat emp.data  | awk '{ names = names $1 " " } END { print names }'=
+
+* 内建变量
+
+|----------+---------------------------------------------------------------|
+| 变量     | 值                                                            |
+|----------+---------------------------------------------------------------|
+|          |                                                               |
+| $0       | 整个行的内容                                                  |
+| $1 - $n  | 当前记录的第 n 个字段，字段间由 FS 分隔                       |
+| FS       | 输入字段分隔符，默认是空格或 Tab                              |
+| NF       | 当前记录中的字段个数                                          |
+| NR       | 已读出的记录数，即行号，从 1 开始，若有多个文件，则不间断累加 |
+| FNR      | 当前记录数，与 NR 不同的是，这个值会是各个文件自己的行号      |
+| RS       | 输入记录分隔符，默认为换行符                                  |
+| OFS      | 输出字段分隔符，默认是空格                                    |
+| ORS      | 输出记录分隔符，默认为换行符                                  |
+| FILENAME | 当前输入文件的名字                                            |
+|----------+---------------------------------------------------------------|
