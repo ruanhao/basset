@@ -1,0 +1,83 @@
+#+TITLE:     Design Pattern
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+* 1, Creational Patter
+
+** 1.1, 抽象类
+
+注意 =__subclasses__= 的用法
+
+#+BEGIN_SRC python
+  from abc import ABC, abstractmethod
+
+
+  class Pet(ABC):
+
+      @classmethod
+      def from_name(cls, name):
+          for s_cls in cls.__subclasses__():
+              if name == s_cls.__name__.lower():
+                  return s_cls()
+
+
+      @abstractmethod
+      def hello(self):
+          pass
+
+
+  class Dog(Pet):
+
+      def hello(self):
+          print("WonWonWon")
+
+
+  if __name__ == '__main__':
+      Pet.from_name("dog").hello()
+#+END_SRC
+
+
+** 1.2, 实例间共享状态 (Monostate Pattern)
+
+#+BEGIN_SRC python
+  class Borg(object):
+      __shared_state = {}
+
+      def __init__(self):
+          self.__dict__ = self.__shared_state
+          self.state = 'Init'
+
+      def __str__(self):
+          return self.state
+
+
+  class MyBorg(Borg):
+      pass
+
+
+  if __name__ == '__main__':
+      ins1 = Borg()
+      ins2 = Borg()
+
+      ins1.state = 'Idle'
+      ins2.state = 'Running'
+
+      print('ins1: {0}'.format(ins1))  # Running
+      print('ins2: {0}'.format(ins2))  # Running
+
+      ins2.state = 'Zombie'
+
+      print('ins1: {0}'.format(ins1))  # Zombie
+      print('ins2: {0}'.format(ins2))  # Zombie
+
+      ins3 = MyBorg()
+
+      print('ins1: {0}'.format(ins1))  # Init
+      print('ins2: {0}'.format(ins2))  # Init
+      print('ins3: {0}'.format(ins3))  # Init
+#+END_SRC

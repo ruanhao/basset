@@ -84,6 +84,7 @@ Python 内置的 @property 装饰器负责把一个方法变成属性调用
 4. 如果 C 定义或继承了特殊方法 __getattr__ ，则调用 C.__getattr__(x, 'name') ，而不是引发 AttributeError，\\
    然后根据 __getattr__ 返回一个合适的值或者引发 AttributeError
 
+
 * 二，常见用法
 
 - 动态给 class 绑定方法
@@ -122,24 +123,67 @@ Python 内置的 @property 装饰器负责把一个方法变成属性调用
 
 - 设置 Property
 
-      #+BEGIN_SRC python
-        class Student():
+#+BEGIN_SRC python
+  class Student():
 
-            @property
-            def score(self):
-                return self._score
+      @property
+      def score(self):
+          return self._score
 
-            @score.setter
-            def score(self, value):
-                if not isinstance(value, int):
-                    raise ValueError('score must be an integer!')
-                if value < 0 or value > 100:
-                    raise ValueError('score must between 0 ~ 100!')
-                self._score = value
-      #+END_SRC
+      @score.setter
+      def score(self, value):
+          if not isinstance(value, int):
+              raise ValueError('score must be an integer!')
+          if value < 0 or value > 100:
+              raise ValueError('score must between 0 ~ 100!')
+          self._score = value
+#+END_SRC
 
-      把一个 getter 方法变成属性，只需要加上 @property 就可以了，\\
-      此时，@property 本身又创建了另一个装饰器 @score.setter ，负责把一个 setter 方法变成属性赋值。
+把一个 getter 方法变成属性，只需要加上 @property 就可以了，\\
+此时，@property 本身又创建了另一个装饰器 @score.setter ，负责把一个 setter 方法变成属性赋值。
+
+*pure python sample implementation of the property() type*:
+
+#+BEGIN_SRC python
+  class Property(object):
+      "Emulate PyProperty_Type() in Objects/descrobject.c"
+
+      def __init__(self, fget=None, fset=None, fdel=None, doc=None):
+          self.fget = fget
+          self.fset = fset
+          self.fdel = fdel
+          if doc is None and fget is not None:
+              doc = fget.__doc__
+          self.__doc__ = doc
+
+      def __get__(self, obj, objtype=None):
+          if obj is None:
+              return self
+          if self.fget is None:
+              raise AttributeError("unreadable attribute")
+          return self.fget(obj)
+
+      def __set__(self, obj, value):
+          if self.fset is None:
+              raise AttributeError("can't set attribute")
+          self.fset(obj, value)
+
+      def __delete__(self, obj):
+          if self.fdel is None:
+              raise AttributeError("can't delete attribute")
+          self.fdel(obj)
+
+      def getter(self, fget):
+          return type(self)(fget, self.fset, self.fdel, self.__doc__)
+
+      def setter(self, fset):
+          return type(self)(self.fget, fset, self.fdel, self.__doc__)
+
+      def deleter(self, fdel):
+          return type(self)(self.fget, self.fset, fdel, self.__doc__)
+#+END_SRC
+
+
 
 - 创建 Enum
 
