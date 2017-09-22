@@ -1,0 +1,84 @@
+#+TITLE:     Time
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 1, 基本原理
+
+=time= 模块始终返回 UTC 时间
+
+=datetime= 模块简化了日期操作，如增加天数，设置时区
+
+
+
+
+* 2, 常用代码片段
+
+
+** 2.1, time
+
+- 获取当前 epoch
+
+  =time.time()=
+
+
+- 获取具体时间值
+
+  #+BEGIN_SRC python
+    current_time = time.time()
+    current_struct_time = time.gmtime(current_time)
+    current_year = current_struct_time.tm_year
+    current_mon  = current_struct_time.tm_mon
+    current_mday = current_struct_time.tm_mday
+    current_hour = current_struct_time.tm_hour
+    current_min  = current_struct_time.tm_min
+  #+END_SRC
+
+
+** 2.2, datetime
+
+- 创建时间
+
+  #+BEGIN_SRC python
+    d = datetime.datetime(year=2017, month=12, day=31, hour=12, minute=59, second=59)
+    d.year        # returns the year value as an integer.
+    d.month       # returns the month value an integer.
+    d.day         # returns the day value as an integer.
+    d.hour        # returns the hour value as an integer.
+    d.minute      # returns the minute value as an integer.
+    d.second      # returns the second value as an integer.
+    d.microsecond # returns the microsecond value as an integer.
+  #+END_SRC
+
+- 获取时间
+
+  #+BEGIN_SRC python
+    datetime.datetime.utcnow()      # utc
+    datetime.datetime.now()         # time in the current zone
+  #+END_SRC
+
+- 日期运算
+
+  #+BEGIN_SRC python
+    today = datetime.datetime.now()
+    diff = datetime.timedelta(weeks = 3, days = 2)
+    future = today + diff
+    past = today - diff
+  #+END_SRC
+
+- datetime => 字符串
+
+  [[https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior][datetime.strftime()]]
+
+- 字符串 => datetime
+
+  #+BEGIN_SRC python
+    march3 = datetime.datetime.strptime("Mar 03, 2010", "%b %d, %Y")
+  #+END_SRC
+
+- timestamp => datetime

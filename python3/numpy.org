@@ -1,0 +1,71 @@
+#+TITLE:     NumPy
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     ruanhao1116@gmail.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
+#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+STARTUP:   showall
+
+
+* 1, 基本原理
+
+NumPy 数组所有值类型必须相同，可以通过 =astype()= 更改类型
+
+* 2, 常见用法
+
+- 加载 csv 文件
+
+#+BEGIN_SRC python
+  import numpy
+  world_alcohol = np.genfromtxt('world_alcohol.csv',
+                                dtype='U75',  # 75 byte unicode
+                                skip_header=1,
+                                delimiter=',')
+
+#+END_SRC
+
+- 数组过滤
+
+  - 过滤某行
+
+    #+BEGIN_SRC python
+      matrix = numpy.array([
+          [5, 10, 15],
+          [20, 25, 30],
+          [35, 40, 45]
+      ])
+      second_column_25 = (matrix[:,1] == 25)
+      print(matrix[second_column_25, :])
+    #+END_SRC
+
+  - 过滤条件运算
+
+    #+BEGIN_SRC python
+      vector = numpy.array([5, 10, 15, 20])
+      equal_to_ten_and_five = (vector == 10) & (vector == 5)  # [False, False, False, False]
+
+      vector = numpy.array([5, 10, 15, 20])
+      equal_to_ten_or_five = (vector == 10) | (vector == 5)  # [True, True, False, False]
+    #+END_SRC
+
+    [[file:./images/array_computation.png]]
+
+  - 数组替换
+
+    #+BEGIN_SRC python
+      matrix = numpy.array([
+          [5, 10, 15],
+          [20, 25, 30],
+          [35, 40, 45]
+      ])
+      second_column_25 = matrix[:,1] == 25
+      matrix[second_column_25, 1] = 10
+
+
+      # [
+      #     [5, 10, 15],
+      #     [20, 10, 30],
+      #     [35, 40, 45]
+      # ]
+    #+END_SRC
