@@ -196,8 +196,16 @@ iptables -I INPUT -p tcp --dport 22 -m state --state NEW -m recent --update --se
 
 ** 2.8, 记录日志
 
-#+BEGIN_SRC
--j LOG --log-prefix "prefix msg"
+`-j LOG --log-prefix "prefix msg"`
+
+#+BEGIN_SRC sh
+  for c in PREROUTING OUTPUT; do
+      iptables -t nat -I $c -d <dest-ip> -j LOG --log-prefix "DBG@$c: " --log-level 4
+      # log level: 0 - 7
+      # 4: standard syslog level (warning)
+      # 7: debug
+  done
+
 #+END_SRC
 
 ** 2.9, 地址转换
