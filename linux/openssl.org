@@ -120,11 +120,19 @@ y：srv_random
 
 ** 2.9，签署证书
 
-1. 生成 csr
+1. 部署 CA 证书
+
+   #+BEGIN_SRC sh
+     mkdir -p $CATOP/private  ## $CATOP: ./demoCA
+     cp ca.key.pem $CATOP/private/cakey.pem
+     cp ca.cert.pem $CATOP/cacert.pem
+   #+END_SRC
+
+2. 生成 csr
 
    =openssl req -new -key webserver.key -out webserver.csr=
 
-2. 签署 csr
+3. 签署 csr
 
    #+BEGIN_SRC sh
      openssl ca -in webserver.csr -out webserver.crt ## 需先部署好 openssl 的 CA 证书
@@ -135,9 +143,13 @@ y：srv_random
 #+BEGIN_SRC sh
   #!/usr/bin/env bash
   # -*- coding: utf-8 -*-
-  rm -rf demoCA
-  mkdir -p demoCA/newcerts
-  touch demoCA/index.txt
+  CATOP=./demoCA
+  rm -rf $CATOP
+  mkdir -p $CATOP/certs           #
+  mkdir -p $CATOP/crl             # 存放 Certificate Revoke List
+  mkdir -p $CATOP/newcerts        # 存放证书
+  mkdir -p $CATOP/private         # 存放 CA private key
+  touch $CATOP/index.txt          # CA log file
   openssl genrsa -out usc.key.pem 2048
   openssl req -new -key usc.key.pem -out usc.csr.pem -subj "/C=US/ST=Califomia/L=Irvine/O=Cisco Systems, Inc./OU=Cisco Small Business/CN=Network Orchestrator"
   openssl ca -selfsign -keyfile usc.key.pem -startdate 20160901000000Z -days 7300 -batch -in usc.csr.pem -out usc.cert.pem -create_serial
