@@ -182,3 +182,17 @@ annotated tag 保存为一个 tag 对象，而轻量级的 tag 作为某个 comm
 
 
 #+END_SRC
+
+** filter-branch
+
+1. 查找仓库中大文件
+
+   #+BEGIN_SRC sh
+     git rev-list --objects --all | grep "$(git verify-pack -v .git/objects/pack/*.idx | sort -k 3 -n | tail -5 | awk '{print$1}')"
+   #+END_SRC
+
+2. 重写这些大文件涉及到的所有提交（重写历史记录）
+
+   #+BEGIN_SRC sh
+     git filter-branch -f --prune-empty --index-filter 'git rm -rf --cached --ignore-unmatch <your-file-name>' --tag-name-filter cat -- --all
+   #+END_SRC
