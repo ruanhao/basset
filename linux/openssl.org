@@ -184,3 +184,9 @@ y：srv_random
 #+BEGIN_SRC sh
   openssl req -new -x509 -days 365 -nodes -out cert.pem -keyout key.pem
 #+END_SRC
+
+** 2.13, 查看服务器证书内容
+
+#+BEGIN_SRC sh
+  echo | openssl s_client -showcerts -connect 10.74.68.89:443 2>/dev/null | sed -n '/BEGIN CERTIFICATE/,/END CERTIFICATE/p'
+#+END_SRC
