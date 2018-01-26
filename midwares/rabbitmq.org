@@ -1,0 +1,77 @@
+#+TITLE:     RabbitMQ
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-spec/css/style.css" rel="stylesheet" type="text/css" />
+ #+HTML: <div class="outline-2" id="meta">
+| *Author* | {{{author}}} ({{{email}}})    |
+| *Date*   | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+#+TOC: headlines 3
+
+
+* 消息标签
+
+AMQP 用标签表述消息，由一个交换器名称和可选的主题标记组成。
+
+在消息的路由过程中，消息的标签并没有随 payload 一起传递，
+如果需要明确知道是谁生产的 AMQP 消息的话，就要看生产者是否把发送方信息放入 payload 中。
+
+
+* 消息订阅
+
+当队列拥有多个消费者，队列收到的消息将以循环的方式发送给消费者，每条消息只会发送给一个订阅的消费者。
+
+消费者接收到的每条消息都必须进行确认，可以在订阅队列的时候讲 =auto_ack= 参数设置为 true。
+
+在上一条消息确认之前，RabbitMQ 会认为这个消费者并没有准备好接收下一条消息，因此不会再给该消费者发送更多消息。
+
+如果消费者收到一条消息，在确认之前断开了连接（或者从队列上取消订阅），RabbitMQ 会认为这条消息没有分发，
+然后重新分发给下一个订阅的消费者。
+
+** 接收模式
+
+#+BEGIN_SRC plantuml :file img/rabbitmq_consume.png
+  hide footbox
+  participant Client as c
+  database Queue as q
+
+  c -> q : basic.consume
+  ...
+  q -> c : msg
+  c --> q : basic.ack
+#+END_SRC
+
+
+** 获得单条消息
+
+=basic.get= 命令会订阅消息，获得单条消息，然后取消订阅，因此效率不高。
+
+
+#+BEGIN_SRC plantuml :file img/rabbitmq_get.png
+  hide footbox
+  participant Client as c
+  database Queue as q
+
+  c -> q : basic.get
+  q -> c : msg
+  c --> q : basic.ack
+#+END_SRC
+
+
+** 拒绝消息
+
+#+BEGIN_SRC plantuml :file img/rabbitmq_reject.png
+  hide footbox
+  participant Client as c
+  database Queue as q
+
+  c -> q : basic.consume
+  ...
+  q -> c : msg
+  c --> q : basic.ack
+#+END_SRC
