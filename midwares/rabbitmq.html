@@ -2,7 +2,7 @@
 <html>
 <head>
 <title>RabbitMQ</title>
-<!-- 2018-01-26 Fri 17:10 -->
+<!-- 2018-01-27 Sat 16:46 -->
 <meta  charset="utf-8">
 <meta  name="generator" content="Org-mode">
 <meta  name="author" content="Hao Ruan">
@@ -143,10 +143,39 @@ for the JavaScript code in this tag.
 <div id="text-table-of-contents">
 <ul>
 <li><a href="#sec-1">1. 消息标签</a></li>
-<li><a href="#sec-2">2. 消息订阅</a>
+<li><a href="#sec-2">2. 消息</a>
 <ul>
-<li><a href="#sec-2-1">2.1. 接收模式</a></li>
-<li><a href="#sec-2-2">2.2. 获得单条消息</a></li>
+<li><a href="#sec-2-1">2.1. 订阅消息</a></li>
+<li><a href="#sec-2-2">2.2. 获取消息</a></li>
+<li><a href="#sec-2-3">2.3. 拒绝消息</a></li>
+<li><a href="#sec-2-4">2.4. 创建队列</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. 交换器</a>
+<ul>
+<li><a href="#sec-3-1">3.1. direct</a></li>
+<li><a href="#sec-3-2">3.2. fanout</a></li>
+<li><a href="#sec-3-3">3.3. topic</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. RabbitMQ 管理</a>
+<ul>
+<li><a href="#sec-4-1">4.1. vhost</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. Pika</a>
+<ul>
+<li><a href="#sec-5-1">5.1. 基本用法</a>
+<ul>
+<li><a href="#sec-5-1-1">5.1.1. 生产者</a></li>
+<li><a href="#sec-5-1-2">5.1.2. 消费者</a></li>
+</ul>
+</li>
+<li><a href="#sec-5-2">5.2. 发送方确认模式</a>
+<ul>
+<li><a href="#sec-5-2-1">5.2.1. 生产者</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -169,7 +198,7 @@ for the JavaScript code in this tag.
 
 <tr>
 <td class="left"><b>Date</b></td>
-<td class="left">2018-01-26 17:10:34</td>
+<td class="left">2018-01-27 16:46:03</td>
 </tr>
 </tbody>
 </table>
@@ -179,10 +208,39 @@ for the JavaScript code in this tag.
 <div id="text-table-of-contents">
 <ul>
 <li><a href="#sec-1">1. 消息标签</a></li>
-<li><a href="#sec-2">2. 消息订阅</a>
+<li><a href="#sec-2">2. 消息</a>
 <ul>
-<li><a href="#sec-2-1">2.1. 接收模式</a></li>
-<li><a href="#sec-2-2">2.2. 获得单条消息</a></li>
+<li><a href="#sec-2-1">2.1. 订阅消息</a></li>
+<li><a href="#sec-2-2">2.2. 获取消息</a></li>
+<li><a href="#sec-2-3">2.3. 拒绝消息</a></li>
+<li><a href="#sec-2-4">2.4. 创建队列</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. 交换器</a>
+<ul>
+<li><a href="#sec-3-1">3.1. direct</a></li>
+<li><a href="#sec-3-2">3.2. fanout</a></li>
+<li><a href="#sec-3-3">3.3. topic</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. RabbitMQ 管理</a>
+<ul>
+<li><a href="#sec-4-1">4.1. vhost</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. Pika</a>
+<ul>
+<li><a href="#sec-5-1">5.1. 基本用法</a>
+<ul>
+<li><a href="#sec-5-1-1">5.1.1. 生产者</a></li>
+<li><a href="#sec-5-1-2">5.1.2. 消费者</a></li>
+</ul>
+</li>
+<li><a href="#sec-5-2">5.2. 发送方确认模式</a>
+<ul>
+<li><a href="#sec-5-2-1">5.2.1. 生产者</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -193,37 +251,33 @@ for the JavaScript code in this tag.
 <div id="outline-container-sec-1" class="outline-2">
 <h2 id="sec-1"><span class="section-number-2">1</span> 消息标签</h2>
 <div class="outline-text-2" id="text-1">
-<p>
-AMQP 用标签表述消息，由一个交换器名称和可选的主题标记组成。
-</p>
-
-<p>
-在消息的路由过程中，消息的标签并没有随 payload 一起传递，
-如果需要明确知道是谁生产的 AMQP 消息的话，就要看生产者是否把发送方信息放入 payload 中。
-</p>
+<ul class="org-ul">
+<li>AMQP 用标签表述消息，由一个交换器名称和可选的主题标记组成。
+</li>
+<li>在消息的路由过程中，消息的标签并没有随 payload 一起传递，如果需要明确知道是谁生产的 AMQP 消息的话，就要看生产者是否把发送方信息放入 payload 中。
+</li>
+</ul>
 </div>
 </div>
 
 
 <div id="outline-container-sec-2" class="outline-2">
-<h2 id="sec-2"><span class="section-number-2">2</span> 消息订阅</h2>
+<h2 id="sec-2"><span class="section-number-2">2</span> 消息</h2>
 <div class="outline-text-2" id="text-2">
-<p>
-当队列拥有多个消费者，队列收到的消息将以循环的方式发送给消费者，每条消息只会发送给一个订阅的消费者。
-</p>
-
-<p>
-消费者接收到的每条消息都必须进行确认，可以在订阅队列的时候讲 <code>auto_ack</code> 参数设置为 true。
-</p>
-
-<p>
-如果消费者收到一条消息，在确认之前断开了连接（或者从队列上取消订阅），RabbitMQ 会认为这条消息没有分发，
-然后重新分发给下一个订阅的消费者。
-</p>
+<ul class="org-ul">
+<li>当队列拥有多个消费者，队列收到的消息将以循环的方式发送给消费者，每条消息只会发送给一个订阅的消费者。
+</li>
+<li>消费者接收到的每条消息都必须进行确认。
+</li>
+<li>在上一条消息确认之前，RabbitMQ 会认为这个消费者并没有准备好接收下一条消息，因此不会再给该消费者发送更多消息。
+</li>
+<li>如果消费者收到一条消息，在确认之前断开了连接（或者从队列上取消订阅），RabbitMQ 会认为这条消息没有分发，然后重新分发给下一个订阅的消费者。
+</li>
+</ul>
 </div>
 
 <div id="outline-container-sec-2-1" class="outline-3">
-<h3 id="sec-2-1"><span class="section-number-3">2.1</span> 接收模式</h3>
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> 订阅消息</h3>
 <div class="outline-text-3" id="text-2-1">
 
 <div class="figure">
@@ -235,17 +289,300 @@ AMQP 用标签表述消息，由一个交换器名称和可选的主题标记组
 
 
 <div id="outline-container-sec-2-2" class="outline-3">
-<h3 id="sec-2-2"><span class="section-number-3">2.2</span> 获得单条消息</h3>
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> 获取消息</h3>
 <div class="outline-text-3" id="text-2-2">
-<p>
-<code>basic.get</code> 命令会订阅消息，获得单条消息，然后取消订阅，因此效率不高。
-</p>
-
-
 
 <div class="figure">
 <p><img src="img/rabbitmq_get.png" alt="rabbitmq_get.png">
 </p>
+</div>
+
+<ul class="org-ul">
+<li><code>basic.get</code> 命令会订阅消息，获得单条消息，然后取消订阅，因此效率不高。
+</li>
+</ul>
+</div>
+</div>
+
+
+
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> 拒绝消息</h3>
+<div class="outline-text-3" id="text-2-3">
+
+<div class="figure">
+<p><img src="img/rabbitmq_reject.png" alt="rabbitmq_reject.png">
+</p>
+</div>
+
+<p>
+<code>requeue=false</code> 的意义在于：RabbitMQ 会支持一个特殊的队列（dead letter）用来存放那些被拒绝而不重入队列的消息。
+dead letter 队列可以让管理者通过检测拒绝或未送达的消息来发现问题所在。
+因此，如果想使用 dead letter 队列功能的话，需要使用 <code>reject</code> 命令，并将其设为 false 。
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> 创建队列</h3>
+<div class="outline-text-3" id="text-2-4">
+
+<div class="figure">
+<p><img src="img/rabbitmq_create.png" alt="rabbitmq_create.png">
+</p>
+</div>
+
+<ul class="org-ul">
+<li>消费者和生产者都能使用 <code>queue.delare</code> 命令来创建队列。
+</li>
+<li>如果消费者在同一信道上已订阅了另一个信道的话，则无法再声明队列了，必须先取消订阅。
+</li>
+<li>当创建队列时，可以指定队列名称，如果不指定的话，RabbitMQ 会分配一个随机名称并在 <code>queue.declare</code> 命令的响应中返回。
+</li>
+<li>如果需要临时队列只为一个消费者服务的话，可以结合使用 <code>auto-delete</code> 和 <code>exclusive</code> ，当消费者断开连接时，队列就被移除了。
+</li>
+<li>发出去的消息如果路由到了不存在的队列的话，RabbitMQ 会忽略它们。因此，一般情况下，生产者和消费者都应该尝试创建队列。
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> 交换器</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> direct</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+如果路由键匹配的话，消息就被投递到对应的队列。
+</p>
+
+<p>
+RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的交换器。
+当声明一个队列时，一开始该队列会自动绑定到默认交换器， <b>并以队列名称作为路由键</b> 。
+之后可以发送 <code>exchange.declare</code> 命令并设置合适的参数，就可以升级成具体类型交换器。
+</p>
+
+
+<div class="figure">
+<p><img src="img/direct-router.png" alt="direct-router.png">
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> fanout</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+将收到的消息广播的绑定的队列上。
+</p>
+
+
+<div class="figure">
+<p><img src="img/fanout-router.png" alt="fanout-router.png">
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> topic</h3>
+<div class="outline-text-3" id="text-3-3">
+
+<div class="figure">
+<p><img src="img/topic-router.png" alt="topic-router.png">
+</p>
+</div>
+
+<ul class="org-ul">
+<li><code>.</code> 把路由键分为了几部分
+</li>
+<li><code>*</code> 匹配特定位置的任意文本
+</li>
+<li><code>#</code> 匹配所有规则
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> RabbitMQ 管理</h2>
+<div class="outline-text-2" id="text-4">
+</div><div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> vhost</h3>
+<div class="outline-text-3" id="text-4-1">
+<ul class="org-ul">
+<li>查看
+<div class="org-src-container">
+
+<pre class="src src-sh">rabbitmqctl list_vhosts
+</pre>
+</div>
+</li>
+<li>创建
+<div class="org-src-container">
+
+<pre class="src src-sh">rabbitmqctl add_vhost &lt;vhost_name&gt;
+</pre>
+</div>
+</li>
+<li>删除
+<div class="org-src-container">
+
+<pre class="src src-sh">rabbitmqctl delete_vhost &lt;vhost_name&gt;
+</pre>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> Pika</h2>
+<div class="outline-text-2" id="text-5">
+</div><div id="outline-container-sec-5-1" class="outline-3">
+<h3 id="sec-5-1"><span class="section-number-3">5.1</span> 基本用法</h3>
+<div class="outline-text-3" id="text-5-1">
+</div><div id="outline-container-sec-5-1-1" class="outline-4">
+<h4 id="sec-5-1-1"><span class="section-number-4">5.1.1</span> 生产者</h4>
+<div class="outline-text-4" id="text-5-1-1">
+<div class="org-src-container">
+
+<pre class="src src-python">import pika
+
+EXCHANGE = 'hello-exchange'
+
+conn_params = pika.ConnectionParameters(host='10.74.68.89', port=45672, socket_timeout=3.0)
+conn_broker = pika.BlockingConnection(conn_params)  # 使用默认 vhost /
+channel = conn_broker.channel()
+
+channel.exchange_declare(exchange=EXCHANGE,
+                         exchange_type='direct',
+                         passive=False,
+                         durable=True,
+                         auto_delete=False)
+
+msg_props = pika.BasicProperties()
+msg_props.content_type = 'text/plain'
+
+channel.basic_publish(exchange=EXCHANGE,
+                      properties=msg_props,
+                      body='Hello World',
+                      routing_key='hola')
+
+conn_broker.close()
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-5-1-2" class="outline-4">
+<h4 id="sec-5-1-2"><span class="section-number-4">5.1.2</span> 消费者</h4>
+<div class="outline-text-4" id="text-5-1-2">
+<div class="org-src-container">
+
+<pre class="src src-python">import pika
+
+EXCHANGE = 'hello-exchange'
+QUEUE = 'hello-exchange'
+TAG = 'hello-consumer'
+
+conn_params = pika.ConnectionParameters(host='10.74.68.89', port=45672, socket_timeout=3.0)
+conn_broker = pika.BlockingConnection(conn_params)
+channel = conn_broker.channel()
+
+channel.exchange_declare(exchange=EXCHANGE,  # 如果没有就创建，否则继续
+                         exchange_type='direct',
+                         passive=False,
+                         durable=True,
+                         auto_delete=False)
+
+channel.queue_declare(queue=QUEUE)
+
+channel.queue_bind(queue=QUEUE,
+                   exchange=EXCHANGE,
+                   routing_key='hola')
+
+def msg_consumer(channel, method, header, body):
+    channel.basic_ack(delivery_tag=method.delivery_tag)
+    print("receive: {}".format(body))
+    channel.basic_cancel(consumer_tag=TAG)
+    channel.stop_consuming()
+
+
+channel.basic_consume(msg_consumer,
+                      queue=QUEUE,
+                      consumer_tag=TAG)  # 用于标识进程的消费者标记
+
+print(' [*] Waiting for messages. To exit press CTRL+C')
+channel.start_consuming()
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-sec-5-2" class="outline-3">
+<h3 id="sec-5-2"><span class="section-number-3">5.2</span> 发送方确认模式</h3>
+<div class="outline-text-3" id="text-5-2">
+<p>
+信道进入 confirm 模式，所有在信道上发布的消息都会被指派一个唯一的 ID 号（从 1 开始）。
+一旦消息被投递给所有匹配队列后，信道会发送一个发送方确认模式给生产者应用程序（包含消息的唯一 ID ）。
+这使得生产者知晓信息已经安全到达目的队列了。
+</p>
+</div>
+
+
+<div id="outline-container-sec-5-2-1" class="outline-4">
+<h4 id="sec-5-2-1"><span class="section-number-4">5.2.1</span> 生产者</h4>
+<div class="outline-text-4" id="text-5-2-1">
+<div class="org-src-container">
+
+<pre class="src src-python">#! /usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import pika
+
+EXCHANGE = 'hello-exchange'
+
+conn_params = pika.ConnectionParameters(host='10.74.68.89', port=45672, socket_timeout=3.0)
+conn_broker = pika.BlockingConnection(conn_params)  # 使用默认 vhost /
+channel = conn_broker.channel()
+channel.confirm_delivery()
+channel.exchange_declare(exchange=EXCHANGE,
+                         exchange_type='direct',
+                         passive=False,
+                         durable=True,
+                         auto_delete=False)
+
+msg_props = pika.BasicProperties()
+msg_props.content_type = 'text/plain'
+
+ack = channel.basic_publish(exchange=EXCHANGE,
+                            properties=msg_props,
+                            body='Hello World',
+                            routing_key='hola')
+
+if ack:
+    print("confirm received")
+else:
+    print("msg lost")
+
+conn_broker.close()
+</pre>
+</div>
 </div>
 </div>
 </div>
