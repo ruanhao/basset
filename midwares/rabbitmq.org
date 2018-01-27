@@ -3,7 +3,7 @@
 #+EMAIL:     haoru@cisco.com
 #+LANGUAGE:  en
 #+LINK_HOME: http://www.github.com/ruanhao
-#+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t
+#+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
 #+HTML_DOCTYPE: <!DOCTYPE html>
 #+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
 #+HTML_HEAD: <link href="../org-spec/css/style.css" rel="stylesheet" type="text/css" />
@@ -26,6 +26,7 @@
 - 消费者接收到的每条消息都必须进行确认。
 - 在上一条消息确认之前，RabbitMQ 会认为这个消费者并没有准备好接收下一条消息，因此不会再给该消费者发送更多消息。
 - 如果消费者收到一条消息，在确认之前断开了连接（或者从队列上取消订阅），RabbitMQ 会认为这条消息没有分发，然后重新分发给下一个订阅的消费者。
+- 一个信道上可以创建多个订阅，使用 =consumer_tag= 来标识。
 
 ** 订阅消息
 
@@ -122,6 +123,7 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 
 [[file:img/fanout-router.png]]
 
+
 ** topic
 
 [[file:img/topic-router.png]]
@@ -133,7 +135,85 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 
 * RabbitMQ 管理
 
-** vhost
+** 启动停止
+
+*** 停止节点
+
+#+BEGIN_SRC sh
+  rabbitmqctl stop
+  rabbitmqctl stop -n rabbit@<nodename>
+#+END_SRC
+
+*** 停止应用
+
+#+BEGIN_SRC sh
+  rabbitmqctl stop_app
+#+END_SRC
+
+
+** 配置文件
+
+=/etc/rabbitmq/rabbitmq.config=
+
+
+** 管理用户
+
+*** 创建
+
+#+BEGIN_SRC sh
+  rabbitmqctl add_user <username> <password>
+#+END_SRC
+
+*** 删除
+
+#+BEGIN_SRC sh
+  rabbitmqctl delete_user <username>
+#+END_SRC
+
+*** 修改密码
+
+#+BEGIN_SRC sh
+  rabbitmqctl change_password <username> <new-password>
+#+END_SRC
+
+*** 查看
+
+#+BEGIN_SRC sh
+  rabbitmqctl list_users
+#+END_SRC
+
+
+** 管理权限
+
+每条访问控制条目由四部分组成：
+
+- 用户
+- vhost
+- 需要授予的读/写/配置权限组合
+- 权限范围
+
+*** 创建
+
+#+BEGIN_SRC sh
+  rabbitmqctl set_permission -p <vhost_name> \
+  <username> ".*" ".*" ".*"
+#+END_SRC
+
+*** 删除
+
+#+BEGIN_SRC sh
+  rabbitmqctl clear_permissions -p <vhost_name> <username>
+#+END_SRC
+
+*** 查看
+
+#+BEGIN_SRC sh
+  rabbitmqctl list_permissions -p <vhost_name>
+  rabbitmqctl list_user_permissions <username>  # 查看某个用户在所有 vhost 上的权限
+#+END_SRC
+
+
+** 管理 vhost
 
 - 查看
   #+BEGIN_SRC sh
@@ -149,8 +229,68 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
   #+END_SRC
 
 
-* Pika
 
+** 信息查询
+
+*** 查看队列
+
+#+BEGIN_SRC sh
+  rabbitmqctl list_queues
+  rabbitmqctl list_queues name messages consumers memory # memory 单位为字节
+#+END_SRC
+
+信息参数包括：
+
+- name
+- durable
+- auto_delete
+- arguments
+- pid
+- owner_pid
+- exclusive_consumer_pid
+- exclusive_consumer_tag
+- messages_ready
+- messages_unacknowledged
+- messages_uncommitted
+- messages
+- acks_uncommitted
+- consumers
+- transactions
+- memory
+
+
+*** 查看交换器
+
+#+BEGIN_SRC sh
+  rabbitmqctl list_exchanges
+#+END_SRC
+
+信息参数包括：
+
+- name
+- type
+- durable
+- auto_delete
+- arguments
+
+
+*** 查看绑定信息
+
+#+BEGIN_SRC sh
+  rabbitmqctl list_bindings
+#+END_SRC
+
+参数信息包括：
+
+- source_name
+- source_kind
+- destination_name
+- destination_kind
+- routing_key
+- arguments
+
+
+* 代码示例
 
 ** 基本用法
 
@@ -219,7 +359,8 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 
   channel.basic_consume(msg_consumer,
                         queue=QUEUE,
-                        consumer_tag=TAG)  # 用于标识进程的消费者标记
+                        consumer_tag=TAG) # 一个 channel 可以有多个订阅，使用 consumer_tag 来标识订阅
+
 
   print(' [*] Waiting for messages. To exit press CTRL+C')
   channel.start_consuming()
@@ -276,3 +417,76 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 
 #+RESULTS:
 : confirm received
+
+
+** 通过 AMQP 实时访问日志
+
+#+BEGIN_SRC python
+  #! /usr/bin/env python3
+  # -*- coding: utf-8 -*-
+
+  import pika
+
+  EXCHANGE = 'amq.rabbitmq.log'
+
+  conn_params = pika.ConnectionParameters(host='10.74.68.89', port=45672, socket_timeout=3.0)
+  conn_broker = pika.BlockingConnection(conn_params)
+  channel = conn_broker.channel()
+
+  result = channel.queue_declare(exclusive=True, auto_delete=True)
+  queue_name = result.method.queue
+
+  # binding_keys = ['info', 'warning', 'error']
+  binding_keys = ['#']
+
+  for binding_key in binding_keys:
+      channel.queue_bind(queue=queue_name,
+                         exchange=EXCHANGE,
+                         routing_key=binding_key)
+
+  def msg_consumer(channel, method, header, body):
+      print("[{}]: {}".format(method.routing_key, body.decode('utf-8')), end='')
+
+
+  channel.basic_consume(msg_consumer,
+                        queue=queue_name,
+                        no_ack=True)
+
+  channel.start_consuming()
+
+#+END_SRC
+
+* 集群
+
+RabbitMQ 默认不会将队列的内容复制到整个集群上。
+如果不进行特别的配置，这些信息仅存在于队列所属的那个节点上。
+非所有者节点 *只知道队列的元数据* 和指向该队列存在的那个节点的指针。
+
+[[file:img/rabbit_cluster.png]]
+
+file:img/rabbit_cluster_exchange.png
+
+** 集群管理
+
+*** 清空节点元数据（重设）
+
+当重设的节点是集群的一部分时，该命令也会和集群中的磁盘节点进行通信。
+
+#+BEGIN_SRC sh
+  rabbitmqctl -n <node> reset
+#+END_SRC
+
+*** 加入集群
+
+将新节点加入到集群时，必须列出在集群中的所有磁盘节点，并作为集群命令的参数。
+
+#+BEGIN_SRC sh
+  # 将 my_node 加入集群，并使其自己也称为磁盘节点
+  rabbitmqctl -n <my_node> cluster <other_node> <my_node>
+#+END_SRC
+
+*** 查看集群信息
+
+#+BEGIN_SRC sh
+  rabbitmqctl cluster_status
+#+END_SRC
