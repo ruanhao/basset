@@ -2,7 +2,7 @@
 <html>
 <head>
 <title>RabbitMQ</title>
-<!-- 2018-01-27 Sat 21:30 -->
+<!-- 2018-01-29 Mon 13:19 -->
 <meta  charset="utf-8">
 <meta  name="generator" content="Org-mode">
 <meta  name="author" content="Hao Ruan">
@@ -143,7 +143,7 @@ for the JavaScript code in this tag.
 <div id="text-table-of-contents">
 <ul>
 <li><a href="#sec-1">1. 消息标签</a></li>
-<li><a href="#sec-2">2. 消息</a>
+<li><a href="#sec-2">2. AMQP</a>
 <ul>
 <li><a href="#sec-2-1">2.1. 订阅消息</a></li>
 <li><a href="#sec-2-2">2.2. 获取消息</a></li>
@@ -188,6 +188,8 @@ for the JavaScript code in this tag.
 <li><a href="#sec-4-6-1">4.6.1. 查看队列</a></li>
 <li><a href="#sec-4-6-2">4.6.2. 查看交换器</a></li>
 <li><a href="#sec-4-6-3">4.6.3. 查看绑定信息</a></li>
+<li><a href="#sec-4-6-4">4.6.4. 查看集群状态</a></li>
+<li><a href="#sec-4-6-5">4.6.5. 接入 Eshell</a></li>
 </ul>
 </li>
 </ul>
@@ -219,6 +221,7 @@ for the JavaScript code in this tag.
 </li>
 </ul>
 </li>
+<li><a href="#sec-7">7. 持久性</a></li>
 </ul>
 </div>
 </div>
@@ -239,7 +242,7 @@ for the JavaScript code in this tag.
 
 <tr>
 <td class="left"><b>Date</b></td>
-<td class="left">2018-01-27 21:30:43</td>
+<td class="left">2018-01-29 13:19:37</td>
 </tr>
 </tbody>
 </table>
@@ -249,7 +252,7 @@ for the JavaScript code in this tag.
 <div id="text-table-of-contents">
 <ul>
 <li><a href="#sec-1">1. 消息标签</a></li>
-<li><a href="#sec-2">2. 消息</a>
+<li><a href="#sec-2">2. AMQP</a>
 <ul>
 <li><a href="#sec-2-1">2.1. 订阅消息</a></li>
 <li><a href="#sec-2-2">2.2. 获取消息</a></li>
@@ -294,6 +297,8 @@ for the JavaScript code in this tag.
 <li><a href="#sec-4-6-1">4.6.1. 查看队列</a></li>
 <li><a href="#sec-4-6-2">4.6.2. 查看交换器</a></li>
 <li><a href="#sec-4-6-3">4.6.3. 查看绑定信息</a></li>
+<li><a href="#sec-4-6-4">4.6.4. 查看集群状态</a></li>
+<li><a href="#sec-4-6-5">4.6.5. 接入 Eshell</a></li>
 </ul>
 </li>
 </ul>
@@ -325,6 +330,7 @@ for the JavaScript code in this tag.
 </li>
 </ul>
 </li>
+<li><a href="#sec-7">7. 持久性</a></li>
 </ul>
 </div>
 </div>
@@ -344,7 +350,7 @@ for the JavaScript code in this tag.
 
 
 <div id="outline-container-sec-2" class="outline-2">
-<h2 id="sec-2"><span class="section-number-2">2</span> 消息</h2>
+<h2 id="sec-2"><span class="section-number-2">2</span> AMQP</h2>
 <div class="outline-text-2" id="text-2">
 <ul class="org-ul">
 <li>当队列拥有多个消费者，队列收到的消息将以循环的方式发送给消费者，每条消息只会发送给一个订阅的消费者。
@@ -787,6 +793,41 @@ rabbitmqctl list_queues name messages consumers memory # memory 单位为字节
 </ul>
 </div>
 </div>
+
+
+<div id="outline-container-sec-4-6-4" class="outline-4">
+<h4 id="sec-4-6-4"><span class="section-number-4">4.6.4</span> 查看集群状态</h4>
+<div class="outline-text-4" id="text-4-6-4">
+<p>
+包括各个节点MQ状态、镜像队列状态等
+</p>
+
+<p>
+<code>rabbitmqctl report</code>
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4-6-5" class="outline-4">
+<h4 id="sec-4-6-5"><span class="section-number-4">4.6.5</span> 接入 Eshell</h4>
+<div class="outline-text-4" id="text-4-6-5">
+<p>
+<code>erl -setcookie abc -name test@&lt;node-name&gt; -remsh rabbit@&lt;node-name&gt; -hidden</code>
+</p>
+
+<p>
+退出时要用 <code>Ctrl+G</code> 然后执行 <b>q</b> 命令退出。
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-erlang">spawn(fun() -&gt; etop:start([{output, text}, {interval, 5}, {lines, 10}, {sort, msg_q}]) end).
+
+spawn(fun() -&gt; etop:start([{output, text}, {interval, 5}, {lines, 10}, {sort, reductions}]) end).
+</pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 
@@ -976,6 +1017,7 @@ channel.start_consuming()
 </div>
 </div>
 
+
 <div id="outline-container-sec-6" class="outline-2">
 <h2 id="sec-6"><span class="section-number-2">6</span> 集群</h2>
 <div class="outline-text-2" id="text-6">
@@ -1042,6 +1084,41 @@ rabbitmqctl -n &lt;my_node&gt; cluster &lt;other_node&gt; &lt;my_node&gt;
 </div>
 </div>
 </div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> 持久性</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+RabbitMQ 支持消息的持久化，也就是数据写在磁盘上。消息队列持久化包括 3 个部分：
+</p>
+
+<ul class="org-ul">
+<li>exchange 持久化，在声明时指定 <code>durable=1</code>
+</li>
+<li>queue 持久化，在声明时指定 <code>durable=1</code>
+</li>
+<li>消息持久化，在投递时指定 <code>delivery_mode=2</code> （1 是非持久化）
+</li>
+</ul>
+
+
+<p>
+如果 exchange 和 queue 都是持久化的， <b>那么它们之间的 binding 也是持久化的</b> 。
+</p>
+
+<p>
+如果 exchange 和 queue 两者之间有一个持久化，一个非持久化，其对应的 binding 就无法得到恢复。
+</p>
+
+<p>
+但是，即使设置了持久化，也不能百分百保证消息不会丢失。有很小的概率在 RabbitMQ 接受到消息后，还没来得及写到磁盘，就发生重启了。
+另外，RabbitMQ 也不会对每一个消息执行 <code>fsync(2)</code> ，消息可能仅仅写入到缓存，还没来得及 flush 到硬件存储。
+因此 RabbitMQ 的持久性设置并非足够安全，对于普通的工作队列也许够用了。
+如果需要加强的安全保证，可以把发布消息的代码封装在 <b>事务</b> 里。
+</p>
 </div>
 </div>
 </div>

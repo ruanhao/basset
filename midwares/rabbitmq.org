@@ -20,7 +20,7 @@
 - 在消息的路由过程中，消息的标签并没有随 payload 一起传递，如果需要明确知道是谁生产的 AMQP 消息的话，就要看生产者是否把发送方信息放入 payload 中。
 
 
-* 消息
+* AMQP
 
 - 当队列拥有多个消费者，队列收到的消息将以循环的方式发送给消费者，每条消息只会发送给一个订阅的消费者。
 - 消费者接收到的每条消息都必须进行确认。
@@ -290,6 +290,25 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 - arguments
 
 
+*** 查看集群状态
+
+包括各个节点MQ状态、镜像队列状态等
+
+=rabbitmqctl report=
+
+*** 接入 Eshell
+
+=erl -setcookie abc -name test@<node-name> -remsh rabbit@<node-name> -hidden=
+
+退出时要用 =Ctrl+G= 然后执行 *q* 命令退出。
+
+#+BEGIN_SRC erlang
+  spawn(fun() -> etop:start([{output, text}, {interval, 5}, {lines, 10}, {sort, msg_q}]) end).
+
+  spawn(fun() -> etop:start([{output, text}, {interval, 5}, {lines, 10}, {sort, reductions}]) end).
+#+END_SRC
+
+
 * 代码示例
 
 ** 基本用法
@@ -456,6 +475,7 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 
 #+END_SRC
 
+
 * 集群
 
 RabbitMQ 默认不会将队列的内容复制到整个集群上。
@@ -490,3 +510,22 @@ file:img/rabbit_cluster_exchange.png
 #+BEGIN_SRC sh
   rabbitmqctl cluster_status
 #+END_SRC
+
+
+* 持久性
+
+RabbitMQ 支持消息的持久化，也就是数据写在磁盘上。消息队列持久化包括 3 个部分：
+
+- exchange 持久化，在声明时指定 =durable=1=
+- queue 持久化，在声明时指定 =durable=1=
+- 消息持久化，在投递时指定 =delivery_mode=2= （1 是非持久化）
+
+
+如果 exchange 和 queue 都是持久化的， *那么它们之间的 binding 也是持久化的* 。
+
+如果 exchange 和 queue 两者之间有一个持久化，一个非持久化，其对应的 binding 就无法得到恢复。
+
+但是，即使设置了持久化，也不能百分百保证消息不会丢失。有很小的概率在 RabbitMQ 接受到消息后，还没来得及写到磁盘，就发生重启了。
+另外，RabbitMQ 也不会对每一个消息执行 =fsync(2)= ，消息可能仅仅写入到缓存，还没来得及 flush 到硬件存储。
+因此 RabbitMQ 的持久性设置并非足够安全，对于普通的工作队列也许够用了。
+如果需要加强的安全保证，可以把发布消息的代码封装在 *事务* 里。
