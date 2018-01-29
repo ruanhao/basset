@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Nginx</title>
+<!-- 2018-01-29 Mon 14:37 -->
+<meta  charset="utf-8">
+<meta  name="generator" content="Org-mode">
+<meta  name="author" content="Hao Ruan">
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+<link href="../org-spec/css/style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Nginx</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 基本原理</a>
+<ul>
+<li><a href="#sec-1-1">1.1. 设计架构</a>
+<ul>
+<li><a href="#sec-1-1-1">1.1.1. master 进程</a></li>
+<li><a href="#sec-1-1-2">1.1.2. worker 进程</a></li>
+<li><a href="#sec-1-1-3">1.1.3. cache loader 进程</a></li>
+<li><a href="#sec-1-1-4">1.1.4. cache manager 进程</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. 常用配置</a>
+<ul>
+<li><a href="#sec-2-1">2.1. 基本配置</a></li>
+<li><a href="#sec-2-2">2.2. 反向代理</a>
+<ul>
+<li><a href="#sec-2-2-1">2.2.1. 2.2.1, 直接转发</a></li>
+<li><a href="#sec-2-2-2">2.2.2. 2.2.2, 动态转发</a></li>
+<li><a href="#sec-2-2-3">2.2.3. 2.2.3, websocket 转发</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-3">2.3. 压缩</a></li>
+<li><a href="#sec-2-4">2.4. 监控</a></li>
+<li><a href="#sec-2-5">2.5. Basic Auth</a></li>
+<li><a href="#sec-2-6">2.6. 负载均衡</a>
+<ul>
+<li><a href="#sec-2-6-1">2.6.1. least_conn</a></li>
+<li><a href="#sec-2-6-2">2.6.2. ip_hash</a></li>
+<li><a href="#sec-2-6-3">2.6.3. hash</a></li>
+<li><a href="#sec-2-6-4">2.6.4. down</a></li>
+<li><a href="#sec-2-6-5">2.6.5. backup</a></li>
+<li><a href="#sec-2-6-6">2.6.6. weight</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-7">2.7. 返回状态码</a></li>
+<li><a href="#sec-2-8">2.8. URL 重写</a></li>
+<li><a href="#sec-2-9">2.9. Location</a>
+<ul>
+<li><a href="#sec-2-9-1">2.9.1. 优先级</a></li>
+<li><a href="#sec-2-9-2">2.9.2. 转发规则</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-10">2.10. 访问控制</a></li>
+<li><a href="#sec-2-11">2.11. 端口转发</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="outline-2" id="meta">
+<table>
+
+
+<colgroup>
+<col  class="left">
+
+<col  class="left">
+</colgroup>
+<tbody>
+<tr>
+<td class="left"><b>Author</b></td>
+<td class="left">Hao Ruan (ruanhao1116@gmail.com)</td>
+</tr>
+
+<tr>
+<td class="left"><b>Date</b></td>
+<td class="left">2018-01-29 14:37:53</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 基本原理</a>
+<ul>
+<li><a href="#sec-1-1">1.1. 设计架构</a>
+<ul>
+<li><a href="#sec-1-1-1">1.1.1. master 进程</a></li>
+<li><a href="#sec-1-1-2">1.1.2. worker 进程</a></li>
+<li><a href="#sec-1-1-3">1.1.3. cache loader 进程</a></li>
+<li><a href="#sec-1-1-4">1.1.4. cache manager 进程</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. 常用配置</a>
+<ul>
+<li><a href="#sec-2-1">2.1. 基本配置</a></li>
+<li><a href="#sec-2-2">2.2. 反向代理</a>
+<ul>
+<li><a href="#sec-2-2-1">2.2.1. 2.2.1, 直接转发</a></li>
+<li><a href="#sec-2-2-2">2.2.2. 2.2.2, 动态转发</a></li>
+<li><a href="#sec-2-2-3">2.2.3. 2.2.3, websocket 转发</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-3">2.3. 压缩</a></li>
+<li><a href="#sec-2-4">2.4. 监控</a></li>
+<li><a href="#sec-2-5">2.5. Basic Auth</a></li>
+<li><a href="#sec-2-6">2.6. 负载均衡</a>
+<ul>
+<li><a href="#sec-2-6-1">2.6.1. least_conn</a></li>
+<li><a href="#sec-2-6-2">2.6.2. ip_hash</a></li>
+<li><a href="#sec-2-6-3">2.6.3. hash</a></li>
+<li><a href="#sec-2-6-4">2.6.4. down</a></li>
+<li><a href="#sec-2-6-5">2.6.5. backup</a></li>
+<li><a href="#sec-2-6-6">2.6.6. weight</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-7">2.7. 返回状态码</a></li>
+<li><a href="#sec-2-8">2.8. URL 重写</a></li>
+<li><a href="#sec-2-9">2.9. Location</a>
+<ul>
+<li><a href="#sec-2-9-1">2.9.1. 优先级</a></li>
+<li><a href="#sec-2-9-2">2.9.2. 转发规则</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-10">2.10. 访问控制</a></li>
+<li><a href="#sec-2-11">2.11. 端口转发</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> 基本原理</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> 设计架构</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+Nginx 会同时运行多个进程，一个主进程（master）和多个工作进程（worker），配置缓存时还会有缓存加载器进程（cache loader）和
+缓存管理器进程（cache manager）等。所有进程均仅含一个线程，通过共享内存的机制实现进程间通信。主进程以 root 身份运行，
+其余进程以非特权身份运行。
+</p>
+</div>
+
+<div id="outline-container-sec-1-1-1" class="outline-4">
+<h4 id="sec-1-1-1"><span class="section-number-4">1.1.1</span> master 进程</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<ul class="org-ul">
+<li>读取并验证配置信息
+</li>
+<li>创建，绑定及关闭套接字
+</li>
+<li>启动，终止及维护 worker 进程的个数
+</li>
+<li>配置热部署（平滑升级）
+</li>
+<li>编译嵌入式脚本
+</li>
+<li>日志文件管理
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-1-2" class="outline-4">
+<h4 id="sec-1-1-2"><span class="section-number-4">1.1.2</span> worker 进程</h4>
+<div class="outline-text-4" id="text-1-1-2">
+<ul class="org-ul">
+<li>接受并处理客户端连接
+</li>
+<li>提供反向代理及过滤功能
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-1-3" class="outline-4">
+<h4 id="sec-1-1-3"><span class="section-number-4">1.1.3</span> cache loader 进程</h4>
+<div class="outline-text-4" id="text-1-1-3">
+<ul class="org-ul">
+<li>建立内存数据库
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-1-4" class="outline-4">
+<h4 id="sec-1-1-4"><span class="section-number-4">1.1.4</span> cache manager 进程</h4>
+<div class="outline-text-4" id="text-1-1-4">
+<ul class="org-ul">
+<li>缓存失效及过期检查
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> 常用配置</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> 基本配置</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+
+<pre class="src src-nginx">server {
+
+    listen 40839;
+    root /var/data;             # 网站的源代码静态文件的根目录。
+    server_name example.org;    # 域名
+
+    location / {
+        index index.html index.php;
+        # 当访问 http://example.org 时就会去读取 /var/root/index.html ，
+        # 如果找不到就会读取 index.php ，就会转发到 fastcgi_pass 里面的逻辑
+    }
+
+    location ~* \.(gif|jpg|png)$ {
+        expires 30d;            # 在 30 天后过期，也就是缓存 30 天
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass  localhost:9000;
+        fastcgi_param SCRIPT_FILENAME
+                      $document_root$fastcgi_script_name;
+        include       fastcgi_params;
+    }
+
+}
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> 反向代理</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+反向代理是依赖于 `ngx_http_proxy_module` 这个模块来实现的
+</p>
+</div>
+
+<div id="outline-container-sec-2-2-1" class="outline-4">
+<h4 id="sec-2-2-1"><span class="section-number-4">2.2.1</span> 2.2.1, 直接转发</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<div class="org-src-container">
+
+<pre class="src src-nginx">server {
+    server_name www.example.com;
+    listen       443;
+
+    location /reverse.gif {
+        proxy_pass http://image.sinajs.cn/newchart/hollow/small/nsh000001.gif;
+    }
+
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2-2" class="outline-4">
+<h4 id="sec-2-2-2"><span class="section-number-4">2.2.2</span> 2.2.2, 动态转发</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<div class="org-src-container">
+
+<pre class="src src-nginx">upstream pool {
+    server 127.0.0.1:8888;
+}
+
+server {
+
+    listen 40839;
+    root /tmp/data;
+    server_name example.org;
+
+    try_files $uri/index.html @reverse; # 先找根目录下的 index.html ，如果找不到，才执行 location @rails365
+
+    location @reverse {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+        proxy_pass http://pool;
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2-3" class="outline-4">
+<h4 id="sec-2-2-3"><span class="section-number-4">2.2.3</span> 2.2.3, websocket 转发</h4>
+<div class="outline-text-4" id="text-2-2-3">
+<div class="org-src-container">
+
+<pre class="src src-nginx">upstream ws {
+  server 127.0.0.1:8888;
+}
+
+server {
+
+  location /ws/ {
+    proxy_pass http://ws;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+  }
+
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> 压缩</h3>
+<div class="outline-text-3" id="text-2-3">
+<div class="org-src-container">
+
+<pre class="src src-nginx">http {
+
+    # 开启gzip
+    gzip on;
+
+    # 启用gzip压缩的最小文件，小于设置值的文件将不会压缩
+    gzip_min_length 1k;
+
+    # gzip 压缩级别，1-10，数字越大压缩的越好，也越占用CPU时间，后面会有详细说明
+    gzip_comp_level 2;
+
+    # 进行压缩的文件类型。javascript有多种形式。其中的值可以在 mime.types 文件中找到。
+    gzip_types text/plain application/javascript application/x-javascript text/css application/xml text/javascript application/x-httpd-php image/jpeg image/gif image/png;
+
+    # 是否在http header中添加Vary: Accept-Encoding，建议开启
+    gzip_vary on;
+
+    # 禁用IE 6 gzip
+    gzip_disable "MSIE [1-6]\.";
+
+    server {
+        location ~* ^.+\.(css|js|txt|xml|swf|wav)$ {
+            access_log   off;
+            expires      24h;   # 开启缓存
+        }
+
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> 监控</h3>
+<div class="outline-text-3" id="text-2-4">
+<div class="org-src-container">
+
+<pre class="src src-sh">pip install ngxtop
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-5" class="outline-3">
+<h3 id="sec-2-5"><span class="section-number-3">2.5</span> Basic Auth</h3>
+<div class="outline-text-3" id="text-2-5">
+<p>
+`ngx_http_auth_basic_module` 是使用文件作为存储介质的，用户名和密码必须和文件的信息匹配才能认证成功。
+</p>
+
+<p>
+使用 `htpasswd` 这个命令来生成存放用户名和密码的文件，需要先安装它。
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">htpasswd -bc /etc/nginx/.htpasswd &lt;username&gt; &lt;password&gt;
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-nginx">location /target {
+    auth_basic "Restricted";
+    auth_basic_user_file /etc/nginx/.htpasswd; # htpasswd 文件
+}
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-6" class="outline-3">
+<h3 id="sec-2-6"><span class="section-number-3">2.6</span> 负载均衡</h3>
+<div class="outline-text-3" id="text-2-6">
+</div><div id="outline-container-sec-2-6-1" class="outline-4">
+<h4 id="sec-2-6-1"><span class="section-number-4">2.6.1</span> least_conn</h4>
+<div class="outline-text-4" id="text-2-6-1">
+<p>
+优先发送给那些接受请求少的
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nginx">upstream servers {
+    least_conn;
+    server &lt;server_ip_1&gt;;
+    server &lt;server_ip_2&gt;;
+}
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-6-2" class="outline-4">
+<h4 id="sec-2-6-2"><span class="section-number-4">2.6.2</span> ip_hash</h4>
+<div class="outline-text-4" id="text-2-6-2">
+<p>
+可以记录请求来源的ip，如果是同一个ip，下次访问的时候还是会到相同的主机
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nginx">upstream servers {
+    ip_hash;
+    server &lt;server_ip_1&gt;;
+    server &lt;server_ip_2&gt;;
+}
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-6-3" class="outline-4">
+<h4 id="sec-2-6-3"><span class="section-number-4">2.6.3</span> hash</h4>
+<div class="outline-text-4" id="text-2-6-3">
+<p>
+通过任何变量来控制
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nginx">upstream servers {
+    hash $request_uri consistent; # 通过请求地址($request_uri)来控制
+    server &lt;server_ip_1&gt;;
+    server &lt;server_ip_2&gt;;
+}
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-6-4" class="outline-4">
+<h4 id="sec-2-6-4"><span class="section-number-4">2.6.4</span> down</h4>
+<div class="outline-text-4" id="text-2-6-4">
+<p>
+假如有一台主机是出了故障，或者下线了，要暂时移出，那可以把它标为down，表示请求会略过这台主机
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nginx">upstream servers {
+    server &lt;server_ip_1&gt;;
+    server &lt;server_ip_2&gt; down;
+}
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-6-5" class="outline-4">
+<h4 id="sec-2-6-5"><span class="section-number-4">2.6.5</span> backup</h4>
+<div class="outline-text-4" id="text-2-6-5">
+<p>
+backup 是指备份的机器，相对于备份的机器来说，其他的机器就相当于主要服务器，只要当主要服务器不可用的时候，才会用到备用服务器
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nginx">upstream servers {
+    server &lt;server_ip_1&gt;;
+    server &lt;server_ip_2&gt; backup;
+}
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-6-6" class="outline-4">
+<h4 id="sec-2-6-6"><span class="section-number-4">2.6.6</span> weight</h4>
+<div class="outline-text-4" id="text-2-6-6">
+<p>
+weight指的是权重，默认情况下，每台主机的权重都是1，也就是说，接收请求的次数的比例是一样的。
+</p>
+
+<p>
+可以根据主机的配置或其他情况自行调节，比如，对于配置高的主机，可以把weight值调大。
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nginx">upstream servers {
+    server &lt;server_ip_0&gt; weight=3;
+    server &lt;server_ip_1&gt;;
+    server &lt;server_ip_2&gt;;
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-7" class="outline-3">
+<h3 id="sec-2-7"><span class="section-number-3">2.7</span> 返回状态码</h3>
+<div class="outline-text-3" id="text-2-7">
+<div class="org-src-container">
+
+<pre class="src src-nginx">location /error {
+    return 404 "Not Found !";
+}
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-8" class="outline-3">
+<h3 id="sec-2-8"><span class="section-number-3">2.8</span> URL 重写</h3>
+<div class="outline-text-3" id="text-2-8">
+<div class="org-src-container">
+
+<pre class="src src-nginx">location / {
+    rewrite '^/images/(.*)\.(png|jpg|gif)$' /data?file=$1.$2;
+    # 注意不能在上面这条规则后面加上“last”参数，否则下面的 set 指令不会执行
+    set $image_file $1;
+    set $image_type $2;
+}
+
+location /data {
+    root /tmp/data;
+    # 应用前面定义的变量。判断首先文件在不在，不在再判断目录在不在，如果还不在就跳转到最
+    try_files /$arg_file /404.html;
+}
+
+location /404.html {
+    return 404 "$image_file.$image_type Not Found";
+}
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-nginx">location /images/ {
+    rewrite ^/images/(.*)$ http://1.2.3.4/images/$1/; ## 浏览器重定向至 http://1.2.3.4/images/$1
+}
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-9" class="outline-3">
+<h3 id="sec-2-9"><span class="section-number-3">2.9</span> Location</h3>
+<div class="outline-text-3" id="text-2-9">
+<div class="org-src-container">
+
+<pre class="src src-sh">location    &lt;uri&gt; { ... }  ## 对当前路径及子路径下的所有资源都生效
+location =  &lt;uri&gt; { ... }  ## 只对当前路径生效（精确匹配，不包括子路径）
+location ~  &lt;uri&gt; { ... }  ## 正则匹配（区分大小写）
+location ~* &lt;uri&gt; { ... }  ## 正则匹配（不区分大小写）
+location ^~ &lt;uri&gt; { ... }  ## 降低正则匹配的优先级
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-2-9-1" class="outline-4">
+<h4 id="sec-2-9-1"><span class="section-number-4">2.9.1</span> 优先级</h4>
+<div class="outline-text-4" id="text-2-9-1">
+<pre class="example">
+1. Directives with the "=" prefix that match the query exactly. If found, searching stops.
+2. All remaining directives with literal strings. If this match used the "^~" prefix, searching stops.
+3. Regular expressions, in the order they are defined in the configuration file.
+4. If #3 yielded a match, that result is used. Otherwise, the match from #2 is used.
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-9-2" class="outline-4">
+<h4 id="sec-2-9-2"><span class="section-number-4">2.9.2</span> 转发规则</h4>
+<div class="outline-text-4" id="text-2-9-2">
+<p>
+location 和 target 尽量都以 / 结尾，否则可能会遇到循环重定向问题，遇到问题请抓包分析即可知来龙去脉。
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">location /hello {
+    root /home/test;   ## 访问 http://&lt;domain&gt;/hello
+                       ## 若不存在目录 /home/test/hello ，则返回 404
+                       ## 若存在目录   /home/test/hello ，重定向至 https://&lt;domain&gt;/hello/，默认请求 /home/test/hello/index.html
+}
+
+location /hello {
+    root /home/test/;  ## 同上
+}
+
+location /hello/ {
+    root /home/test;   ## 访问 http://&lt;domain&gt;/hello ， 无法匹配，返回 404
+                       ## 访问 https://&lt;domain&gt;/hello/，默认请求 /home/test/hello/index.html
+}
+
+location /hello/ {
+    root /home/test/;  ## 同上
+}
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">location /world {
+    proxy_pass http://127.0.0.1:9999;   ## 访问 http://&lt;domain&gt;/world ，   转发为 GET /world HTTP/1.0
+                                        ## 访问 http://&lt;domain&gt;/world/hk ，转发为 GET /world/hk HTTP/1.0
+}
+
+location /world {
+    proxy_pass http://127.0.0.1:9999/;  ## 访问 http://&lt;domain&gt;/world ，   转发为 GET / HTTP/1.0
+                                        ## 访问 http://&lt;domain&gt;/world/hk ，转发为 GET //hk HTTP/1.0
+                                        ## / + (/world/hk - /world) = / + /hk = //hk
+}
+
+location /world/ {
+    proxy_pass http://127.0.0.1:9999;   ## 访问 http://&lt;domain&gt;/world ，   重定向为 http://&lt;domain&gt;/world/ ，转发为 GET /world/ HTTP/1.0
+                                        ## 访问 http://&lt;domain&gt;/world/hk ，转发为 GET /world/hk HTTP/1.0
+}
+
+location /world/ {
+    proxy_pass http://127.0.0.1:9999/;  ## 访问 http://&lt;domain&gt;/world ，   重定向为 http://&lt;domain&gt;/world/ ，转发为 GET / HTTP/1.0
+                                        ## 访问 http://&lt;domain&gt;/world/hk ，转发为 GET /hk HTTP/1.0
+                                        ## / + (/workd/hk - /world/) = / + hk = /hk
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-10" class="outline-3">
+<h3 id="sec-2-10"><span class="section-number-3">2.10</span> 访问控制</h3>
+<div class="outline-text-3" id="text-2-10">
+<p>
+默认是 <code>allow all</code> ，如果要启用访问控制功能，则最后一行必须为 <code>deny all</code>
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nginx">location &lt;uri&gt; {
+    deny  192.168.0.2;
+    allow 192.168.1.0/24;
+    deny  all;
+}
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-11" class="outline-3">
+<h3 id="sec-2-11"><span class="section-number-3">2.11</span> 端口转发</h3>
+<div class="outline-text-3" id="text-2-11">
+<div class="org-src-container">
+
+<pre class="src src-nginx">stream {
+    server {
+        listen     48080;
+        proxy_pass 127.0.0.1:8080;
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

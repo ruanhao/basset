@@ -3,20 +3,26 @@
 #+EMAIL:     ruanhao1116@gmail.com
 #+LANGUAGE:  en
 #+LINK_HOME: http://www.github.com/ruanhao
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
-#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
-#+STARTUP:   showall
+#+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-spec/css/style.css" rel="stylesheet" type="text/css" />
+ #+HTML: <div class="outline-2" id="meta">
+| *Author* | {{{author}}} ({{{email}}})    |
+| *Date*   | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+#+TOC: headlines 3
 
 
-* 一，基本原理
+* 基本原理
 
-** 1.1，设计架构
+** 设计架构
 
 Nginx 会同时运行多个进程，一个主进程（master）和多个工作进程（worker），配置缓存时还会有缓存加载器进程（cache loader）和
 缓存管理器进程（cache manager）等。所有进程均仅含一个线程，通过共享内存的机制实现进程间通信。主进程以 root 身份运行，
 其余进程以非特权身份运行。
 
-*** 1.1.1，master 进程
+*** master 进程
 
 - 读取并验证配置信息
 - 创建，绑定及关闭套接字
@@ -26,25 +32,25 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 - 日志文件管理
 
 
-*** 1.1.2，worker 进程
+*** worker 进程
 
 - 接受并处理客户端连接
 - 提供反向代理及过滤功能
 
 
-*** 1.1.3，cache loader 进程
+*** cache loader 进程
 
 - 建立内存数据库
 
 
-*** 1.1.4，cache manager 进程
+*** cache manager 进程
 
 - 缓存失效及过期检查
 
 
-* 二，常用配置
+* 常用配置
 
-** 2.1，基本配置
+** 基本配置
 
 #+BEGIN_SRC nginx
   server {
@@ -74,7 +80,7 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 #+END_SRC
 
 
-** 2.2，反向代理
+** 反向代理
 
 反向代理是依赖于 `ngx_http_proxy_module` 这个模块来实现的
 
@@ -137,7 +143,7 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 #+END_SRC
 
 
-** 2.3, 压缩
+** 压缩
 
 #+BEGIN_SRC nginx
   http {
@@ -171,14 +177,14 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 #+END_SRC
 
 
-** 2.4, 监控
+** 监控
 
 #+BEGIN_SRC sh
   pip install ngxtop
 #+END_SRC
 
 
-** 2.5, Basic Auth
+** Basic Auth
 
 `ngx_http_auth_basic_module` 是使用文件作为存储介质的，用户名和密码必须和文件的信息匹配才能认证成功。
 
@@ -196,9 +202,9 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 #+END_SRC
 
 
-** 2.6, 负载均衡
+** 负载均衡
 
-*** 2.6.1, least_conn
+*** least_conn
 
 优先发送给那些接受请求少的
 
@@ -210,7 +216,8 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
   }
 #+END_SRC
 
-*** 2.6.2, ip_hash
+
+*** ip_hash
 
 可以记录请求来源的ip，如果是同一个ip，下次访问的时候还是会到相同的主机
 
@@ -222,7 +229,8 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
   }
 #+END_SRC
 
-*** 2.6.3, hash
+
+*** hash
 
 通过任何变量来控制
 
@@ -234,7 +242,8 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
   }
 #+END_SRC
 
-*** 2.6.4, down
+
+*** down
 
 假如有一台主机是出了故障，或者下线了，要暂时移出，那可以把它标为down，表示请求会略过这台主机
 
@@ -246,7 +255,7 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 #+END_SRC
 
 
-*** 2.6.5, backup
+*** backup
 
 backup 是指备份的机器，相对于备份的机器来说，其他的机器就相当于主要服务器，只要当主要服务器不可用的时候，才会用到备用服务器
 
@@ -258,7 +267,7 @@ backup 是指备份的机器，相对于备份的机器来说，其他的机器�
 #+END_SRC
 
 
-*** 2.6.6, weight
+*** weight
 
 weight指的是权重，默认情况下，每台主机的权重都是1，也就是说，接收请求的次数的比例是一样的。
 
@@ -273,7 +282,7 @@ weight指的是权重，默认情况下，每台主机的权重都是1，也就�
 #+END_SRC
 
 
-** 2.7, 返回状态码
+** 返回状态码
 
 #+BEGIN_SRC nginx
   location /error {
@@ -282,7 +291,7 @@ weight指的是权重，默认情况下，每台主机的权重都是1，也就�
 #+END_SRC
 
 
-** 2.8, URL 重写
+** URL 重写
 
 #+BEGIN_SRC nginx
   location / {
@@ -310,7 +319,7 @@ weight指的是权重，默认情况下，每台主机的权重都是1，也就�
 #+END_SRC
 
 
-** 2.9, Location
+** Location
 
 #+BEGIN_SRC sh
 location    <uri> { ... }  ## 对当前路径及子路径下的所有资源都生效
@@ -320,7 +329,7 @@ location ~* <uri> { ... }  ## 正则匹配（不区分大小写）
 location ^~ <uri> { ... }  ## 降低正则匹配的优先级
 #+END_SRC
 
-*** 2.9.1，优先级
+*** 优先级
 
   #+BEGIN_EXAMPLE
   1. Directives with the "=" prefix that match the query exactly. If found, searching stops.
@@ -330,7 +339,7 @@ location ^~ <uri> { ... }  ## 降低正则匹配的优先级
   #+END_EXAMPLE
 
 
-*** 2.9.2，转发规则
+*** 转发规则
 
   location 和 target 尽量都以 / 结尾，否则可能会遇到循环重定向问题，遇到问题请抓包分析即可知来龙去脉。
 
@@ -380,7 +389,7 @@ location ^~ <uri> { ... }  ## 降低正则匹配的优先级
   #+END_SRC
 
 
-** 2.10，访问控制
+** 访问控制
 
 默认是 =allow all= ，如果要启用访问控制功能，则最后一行必须为 =deny all=
 
@@ -392,7 +401,8 @@ location ^~ <uri> { ... }  ## 降低正则匹配的优先级
   }
 #+END_SRC
 
-** 2.11, 端口转发
+
+** 端口转发
 
 #+BEGIN_SRC nginx
   stream {
