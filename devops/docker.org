@@ -3,36 +3,40 @@
 #+EMAIL:     ruanhao1116@gmail.com
 #+LANGUAGE:  en
 #+LINK_HOME: http://www.github.com/ruanhao
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
-#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
-#+STARTUP:   showall
+#+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-spec/css/style.css" rel="stylesheet" type="text/css" />
+#+HTML: <div class="outline-2" id="meta">
+| Author | {{{author}}} ({{{email}}})    |
+| Date   | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+#+TOC: headlines 3
 
 
-* 1, 基本原理
-
-* 2, Docker 守护进程
+* Docker 守护进程
 
 可以使用 -H 标志调整守护进程绑定监听接口的方式
 
 客户端也必须指定接口的变化，如: =docker -H :2375= , 或者设置环境变量 DOCKER_HOST:
 
-#+BEGIN_SRC bash
-export DOCKER_HOST="tcp://0.0.0.0:2375"
+#+BEGIN_SRC sh
+  export DOCKER_HOST="tcp://0.0.0.0:2375"
 #+END_SRC
 
-** 2.1, 修改守护进程的端口
+** 修改守护进程的端口
 
 =docker daemon -H tcp://0.0.0.0:2375=
 
-** 2.2, 修改守护进程的套接字路径
+** 修改守护进程的套接字路径
 
 =docker daemon -H unix://home/docker/docker.sock=
 
-* 3, 容器操作
+* 容器操作
 
-- 运行容器
+** 运行容器
 
-  #+BEGIN_SRC sh
+#+BEGIN_SRC sh
   docker run --name my_container -i -t ubuntu /bin/bash
   # -i:     保证容器中 STDIN 开启
   # -t:     为容器创建伪终端
@@ -61,11 +65,11 @@ export DOCKER_HOST="tcp://0.0.0.0:2375"
 
   # --cidfile=/tmp/containerid.txt: 保存容器 ID 到指定文件中
   # --rm: 进程运行完毕自动删除容器，适用于只用一次的容器
-  #+END_SRC
+#+END_SRC
 
-- 查看容器
+** 查看容器
 
-  #+BEGIN_SRC sh
+#+BEGIN_SRC sh
   docker ps          # 正在运行的容器
   docker ps -a       # 所有容器
   docker ps -n <x>   # 查看最后 x 个容器，不论运行或停止
@@ -74,18 +78,18 @@ export DOCKER_HOST="tcp://0.0.0.0:2375"
   docker inspect <cname>
   docker inspct -f "{{ range .Mounts }}{{.}}{{end}}" <cname>
   docker port <image_hash> <port> # 查看容器端口映射情况
-  #+END_SRC
+#+END_SRC
 
-- 删除容器
+** 删除容器
 
-  #+BEGIN_SRC sh
+#+BEGIN_SRC sh
   docker rm <cname>
   docker rm `docker ps -a -q` # 删除所有容器
-  #+END_SRC
+#+END_SRC
 
-* 4, Dockerfile
+* Dockerfile
 
-#+BEGIN_SRC
+#+BEGIN_EXAMPLE
 FROM ubuntu:14.04
 MAINTAINER Hao Ruan "haoru@cisco.com"
 ENV REFRESHED_DATE 2017-04-19
@@ -95,11 +99,11 @@ WORKDIR /opt/cisco
 VOLUMN ["/opt/project"]
 ENTRYPOINT ["/usr/sbin/nginx"]
 EXPOSE 8080
-#+END_SRC
+#+END_EXAMPLE
 
-- 构建镜像
+** 构建镜像
 
-  #+BEGIN_SRC sh
+#+BEGIN_SRC sh
   docker build -t "<username>/<image_name>:<tag>" .
 
   docker images [<username>/<image_name>] # 查看镜像
@@ -108,30 +112,30 @@ EXPOSE 8080
 
   docker rmi # 删除镜像
   docker rmi `docker images -a -q` # 删除所有镜像
-  #+END_SRC
+#+END_SRC
 
-- 常用指令
+** 常用指令
 
-  1. CMD
+*** CMD
 
-     Dockerfile 中只能有一个 CMD 指令生效， =docker run= 中的 command 会覆盖 Dockerfile 中的 CMD 指令
+Dockerfile 中只能有一个 CMD 指令生效， =docker run= 中的 command 会覆盖 Dockerfile 中的 CMD 指令
 
-     #+BEGIN_SRC
+#+BEGIN_SRC
      CMD [ "executable", "param1", "param2" ] # exec 模式
      CMD command param1 param2                # shell 模式
      CMD [ "param1", "param2" ]               # 作为 ENTRYPOINT 指令的默认参数
-     #+END_SRC
+#+END_SRC
 
-  2. ENTRYPOINT
+*** ENTRYPOINT
 
-     如果要覆盖 Dockerfile 中的 ENTRYPOINT 指令, 则必须由 =docker run -e= 指定
+如果要覆盖 Dockerfile 中的 ENTRYPOINT 指令, 则必须由 =docker run -e= 指定
 
-     #+BEGIN_SRC
+#+BEGIN_SRC
      ENTRYPOINT [ "executable", "param1", "param2" ] # exec 模式
      ENTRYPOINT command param1 param2                # shell 模式
-     #+END_SRC
+#+END_SRC
 
-* 5, Docker Networking
+* Docker Networking
 
 Docker Networking 允许用户创建自己的网络，容器间通过此技术可以相互通信，包括跨越宿主机的通信（overlay 网络）
 
@@ -146,17 +150,17 @@ docker network connect <net_name> <cname> # 将已有容器添加到网络
 docker network disconnect <net_name> <cname>
 #+END_SRC
 
-** 5.1, Docker 中的桥接技术
+** Docker 中的桥接技术
 
 在安装了 Docker 的宿主机上的 docker0 设备就是个虚拟网桥：
 
-[[file:images/docker_br.png]]
+[[file:img/docker_br.png]]
 
-[[file:images/docker_host.png]]
+[[file:img/docker_host.png]]
 
-- 容器访问外部网络
+*** 容器访问外部网络
 
-  #+BEGIN_EXAMPLE
+#+BEGIN_EXAMPLE
   宿主机创建一个虚拟网桥 docker0，每个容器对应一个虚拟网络设备（TAP设备），
   与 docker0 一起构成一个虚拟网络，通过虚拟网桥实现相互通信。
 
@@ -164,34 +168,39 @@ docker network disconnect <net_name> <cname>
 
   iptables 规则类似于： iptables -t nat -A POSTROUTING -s 127.0.0.0/8 ! -d 127.0.0.0/8 -j MASQUERADE
   其中 127.0.0.0/8 是内部容器的网络，如果目标地址非内部虚拟网络，则进行 NAT 转换。
-  #+END_EXAMPLE
+#+END_EXAMPLE
 
-- 外部访问容器内部网络
+*** 外部访问容器内部网络
 
-  #+BEGIN_EXAMPLE
+#+BEGIN_EXAMPLE
   要让外部网络能够访问容器，通过 DNAT 来实现：
   iptables -t nat -A DOCKER ! -i docker0 -p tcp -m tcp --dport 49153 -j DNAT --to-destination 127.0.0.3:22
   其中 127.0.0.3:22 是内部容器 IP 和 SSHD 端口，在宿主机上映射为 49153 端口。
-  #+END_EXAMPLE
+#+END_EXAMPLE
 
-*** 5.1.1, 自定义网桥
+*** 自定义网桥
 
 也可以使用自定义网桥 br0 ，从而使得宿主机与容器属于同一个网络，架构如图所示：
 
-[[file:images/docker_host_br.png]]
+[[file:img/docker_host_br.png]]
 
 
-* 6, Docker Save & Export
+* Docker Save & Export
 
-- export
+** export
 
-  #+BEGIN_SRC
+用于导出容器，丢失镜像层次关系。
+
+#+BEGIN_SRC
   docker export hinaWeb > hinaWeb_Export.tar
   cat hinaWeb_Export.tar | docker import - local/hinaweb
-  #+END_SRC
+#+END_SRC
 
-- save
-  #+BEGIN_SRC
+** save
+
+导出镜像，保留层次关系。
+
+#+BEGIN_SRC
   docker save ubuntu:latest > hinaWeb_Save.tar
   docker load < hinaWeb_Save.tar
-  #+END_SRC
+#+END_SRC

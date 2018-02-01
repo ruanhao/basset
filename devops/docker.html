@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Docker</title>
+<!-- 2018-02-01 Thu 22:48 -->
+<meta  charset="utf-8">
+<meta  name="generator" content="Org-mode">
+<meta  name="author" content="Hao Ruan">
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+<link href="../org-spec/css/style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Docker</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Docker 守护进程</a>
+<ul>
+<li><a href="#sec-1-1">1.1. 修改守护进程的端口</a></li>
+<li><a href="#sec-1-2">1.2. 修改守护进程的套接字路径</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2. 容器操作</a>
+<ul>
+<li><a href="#sec-2-1">2.1. 运行容器</a></li>
+<li><a href="#sec-2-2">2.2. 查看容器</a></li>
+<li><a href="#sec-2-3">2.3. 删除容器</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. Dockerfile</a>
+<ul>
+<li><a href="#sec-3-1">3.1. 构建镜像</a></li>
+<li><a href="#sec-3-2">3.2. 常用指令</a>
+<ul>
+<li><a href="#sec-3-2-1">3.2.1. CMD</a></li>
+<li><a href="#sec-3-2-2">3.2.2. ENTRYPOINT</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-4">4. Docker Networking</a>
+<ul>
+<li><a href="#sec-4-1">4.1. Docker 中的桥接技术</a>
+<ul>
+<li><a href="#sec-4-1-1">4.1.1. 容器访问外部网络</a></li>
+<li><a href="#sec-4-1-2">4.1.2. 外部访问容器内部网络</a></li>
+<li><a href="#sec-4-1-3">4.1.3. 自定义网桥</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-5">5. Docker Save &amp; Export</a>
+<ul>
+<li><a href="#sec-5-1">5.1. export</a></li>
+<li><a href="#sec-5-2">5.2. save</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="outline-2" id="meta">
+<table>
+
+
+<colgroup>
+<col  class="left">
+
+<col  class="left">
+</colgroup>
+<tbody>
+<tr>
+<td class="left">Author</td>
+<td class="left">Hao Ruan (ruanhao1116@gmail.com)</td>
+</tr>
+
+<tr>
+<td class="left">Date</td>
+<td class="left">2018-02-01 22:48:51</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Docker 守护进程</a>
+<ul>
+<li><a href="#sec-1-1">1.1. 修改守护进程的端口</a></li>
+<li><a href="#sec-1-2">1.2. 修改守护进程的套接字路径</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2. 容器操作</a>
+<ul>
+<li><a href="#sec-2-1">2.1. 运行容器</a></li>
+<li><a href="#sec-2-2">2.2. 查看容器</a></li>
+<li><a href="#sec-2-3">2.3. 删除容器</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. Dockerfile</a>
+<ul>
+<li><a href="#sec-3-1">3.1. 构建镜像</a></li>
+<li><a href="#sec-3-2">3.2. 常用指令</a>
+<ul>
+<li><a href="#sec-3-2-1">3.2.1. CMD</a></li>
+<li><a href="#sec-3-2-2">3.2.2. ENTRYPOINT</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-4">4. Docker Networking</a>
+<ul>
+<li><a href="#sec-4-1">4.1. Docker 中的桥接技术</a>
+<ul>
+<li><a href="#sec-4-1-1">4.1.1. 容器访问外部网络</a></li>
+<li><a href="#sec-4-1-2">4.1.2. 外部访问容器内部网络</a></li>
+<li><a href="#sec-4-1-3">4.1.3. 自定义网桥</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-5">5. Docker Save &amp; Export</a>
+<ul>
+<li><a href="#sec-5-1">5.1. export</a></li>
+<li><a href="#sec-5-2">5.2. save</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Docker 守护进程</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+可以使用 -H 标志调整守护进程绑定监听接口的方式
+</p>
+
+<p>
+客户端也必须指定接口的变化，如: <code>docker -H :2375</code> , 或者设置环境变量 DOCKER_HOST:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh"><span style="color: #5f8700;">export</span> <span style="color: #0087ff;">DOCKER_HOST</span>=<span style="color: #00afaf;">"tcp://0.0.0.0:2375"</span>
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> 修改守护进程的端口</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+<code>docker daemon -H tcp://0.0.0.0:2375</code>
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> 修改守护进程的套接字路径</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+<code>docker daemon -H unix://home/docker/docker.sock</code>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> 容器操作</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> 运行容器</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">docker run --name my_container -i -t ubuntu /bin/bash
+<span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">-i:     &#20445;&#35777;&#23481;&#22120;&#20013; STDIN &#24320;&#21551;</span>
+<span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">-t:     &#20026;&#23481;&#22120;&#21019;&#24314;&#20266;&#32456;&#31471;</span>
+<span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">--name: &#21629;&#21517;&#24517;&#39035;&#21807;&#19968;</span>
+
+docker run --name my_container -d ubuntu &lt;cmd&gt;
+<span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">-d: &#21518;&#21488;&#36816;&#34892;</span>
+
+docker run --name my_container -p 80 -d ubuntu &lt;cmd&gt;
+<span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">-p: &#25511;&#21046; docker &#36816;&#34892;&#26102;&#24212;&#20844;&#24320;&#21738;&#20123;&#31471;&#21475;</span>
+docker run --name my_container -p 8080:80 -d ubuntu &lt;cmd&gt; <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#23558;&#23481;&#22120;&#20013;&#30340;80&#31471;&#21475;&#32465;&#23450;&#21040;&#23487;&#20027;&#26426;&#30340;8080&#31471;&#21475;</span>
+docker run --name my_container -p 127.0.0.1:8080:80 -d ubuntu &lt;cmd&gt;
+docker run --name my_container -p 127.0.0.1::80 -d ubuntu &lt;cmd&gt; <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#38543;&#26426;&#31471;&#21475;</span>
+docker run --name my_container -P -d ubuntu &lt;cmd&gt;
+<span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">-P: &#20844;&#24320;&#22312; Dockerfile &#20013;&#36890;&#36807; EXPOSE &#25351;&#20196;&#20844;&#24320;&#30340;&#25152;&#26377;&#31471;&#21475;</span>
+
+docker run --name my_container -P -d -v $<span style="color: #0087ff;">PWD</span>/website:/var/www/html/ ubuntu &lt;cmd&gt; <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#21367;</span>
+docker run --name my_container -P -d -v $<span style="color: #0087ff;">PWD</span>/website:/var/www/html/:ro ubuntu &lt;cmd&gt; <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#21482;&#35835;&#21367;</span>
+docker run --name my_container -P -d --volumes-from &lt;cname&gt; ubuntu &lt;cmd&gt; <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#25480;&#26435;&#19968;&#20010;&#23481;&#22120;&#35775;&#38382;&#21478;&#19968;&#20010;&#23481;&#22120;&#30340; Volume</span>
+
+docker run --name my_container -P -d --net=&lt;name&gt; ubuntu &lt;cmd&gt;
+<span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">--net: &#34920;&#31034;&#26032;&#23481;&#22120;&#23558;&#22312;&#21738;&#20010;&#32593;&#32476;&#20013;&#36816;&#34892;</span>
+
+docker run --name my_container -P -d --previleged ubuntu &lt;cmd&gt;
+<span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">--previleged: &#23481;&#22120;&#23545;&#20110;&#23487;&#20027;&#26426;&#25317;&#26377; root &#26435;&#38480;&#65292;&#29992;&#20110;&#22312; Docker &#20013;&#36816;&#34892; Docker &#30340;&#22330;&#26223;</span>
+
+<span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">--cidfile=/tmp/containerid.txt: &#20445;&#23384;&#23481;&#22120; ID &#21040;&#25351;&#23450;&#25991;&#20214;&#20013;</span>
+<span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">--rm: &#36827;&#31243;&#36816;&#34892;&#23436;&#27605;&#33258;&#21160;&#21024;&#38500;&#23481;&#22120;&#65292;&#36866;&#29992;&#20110;&#21482;&#29992;&#19968;&#27425;&#30340;&#23481;&#22120;</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> 查看容器</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">docker ps          <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#27491;&#22312;&#36816;&#34892;&#30340;&#23481;&#22120;</span>
+docker ps -a       <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#25152;&#26377;&#23481;&#22120;</span>
+docker ps -n &lt;x&gt;   <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#26597;&#30475;&#26368;&#21518; x &#20010;&#23481;&#22120;&#65292;&#19981;&#35770;&#36816;&#34892;&#25110;&#20572;&#27490;</span>
+docker top &lt;cname&gt; <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#26597;&#30475;&#23481;&#22120;&#20013;&#30340;&#36827;&#31243;</span>
+docker stats
+docker inspect &lt;cname&gt;
+docker inspct -f <span style="color: #00afaf;">"{{ range .Mounts }}{{.}}{{end}}"</span> &lt;cname&gt;
+docker port &lt;image_hash&gt; &lt;port&gt; <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#26597;&#30475;&#23481;&#22120;&#31471;&#21475;&#26144;&#23556;&#24773;&#20917;</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> 删除容器</h3>
+<div class="outline-text-3" id="text-2-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">docker rm &lt;cname&gt;
+docker rm <span style="color: #fa8072;">`docker ps -a -q`</span> <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#21024;&#38500;&#25152;&#26377;&#23481;&#22120;</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Dockerfile</h2>
+<div class="outline-text-2" id="text-3">
+<pre class="example">
+FROM ubuntu:14.04
+MAINTAINER Hao Ruan "haoru@cisco.com"
+ENV REFRESHED_DATE 2017-04-19
+COPY tomcat.jar /etc/
+RUN ["apt-get", "-qq", "update"]
+WORKDIR /opt/cisco
+VOLUMN ["/opt/project"]
+ENTRYPOINT ["/usr/sbin/nginx"]
+EXPOSE 8080
+</pre>
+</div>
+
+<div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> 构建镜像</h3>
+<div class="outline-text-3" id="text-3-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">docker build -t <span style="color: #00afaf;">"&lt;username&gt;/&lt;image_name&gt;:&lt;tag&gt;"</span> .
+
+docker images [&lt;username&gt;/&lt;image_name&gt;] <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#26597;&#30475;&#38236;&#20687;</span>
+
+docker history &lt;image_hash&gt; <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#26597;&#30475;&#38236;&#20687;&#26500;&#24314;&#36807;&#31243;</span>
+
+docker rmi <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#21024;&#38500;&#38236;&#20687;</span>
+docker rmi <span style="color: #fa8072;">`docker images -a -q`</span> <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#21024;&#38500;&#25152;&#26377;&#38236;&#20687;</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> 常用指令</h3>
+<div class="outline-text-3" id="text-3-2">
+</div><div id="outline-container-sec-3-2-1" class="outline-4">
+<h4 id="sec-3-2-1"><span class="section-number-4">3.2.1</span> CMD</h4>
+<div class="outline-text-4" id="text-3-2-1">
+<p>
+Dockerfile 中只能有一个 CMD 指令生效， <code>docker run</code> 中的 command 会覆盖 Dockerfile 中的 CMD 指令
+</p>
+
+<pre class="example">
+CMD [ "executable", "param1", "param2" ] # exec 模式
+CMD command param1 param2                # shell 模式
+CMD [ "param1", "param2" ]               # 作为 ENTRYPOINT 指令的默认参数
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2-2" class="outline-4">
+<h4 id="sec-3-2-2"><span class="section-number-4">3.2.2</span> ENTRYPOINT</h4>
+<div class="outline-text-4" id="text-3-2-2">
+<p>
+如果要覆盖 Dockerfile 中的 ENTRYPOINT 指令, 则必须由 <code>docker run -e</code> 指定
+</p>
+
+<pre class="example">
+ENTRYPOINT [ "executable", "param1", "param2" ] # exec 模式
+ENTRYPOINT command param1 param2                # shell 模式
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> Docker Networking</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Docker Networking 允许用户创建自己的网络，容器间通过此技术可以相互通信，包括跨越宿主机的通信（overlay 网络）
+</p>
+
+<p>
+容器间可通过 &lt;cname&gt;.&lt;net_name&gt; 方式通信
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">docker network create &lt;net_name&gt; <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#21019;&#24314;&#32593;&#32476;</span>
+docker network inspect &lt;net_name&gt; <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#26597;&#30475;&#32593;&#32476;</span>
+docker network ls
+docker network rm &lt;net_name&gt;
+docker network connect &lt;net_name&gt; &lt;cname&gt; <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#23558;&#24050;&#26377;&#23481;&#22120;&#28155;&#21152;&#21040;&#32593;&#32476;</span>
+docker network disconnect &lt;net_name&gt; &lt;cname&gt;
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> Docker 中的桥接技术</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+在安装了 Docker 的宿主机上的 docker0 设备就是个虚拟网桥：
+</p>
+
+
+<div class="figure">
+<p><img src="img/docker_br.png" alt="docker_br.png">
+</p>
+</div>
+
+
+<div class="figure">
+<p><img src="img/docker_host.png" alt="docker_host.png">
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4-1-1" class="outline-4">
+<h4 id="sec-4-1-1"><span class="section-number-4">4.1.1</span> 容器访问外部网络</h4>
+<div class="outline-text-4" id="text-4-1-1">
+<pre class="example">
+宿主机创建一个虚拟网桥 docker0，每个容器对应一个虚拟网络设备（TAP设备），
+与 docker0 一起构成一个虚拟网络，通过虚拟网桥实现相互通信。
+
+宿主机的物理网络设备 eth0 作为内部虚拟网络的 NAT 网关，容器通过 eth0 访问外部网络：
+
+iptables 规则类似于： iptables -t nat -A POSTROUTING -s 127.0.0.0/8 ! -d 127.0.0.0/8 -j MASQUERADE
+其中 127.0.0.0/8 是内部容器的网络，如果目标地址非内部虚拟网络，则进行 NAT 转换。
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-4-1-2" class="outline-4">
+<h4 id="sec-4-1-2"><span class="section-number-4">4.1.2</span> 外部访问容器内部网络</h4>
+<div class="outline-text-4" id="text-4-1-2">
+<pre class="example">
+要让外部网络能够访问容器，通过 DNAT 来实现：
+iptables -t nat -A DOCKER ! -i docker0 -p tcp -m tcp --dport 49153 -j DNAT --to-destination 127.0.0.3:22
+其中 127.0.0.3:22 是内部容器 IP 和 SSHD 端口，在宿主机上映射为 49153 端口。
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-4-1-3" class="outline-4">
+<h4 id="sec-4-1-3"><span class="section-number-4">4.1.3</span> 自定义网桥</h4>
+<div class="outline-text-4" id="text-4-1-3">
+<p>
+也可以使用自定义网桥 br0 ，从而使得宿主机与容器属于同一个网络，架构如图所示：
+</p>
+
+
+<div class="figure">
+<p><img src="img/docker_host_br.png" alt="docker_host_br.png">
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> Docker Save &amp; Export</h2>
+<div class="outline-text-2" id="text-5">
+</div><div id="outline-container-sec-5-1" class="outline-3">
+<h3 id="sec-5-1"><span class="section-number-3">5.1</span> export</h3>
+<div class="outline-text-3" id="text-5-1">
+<p>
+用于导出容器，丢失镜像层次关系。
+</p>
+
+<pre class="example">
+docker export hinaWeb &gt; hinaWeb_Export.tar
+cat hinaWeb_Export.tar | docker import - local/hinaweb
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-5-2" class="outline-3">
+<h3 id="sec-5-2"><span class="section-number-3">5.2</span> save</h3>
+<div class="outline-text-3" id="text-5-2">
+<p>
+导出镜像，保留层次关系。
+</p>
+
+<pre class="example">
+docker save ubuntu:latest &gt; hinaWeb_Save.tar
+docker load &lt; hinaWeb_Save.tar
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
