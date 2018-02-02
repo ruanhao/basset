@@ -30,6 +30,8 @@
 
 ** 订阅消息
 
+
+
 #+BEGIN_SRC plantuml :file img/rabbitmq_consume.png
   hide footbox
   participant Consumer as c
@@ -43,6 +45,9 @@
   q -> c : msg
   c --> q : basic.ack
 #+END_SRC
+#+NAME: subcribe
+#+CAPTION: 订阅
+#+RESULTS:
 
 
 ** 获取消息
@@ -56,6 +61,9 @@
   q -> c : msg
   c --> q : basic.ack
 #+END_SRC
+#+NAME: get
+#+CAPTION: 获取单个消息
+#+RESULTS:
 
 - =basic.get= 命令会订阅消息，获得单条消息，然后取消订阅，因此效率不高。
 
@@ -75,6 +83,9 @@
   requeue=false: 立即把消息从队列中移除，不会发送给新的消费者
   end note
 #+END_SRC
+#+NAME: reject
+#+CAPTION: 拒绝消息
+#+RESULTS:
 
 =requeue=false= 的意义在于：RabbitMQ 会支持一个特殊的队列（dead letter）用来存放那些被拒绝而不重入队列的消息。
 dead letter 队列可以让管理者通过检测拒绝或未送达的消息来发现问题所在。
@@ -96,6 +107,9 @@ dead letter 队列可以让管理者通过检测拒绝或未送达的消息来�
   end note
   r --> c : response
 #+END_SRC
+#+NAME: create
+#+CAPTION: 创建队列
+#+RESULTS:
 
 - 消费者和生产者都能使用 =queue.delare= 命令来创建队列。
 - 如果消费者在同一信道上已订阅了另一个信道的话，则无法再声明队列了，必须先取消订阅。
@@ -114,6 +128,8 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 当声明一个队列时，一开始该队列会自动绑定到默认交换器， *并以队列名称作为路由键* 。
 之后可以发送 =exchange.declare= 命令并设置合适的参数，就可以升级成具体类型交换器。
 
+#+CAPTION: direct router
+#+NAME: direct-router
 [[file:img/direct-router.png]]
 
 
@@ -121,11 +137,15 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 
 将收到的消息广播的绑定的队列上。
 
+#+CAPTION: fanout router
+#+NAME: fanout-router
 [[file:img/fanout-router.png]]
 
 
 ** topic
 
+#+CAPTION: topic router
+#+NAME: topic-router
 [[file:img/topic-router.png]]
 
 - =.= 把路由键分为了几部分
@@ -482,8 +502,12 @@ RabbitMQ 默认不会将队列的内容复制到整个集群上。
 如果不进行特别的配置，这些信息仅存在于队列所属的那个节点上。
 非所有者节点 *只知道队列的元数据* 和指向该队列存在的那个节点的指针。
 
+#+CAPTION: 只有队列的元信息在节点间共享
+#+NAME: rabiit_cluster
 [[file:img/rabbit_cluster.png]]
 
+#+CAPTION: 交换器中的路由信息在节点间共享
+#+NAME: rabiit_cluster_exchange
 file:img/rabbit_cluster_exchange.png
 
 ** 集群管理

@@ -2,7 +2,7 @@
 <html>
 <head>
 <title>RabbitMQ</title>
-<!-- 2018-01-29 Mon 13:19 -->
+<!-- 2018-02-02 Fri 22:24 -->
 <meta  charset="utf-8">
 <meta  name="generator" content="Org-mode">
 <meta  name="author" content="Hao Ruan">
@@ -242,7 +242,7 @@ for the JavaScript code in this tag.
 
 <tr>
 <td class="left"><b>Date</b></td>
-<td class="left">2018-01-29 13:19:37</td>
+<td class="left">2018-02-02 22:24:04</td>
 </tr>
 </tbody>
 </table>
@@ -370,9 +370,10 @@ for the JavaScript code in this tag.
 <h3 id="sec-2-1"><span class="section-number-3">2.1</span> 订阅消息</h3>
 <div class="outline-text-3" id="text-2-1">
 
-<div class="figure">
+<div id="subcribe" class="figure">
 <p><img src="img/rabbitmq_consume.png" alt="rabbitmq_consume.png">
 </p>
+<p><span class="figure-number">Figure 1:</span> 订阅</p>
 </div>
 </div>
 </div>
@@ -382,9 +383,10 @@ for the JavaScript code in this tag.
 <h3 id="sec-2-2"><span class="section-number-3">2.2</span> 获取消息</h3>
 <div class="outline-text-3" id="text-2-2">
 
-<div class="figure">
+<div id="get" class="figure">
 <p><img src="img/rabbitmq_get.png" alt="rabbitmq_get.png">
 </p>
+<p><span class="figure-number">Figure 2:</span> 获取单个消息</p>
 </div>
 
 <ul class="org-ul">
@@ -400,9 +402,10 @@ for the JavaScript code in this tag.
 <h3 id="sec-2-3"><span class="section-number-3">2.3</span> 拒绝消息</h3>
 <div class="outline-text-3" id="text-2-3">
 
-<div class="figure">
+<div id="reject" class="figure">
 <p><img src="img/rabbitmq_reject.png" alt="rabbitmq_reject.png">
 </p>
+<p><span class="figure-number">Figure 3:</span> 拒绝消息</p>
 </div>
 
 <p>
@@ -418,9 +421,10 @@ dead letter 队列可以让管理者通过检测拒绝或未送达的消息来�
 <h3 id="sec-2-4"><span class="section-number-3">2.4</span> 创建队列</h3>
 <div class="outline-text-3" id="text-2-4">
 
-<div class="figure">
+<div id="create" class="figure">
 <p><img src="img/rabbitmq_create.png" alt="rabbitmq_create.png">
 </p>
+<p><span class="figure-number">Figure 4:</span> 创建队列</p>
 </div>
 
 <ul class="org-ul">
@@ -457,9 +461,10 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 </p>
 
 
-<div class="figure">
+<div id="direct-router" class="figure">
 <p><img src="img/direct-router.png" alt="direct-router.png">
 </p>
+<p><span class="figure-number">Figure 5:</span> direct router</p>
 </div>
 </div>
 </div>
@@ -473,9 +478,10 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 </p>
 
 
-<div class="figure">
+<div id="fanout-router" class="figure">
 <p><img src="img/fanout-router.png" alt="fanout-router.png">
 </p>
+<p><span class="figure-number">Figure 6:</span> fanout router</p>
 </div>
 </div>
 </div>
@@ -485,9 +491,10 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 <h3 id="sec-3-3"><span class="section-number-3">3.3</span> topic</h3>
 <div class="outline-text-3" id="text-3-3">
 
-<div class="figure">
+<div id="topic-router" class="figure">
 <p><img src="img/topic-router.png" alt="topic-router.png">
 </p>
+<p><span class="figure-number">Figure 7:</span> topic router</p>
 </div>
 
 <ul class="org-ul">
@@ -617,8 +624,8 @@ rabbitmqctl stop -n rabbit@&lt;nodename&gt;
 <div class="outline-text-4" id="text-4-4-1">
 <div class="org-src-container">
 
-<pre class="src src-sh">rabbitmqctl set_permission -p &lt;vhost_name&gt; \
-&lt;username&gt; ".*" ".*" ".*"
+<pre class="src src-sh">rabbitmqctl set_permission -p &lt;vhost_name&gt; <span style="color: #00afaf;">\</span>
+&lt;username&gt; <span style="color: #00afaf;">".*"</span> <span style="color: #00afaf;">".*"</span> <span style="color: #00afaf;">".*"</span>
 </pre>
 </div>
 </div>
@@ -641,7 +648,7 @@ rabbitmqctl stop -n rabbit@&lt;nodename&gt;
 <div class="org-src-container">
 
 <pre class="src src-sh">rabbitmqctl list_permissions -p &lt;vhost_name&gt;
-rabbitmqctl list_user_permissions &lt;username&gt;  # 查看某个用户在所有 vhost 上的权限
+rabbitmqctl list_user_permissions &lt;username&gt;  <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#26597;&#30475;&#26576;&#20010;&#29992;&#25143;&#22312;&#25152;&#26377; vhost &#19978;&#30340;&#26435;&#38480;</span>
 </pre>
 </div>
 </div>
@@ -689,7 +696,7 @@ rabbitmqctl list_user_permissions &lt;username&gt;  # 查看某个用户在所�
 <div class="org-src-container">
 
 <pre class="src src-sh">rabbitmqctl list_queues
-rabbitmqctl list_queues name messages consumers memory # memory 单位为字节
+rabbitmqctl list_queues name messages consumers memory <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">memory &#21333;&#20301;&#20026;&#23383;&#33410;</span>
 </pre>
 </div>
 
@@ -843,27 +850,27 @@ spawn(fun() -&gt; etop:start([{output, text}, {interval, 5}, {lines, 10}, {sort,
 <div class="outline-text-4" id="text-5-1-1">
 <div class="org-src-container">
 
-<pre class="src src-python">import pika
+<pre class="src src-python"><span style="color: #5f8700;">import</span> pika
 
-EXCHANGE = 'hello-exchange'
+<span style="color: #0087ff;">EXCHANGE</span> = <span style="color: #00afaf;">'hello-exchange'</span>
 
-conn_params = pika.ConnectionParameters(host='10.74.68.89', port=45672, socket_timeout=3.0)
-conn_broker = pika.BlockingConnection(conn_params)  # 使用默认 vhost /
-channel = conn_broker.channel()
+<span style="color: #0087ff;">conn_params</span> = pika.ConnectionParameters(host=<span style="color: #00afaf;">'10.74.68.89'</span>, port=45672, socket_timeout=3.0)
+<span style="color: #0087ff;">conn_broker</span> = pika.BlockingConnection(conn_params)  <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#20351;&#29992;&#40664;&#35748; vhost /</span>
+<span style="color: #0087ff;">channel</span> = conn_broker.channel()
 
 channel.exchange_declare(exchange=EXCHANGE,
-                         exchange_type='direct',
-                         passive=False,
-                         durable=True,
-                         auto_delete=False)
+                         exchange_type=<span style="color: #00afaf;">'direct'</span>,
+                         passive=<span style="color: #00afaf;">False</span>,
+                         durable=<span style="color: #00afaf;">True</span>,
+                         auto_delete=<span style="color: #00afaf;">False</span>)
 
-msg_props = pika.BasicProperties()
-msg_props.content_type = 'text/plain'
+<span style="color: #0087ff;">msg_props</span> = pika.BasicProperties()
+<span style="color: #0087ff;">msg_props.content_type</span> = <span style="color: #00afaf;">'text/plain'</span>
 
 channel.basic_publish(exchange=EXCHANGE,
                       properties=msg_props,
-                      body='Hello World',
-                      routing_key='hola')
+                      body=<span style="color: #00afaf;">'Hello World'</span>,
+                      routing_key=<span style="color: #00afaf;">'hola'</span>)
 
 conn_broker.close()
 </pre>
@@ -877,41 +884,41 @@ conn_broker.close()
 <div class="outline-text-4" id="text-5-1-2">
 <div class="org-src-container">
 
-<pre class="src src-python">import pika
+<pre class="src src-python"><span style="color: #5f8700;">import</span> pika
 
-EXCHANGE = 'hello-exchange'
-QUEUE = 'hello-exchange'
-TAG = 'hello-consumer'
+<span style="color: #0087ff;">EXCHANGE</span> = <span style="color: #00afaf;">'hello-exchange'</span>
+<span style="color: #0087ff;">QUEUE</span> = <span style="color: #00afaf;">'hello-exchange'</span>
+<span style="color: #0087ff;">TAG</span> = <span style="color: #00afaf;">'hello-consumer'</span>
 
-conn_params = pika.ConnectionParameters(host='10.74.68.89', port=45672, socket_timeout=3.0)
-conn_broker = pika.BlockingConnection(conn_params)
-channel = conn_broker.channel()
+<span style="color: #0087ff;">conn_params</span> = pika.ConnectionParameters(host=<span style="color: #00afaf;">'10.74.68.89'</span>, port=45672, socket_timeout=3.0)
+<span style="color: #0087ff;">conn_broker</span> = pika.BlockingConnection(conn_params)
+<span style="color: #0087ff;">channel</span> = conn_broker.channel()
 
-channel.exchange_declare(exchange=EXCHANGE,  # 如果没有就创建，否则继续
-                         exchange_type='direct',
-                         passive=False,
-                         durable=True,
-                         auto_delete=False)
+channel.exchange_declare(exchange=EXCHANGE,  <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#22914;&#26524;&#27809;&#26377;&#23601;&#21019;&#24314;&#65292;&#21542;&#21017;&#32487;&#32493;</span>
+                         exchange_type=<span style="color: #00afaf;">'direct'</span>,
+                         passive=<span style="color: #00afaf;">False</span>,
+                         durable=<span style="color: #00afaf;">True</span>,
+                         auto_delete=<span style="color: #00afaf;">False</span>)
 
 channel.queue_declare(queue=QUEUE)
 
 channel.queue_bind(queue=QUEUE,
                    exchange=EXCHANGE,
-                   routing_key='hola')
+                   routing_key=<span style="color: #00afaf;">'hola'</span>)
 
-def msg_consumer(channel, method, header, body):
+<span style="color: #5f8700;">def</span> <span style="color: #0087ff;">msg_consumer</span>(channel, method, header, body):
     channel.basic_ack(delivery_tag=method.delivery_tag)
-    print("receive: {}".format(body))
+    <span style="color: #5f8700;">print</span>(<span style="color: #00afaf;">"receive: {}"</span>.<span style="color: #5f8700;">format</span>(body))
     channel.basic_cancel(consumer_tag=TAG)
     channel.stop_consuming()
 
 
 channel.basic_consume(msg_consumer,
                       queue=QUEUE,
-                      consumer_tag=TAG) # 一个 channel 可以有多个订阅，使用 consumer_tag 来标识订阅
+                      consumer_tag=TAG) <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#19968;&#20010; channel &#21487;&#20197;&#26377;&#22810;&#20010;&#35746;&#38405;&#65292;&#20351;&#29992; consumer_tag &#26469;&#26631;&#35782;&#35746;&#38405;</span>
 
 
-print(' [*] Waiting for messages. To exit press CTRL+C')
+<span style="color: #5f8700;">print</span>(<span style="color: #00afaf;">' [*] Waiting for messages. To exit press CTRL+C'</span>)
 channel.start_consuming()
 </pre>
 </div>
@@ -937,35 +944,35 @@ channel.start_consuming()
 <div class="outline-text-4" id="text-5-2-1">
 <div class="org-src-container">
 
-<pre class="src src-python">#! /usr/bin/env python3
-# -*- coding: utf-8 -*-
+<pre class="src src-python"><span style="color: #585858; font-style: italic;">#</span><span style="color: #585858; font-style: italic;">! /usr/bin/env python3</span>
+<span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">-*- coding: utf-8 -*-</span>
 
-import pika
+<span style="color: #5f8700;">import</span> pika
 
-EXCHANGE = 'hello-exchange'
+<span style="color: #0087ff;">EXCHANGE</span> = <span style="color: #00afaf;">'hello-exchange'</span>
 
-conn_params = pika.ConnectionParameters(host='10.74.68.89', port=45672, socket_timeout=3.0)
-conn_broker = pika.BlockingConnection(conn_params)  # 使用默认 vhost /
-channel = conn_broker.channel()
+<span style="color: #0087ff;">conn_params</span> = pika.ConnectionParameters(host=<span style="color: #00afaf;">'10.74.68.89'</span>, port=45672, socket_timeout=3.0)
+<span style="color: #0087ff;">conn_broker</span> = pika.BlockingConnection(conn_params)  <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#20351;&#29992;&#40664;&#35748; vhost /</span>
+<span style="color: #0087ff;">channel</span> = conn_broker.channel()
 channel.confirm_delivery()
 channel.exchange_declare(exchange=EXCHANGE,
-                         exchange_type='direct',
-                         passive=False,
-                         durable=True,
-                         auto_delete=False)
+                         exchange_type=<span style="color: #00afaf;">'direct'</span>,
+                         passive=<span style="color: #00afaf;">False</span>,
+                         durable=<span style="color: #00afaf;">True</span>,
+                         auto_delete=<span style="color: #00afaf;">False</span>)
 
-msg_props = pika.BasicProperties()
-msg_props.content_type = 'text/plain'
+<span style="color: #0087ff;">msg_props</span> = pika.BasicProperties()
+<span style="color: #0087ff;">msg_props.content_type</span> = <span style="color: #00afaf;">'text/plain'</span>
 
-ack = channel.basic_publish(exchange=EXCHANGE,
+<span style="color: #0087ff;">ack</span> = channel.basic_publish(exchange=EXCHANGE,
                             properties=msg_props,
-                            body='Hello World',
-                            routing_key='hola')
+                            body=<span style="color: #00afaf;">'Hello World'</span>,
+                            routing_key=<span style="color: #00afaf;">'hola'</span>)
 
-if ack:
-    print("confirm received")
-else:
-    print("msg lost")
+<span style="color: #5f8700;">if</span> ack:
+    <span style="color: #5f8700;">print</span>(<span style="color: #00afaf;">"confirm received"</span>)
+<span style="color: #5f8700;">else</span>:
+    <span style="color: #5f8700;">print</span>(<span style="color: #00afaf;">"msg lost"</span>)
 
 conn_broker.close()
 </pre>
@@ -980,35 +987,35 @@ conn_broker.close()
 <div class="outline-text-3" id="text-5-3">
 <div class="org-src-container">
 
-<pre class="src src-python">#! /usr/bin/env python3
-# -*- coding: utf-8 -*-
+<pre class="src src-python"><span style="color: #585858; font-style: italic;">#</span><span style="color: #585858; font-style: italic;">! /usr/bin/env python3</span>
+<span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">-*- coding: utf-8 -*-</span>
 
-import pika
+<span style="color: #5f8700;">import</span> pika
 
-EXCHANGE = 'amq.rabbitmq.log'
+<span style="color: #0087ff;">EXCHANGE</span> = <span style="color: #00afaf;">'amq.rabbitmq.log'</span>
 
-conn_params = pika.ConnectionParameters(host='10.74.68.89', port=45672, socket_timeout=3.0)
-conn_broker = pika.BlockingConnection(conn_params)
-channel = conn_broker.channel()
+<span style="color: #0087ff;">conn_params</span> = pika.ConnectionParameters(host=<span style="color: #00afaf;">'10.74.68.89'</span>, port=45672, socket_timeout=3.0)
+<span style="color: #0087ff;">conn_broker</span> = pika.BlockingConnection(conn_params)
+<span style="color: #0087ff;">channel</span> = conn_broker.channel()
 
-result = channel.queue_declare(exclusive=True, auto_delete=True)
-queue_name = result.method.queue
+<span style="color: #0087ff;">result</span> = channel.queue_declare(exclusive=<span style="color: #00afaf;">True</span>, auto_delete=<span style="color: #00afaf;">True</span>)
+<span style="color: #0087ff;">queue_name</span> = result.method.queue
 
-# binding_keys = ['info', 'warning', 'error']
-binding_keys = ['#']
+<span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">binding_keys = ['info', 'warning', 'error']</span>
+<span style="color: #0087ff;">binding_keys</span> = [<span style="color: #00afaf;">'#'</span>]
 
-for binding_key in binding_keys:
+<span style="color: #5f8700;">for</span> binding_key <span style="color: #5f8700;">in</span> binding_keys:
     channel.queue_bind(queue=queue_name,
                        exchange=EXCHANGE,
                        routing_key=binding_key)
 
-def msg_consumer(channel, method, header, body):
-    print("[{}]: {}".format(method.routing_key, body.decode('utf-8')), end='')
+<span style="color: #5f8700;">def</span> <span style="color: #0087ff;">msg_consumer</span>(channel, method, header, body):
+    <span style="color: #5f8700;">print</span>(<span style="color: #00afaf;">"[{}]: {}"</span>.<span style="color: #5f8700;">format</span>(method.routing_key, body.decode(<span style="color: #00afaf;">'utf-8'</span>)), end=<span style="color: #00afaf;">''</span>)
 
 
 channel.basic_consume(msg_consumer,
                       queue=queue_name,
-                      no_ack=True)
+                      no_ack=<span style="color: #00afaf;">True</span>)
 
 channel.start_consuming()
 </pre>
@@ -1028,15 +1035,17 @@ RabbitMQ 默认不会将队列的内容复制到整个集群上。
 </p>
 
 
-<div class="figure">
+<div id="rabiit_cluster" class="figure">
 <p><img src="img/rabbit_cluster.png" alt="rabbit_cluster.png">
 </p>
+<p><span class="figure-number">Figure 8:</span> 只有队列的元信息在节点间共享</p>
 </div>
 
 
-<div class="figure">
+<div id="rabiit_cluster_exchange" class="figure">
 <p><img src="img/rabbit_cluster_exchange.png" alt="rabbit_cluster_exchange.png">
 </p>
+<p><span class="figure-number">Figure 9:</span> 交换器中的路由信息在节点间共享</p>
 </div>
 </div>
 
@@ -1067,7 +1076,7 @@ RabbitMQ 默认不会将队列的内容复制到整个集群上。
 
 <div class="org-src-container">
 
-<pre class="src src-sh"># 将 my_node 加入集群，并使其自己也称为磁盘节点
+<pre class="src src-sh"><span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#23558; my_node &#21152;&#20837;&#38598;&#32676;&#65292;&#24182;&#20351;&#20854;&#33258;&#24049;&#20063;&#31216;&#20026;&#30913;&#30424;&#33410;&#28857;</span>
 rabbitmqctl -n &lt;my_node&gt; cluster &lt;other_node&gt; &lt;my_node&gt;
 </pre>
 </div>
