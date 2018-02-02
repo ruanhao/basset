@@ -2,7 +2,7 @@
 <html>
 <head>
 <title>Nginx</title>
-<!-- 2018-01-29 Mon 14:37 -->
+<!-- 2018-02-02 Fri 23:11 -->
 <meta  charset="utf-8">
 <meta  name="generator" content="Org-mode">
 <meta  name="author" content="Hao Ruan">
@@ -159,9 +159,9 @@ for the JavaScript code in this tag.
 <li><a href="#sec-2-1">2.1. 基本配置</a></li>
 <li><a href="#sec-2-2">2.2. 反向代理</a>
 <ul>
-<li><a href="#sec-2-2-1">2.2.1. 2.2.1, 直接转发</a></li>
-<li><a href="#sec-2-2-2">2.2.2. 2.2.2, 动态转发</a></li>
-<li><a href="#sec-2-2-3">2.2.3. 2.2.3, websocket 转发</a></li>
+<li><a href="#sec-2-2-1">2.2.1. 直接转发</a></li>
+<li><a href="#sec-2-2-2">2.2.2. 动态转发</a></li>
+<li><a href="#sec-2-2-3">2.2.3. websocket 转发</a></li>
 </ul>
 </li>
 <li><a href="#sec-2-3">2.3. 压缩</a></li>
@@ -203,13 +203,13 @@ for the JavaScript code in this tag.
 </colgroup>
 <tbody>
 <tr>
-<td class="left"><b>Author</b></td>
+<td class="left">Author</td>
 <td class="left">Hao Ruan (ruanhao1116@gmail.com)</td>
 </tr>
 
 <tr>
-<td class="left"><b>Date</b></td>
-<td class="left">2018-01-29 14:37:53</td>
+<td class="left">Date</td>
+<td class="left">2018-02-02 23:11:18</td>
 </tr>
 </tbody>
 </table>
@@ -235,9 +235,9 @@ for the JavaScript code in this tag.
 <li><a href="#sec-2-1">2.1. 基本配置</a></li>
 <li><a href="#sec-2-2">2.2. 反向代理</a>
 <ul>
-<li><a href="#sec-2-2-1">2.2.1. 2.2.1, 直接转发</a></li>
-<li><a href="#sec-2-2-2">2.2.2. 2.2.2, 动态转发</a></li>
-<li><a href="#sec-2-2-3">2.2.3. 2.2.3, websocket 转发</a></li>
+<li><a href="#sec-2-2-1">2.2.1. 直接转发</a></li>
+<li><a href="#sec-2-2-2">2.2.2. 动态转发</a></li>
+<li><a href="#sec-2-2-3">2.2.3. websocket 转发</a></li>
 </ul>
 </li>
 <li><a href="#sec-2-3">2.3. 压缩</a></li>
@@ -349,27 +349,27 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
 
-<pre class="src src-nginx">server {
+<pre class="src src-nginx"><span style="color: #5f8700;">server</span> {
 
-    listen 40839;
-    root /var/data;             # 网站的源代码静态文件的根目录。
-    server_name example.org;    # 域名
+    <span style="color: #5f8700;">listen</span> 40839;
+    <span style="color: #5f8700;">root</span> /var/data;             <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#32593;&#31449;&#30340;&#28304;&#20195;&#30721;&#38745;&#24577;&#25991;&#20214;&#30340;&#26681;&#30446;&#24405;&#12290;</span>
+    <span style="color: #5f8700;">server_name</span> example.org;    <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#22495;&#21517;</span>
 
-    location / {
-        index index.html index.php;
-        # 当访问 http://example.org 时就会去读取 /var/root/index.html ，
-        # 如果找不到就会读取 index.php ，就会转发到 fastcgi_pass 里面的逻辑
+    <span style="color: #5f8700;">location</span> <span style="color: #0087ff;">/</span> {
+        <span style="color: #5f8700;">index</span> index.html index.php;
+        <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#24403;&#35775;&#38382; http://example.org &#26102;&#23601;&#20250;&#21435;&#35835;&#21462; /var/root/index.html &#65292;</span>
+        <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#22914;&#26524;&#25214;&#19981;&#21040;&#23601;&#20250;&#35835;&#21462; index.php &#65292;&#23601;&#20250;&#36716;&#21457;&#21040; fastcgi_pass &#37324;&#38754;&#30340;&#36923;&#36753;</span>
     }
 
-    location ~* \.(gif|jpg|png)$ {
-        expires 30d;            # 在 30 天后过期，也就是缓存 30 天
+    <span style="color: #5f8700;">location</span> ~* <span style="color: #0087ff;">\.(gif|jpg|png)$</span> {
+        <span style="color: #5f8700;">expires</span> 30d;            <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#22312; 30 &#22825;&#21518;&#36807;&#26399;&#65292;&#20063;&#23601;&#26159;&#32531;&#23384; 30 &#22825;</span>
     }
 
-    location ~ \.php$ {
-        fastcgi_pass  localhost:9000;
-        fastcgi_param SCRIPT_FILENAME
-                      $document_root$fastcgi_script_name;
-        include       fastcgi_params;
+    <span style="color: #5f8700;">location</span> ~ <span style="color: #0087ff;">\.php$</span> {
+        <span style="color: #5f8700;">fastcgi_pass</span>  localhost:9000;
+        <span style="color: #5f8700;">fastcgi_param</span> SCRIPT_FILENAME
+                      <span style="color: #0087ff;">$document_root$fastcgi_script_name</span>;
+        <span style="color: #5f8700;">include</span>       fastcgi_params;
     }
 
 }
@@ -388,16 +388,16 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 </div>
 
 <div id="outline-container-sec-2-2-1" class="outline-4">
-<h4 id="sec-2-2-1"><span class="section-number-4">2.2.1</span> 2.2.1, 直接转发</h4>
+<h4 id="sec-2-2-1"><span class="section-number-4">2.2.1</span> 直接转发</h4>
 <div class="outline-text-4" id="text-2-2-1">
 <div class="org-src-container">
 
-<pre class="src src-nginx">server {
-    server_name www.example.com;
-    listen       443;
+<pre class="src src-nginx"><span style="color: #5f8700;">server</span> {
+    <span style="color: #5f8700;">server_name</span> www.example.com;
+    <span style="color: #5f8700;">listen</span>       443;
 
-    location /reverse.gif {
-        proxy_pass http://image.sinajs.cn/newchart/hollow/small/nsh000001.gif;
+    <span style="color: #5f8700;">location</span> <span style="color: #0087ff;">/reverse.gif</span> {
+        <span style="color: #5f8700;">proxy_pass</span> http://image.sinajs.cn/newchart/hollow/small/nsh000001.gif;
     }
 
 }
@@ -407,27 +407,27 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 </div>
 
 <div id="outline-container-sec-2-2-2" class="outline-4">
-<h4 id="sec-2-2-2"><span class="section-number-4">2.2.2</span> 2.2.2, 动态转发</h4>
+<h4 id="sec-2-2-2"><span class="section-number-4">2.2.2</span> 动态转发</h4>
 <div class="outline-text-4" id="text-2-2-2">
 <div class="org-src-container">
 
-<pre class="src src-nginx">upstream pool {
-    server 127.0.0.1:8888;
+<pre class="src src-nginx"><span style="color: #5f8700;">upstream</span> <span style="color: #0087ff;">pool</span> {
+    <span style="color: #5f8700;">server</span> 127.0.0.1:8888;
 }
 
-server {
+<span style="color: #5f8700;">server</span> {
 
-    listen 40839;
-    root /tmp/data;
-    server_name example.org;
+    <span style="color: #5f8700;">listen</span> 40839;
+    <span style="color: #5f8700;">root</span> /tmp/data;
+    <span style="color: #5f8700;">server_name</span> example.org;
 
-    try_files $uri/index.html @reverse; # 先找根目录下的 index.html ，如果找不到，才执行 location @rails365
+    <span style="color: #5f8700;">try_files</span> <span style="color: #0087ff;">$uri</span>/index.html @reverse; <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#20808;&#25214;&#26681;&#30446;&#24405;&#19979;&#30340; index.html &#65292;&#22914;&#26524;&#25214;&#19981;&#21040;&#65292;&#25165;&#25191;&#34892; location @rails365</span>
 
-    location @reverse {
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header Host $http_host;
-        proxy_redirect off;
-        proxy_pass http://pool;
+    <span style="color: #5f8700;">location</span> <span style="color: #0087ff;">@reverse</span> {
+        <span style="color: #5f8700;">proxy_set_header</span> X-Forwarded-For <span style="color: #0087ff;">$proxy_add_x_forwarded_for</span>;
+        <span style="color: #5f8700;">proxy_set_header</span> Host <span style="color: #0087ff;">$http_host</span>;
+        <span style="color: #5f8700;">proxy_redirect</span> <span style="color: #00afaf;">off</span>;
+        <span style="color: #5f8700;">proxy_pass</span> http://pool;
     }
 }
 </pre>
@@ -436,21 +436,21 @@ server {
 </div>
 
 <div id="outline-container-sec-2-2-3" class="outline-4">
-<h4 id="sec-2-2-3"><span class="section-number-4">2.2.3</span> 2.2.3, websocket 转发</h4>
+<h4 id="sec-2-2-3"><span class="section-number-4">2.2.3</span> websocket 转发</h4>
 <div class="outline-text-4" id="text-2-2-3">
 <div class="org-src-container">
 
-<pre class="src src-nginx">upstream ws {
-  server 127.0.0.1:8888;
+<pre class="src src-nginx"><span style="color: #5f8700;">upstream</span> <span style="color: #0087ff;">ws</span> {
+  <span style="color: #5f8700;">server</span> 127.0.0.1:8888;
 }
 
-server {
+<span style="color: #5f8700;">server</span> {
 
-  location /ws/ {
-    proxy_pass http://ws;
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection "upgrade";
+  <span style="color: #5f8700;">location</span> <span style="color: #0087ff;">/ws/</span> {
+    <span style="color: #5f8700;">proxy_pass</span> http://ws;
+    <span style="color: #5f8700;">proxy_http_version</span> 1.1;
+    <span style="color: #5f8700;">proxy_set_header</span> Upgrade <span style="color: #0087ff;">$http_upgrade</span>;
+    <span style="color: #5f8700;">proxy_set_header</span> Connection <span style="color: #00afaf;">"upgrade"</span>;
   }
 
 }
@@ -466,30 +466,30 @@ server {
 <div class="outline-text-3" id="text-2-3">
 <div class="org-src-container">
 
-<pre class="src src-nginx">http {
+<pre class="src src-nginx"><span style="color: #5f8700;">http</span> {
 
-    # 开启gzip
-    gzip on;
+    <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#24320;&#21551;gzip</span>
+    <span style="color: #5f8700;">gzip</span> <span style="color: #00afaf;">on</span>;
 
-    # 启用gzip压缩的最小文件，小于设置值的文件将不会压缩
-    gzip_min_length 1k;
+    <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#21551;&#29992;gzip&#21387;&#32553;&#30340;&#26368;&#23567;&#25991;&#20214;&#65292;&#23567;&#20110;&#35774;&#32622;&#20540;&#30340;&#25991;&#20214;&#23558;&#19981;&#20250;&#21387;&#32553;</span>
+    <span style="color: #5f8700;">gzip_min_length</span> 1k;
 
-    # gzip 压缩级别，1-10，数字越大压缩的越好，也越占用CPU时间，后面会有详细说明
-    gzip_comp_level 2;
+    <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">gzip &#21387;&#32553;&#32423;&#21035;&#65292;1-10&#65292;&#25968;&#23383;&#36234;&#22823;&#21387;&#32553;&#30340;&#36234;&#22909;&#65292;&#20063;&#36234;&#21344;&#29992;CPU&#26102;&#38388;&#65292;&#21518;&#38754;&#20250;&#26377;&#35814;&#32454;&#35828;&#26126;</span>
+    <span style="color: #5f8700;">gzip_comp_level</span> 2;
 
-    # 进行压缩的文件类型。javascript有多种形式。其中的值可以在 mime.types 文件中找到。
-    gzip_types text/plain application/javascript application/x-javascript text/css application/xml text/javascript application/x-httpd-php image/jpeg image/gif image/png;
+    <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#36827;&#34892;&#21387;&#32553;&#30340;&#25991;&#20214;&#31867;&#22411;&#12290;javascript&#26377;&#22810;&#31181;&#24418;&#24335;&#12290;&#20854;&#20013;&#30340;&#20540;&#21487;&#20197;&#22312; mime.types &#25991;&#20214;&#20013;&#25214;&#21040;&#12290;</span>
+    <span style="color: #5f8700;">gzip_types</span> text/plain application/javascript application/x-javascript text/css application/xml text/javascript application/x-httpd-php image/jpeg image/gif image/png;
 
-    # 是否在http header中添加Vary: Accept-Encoding，建议开启
-    gzip_vary on;
+    <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#26159;&#21542;&#22312;http header&#20013;&#28155;&#21152;Vary: Accept-Encoding&#65292;&#24314;&#35758;&#24320;&#21551;</span>
+    <span style="color: #5f8700;">gzip_vary</span> <span style="color: #00afaf;">on</span>;
 
-    # 禁用IE 6 gzip
-    gzip_disable "MSIE [1-6]\.";
+    <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#31105;&#29992;IE 6 gzip</span>
+    <span style="color: #5f8700;">gzip_disable</span> <span style="color: #00afaf;">"MSIE [1-6]\."</span>;
 
-    server {
-        location ~* ^.+\.(css|js|txt|xml|swf|wav)$ {
-            access_log   off;
-            expires      24h;   # 开启缓存
+    <span style="color: #5f8700;">server</span> {
+        <span style="color: #5f8700;">location</span> ~* <span style="color: #0087ff;">^.+\.(css|js|txt|xml|swf|wav)$</span> {
+            <span style="color: #5f8700;">access_log</span>   <span style="color: #00afaf;">off</span>;
+            <span style="color: #5f8700;">expires</span>      24h;   <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#24320;&#21551;&#32531;&#23384;</span>
         }
 
     }
@@ -531,9 +531,9 @@ server {
 
 <div class="org-src-container">
 
-<pre class="src src-nginx">location /target {
-    auth_basic "Restricted";
-    auth_basic_user_file /etc/nginx/.htpasswd; # htpasswd 文件
+<pre class="src src-nginx"><span style="color: #5f8700;">location</span> <span style="color: #0087ff;">/target</span> {
+    <span style="color: #5f8700;">auth_basic</span> <span style="color: #00afaf;">"Restricted"</span>;
+    <span style="color: #5f8700;">auth_basic_user_file</span> /etc/nginx/.htpasswd; <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">htpasswd &#25991;&#20214;</span>
 }
 </pre>
 </div>
@@ -553,10 +553,10 @@ server {
 
 <div class="org-src-container">
 
-<pre class="src src-nginx">upstream servers {
-    least_conn;
-    server &lt;server_ip_1&gt;;
-    server &lt;server_ip_2&gt;;
+<pre class="src src-nginx"><span style="color: #5f8700;">upstream</span> <span style="color: #0087ff;">servers</span> {
+    <span style="color: #5f8700;">least_conn</span>;
+    <span style="color: #5f8700;">server</span> &lt;server_ip_1&gt;;
+    <span style="color: #5f8700;">server</span> &lt;server_ip_2&gt;;
 }
 </pre>
 </div>
@@ -573,10 +573,10 @@ server {
 
 <div class="org-src-container">
 
-<pre class="src src-nginx">upstream servers {
-    ip_hash;
-    server &lt;server_ip_1&gt;;
-    server &lt;server_ip_2&gt;;
+<pre class="src src-nginx"><span style="color: #5f8700;">upstream</span> <span style="color: #0087ff;">servers</span> {
+    <span style="color: #5f8700;">ip_hash</span>;
+    <span style="color: #5f8700;">server</span> &lt;server_ip_1&gt;;
+    <span style="color: #5f8700;">server</span> &lt;server_ip_2&gt;;
 }
 </pre>
 </div>
@@ -593,10 +593,10 @@ server {
 
 <div class="org-src-container">
 
-<pre class="src src-nginx">upstream servers {
-    hash $request_uri consistent; # 通过请求地址($request_uri)来控制
-    server &lt;server_ip_1&gt;;
-    server &lt;server_ip_2&gt;;
+<pre class="src src-nginx"><span style="color: #5f8700;">upstream</span> <span style="color: #0087ff;">servers</span> {
+    <span style="color: #5f8700;">hash</span> <span style="color: #0087ff;">$request_uri</span> consistent; <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#36890;&#36807;&#35831;&#27714;&#22320;&#22336;($request_uri)&#26469;&#25511;&#21046;</span>
+    <span style="color: #5f8700;">server</span> &lt;server_ip_1&gt;;
+    <span style="color: #5f8700;">server</span> &lt;server_ip_2&gt;;
 }
 </pre>
 </div>
@@ -613,9 +613,9 @@ server {
 
 <div class="org-src-container">
 
-<pre class="src src-nginx">upstream servers {
-    server &lt;server_ip_1&gt;;
-    server &lt;server_ip_2&gt; down;
+<pre class="src src-nginx"><span style="color: #5f8700;">upstream</span> <span style="color: #0087ff;">servers</span> {
+    <span style="color: #5f8700;">server</span> &lt;server_ip_1&gt;;
+    <span style="color: #5f8700;">server</span> &lt;server_ip_2&gt; down;
 }
 </pre>
 </div>
@@ -632,9 +632,9 @@ backup 是指备份的机器，相对于备份的机器来说，其他的机器�
 
 <div class="org-src-container">
 
-<pre class="src src-nginx">upstream servers {
-    server &lt;server_ip_1&gt;;
-    server &lt;server_ip_2&gt; backup;
+<pre class="src src-nginx"><span style="color: #5f8700;">upstream</span> <span style="color: #0087ff;">servers</span> {
+    <span style="color: #5f8700;">server</span> &lt;server_ip_1&gt;;
+    <span style="color: #5f8700;">server</span> &lt;server_ip_2&gt; backup;
 }
 </pre>
 </div>
@@ -655,10 +655,10 @@ weight指的是权重，默认情况下，每台主机的权重都是1，也就�
 
 <div class="org-src-container">
 
-<pre class="src src-nginx">upstream servers {
-    server &lt;server_ip_0&gt; weight=3;
-    server &lt;server_ip_1&gt;;
-    server &lt;server_ip_2&gt;;
+<pre class="src src-nginx"><span style="color: #5f8700;">upstream</span> <span style="color: #0087ff;">servers</span> {
+    <span style="color: #5f8700;">server</span> &lt;server_ip_0&gt; weight=3;
+    <span style="color: #5f8700;">server</span> &lt;server_ip_1&gt;;
+    <span style="color: #5f8700;">server</span> &lt;server_ip_2&gt;;
 }
 </pre>
 </div>
@@ -672,8 +672,8 @@ weight指的是权重，默认情况下，每台主机的权重都是1，也就�
 <div class="outline-text-3" id="text-2-7">
 <div class="org-src-container">
 
-<pre class="src src-nginx">location /error {
-    return 404 "Not Found !";
+<pre class="src src-nginx"><span style="color: #5f8700;">location</span> <span style="color: #0087ff;">/error</span> {
+    <span style="color: #5f8700;">return</span> 404 <span style="color: #00afaf;">"Not Found !"</span>;
 }
 </pre>
 </div>
@@ -686,29 +686,29 @@ weight指的是权重，默认情况下，每台主机的权重都是1，也就�
 <div class="outline-text-3" id="text-2-8">
 <div class="org-src-container">
 
-<pre class="src src-nginx">location / {
-    rewrite '^/images/(.*)\.(png|jpg|gif)$' /data?file=$1.$2;
-    # 注意不能在上面这条规则后面加上“last”参数，否则下面的 set 指令不会执行
-    set $image_file $1;
-    set $image_type $2;
+<pre class="src src-nginx"><span style="color: #5f8700;">location</span> <span style="color: #0087ff;">/</span> {
+    <span style="color: #5f8700;">rewrite</span> '^/images/(.*)\.(png|jpg|gif)$' /data?file=<span style="color: #00afaf;">$1</span>.<span style="color: #00afaf;">$2</span>;
+    <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#27880;&#24847;&#19981;&#33021;&#22312;&#19978;&#38754;&#36825;&#26465;&#35268;&#21017;&#21518;&#38754;&#21152;&#19978;&#8220;last&#8221;&#21442;&#25968;&#65292;&#21542;&#21017;&#19979;&#38754;&#30340; set &#25351;&#20196;&#19981;&#20250;&#25191;&#34892;</span>
+    <span style="color: #5f8700;">set</span> <span style="color: #0087ff;">$image_file</span> <span style="color: #00afaf;">$1</span>;
+    <span style="color: #5f8700;">set</span> <span style="color: #0087ff;">$image_type</span> <span style="color: #00afaf;">$2</span>;
 }
 
-location /data {
-    root /tmp/data;
-    # 应用前面定义的变量。判断首先文件在不在，不在再判断目录在不在，如果还不在就跳转到最
-    try_files /$arg_file /404.html;
+<span style="color: #5f8700;">location</span> <span style="color: #0087ff;">/data</span> {
+    <span style="color: #5f8700;">root</span> /tmp/data;
+    <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#24212;&#29992;&#21069;&#38754;&#23450;&#20041;&#30340;&#21464;&#37327;&#12290;&#21028;&#26029;&#39318;&#20808;&#25991;&#20214;&#22312;&#19981;&#22312;&#65292;&#19981;&#22312;&#20877;&#21028;&#26029;&#30446;&#24405;&#22312;&#19981;&#22312;&#65292;&#22914;&#26524;&#36824;&#19981;&#22312;&#23601;&#36339;&#36716;&#21040;&#26368;</span>
+    <span style="color: #5f8700;">try_files</span> /<span style="color: #0087ff;">$arg_file</span> /404.html;
 }
 
-location /404.html {
-    return 404 "$image_file.$image_type Not Found";
+<span style="color: #5f8700;">location</span> <span style="color: #0087ff;">/404.html</span> {
+    <span style="color: #5f8700;">return</span> 404 <span style="color: #00afaf;">"$image_file.$image_type Not Found"</span>;
 }
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-nginx">location /images/ {
-    rewrite ^/images/(.*)$ http://1.2.3.4/images/$1/; ## 浏览器重定向至 http://1.2.3.4/images/$1
+<pre class="src src-nginx"><span style="color: #5f8700;">location</span> <span style="color: #0087ff;">/images/</span> {
+    <span style="color: #5f8700;">rewrite</span> ^/images/(.*)$ http://1.2.3.4/images/<span style="color: #00afaf;">$1</span>/; <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#27983;&#35272;&#22120;&#37325;&#23450;&#21521;&#33267; http://1.2.3.4/images/$1</span>
 }
 </pre>
 </div>
@@ -721,11 +721,11 @@ location /404.html {
 <div class="outline-text-3" id="text-2-9">
 <div class="org-src-container">
 
-<pre class="src src-sh">location    &lt;uri&gt; { ... }  ## 对当前路径及子路径下的所有资源都生效
-location =  &lt;uri&gt; { ... }  ## 只对当前路径生效（精确匹配，不包括子路径）
-location ~  &lt;uri&gt; { ... }  ## 正则匹配（区分大小写）
-location ~* &lt;uri&gt; { ... }  ## 正则匹配（不区分大小写）
-location ^~ &lt;uri&gt; { ... }  ## 降低正则匹配的优先级
+<pre class="src src-sh">location    &lt;uri&gt; { ... }  <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#23545;&#24403;&#21069;&#36335;&#24452;&#21450;&#23376;&#36335;&#24452;&#19979;&#30340;&#25152;&#26377;&#36164;&#28304;&#37117;&#29983;&#25928;</span>
+location =  &lt;uri&gt; { ... }  <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#21482;&#23545;&#24403;&#21069;&#36335;&#24452;&#29983;&#25928;&#65288;&#31934;&#30830;&#21305;&#37197;&#65292;&#19981;&#21253;&#25324;&#23376;&#36335;&#24452;&#65289;</span>
+location ~  &lt;uri&gt; { ... }  <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#27491;&#21017;&#21305;&#37197;&#65288;&#21306;&#20998;&#22823;&#23567;&#20889;&#65289;</span>
+location ~* &lt;uri&gt; { ... }  <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#27491;&#21017;&#21305;&#37197;&#65288;&#19981;&#21306;&#20998;&#22823;&#23567;&#20889;&#65289;</span>
+location ^~ &lt;uri&gt; { ... }  <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#38477;&#20302;&#27491;&#21017;&#21305;&#37197;&#30340;&#20248;&#20808;&#32423;</span>
 </pre>
 </div>
 </div>
@@ -753,22 +753,22 @@ location 和 target 尽量都以 / 结尾，否则可能会遇到循环重定向
 <div class="org-src-container">
 
 <pre class="src src-sh">location /hello {
-    root /home/test;   ## 访问 http://&lt;domain&gt;/hello
-                       ## 若不存在目录 /home/test/hello ，则返回 404
-                       ## 若存在目录   /home/test/hello ，重定向至 https://&lt;domain&gt;/hello/，默认请求 /home/test/hello/index.html
+    root /home/test;   <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#35775;&#38382; http://&lt;domain&gt;/hello</span>
+                       <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#33509;&#19981;&#23384;&#22312;&#30446;&#24405; /home/test/hello &#65292;&#21017;&#36820;&#22238; 404</span>
+                       <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#33509;&#23384;&#22312;&#30446;&#24405;   /home/test/hello &#65292;&#37325;&#23450;&#21521;&#33267; https://&lt;domain&gt;/hello/&#65292;&#40664;&#35748;&#35831;&#27714; /home/test/hello/index.html</span>
 }
 
 location /hello {
-    root /home/test/;  ## 同上
+    root /home/test/;  <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#21516;&#19978;</span>
 }
 
 location /hello/ {
-    root /home/test;   ## 访问 http://&lt;domain&gt;/hello ， 无法匹配，返回 404
-                       ## 访问 https://&lt;domain&gt;/hello/，默认请求 /home/test/hello/index.html
+    root /home/test;   <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#35775;&#38382; http://&lt;domain&gt;/hello &#65292; &#26080;&#27861;&#21305;&#37197;&#65292;&#36820;&#22238; 404</span>
+                       <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#35775;&#38382; https://&lt;domain&gt;/hello/&#65292;&#40664;&#35748;&#35831;&#27714; /home/test/hello/index.html</span>
 }
 
 location /hello/ {
-    root /home/test/;  ## 同上
+    root /home/test/;  <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#21516;&#19978;</span>
 }
 </pre>
 </div>
@@ -776,25 +776,25 @@ location /hello/ {
 <div class="org-src-container">
 
 <pre class="src src-sh">location /world {
-    proxy_pass http://127.0.0.1:9999;   ## 访问 http://&lt;domain&gt;/world ，   转发为 GET /world HTTP/1.0
-                                        ## 访问 http://&lt;domain&gt;/world/hk ，转发为 GET /world/hk HTTP/1.0
+    proxy_pass http://127.0.0.1:9999;   <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#35775;&#38382; http://&lt;domain&gt;/world &#65292;   &#36716;&#21457;&#20026; GET /world HTTP/1.0</span>
+                                        <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#35775;&#38382; http://&lt;domain&gt;/world/hk &#65292;&#36716;&#21457;&#20026; GET /world/hk HTTP/1.0</span>
 }
 
 location /world {
-    proxy_pass http://127.0.0.1:9999/;  ## 访问 http://&lt;domain&gt;/world ，   转发为 GET / HTTP/1.0
-                                        ## 访问 http://&lt;domain&gt;/world/hk ，转发为 GET //hk HTTP/1.0
-                                        ## / + (/world/hk - /world) = / + /hk = //hk
+    proxy_pass http://127.0.0.1:9999/;  <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#35775;&#38382; http://&lt;domain&gt;/world &#65292;   &#36716;&#21457;&#20026; GET / HTTP/1.0</span>
+                                        <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#35775;&#38382; http://&lt;domain&gt;/world/hk &#65292;&#36716;&#21457;&#20026; GET //hk HTTP/1.0</span>
+                                        <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">/ + (/world/hk - /world) = / + /hk = //hk</span>
 }
 
 location /world/ {
-    proxy_pass http://127.0.0.1:9999;   ## 访问 http://&lt;domain&gt;/world ，   重定向为 http://&lt;domain&gt;/world/ ，转发为 GET /world/ HTTP/1.0
-                                        ## 访问 http://&lt;domain&gt;/world/hk ，转发为 GET /world/hk HTTP/1.0
+    proxy_pass http://127.0.0.1:9999;   <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#35775;&#38382; http://&lt;domain&gt;/world &#65292;   &#37325;&#23450;&#21521;&#20026; http://&lt;domain&gt;/world/ &#65292;&#36716;&#21457;&#20026; GET /world/ HTTP/1.0</span>
+                                        <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#35775;&#38382; http://&lt;domain&gt;/world/hk &#65292;&#36716;&#21457;&#20026; GET /world/hk HTTP/1.0</span>
 }
 
 location /world/ {
-    proxy_pass http://127.0.0.1:9999/;  ## 访问 http://&lt;domain&gt;/world ，   重定向为 http://&lt;domain&gt;/world/ ，转发为 GET / HTTP/1.0
-                                        ## 访问 http://&lt;domain&gt;/world/hk ，转发为 GET /hk HTTP/1.0
-                                        ## / + (/workd/hk - /world/) = / + hk = /hk
+    proxy_pass http://127.0.0.1:9999/;  <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#35775;&#38382; http://&lt;domain&gt;/world &#65292;   &#37325;&#23450;&#21521;&#20026; http://&lt;domain&gt;/world/ &#65292;&#36716;&#21457;&#20026; GET / HTTP/1.0</span>
+                                        <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#35775;&#38382; http://&lt;domain&gt;/world/hk &#65292;&#36716;&#21457;&#20026; GET /hk HTTP/1.0</span>
+                                        <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">/ + (/workd/hk - /world/) = / + hk = /hk</span>
 }
 </pre>
 </div>
@@ -812,10 +812,10 @@ location /world/ {
 
 <div class="org-src-container">
 
-<pre class="src src-nginx">location &lt;uri&gt; {
-    deny  192.168.0.2;
-    allow 192.168.1.0/24;
-    deny  all;
+<pre class="src src-nginx"><span style="color: #5f8700;">location</span> <span style="color: #0087ff;">&lt;uri&gt;</span> {
+    <span style="color: #5f8700;">deny</span>  192.168.0.2;
+    <span style="color: #5f8700;">allow</span> 192.168.1.0/24;
+    <span style="color: #5f8700;">deny</span>  all;
 }
 </pre>
 </div>
@@ -828,10 +828,10 @@ location /world/ {
 <div class="outline-text-3" id="text-2-11">
 <div class="org-src-container">
 
-<pre class="src src-nginx">stream {
-    server {
-        listen     48080;
-        proxy_pass 127.0.0.1:8080;
+<pre class="src src-nginx"><span style="color: #5f8700;">stream</span> {
+    <span style="color: #5f8700;">server</span> {
+        <span style="color: #5f8700;">listen</span>     48080;
+        <span style="color: #5f8700;">proxy_pass</span> 127.0.0.1:8080;
     }
 }
 </pre>
