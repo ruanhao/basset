@@ -32,6 +32,7 @@
 
 =docker daemon -H unix://home/docker/docker.sock=
 
+
 * 容器操作
 
 ** 运行容器
@@ -87,6 +88,7 @@
   docker rm `docker ps -a -q` # 删除所有容器
 #+END_SRC
 
+
 * Dockerfile
 
 #+BEGIN_EXAMPLE
@@ -135,6 +137,7 @@ Dockerfile 中只能有一个 CMD 指令生效， =docker run= 中的 command �
      ENTRYPOINT command param1 param2                # shell 模式
 #+END_SRC
 
+
 * Docker Networking
 
 Docker Networking 允许用户创建自己的网络，容器间通过此技术可以相互通信，包括跨越宿主机的通信（overlay 网络）
@@ -150,13 +153,20 @@ docker network connect <net_name> <cname> # 将已有容器添加到网络
 docker network disconnect <net_name> <cname>
 #+END_SRC
 
+
 ** Docker 中的桥接技术
 
 在安装了 Docker 的宿主机上的 docker0 设备就是个虚拟网桥：
 
+#+CAPTION: 容器与外部通信使用 veth
+#+NAME: docker_br
 [[file:img/docker_br.png]]
 
+
+#+CAPTION: docker0 作为桥接网卡
+#+NAME: docker_host_hr
 [[file:img/docker_host.png]]
+
 
 *** 容器访问外部网络
 
@@ -178,11 +188,15 @@ docker network disconnect <net_name> <cname>
   其中 127.0.0.3:22 是内部容器 IP 和 SSHD 端口，在宿主机上映射为 49153 端口。
 #+END_EXAMPLE
 
+
 *** 自定义网桥
 
 也可以使用自定义网桥 br0 ，从而使得宿主机与容器属于同一个网络，架构如图所示：
 
+#+CAPTION: 自定义网桥结构图
+#+NAME: docker_host_hr
 [[file:img/docker_host_br.png]]
+
 
 
 * Docker Save & Export
