@@ -1,19 +1,38 @@
-#+TITLE:     IPTABLES
+#+TITLE:     Iptables
 #+AUTHOR:    Hao Ruan
-#+EMAIL:     ruanhao1116@gmail.com
+#+EMAIL:     haoru@cisco.com
 #+LANGUAGE:  en
 #+LINK_HOME: http://www.github.com/ruanhao
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
-#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
-#+STARTUP:   showall
+#+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+ #+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+#+TOC: headlines 3
 
-* 1. 基本原理
 
-Netfilter是由Rusty Russell提出的内核防火墙框架，该框架既简洁又灵活，可实现安全策略应用中的许多功能，如数据包过滤、数据包处理、地址伪装、透明代理、动态网络地址转换(Network Address Translation，NAT)，以及基于用户及媒体访问控制(Media Access Control，MAC)地址的过滤和基于状态的过滤、包速率限制等。
+* 基本原理
 
-** 1.1, 处理逻辑 (四表五链)
+Netfilter是由Rusty Russell提出的内核防火墙框架，
+该框架既简洁又灵活，可实现安全策略应用中的许多功能，如：
 
-[[file:images/tables_traverse.jpg]]
+- 数据包过滤
+- 数据包处理
+- 地址伪装
+- 透明代理
+- 动态网络地址转换(Network Address Translation，NAT)
+- 基于用户及媒体访问控制(Media Access Control，MAC)地址的过滤
+- 基于状态的过滤
+- 包速率限制
+
+** 处理逻辑 (四表五链)
+
+#+CAPTION: 逻辑处理顺序
+#+NAME: traverse
+[[file:img/tables_traverse.jpg]]
 
 #+BEGIN_EXAMPLE
 从上往下：
@@ -23,18 +42,20 @@ Netfilter是由Rusty Russell提出的内核防火墙框架，该框架既简洁�
 第三个 Routing Decision：选择发出网卡
 #+END_EXAMPLE
 
-** 1.2, 命令格式
+** 命令格式
 
-[[file:images/iptables-cli.png]]
+#+CAPTION: 命令格式
+#+NAME: cli
+[[file:img/iptables-cli.png]]
 
 =iptables [ -t 表名] 命令选项 [链名] [匹配] [-j 目标动作或跳转]=
 
-*** 1.2.1, 表名
+*** 表名
 
 filter, nat, mangle, raw (默认为 filter)
 
 
-*** 1.2.2, 匹配
+*** 匹配
 
 #+BEGIN_EXAMPLE
 通用匹配：
@@ -87,7 +108,7 @@ filter, nat, mangle, raw (默认为 filter)
 #+END_EXAMPLE
 
 
-*** 1.2.3, 命令选项
+*** 命令选项
 
 #+BEGIN_EXAMPLE
 管理规则：
@@ -114,13 +135,13 @@ filter, nat, mangle, raw (默认为 filter)
 #+END_EXAMPLE
 
 
-*** 1.2.4, 目标动作
+*** 目标动作
 ACCEPT, DROP, REJECT, DNAT, SNAT, REDIRECT（端口重定向）, MASQUERADE（地址伪装）, LOG, MARK
 
 
-* 2, 常用脚本
+* 常用命令
 
-** 2.1, 重置到默认状态：
+** 重置到默认状态
 
 #+BEGIN_SRC
 iptables -F
@@ -138,17 +159,17 @@ iptables -P FORWARD ACCEPT
 iptables -P OUTPUT ACCEPT
 #+END_SRC
 
-** 2.2, 查看信息
+** 查看信息
 =iptables -L -n -x=
 
-** 2.3, 封堵端口
+** 封堵端口
 
 #+BEGIN_SRC
 iptables -I INPUT -p tcp --dport 12345 -j REJECT
 iptables -I OUTPUT -p tcp --sport 12345 -j REJECT
 #+END_SRC
 
-** 2.4, 创建自定义链
+** 创建自定义链
 
 #+BEGIN_SRC
 iptables -N my_chain
@@ -158,7 +179,7 @@ iptables -I INPUT -j my_chain # 添加自定义链跳转
 iptables -X my_chain # 删除自定义链，仅当自定义链为空
 #+END_SRC
 
-** 2.5, 禁止 SYN floods
+** 禁止 SYN floods
 
 #+BEGIN_SRC
 # Limit the number of incoming tcp connections
@@ -171,13 +192,13 @@ iptables -A syn_flood -j REJECT
 # --limit-burst 3: Maximum initial number of packets to match
 #+END_SRC
 
-** 2.6, 限制连接数
+** 限制连接数
 
 #+BEGIN_SRC
 iptables -I INPUT -p tcp --dport 22 -m connlimit --connlimit-above 3 -j DROP # 超过 3 个连接则拒绝
 #+END_SRC
 
-** 2.7, 防止 DoS
+** 防止 DoS
 
 利用 recent 和 state 模块限制单个 IP 在 300 秒内只能与本机建立 3 个新连接，被限制 5 分钟周恢复访问
 
@@ -194,7 +215,7 @@ iptables -I INPUT -p tcp --dport 22 -m state --state NEW -m recent --update --se
 # 记录保存于：/proc/net/ipt_recent/SSH
 #+END_SRC
 
-** 2.8, 记录日志
+** 记录日志
 
 `-j LOG --log-prefix "prefix msg"`
 
@@ -208,7 +229,7 @@ iptables -I INPUT -p tcp --dport 22 -m state --state NEW -m recent --update --se
 
 #+END_SRC
 
-** 2.9, 地址转换
+** 地址转换
 
 会自动建立 NAT session 表
 
@@ -222,7 +243,7 @@ iptables -t nat -A PREROUTING -d 1.2.3.4 -p tcp --dport 80 -j DNAT --to-destinat
 iptables -t nat -A PREROUTING -d 1.2.3.4 -p tcp --dport 80 -j DNAT --to-destination 192.168.0.3:8080
 #+END_SRC
 
-** 2.10, 端口转发
+** 端口转发
 
 #+BEGIN_SRC
 iptables -t nat -A PREROUTING -d 1.2.3.4 -p tcp --dport 80 -j REDIRECT --to-port 8080 # 本地端口转发
@@ -232,7 +253,7 @@ iptables -t nat -A PREROUTING -d 1.2.3.4 -p tcp --dport 80 -j DNAT --to-destinat
 # 若 8080 监听于 localhost，则需要执行：sysctl -w net.ipv4.conf.all.route_localnet=1
 #+END_SRC
 
-** 2.11, 规则保存与加载
+** 规则保存与加载
 
 #+BEGIN_SRC
 iptables-save > /etc/iptables/iptables.rules
