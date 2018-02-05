@@ -1,0 +1,545 @@
+#+TITLE:     Bash
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+ #+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+#+TOC: headlines 3
+
+
+* 循环
+
+** for
+
+
+*** 基本用法
+
+#+BEGIN_SRC sh
+  for arg; do
+      # TODO
+  done [ | command ]
+#+END_SRC
+
+*** bash 风格
+
+#+BEGIN_SRC sh
+  for i in {1..10}; do
+      echo -n "$i "
+  done
+#+END_SRC
+
+*** c 风格
+
+#+BEGIN_SRC sh
+  LIMIT=10
+
+  for ((i = 1; i <= LIMIT; i++)); do
+      echo -n "$i "
+  done
+#+END_SRC
+
+#+BEGIN_SRC sh
+  LIMIT=10
+
+  for ((i = 1, j = 1; i <= LIMIT; i++, j++)); do
+      echo -n "$i-$j "
+  done
+#+END_SRC
+
+
+** while
+
+*** 基本用法
+
+#+BEGIN_SRC sh
+  while read line; do
+      # TODO
+  done
+#+END_SRC
+
+*** c 风格
+
+#+BEGIN_SRC sh
+  (( i = 1 ))
+
+  while (( i <= LIMIT )); do
+      echo -n "$i "
+      (( i += 1 ))
+  done
+#+END_SRC
+
+
+
+
+** IFS
+
+可以在循环内部设置 =$IFS= 变量，而不用把原始的 =$IFS= 保存到临时变量中
+
+#+BEGIN_SRC sh
+  echo "List of all users:"
+  while IFS=: read name passwd uid gid fullname ignore; do
+      echo "$name ($fullname)"
+  done </etc/passwd
+  echo "\$IFS still $IFS"
+#+END_SRC
+
+
+** continue, break
+
+=continue= 命令可以 *带一个参数* ，不带参数的 =continue= 命令只会去掉本次循环的剩余代码，而 =continue N= 将会把 N 层循环的剩余代码都去掉。
+
+=break= 命令 *可以带一个参数* ，一个不带参数的 =break= 命令只能退出最内层的循环，而 =break N= 可以退出 N 层循环。
+
+
+** case, select
+
+#+BEGIN_SRC sh
+  # Bash Menu Script Example
+
+  PS3='Please enter your choice: '
+  options=("Option 1" "Option 2" "Option 3" "Quit")
+  select opt in "${options[@]}"
+  do
+      case $opt in
+          "Option 1")
+              echo "you chose choice 1"
+              ;;
+          "Option 2")
+              echo "you chose choice 2"
+              ;;
+          "Option 3")
+              echo "you chose choice 3"
+              ;;
+          "Quit")
+              break # Add break statements wherever need the select loop to exit
+              ;;
+          *) echo invalid option;;
+      esac
+  done
+#+END_SRC
+
+
+** 带步进值的循环
+
+ #+BEGIN_SRC sh
+    for i in {0..100..3}; do
+        echo $i
+    done
+ #+END_SRC
+
+
+* 函数
+
+- =return= 只能用在函数或被 =source= 的脚本中
+- 函数如果在一行内定义，需要加分号： =hello() { true; }=
+- 代码块 ={}= ，又被称为内部组，实际上是创建了一个匿名函数，与标准函数不同的是，在其中申明的变量， *对脚本其他部分的代码而言是可见的*
+
+** 在 =if/then= 结构中定义函数
+
+#+BEGIN_SRC sh
+  if [[ "$USER" == root ]]; then
+      greet() {
+          echo hello
+      }
+  fi
+#+END_SRC
+
+** 函数指针
+
+#+BEGIN_SRC sh
+  declare -f fp
+  fp=function_name
+  $fp arg1 arg2
+#+END_SRC
+
+
+* 声明
+
+- =declare= 和 =typeset= 命令两者是 *完全一样* 的
+
+** 声明只读变量
+
+=declare -r `Variable`= 等价于 =readonly `Variable`=
+
+** 查看变量类型
+
+=declare -p `Variable`=
+
+** 声明整形变量
+
+=declare -i `Variable`=
+
+如果把一个变量指定为整形的话，即使没有 =expr= 或者 =let= 命令，也允许使用特定的算术运算
+
+** 声明数组变量
+
+=declare -a `Array`=
+
+** 声明函数指针
+
+=declare -f `[FunctionName]`=
+
+如果不提供 FunctionName ，将会列出这个脚本之前定义的所有函数，若提供函数名，则给出这个函数的相关信息
+
+** 限制变量作用域
+
+#+BEGIN_SRC sh
+  foo() {
+      declare FOO="bar"
+  }
+  bar() {
+      foo
+      echo $FOO
+  }
+  bar  # output nothing
+#+END_SRC
+
+
+* 测试
+
+** 测试文件类型
+
+- =-e= :: 文件是否存在
+- =-f= :: 文件是否存在且为文件（file）
+- =-d= :: 文件是否存在且为目录（directory）
+- =-b= :: 文件是否存在且为 block device
+- =-c= :: 文件是否存在且为 character device
+- =-S= :: 文件是否存在且为 Socket
+- =-p= :: 文件是否存在且为 FIFO (pipe)
+- =-L= :: 文件是否存在且为 link
+
+** 测试文件权限
+
+- =-r= :: 文件是否存在且具有可读权限
+- =-w= :: 文件是否存在且具有可写权限
+- =-x= :: 文件是否存在且具有可运行权限
+- =-u= :: 文件是否存在且具有SUID权限
+- =-g= :: 文件是否存在且具有SGID权限
+- =-k= :: 文件是否存在且具有Sticky bit权限
+- =-s= :: 文件是否存在且为非空白文件
+
+** 文件比较
+
+- =-nt= :: 判断 file1 是否比 file2 新
+- =-ot= :: 判断 file1 是否比 file2 旧
+- =-ef= :: 判断 file1 与 file2 是否为同一文件（两个文件是否均指向同一个 inode ）
+
+** *整数* 比较
+
+- =-eq= ::  equal
+- =-ne= ::  not equal
+- =-gt= ::  great than
+- =-lt= ::  less than
+- =-ge= ::  great than or equal
+- =-le= ::  less than or equal
+
+
+** 字符串比较
+
+- =-z string= :: 若 string 为空字符串，则为 true  ( z 表示 zero )
+- =-n string= :: 若 string 为空字符串，则为 false ( -n 可省略，n 表示 not empty )
+- =str1 = str2= :: 若 str1 等于 str2 ，则为 true
+- str1 != str2 :: 若 str1 等于 str2 ，则为 false
+
+
+** 多重条件判定
+
+- -a :: =test -r file -a -x file=
+- -o :: =test -r file -o -x file=
+- ! :: =test ! -x file=
+- && :: 用于双括号结构中
+- || :: 用于双括号结构中
+
+
+** 双括号和单括号中的行为比较
+
+#+BEGIN_SRC sh
+  [[ $var == z* ]]   ## 如果 var 以 z 开头，则结果为真
+
+  [ $var == z* ]     ## 如果 var 为 zoo，当前目录下有且只有一个文件名为 zoo，则结果为真，
+                     ## 此处，z* 将文件名扩展了
+
+  [[ $var == "z*" ]] ## 如果 var 和 "z*" 在字面上完全相等，则结果为真
+
+  [ $var == "z*" ]   ## 同上
+#+END_SRC
+
+** c 风格
+
+#+BEGIN_SRC sh
+  (( a < 16 )) && echo "true"
+#+END_SRC
+
+
+* 变量
+
+** 变量检查
+
+#+BEGIN_SRC sh
+  : ${variable?error_msg} ## 一种检查变量是否设置的方法，
+                          ## 若没有设置，则error_msg会输出到std_err中
+#+END_SRC
+** 变量匹配
+
+=${!varprefix*}= 或 =${!varprefix@}= 用于匹配所有之前声明过的，并且以 =varprefix= 开头的变量
+
+#+BEGIN_SRC sh
+  xyz23=whatever
+  xyz24=
+  a=${!xyz*}                     ## 展开所有以"xyz"开头的，并且之前声明过的变量名
+  echo "a = $a"                  ## a = xyz23 xyz24
+
+#+END_SRC
+
+** 变量替换
+
+|------------------+-----------------------+-------------------------+---------------------------|
+| str              | =not set=             | =empty string=          | =set & not empty string=  |
+|------------------+-----------------------+-------------------------+---------------------------|
+| var=${str-expr}  | var=expr              | var=""                  | var=$str                  |
+| var=${str:-expr} | var=expr              | var=expr                | var=$str                  |
+| var=${str+expr}  | var=""                | var=expr                | var=expr                  |
+| var=${str:+expr} | var=""                | var=""                  | var=expr                  |
+| var=${str=expr}  | str=expr; var=expr    | str =unchanged=; var="" | str =unchanged=; var=$str |
+| var=${str:=expr} | str=expr; var=expr    | str=expr; var=expr      | str =unchanged=; var=$str |
+| var=${str?expr}  | output expr to stderr | var=""                  | var=$str                  |
+| var=${str:?expr} | output expr to stderr | output expr to stderr   | var=$str                  |
+|------------------+-----------------------+-------------------------+---------------------------|
+
+** 变量赋值
+
+*** 文件内容赋值
+
+#+BEGIN_SRC sh
+  var=$( <FileName )
+#+END_SRC
+
+*** 间接引用
+
+#+BEGIN_SRC sh
+  eval var1=\$$var2
+#+END_SRC
+
+等效于：
+
+#+BEGIN_SRC sh
+  var1=${!var2}
+#+END_SRC
+
+** 数组变量
+
+*** 访问
+
+#+BEGIN_SRC sh
+  ${array[Idx]}
+
+  echo ${array[*]} # 打印所有数组
+#+END_SRC
+
+*** 赋值
+
+#+BEGIN_SRC sh
+  arr=( 1 2 3 4 5 )
+
+  arr=( [Idx1]=v1 [Idx2]=v2 )
+#+END_SRC
+
+*** 删除
+
+#+BEGIN_SRC sh
+  unset array[2]      ## 删除数组第3个元素
+  unset array         ## 删除整个数组
+#+END_SRC
+
+*** 扩展
+
+#+BEGIN_SRC sh
+  new_array+=( 1 2 3 )
+  new_array=( "${old_array[@]}" new_element )
+  array[${#array[*]}]=new_element
+
+  new_array="${old_array[@]}"  ## 复制数组(但是如果在*缺项*数组中使用的话，将会失败，新数组中的某个元素会没被赋值)
+                               ## 建议使用 new=( ${old[*]} )
+#+END_SRC
+
+
+*** 元素个数
+
+#+BEGIN_SRC sh
+  ${#array[*]}
+  ${#array[@]}
+
+
+#+END_SRC
+
+*注意* ：
+
+=${#array}= ：表示数组中 *第一个元素的长度*
+
+*** Bash 允许把变量当成数组来操作，即使这个变量没有明确地被声明为数组
+
+#+BEGIN_SRC sh
+  string=abcABC123ABCabc
+  echo ${string[@]}       ## abcABC123ABCabc
+  echo ${string[*]}       ## abcABC123ABCabc
+  echo ${string[0]}       ## abcABC123ABCabc
+  echo ${string[1]}       ## 没有输出
+  echo ${#string[@]}      ## 1
+                          ## 数组中只有一个元素，就是这个字符串本身
+#+END_SRC
+
+*** 对字符串使用数组操作
+
+#+BEGIN_SRC sh
+  array=( zero one two three four fiive )
+  ${array[0]}         ## zero
+  ${array}            ## 同上
+  ${array:1}          ## ero
+  $(array[0]:1}       ## 同上
+  ${#array[0]}        ## 等同于 ${#array}
+  ${array[@]:0}       ## 所有元素
+  ${array[@]:1}       ## element[0] 后面的所有元素
+  ${array[@]:1:2}
+  ${array[@]#f*r}
+  ${array[@]%%t*e}
+  ${array[@]/#fi/XY}
+  ${array[@]/%ve/ZZ}  ## 这类操作其实都是对每个 element 做轮询，
+                      ## 而不是针对整个 array，
+                      ## 如 ${array[*]#*ree}，只是删除 three
+#+END_SRC
+
+** 特殊变量
+
+#+BEGIN_SRC sh
+  $DIRSTACK ## 内建数组，记录目录栈
+  $#        ## 参数数量
+  $$        ## shell进程ID
+  $-        ## 当前shell的选项标识
+  $_        ## 上一条命令的参数
+  $!        ## 上一个在后台运行的作业的pid
+  $@        ## "$@" 等价于 "$1" "$2" "$3",
+            ## 按照空格来分隔，就算IFS用别的字符，"$@"还是按照空格来判断参数的个数,
+            ## $@ 也可以用来获取传递给脚本的输入，cat $@ 可以接受从 stdin 传递给脚本的输入，
+            ## 也可以接受从参数中指定的文件中传递给脚本的输入,
+            ## *$@ 与 $* 中的参数只有在被双引号引用起来的时候才会不同
+  ${#*}     ## 位置参数的个数
+  ${#@}     ## 同上
+  $RANDOM   ## 0 - 32767
+#+END_SRC
+
+* 字符串处理
+
+** 获取字符串变量长度
+
+#+BEGIN_SRC sh
+  ${#var}
+  expr "$var" : '.*'
+  expr length $var
+#+END_SRC
+
+
+** 子串匹配
+
+*** *匹配字符串开头* 的子串长度
+
+#+BEGIN_SRC sh
+  expr match "$string" '$regex'
+  expr "$string" : '$regex'
+  stringZ=abcABC123ABCabc
+  echo `expr match "$stringZ" 'abc[A-Z]*.2'`
+  echo `expr "$stringZ" : 'abc[A-Z]*.2'`
+#+END_SRC
+
+*** 匹配字符串中子串第一次出现的位置
+
+#+BEGIN_SRC sh
+  expr index $string $regex
+  stringZ=abcABC123ABCabc
+  echo `expr index "$stringZ" C12` # 6
+  echo `expr index "$stringZ" 1c`  # 3, 'c' (in #3 position) matches before '1'
+#+END_SRC
+
+** 子串提取
+
+*** 正向提取子串
+
+#+BEGIN_SRC sh
+  ${string:position}
+
+  ${string:position:length}  # 在 $string 中从位置 $position 开始提取子串
+                             # 如果 $string 是 * 或 @ ，那么将会从位置 $position 开始提取位置参数
+#+END_SRC
+
+*** 反向（从右边开始）提取子串
+
+#+BEGIN_SRC sh
+  echo ${stringZ:-4}   ## 错误语法，结果为提取了整个字符串
+  echo ${stringZ:(-4)} ## 正确语法
+  echo ${stringZ: -4}  ## 正确语法
+#+END_SRC
+
+*** 从 *开始位置* 提取 substring (substring 是正则表达式)
+
+#+BEGIN_SRC sh
+  stringZ=abcABC123ABCabc
+
+  echo `expr match "$stringZ" '\(.[b-c]*[A-Z]..[0-9]\)'` # abcABC1
+  echo `expr "$stringZ" : '\(.[b-c]*[A-Z]..[0-9]\)'`
+  echo `expr "$stringZ" : '\(.......\)'`
+#+END_SRC
+
+*** 从 *结尾* 提取 substring (substring 是正则表达式)
+
+#+BEGIN_SRC sh
+  stringZ=abcABC123ABCabc
+
+  echo `expr match "$stringZ" '.*\([A-C][A-C][A-C][a-c]*\)'`
+  echo `expr "$stringZ" : '.*\(......\)'`
+#+END_SRC
+
+** 子串消除
+
+#+BEGIN_SRC sh
+  ${string#substring}  ## 从$string的**开头位置**截掉最短匹配的$substring
+  ${string##substring} ## 从$string的**开头位置**截掉最长匹配的$substring
+  ${string%substring}  ## 从$string的**结尾位置**截掉最短匹配的$substring
+  ${string%%substring} ## 从$string的**结尾位置**截掉最长匹配的$substring
+#+END_SRC
+
+
+** 子串替换
+
+#+BEGIN_SRC sh
+  ${string/substring/replacement}  ## 使用$replacement来替换**第一个匹配**的$substring
+  ${string//substring/replacement} ## 使用$replacement来替换**所有匹配**的$substring
+  ## 如果$substring匹配$string的**开头部分**，那么就用$replacement替换$substring
+  ${string/#substring/replacement}
+  ## 如果$substring匹配$string的**结尾部分**，那么就用$replacement替换$substring
+  ${string/%substring/replacement}
+#+END_SRC
+
+** 大小写转换
+
+#+BEGIN_SRC sh
+  echo ${var^^}
+  echo ${var,,}
+  tr '[:lower:]' '[:upper:]'
+#+END_SRC
+
+* 参数处理
+
+** 获取最后一个参数
+
+  #+BEGIN_SRC sh
+    num=$#; echo ${!num}
+    # 不能直接写作${!$#}，这是一种**间接引用**
+    # ruanhao: ${$num}是不允许的，因为变量替换不能嵌套，
+    # 但是类似${var:$len}是可行的
+  #+END_SRC
