@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Git</title>
+<!-- 2018-02-05 Mon 23:24 -->
+<meta  charset="utf-8">
+<meta  name="generator" content="Org-mode">
+<meta  name="author" content="Hao Ruan">
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+<link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Git</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. config</a></li>
+<li><a href="#sec-2">2. branch</a>
+<ul>
+<li><a href="#sec-2-1">2.1. 删除分支</a></li>
+<li><a href="#sec-2-2">2.2. 删除服务器上的 branch</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. tag</a>
+<ul>
+<li><a href="#sec-3-1">3.1. 创建</a></li>
+<li><a href="#sec-3-2">3.2. 删除</a></li>
+<li><a href="#sec-3-3">3.3. 显示</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. clean</a>
+<ul>
+<li><a href="#sec-4-1">4.1. 清除当前工作区中没有加入版本库的文件和目录（非跟踪文件和目录）</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. rm</a>
+<ul>
+<li><a href="#sec-5-1">5.1. 删除暂存区文件，工作区保持不变</a></li>
+</ul>
+</li>
+<li><a href="#sec-6">6. diff</a>
+<ul>
+<li><a href="#sec-6-1">6.1. 比较工作区与暂存区</a></li>
+<li><a href="#sec-6-2">6.2. 比较工作区与仓库</a></li>
+<li><a href="#sec-6-3">6.3. 比较暂存区与仓库</a></li>
+<li><a href="#sec-6-4">6.4. 比较文件</a></li>
+</ul>
+</li>
+<li><a href="#sec-7">7. cat-file</a>
+<ul>
+<li><a href="#sec-7-1">7.1. 查看历史文件</a></li>
+<li><a href="#sec-7-2">7.2. 查看暂存区中的文件对象</a></li>
+<li><a href="#sec-7-3">7.3. 查看仓库中的文件对象</a></li>
+<li><a href="#sec-7-4">7.4. 查看 commit 对象</a></li>
+<li><a href="#sec-7-5">7.5. 查看 commit 对象对应的树对象</a></li>
+</ul>
+</li>
+<li><a href="#sec-8">8. ls-*</a>
+<ul>
+<li><a href="#sec-8-1">8.1. 显示 commit 指向的目录树</a></li>
+<li><a href="#sec-8-2">8.2. 显示暂存区的目录树</a></li>
+<li><a href="#sec-8-3">8.3. 显示 remote 的目录树</a></li>
+</ul>
+</li>
+<li><a href="#sec-9">9. reset</a>
+<ul>
+<li><a href="#sec-9-1">9.1. 替换 HEAD，替换暂存区，替换工作区</a></li>
+<li><a href="#sec-9-2">9.2. 替换 HEAD，暂存区不变，工作区不变</a></li>
+<li><a href="#sec-9-3">9.3. 替换 HEAD，替换暂存区，工作区不变</a></li>
+<li><a href="#sec-9-4">9.4. 对 filename 的改动撤出暂存区</a></li>
+</ul>
+</li>
+<li><a href="#sec-10">10. checkout</a>
+<ul>
+<li><a href="#sec-10-1">10.1. 暂存区中的 filename，覆盖工作区中的 filename</a></li>
+<li><a href="#sec-10-2">10.2. HEAD 不变，用 branch 指向的 filename 替换暂存区和工作区中的文件</a></li>
+<li><a href="#sec-10-3">10.3. 用暂存区中的所有文件覆盖工作区中的文件</a></li>
+<li><a href="#sec-10-4">10.4. 汇总显示工作区，暂存区和 HEAD 的差异</a></li>
+</ul>
+</li>
+<li><a href="#sec-11">11. revert</a></li>
+<li><a href="#sec-12">12. log</a></li>
+<li><a href="#sec-13">13. blame</a></li>
+<li><a href="#sec-14">14. rebase</a></li>
+<li><a href="#sec-15">15. remote</a>
+<ul>
+<li><a href="#sec-15-1">15.1. 查看状态</a></li>
+</ul>
+</li>
+<li><a href="#sec-16">16. rev-parse</a>
+<ul>
+<li><a href="#sec-16-1">16.1. 得到文件对应的 SHA</a></li>
+</ul>
+</li>
+<li><a href="#sec-17">17. stash</a></li>
+<li><a href="#sec-18">18. subtree</a>
+<ul>
+<li><a href="#sec-18-1">18.1. 添加</a></li>
+<li><a href="#sec-18-2">18.2. push</a></li>
+<li><a href="#sec-18-3">18.3. pull</a></li>
+</ul>
+</li>
+<li><a href="#sec-19">19. filter-branch</a>
+<ul>
+<li><a href="#sec-19-1">19.1. 查找仓库中大文件</a></li>
+<li><a href="#sec-19-2">19.2. 重写大文件涉及到的所有提交（重写历史记录）</a></li>
+</ul>
+</li>
+<li><a href="#sec-20">20. 参数</a>
+<ul>
+<li><a href="#sec-20-1">20.1. 忽略空白字符</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="outline-2" id="meta">
+<table>
+
+
+<colgroup>
+<col  class="left">
+
+<col  class="left">
+</colgroup>
+<tbody>
+<tr>
+<td class="left">Author</td>
+<td class="left">Hao Ruan (haoru@cisco.com)</td>
+</tr>
+
+<tr>
+<td class="left">Date</td>
+<td class="left">2018-02-05 23:24:56</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. config</a></li>
+<li><a href="#sec-2">2. branch</a>
+<ul>
+<li><a href="#sec-2-1">2.1. 删除分支</a></li>
+<li><a href="#sec-2-2">2.2. 删除服务器上的 branch</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. tag</a>
+<ul>
+<li><a href="#sec-3-1">3.1. 创建</a></li>
+<li><a href="#sec-3-2">3.2. 删除</a></li>
+<li><a href="#sec-3-3">3.3. 显示</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. clean</a>
+<ul>
+<li><a href="#sec-4-1">4.1. 清除当前工作区中没有加入版本库的文件和目录（非跟踪文件和目录）</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. rm</a>
+<ul>
+<li><a href="#sec-5-1">5.1. 删除暂存区文件，工作区保持不变</a></li>
+</ul>
+</li>
+<li><a href="#sec-6">6. diff</a>
+<ul>
+<li><a href="#sec-6-1">6.1. 比较工作区与暂存区</a></li>
+<li><a href="#sec-6-2">6.2. 比较工作区与仓库</a></li>
+<li><a href="#sec-6-3">6.3. 比较暂存区与仓库</a></li>
+<li><a href="#sec-6-4">6.4. 比较文件</a></li>
+</ul>
+</li>
+<li><a href="#sec-7">7. cat-file</a>
+<ul>
+<li><a href="#sec-7-1">7.1. 查看历史文件</a></li>
+<li><a href="#sec-7-2">7.2. 查看暂存区中的文件对象</a></li>
+<li><a href="#sec-7-3">7.3. 查看仓库中的文件对象</a></li>
+<li><a href="#sec-7-4">7.4. 查看 commit 对象</a></li>
+<li><a href="#sec-7-5">7.5. 查看 commit 对象对应的树对象</a></li>
+</ul>
+</li>
+<li><a href="#sec-8">8. ls-*</a>
+<ul>
+<li><a href="#sec-8-1">8.1. 显示 commit 指向的目录树</a></li>
+<li><a href="#sec-8-2">8.2. 显示暂存区的目录树</a></li>
+<li><a href="#sec-8-3">8.3. 显示 remote 的目录树</a></li>
+</ul>
+</li>
+<li><a href="#sec-9">9. reset</a>
+<ul>
+<li><a href="#sec-9-1">9.1. 替换 HEAD，替换暂存区，替换工作区</a></li>
+<li><a href="#sec-9-2">9.2. 替换 HEAD，暂存区不变，工作区不变</a></li>
+<li><a href="#sec-9-3">9.3. 替换 HEAD，替换暂存区，工作区不变</a></li>
+<li><a href="#sec-9-4">9.4. 对 filename 的改动撤出暂存区</a></li>
+</ul>
+</li>
+<li><a href="#sec-10">10. checkout</a>
+<ul>
+<li><a href="#sec-10-1">10.1. 暂存区中的 filename，覆盖工作区中的 filename</a></li>
+<li><a href="#sec-10-2">10.2. HEAD 不变，用 branch 指向的 filename 替换暂存区和工作区中的文件</a></li>
+<li><a href="#sec-10-3">10.3. 用暂存区中的所有文件覆盖工作区中的文件</a></li>
+<li><a href="#sec-10-4">10.4. 汇总显示工作区，暂存区和 HEAD 的差异</a></li>
+</ul>
+</li>
+<li><a href="#sec-11">11. revert</a></li>
+<li><a href="#sec-12">12. log</a></li>
+<li><a href="#sec-13">13. blame</a></li>
+<li><a href="#sec-14">14. rebase</a></li>
+<li><a href="#sec-15">15. remote</a>
+<ul>
+<li><a href="#sec-15-1">15.1. 查看状态</a></li>
+</ul>
+</li>
+<li><a href="#sec-16">16. rev-parse</a>
+<ul>
+<li><a href="#sec-16-1">16.1. 得到文件对应的 SHA</a></li>
+</ul>
+</li>
+<li><a href="#sec-17">17. stash</a></li>
+<li><a href="#sec-18">18. subtree</a>
+<ul>
+<li><a href="#sec-18-1">18.1. 添加</a></li>
+<li><a href="#sec-18-2">18.2. push</a></li>
+<li><a href="#sec-18-3">18.3. pull</a></li>
+</ul>
+</li>
+<li><a href="#sec-19">19. filter-branch</a>
+<ul>
+<li><a href="#sec-19-1">19.1. 查找仓库中大文件</a></li>
+<li><a href="#sec-19-2">19.2. 重写大文件涉及到的所有提交（重写历史记录）</a></li>
+</ul>
+</li>
+<li><a href="#sec-20">20. 参数</a>
+<ul>
+<li><a href="#sec-20-1">20.1. 忽略空白字符</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> config</h2>
+<div class="outline-text-2" id="text-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">git config --global user.name &lt;name&gt;
+git config --global user.email &lt;email&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> branch</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> 删除分支</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">git branch -D &lt;branch_to_delete&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> 删除服务器上的 branch</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">git push origin :&lt;branch_or_tag_to_delete&gt;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> tag</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+<code>annotated tag</code> 保存为一个 tag 对象，而轻量级的 tag 是作为某个 commit 对象的别名。
+</p>
+</div>
+
+<div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> 创建</h3>
+<div class="outline-text-3" id="text-3-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">git tag -m &lt;msg&gt; &lt;Tag&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> 删除</h3>
+<div class="outline-text-3" id="text-3-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">git tag -d &lt;tag_to_delete&gt;
+git push origin :&lt;tag_to_delete&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> 显示</h3>
+<div class="outline-text-3" id="text-3-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">git tag -n # 显示所有 tag
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> clean</h2>
+<div class="outline-text-2" id="text-4">
+</div><div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> 清除当前工作区中没有加入版本库的文件和目录（非跟踪文件和目录）</h3>
+<div class="outline-text-3" id="text-4-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">git clean -fd
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> rm</h2>
+<div class="outline-text-2" id="text-5">
+</div><div id="outline-container-sec-5-1" class="outline-3">
+<h3 id="sec-5-1"><span class="section-number-3">5.1</span> 删除暂存区文件，工作区保持不变</h3>
+<div class="outline-text-3" id="text-5-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">git rm --cached &lt;file&gt;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> diff</h2>
+<div class="outline-text-2" id="text-6">
+</div><div id="outline-container-sec-6-1" class="outline-3">
+<h3 id="sec-6-1"><span class="section-number-3">6.1</span> 比较工作区与暂存区</h3>
+<div class="outline-text-3" id="text-6-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">git diff                   # workspace &amp; stage
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-6-2" class="outline-3">
+<h3 id="sec-6-2"><span class="section-number-3">6.2</span> 比较工作区与仓库</h3>
+<div class="outline-text-3" id="text-6-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">git diff &lt;commit&gt;          # workspace &amp; &lt;commit&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-6-3" class="outline-3">
+<h3 id="sec-6-3"><span class="section-number-3">6.3</span> 比较暂存区与仓库</h3>
+<div class="outline-text-3" id="text-6-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">git diff --cached|--staged # stage &amp; HEAD
+git diff --cached &lt;commit&gt; # stage &amp; &lt;commit&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-6-4" class="outline-3">
+<h3 id="sec-6-4"><span class="section-number-3">6.4</span> 比较文件</h3>
+<div class="outline-text-3" id="text-6-4">
+<div class="org-src-container">
+
+<pre class="src src-sh">git diff &lt;commit1&gt; &lt;commit2&gt; &lt;filename&gt;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> cat-file</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+<code>git cat-file</code> 等效于 <code>git show</code>
+</p>
+</div>
+
+<div id="outline-container-sec-7-1" class="outline-3">
+<h3 id="sec-7-1"><span class="section-number-3">7.1</span> 查看历史文件</h3>
+<div class="outline-text-3" id="text-7-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">git cat-file -p &lt;sha&gt;                  # 查看 sha 对应的内容，即历史文件
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-2" class="outline-3">
+<h3 id="sec-7-2"><span class="section-number-3">7.2</span> 查看暂存区中的文件对象</h3>
+<div class="outline-text-3" id="text-7-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">git cat-file -p &lt;:/path/to/file&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-3" class="outline-3">
+<h3 id="sec-7-3"><span class="section-number-3">7.3</span> 查看仓库中的文件对象</h3>
+<div class="outline-text-3" id="text-7-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">git cat-file -p &lt;commit:/path/to/file&gt; # 查看 commit 中的文件对象
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-4" class="outline-3">
+<h3 id="sec-7-4"><span class="section-number-3">7.4</span> 查看 commit 对象</h3>
+<div class="outline-text-3" id="text-7-4">
+<div class="org-src-container">
+
+<pre class="src src-sh">git cat-file &lt;commit&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-5" class="outline-3">
+<h3 id="sec-7-5"><span class="section-number-3">7.5</span> 查看 commit 对象对应的树对象</h3>
+<div class="outline-text-3" id="text-7-5">
+<div class="org-src-container">
+
+<pre class="src src-sh">git cat-file &lt;commit:&gt;
+git cat-file -p &lt;commit^{tree}&gt;        # 同上
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> ls-*</h2>
+<div class="outline-text-2" id="text-8">
+</div><div id="outline-container-sec-8-1" class="outline-3">
+<h3 id="sec-8-1"><span class="section-number-3">8.1</span> 显示 commit 指向的目录树</h3>
+<div class="outline-text-3" id="text-8-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">git ls-tree -r &lt;commit&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-8-2" class="outline-3">
+<h3 id="sec-8-2"><span class="section-number-3">8.2</span> 显示暂存区的目录树</h3>
+<div class="outline-text-3" id="text-8-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">git ls-files -s
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-8-3" class="outline-3">
+<h3 id="sec-8-3"><span class="section-number-3">8.3</span> 显示 remote 的目录树</h3>
+<div class="outline-text-3" id="text-8-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">git ls-remote &lt;remote&gt;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-9" class="outline-2">
+<h2 id="sec-9"><span class="section-number-2">9</span> reset</h2>
+<div class="outline-text-2" id="text-9">
+</div><div id="outline-container-sec-9-1" class="outline-3">
+<h3 id="sec-9-1"><span class="section-number-3">9.1</span> 替换 HEAD，替换暂存区，替换工作区</h3>
+<div class="outline-text-3" id="text-9-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">git reset --hard &lt;commit&gt; #
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-9-2" class="outline-3">
+<h3 id="sec-9-2"><span class="section-number-3">9.2</span> 替换 HEAD，暂存区不变，工作区不变</h3>
+<div class="outline-text-3" id="text-9-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">git reset --soft &lt;commit&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-9-3" class="outline-3">
+<h3 id="sec-9-3"><span class="section-number-3">9.3</span> 替换 HEAD，替换暂存区，工作区不变</h3>
+<div class="outline-text-3" id="text-9-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">git reset &lt;commit&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-9-4" class="outline-3">
+<h3 id="sec-9-4"><span class="section-number-3">9.4</span> 对 filename 的改动撤出暂存区</h3>
+<div class="outline-text-3" id="text-9-4">
+<div class="org-src-container">
+
+<pre class="src src-sh">git reset -- &lt;filename&gt;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-10" class="outline-2">
+<h2 id="sec-10"><span class="section-number-2">10</span> checkout</h2>
+<div class="outline-text-2" id="text-10">
+</div><div id="outline-container-sec-10-1" class="outline-3">
+<h3 id="sec-10-1"><span class="section-number-3">10.1</span> 暂存区中的 filename，覆盖工作区中的 filename</h3>
+<div class="outline-text-3" id="text-10-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">git checkout -- &lt;filename&gt;          #
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-10-2" class="outline-3">
+<h3 id="sec-10-2"><span class="section-number-3">10.2</span> HEAD 不变，用 branch 指向的 filename 替换暂存区和工作区中的文件</h3>
+<div class="outline-text-3" id="text-10-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">git checkout &lt;branch&gt; -- &lt;filename&gt; #
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-10-3" class="outline-3">
+<h3 id="sec-10-3"><span class="section-number-3">10.3</span> 用暂存区中的所有文件覆盖工作区中的文件</h3>
+<div class="outline-text-3" id="text-10-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">git checkout -- . #
+git checkout .    # 同上n
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-10-4" class="outline-3">
+<h3 id="sec-10-4"><span class="section-number-3">10.4</span> 汇总显示工作区，暂存区和 HEAD 的差异</h3>
+<div class="outline-text-3" id="text-10-4">
+<div class="org-src-container">
+
+<pre class="src src-sh">git checkout      #
+git checkout HEAD # 同上
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-11" class="outline-2">
+<h2 id="sec-11"><span class="section-number-2">11</span> revert</h2>
+<div class="outline-text-2" id="text-11">
+<div class="org-src-container">
+
+<pre class="src src-sh">git revert -n                   # no commit
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-12" class="outline-2">
+<h2 id="sec-12"><span class="section-number-2">12</span> log</h2>
+<div class="outline-text-2" id="text-12">
+<div class="org-src-container">
+
+<pre class="src src-sh">git log --oneline &lt;commit^@&gt; # 某次提交的历史提交，自身除外，用语法 commit^@ 表示
+
+git log --oneline &lt;commit^!&gt; # 只要提交本身，不包括其历史提交，用语法 commit^! 表示
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-13" class="outline-2">
+<h2 id="sec-13"><span class="section-number-2">13</span> blame</h2>
+<div class="outline-text-2" id="text-13">
+<div class="org-src-container">
+
+<pre class="src src-sh">git blame -L &lt;line&gt;,+&lt;incr&gt; &lt;filename&gt;
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-14" class="outline-2">
+<h2 id="sec-14"><span class="section-number-2">14</span> rebase</h2>
+<div class="outline-text-2" id="text-14">
+<p>
+<code>git rebase &lt;since&gt;</code> 等效于 <code>git rebase --onto &lt;since&gt; &lt;since&gt; HEAD</code>
+</p>
+
+<pre class="example">
+git rebase 的归一化形式：git rebase --onto &lt;NewBase&gt; &lt;Since&gt; &lt;Till&gt;
+
+变基操作过程：
+  1) 首先执行 git checkout `Till`
+  2) 将`Since`..`Till`标识的提交范围写到一个临时文件中
+  3) git reset --hard `NewBase`
+  4) 从保存在临时文件中的提交列表中，将提交逐一按顺序重新提交到重置后的分支上
+  5) 如果遇到提交已经在分支中包含，则跳过改提交
+  6) 如果在提交过程遇到冲突，则变基过程暂停；
+     用户解决冲突后，执行 git rebase --continue 继续变基操作；
+     或者执行git rebase --skip 跳过该次提交；
+     或者执行 git rebase --abort 就此终止变基操作切换到变基前的分支上
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-15" class="outline-2">
+<h2 id="sec-15"><span class="section-number-2">15</span> remote</h2>
+<div class="outline-text-2" id="text-15">
+</div><div id="outline-container-sec-15-1" class="outline-3">
+<h3 id="sec-15-1"><span class="section-number-3">15.1</span> 查看状态</h3>
+<div class="outline-text-3" id="text-15-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">git remote show &lt;remote&gt; # Show status of remote
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-16" class="outline-2">
+<h2 id="sec-16"><span class="section-number-2">16</span> rev-parse</h2>
+<div class="outline-text-2" id="text-16">
+</div><div id="outline-container-sec-16-1" class="outline-3">
+<h3 id="sec-16-1"><span class="section-number-3">16.1</span> 得到文件对应的 SHA</h3>
+<div class="outline-text-3" id="text-16-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">git rev-parse `Commit:/path/to/file` #
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-sec-17" class="outline-2">
+<h2 id="sec-17"><span class="section-number-2">17</span> stash</h2>
+<div class="outline-text-2" id="text-17">
+<div class="org-src-container">
+
+<pre class="src src-sh">git stash -u                    # 包括工作区
+git stash save -u "message"     # 包括工作区，加上注释
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-18" class="outline-2">
+<h2 id="sec-18"><span class="section-number-2">18</span> subtree</h2>
+<div class="outline-text-2" id="text-18">
+</div><div id="outline-container-sec-18-1" class="outline-3">
+<h3 id="sec-18-1"><span class="section-number-3">18.1</span> 添加</h3>
+<div class="outline-text-3" id="text-18-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">git remote add my-subtree &lt;url&gt;
+git subtree add —-prefix=dir/ my-subtree master
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-18-2" class="outline-3">
+<h3 id="sec-18-2"><span class="section-number-3">18.2</span> push</h3>
+<div class="outline-text-3" id="text-18-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">git subtree push --prefix=dir my-subtree master
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-18-3" class="outline-3">
+<h3 id="sec-18-3"><span class="section-number-3">18.3</span> pull</h3>
+<div class="outline-text-3" id="text-18-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">git subtree pull --prefix=dir my-subtree master
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-19" class="outline-2">
+<h2 id="sec-19"><span class="section-number-2">19</span> filter-branch</h2>
+<div class="outline-text-2" id="text-19">
+</div><div id="outline-container-sec-19-1" class="outline-3">
+<h3 id="sec-19-1"><span class="section-number-3">19.1</span> 查找仓库中大文件</h3>
+<div class="outline-text-3" id="text-19-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">git rev-list --objects --all | \
+  grep "$(git verify-pack -v .git/objects/pack/*.idx | sort -k 3 -n | tail -5 | awk '{print$1}')"
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-19-2" class="outline-3">
+<h3 id="sec-19-2"><span class="section-number-3">19.2</span> 重写大文件涉及到的所有提交（重写历史记录）</h3>
+<div class="outline-text-3" id="text-19-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">git filter-branch -f --prune-empty \
+  --index-filter 'git rm -rf --cached --ignore-unmatch &lt;your-file-name&gt;' \
+  --tag-name-filter cat -- --all
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-20" class="outline-2">
+<h2 id="sec-20"><span class="section-number-2">20</span> 参数</h2>
+<div class="outline-text-2" id="text-20">
+</div><div id="outline-container-sec-20-1" class="outline-3">
+<h3 id="sec-20-1"><span class="section-number-3">20.1</span> 忽略空白字符</h3>
+<div class="outline-text-3" id="text-20-1">
+<p>
+<code>-X ignore-all-space</code></p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
