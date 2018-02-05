@@ -1,19 +1,21 @@
-#+TITLE:     curl
+# -*- mode: snippet -*-
+#+TITLE:     Curl
 #+AUTHOR:    Hao Ruan
-#+EMAIL:     ruanhao1116@gmail.com
+#+EMAIL:     haoru@cisco.com
 #+LANGUAGE:  en
 #+LINK_HOME: http://www.github.com/ruanhao
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
-#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
-#+STARTUP:   showall
+#+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+ #+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+#+TOC: headlines 3
 
 
-* 1，基本知识
-
-
-* 2，常见用法
-
-** 2.1，使用 cookie
+* 使用 cookie
 
 #+BEGIN_SRC sh
   -c <cookie-file> # 使用文件保存 cookie
@@ -21,14 +23,14 @@
   -b <cookie-file> # 以文件的形式提供 cookie
 #+END_SRC
 
-** 2.2，URL 编码
+* URL 编码
 
 #+BEGIN_SRC sh
   curl -G --data-urlencode "search=hello world"
   # -G 表示指定 GET 方法，并将 payload 追加至 request uri 后（用 ? 分隔)
 #+END_SRC
 
-** 2.3，SSL/TLS
+* SSL/TLS
 
 #+BEGIN_SRC sh
   -E <cert-file>     # 提供证书文件
@@ -39,9 +41,9 @@
 
 [[http://curl.haxx.se/ca/cacert.pem][授信 CA 列表]]
 
-** 2.4，禁用 Expect 机制
+* 禁用 Expect 机制
 
-使用 curl 进行上传时，有些服务器会返回 =Expect: 100-continue= ，导致上传失败。
+使用 curl 进行上传时，有些服务器会返回 =Expect: 100-continue= ，导致上传失败。解决方案：
 
 #+BEGIN_SRC sh
   curl -X PUT -Ss -H 'Expect:' -d@<payload-file> <url>
@@ -49,8 +51,8 @@
 
 [[http://www.iandennismiller.com/posts/curl-http1-1-100-continue-and-multipartform-data-post.html][curl: HTTP/1.1 100 CONTINUE and multipart/form-data POST]]
 
-** 2.5，建立 WebSocket
+* 建立 WebSocket 连接
 
-#+BEGIN_EXAMPLE sh
+#+BEGIN_SRC sh
   curl -i -N -H "Connection: Upgrade" -H "Upgrade: websocket" -H "Origin: http://localhost" $url
-#+END_EXAMPLE
+#+END_SRC

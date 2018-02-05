@@ -1,13 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-<title>知识索引</title>
-<!-- 2018-02-05 Mon 22:10 -->
-<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<meta  name="generator" content="Org-mode" />
-<meta  name="author" content="Hao Ruan" />
+<title>Curl</title>
+<!-- 2018-02-05 Mon 22:08 -->
+<meta  charset="utf-8">
+<meta  name="generator" content="Org-mode">
+<meta  name="author" content="Hao Ruan">
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
   .title  { text-align: center; }
@@ -88,7 +86,8 @@
     { background-color: #ffff00; color: #000000; font-weight: bold; }
   /*]]>*/-->
 </style>
-<link href="org-html-themes/fold-css/style.css" rel="stylesheet" type="text/css" />
+<link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+<link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -138,75 +137,127 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
-<h1 class="title">知识索引</h1>
+<h1 class="title">Curl</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. Bash</a></li>
-<li><a href="#sec-2">2. 中间件</a>
-<ul>
-<li><a href="#sec-2-1">2.1. RabbitMQ</a></li>
-<li><a href="#sec-2-2">2.2. Nginx</a></li>
+<li><a href="#sec-1">1. 使用 cookie</a></li>
+<li><a href="#sec-2">2. URL 编码</a></li>
+<li><a href="#sec-3">3. SSL/TLS</a></li>
+<li><a href="#sec-4">4. 禁用 Expect 机制</a></li>
+<li><a href="#sec-5">5. 建立 WebSocket 连接</a></li>
 </ul>
-</li>
-<li><a href="#sec-3">3. 运维管理</a>
+</div>
+</div>
+<div class="outline-2" id="meta">
+<table>
+
+
+<colgroup>
+<col  class="left">
+
+<col  class="left">
+</colgroup>
+<tbody>
+<tr>
+<td class="left">Author</td>
+<td class="left">Hao Ruan (haoru@cisco.com)</td>
+</tr>
+
+<tr>
+<td class="left">Date</td>
+<td class="left">2018-02-05 22:08:05</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-3-1">3.1. Ansible</a></li>
-<li><a href="#sec-3-2">3.2. Docker</a></li>
-</ul>
-</li>
-<li><a href="#sec-4">4. 网络命令</a></li>
+<li><a href="#sec-1">1. 使用 cookie</a></li>
+<li><a href="#sec-2">2. URL 编码</a></li>
+<li><a href="#sec-3">3. SSL/TLS</a></li>
+<li><a href="#sec-4">4. 禁用 Expect 机制</a></li>
+<li><a href="#sec-5">5. 建立 WebSocket 连接</a></li>
 </ul>
 </div>
 </div>
 
+
 <div id="outline-container-sec-1" class="outline-2">
-<h2 id="sec-1"><span class="section-number-2">1</span> <a href="https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/bash/bash.html">Bash</a></h2>
+<h2 id="sec-1"><span class="section-number-2">1</span> 使用 cookie</h2>
+<div class="outline-text-2" id="text-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">-c &lt;cookie-file&gt; # 使用文件保存 cookie
+-b "name=data"   # 以键值对的形式提供 cookie
+-b &lt;cookie-file&gt; # 以文件的形式提供 cookie
+</pre>
+</div>
+</div>
 </div>
 
 <div id="outline-container-sec-2" class="outline-2">
-<h2 id="sec-2"><span class="section-number-2">2</span> 中间件</h2>
+<h2 id="sec-2"><span class="section-number-2">2</span> URL 编码</h2>
 <div class="outline-text-2" id="text-2">
-</div><div id="outline-container-sec-2-1" class="outline-3">
-<h3 id="sec-2-1"><span class="section-number-3">2.1</span> <a href="https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/midwares/rabbitmq.html">RabbitMQ</a></h3>
-</div>
+<div class="org-src-container">
 
-<div id="outline-container-sec-2-2" class="outline-3">
-<h3 id="sec-2-2"><span class="section-number-3">2.2</span> <a href="https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/midwares/nginx.html">Nginx</a></h3>
+<pre class="src src-sh">curl -G --data-urlencode "search=hello world"
+# -G 表示指定 GET 方法，并将 payload 追加至 request uri 后（用 ? 分隔)
+</pre>
 </div>
 </div>
-
+</div>
 
 <div id="outline-container-sec-3" class="outline-2">
-<h2 id="sec-3"><span class="section-number-2">3</span> 运维管理</h2>
+<h2 id="sec-3"><span class="section-number-2">3</span> SSL/TLS</h2>
 <div class="outline-text-2" id="text-3">
-</div><div id="outline-container-sec-3-1" class="outline-3">
-<h3 id="sec-3-1"><span class="section-number-3">3.1</span> <a href="https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/devops/ansible.html">Ansible</a></h3>
+<div class="org-src-container">
+
+<pre class="src src-sh">-E &lt;cert-file&gt;     # 提供证书文件
+--key &lt;key-file&gt;   # 提供私钥文件
+--cacert &lt;ca-file&gt; # 提供授信 CA 列表文件，也可由环境变量 CURL_CA_BUNDLE 指定
+-k                 # 忽略服务器证书的认证
+</pre>
 </div>
 
-<div id="outline-container-sec-3-2" class="outline-3">
-<h3 id="sec-3-2"><span class="section-number-3">3.2</span> <a href="https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/devops/docker.html">Docker</a></h3>
+<p>
+<a href="http://curl.haxx.se/ca/cacert.pem">授信 CA 列表</a>
+</p>
 </div>
 </div>
 
 <div id="outline-container-sec-4" class="outline-2">
-<h2 id="sec-4"><span class="section-number-2">4</span> 网络命令</h2>
+<h2 id="sec-4"><span class="section-number-2">4</span> 禁用 Expect 机制</h2>
 <div class="outline-text-2" id="text-4">
-<ul class="org-ul">
-<li><a href="https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/curl.html">curl</a>
-</li>
-<li><a href="https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/iptables.html">iptables</a>
-</li>
-</ul>
+<p>
+使用 curl 进行上传时，有些服务器会返回 <code>Expect: 100-continue</code> ，导致上传失败。解决方案：
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">curl -X PUT -Ss -H 'Expect:' -d@&lt;payload-file&gt; &lt;url&gt;
+</pre>
+</div>
+
+<p>
+<a href="http://www.iandennismiller.com/posts/curl-http1-1-100-continue-and-multipartform-data-post.html">curl: HTTP/1.1 100 CONTINUE and multipart/form-data POST</a>
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> 建立 WebSocket 连接</h2>
+<div class="outline-text-2" id="text-5">
+<div class="org-src-container">
+
+<pre class="src src-sh">curl -i -N -H "Connection: Upgrade" -H "Upgrade: websocket" -H "Origin: http://localhost" $url
+</pre>
 </div>
 </div>
 </div>
-<div id="postamble" class="status">
-<p class="author">Author: Hao Ruan</p>
-<p class="date">Created: 2018-02-05 Mon 22:10</p>
-<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 25.3.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
-<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
 </html>
