@@ -1,0 +1,101 @@
+#+TITLE:     Tshark
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+#+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+#+TOC: headlines 3
+#+STARTUP:   showall
+
+
+* 基本原理
+
+** 基本用法
+
+*** 抓包
+
+略（参见 tcpdump ）
+
+
+*** 抓包停止条件
+
+- =-c= : 指定抓包数量
+
+- =-a duration:5= : 指定抓包时间（秒）
+
+- =-a filesize:10= : 指定 ring buffer 文件大小（ KB ）
+
+- =-a files:7= : 指定 ring buffer 文件数量
+
+*** 查看包的信息
+
+#+BEGIN_SRC sh
+  tshark -r <pcap-file>
+#+END_SRC
+
+
+选项说明：
+
+- =-r= : 指定读入的 pcap 文件
+- =-Y <display filter pattern>= : 指定 display 过滤表达式
+- =-V= : 显示包的详细信息
+
+
+** 系统信息查询
+
+*** 查看所有网络接口
+
+=tshark -D=
+
+*** 查看所有支持字段
+
+=tshark -G fields=
+
+*** 查看所有支持协议
+
+=tshark -G protocols=
+
+
+
+* 使用示例
+
+** 查看间隔时间内的数据通信量
+
+#+BEGIN_SRC sh
+  ## 以 10 秒为间隔
+  tshark -r pcap -q -z io,stat,10
+#+END_SRC
+
+** 禁用相对序号
+
+#+BEGIN_SRC sh
+  -o 'tcp.relative_sequence_numbers:FALSE'
+#+END_SRC
+
+** 过滤 http 信息
+
+#+BEGIN_SRC sh
+  tshark -n -r test.pcap -Tfields -e http.request.uri -e http.host 'http'
+  # output:
+  # /index.html     10.74.68.58:8989
+
+  ## -Tfields -e http.request.uri -e http.host : 指定输出项
+#+END_SRC
+
+** 解密 https
+
+#+BEGIN_SRC sh
+  export SSLKEYLOGFILE='<path-to-sslkeylog-file>' ## 浏览器用于记录 (Pre)-Master-Secret
+
+  tshark -r capture.pcap \
+  -o 'http.ssl.port:443,10000-20000' \            ## 指定需要解密的端口
+  -o 'ssl.keylog_file:<path-to-sslkeylog-file>' \
+  'http'
+#+END_SRC
