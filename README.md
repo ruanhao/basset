@@ -16,6 +16,7 @@
 - [curl](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/curl.html)
 - [git](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/git.html)
 - [iptables](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/iptables.html)
+- [netcat](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/netcat.html)
 - [openssl](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/openssl.html)
 - [sed](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/sed.html)
 - [socat](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/socat.html)
