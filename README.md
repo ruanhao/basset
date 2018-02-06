@@ -17,3 +17,4 @@
 - [git](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/git.html)
 - [iptables](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/iptables.html)
 - [openssl](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/openssl.html)
+- [socat](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/socat.html)

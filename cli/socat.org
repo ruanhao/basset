@@ -1,0 +1,171 @@
+# -*- mode: snippet -*-
+#+TITLE:     Socat
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+ #+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+#+TOC: headlines 3
+#+STARTUP:   showall
+
+
+* 基本用法
+
+#+BEGIN_SRC sh
+socat [options] <address1> <address2>
+#+END_SRC
+
+简写:
+
+- tcp-l: tcp-listen
+- udp-l : udp-listen
+- unix-l: unix-listen
+
+- tcp: tcp-connect
+- udp: udp-connect
+- unix: unix-connect
+
+
+
+
+* 发送文件
+
+** 方式一
+
+*** 服务器端
+
+#+BEGIN_SRC sh
+  socat -u open:filename,binary tcp-listen:12345
+#+END_SRC
+
+
+*** 客户端
+
+#+BEGIN_SRC sh
+  socat -u tcp:serverip:12345 open:localfilename,create,binary
+#+END_SRC
+
+
+说明:
+
+- =-u= 表示数据单向传送，从第一个参数传递到第二个参数，如果是 =-U= 则表示从第二个参数传送到第一个参数
+- =binary= 表示以二进制方式打开文件
+- =create= 表示如果文件不存在则创建
+- 传输结束后两端均退出
+
+
+
+** 方式二
+
+*** 服务器端
+
+#+BEGIN_SRC sh
+  socat tcp-l:12345,reuseaddr,fork open:<filename>
+#+END_SRC
+
+
+*** 客户端
+
+#+BEGIN_SRC sh
+  socat tcp:<ip>:12345 open:<filename>,create
+#+END_SRC
+
+
+
+* 读写分离
+
+socat 支持打开端的读写分离，使用 !! 符号，左侧表示读，右侧表示写
+
+#+BEGIN_SRC sh
+  socat open:hello.html\!\!open:log.txt,create,append tcp-listen:12345,reuseaddr,fork
+#+END_SRC
+
+
+说明:
+
+- =open:hello.html= 表示读 hello.html 文件
+- =open:log.txt= 表示收到的数据写入 log.txt 文件
+- =fork= 请求到达时，fork 一个进程进行处理
+- 在 bash 下，需要用 =\= 对 =!= 进行转义
+
+
+* TLS 连接
+
+** 服务器端
+
+  #+BEGIN_SRC sh
+  socat -U openssl-listen:8443,\
+           reuseaddr,\
+           cert=server.crt.pem,\
+           key=server.key.pem,\
+           cafile=ca.pem, \  ## 忽略证书有效性：verify=0,\
+           fork \
+           open:<filename>
+  #+END_SRC
+
+** 客户端
+
+#+BEGIN_SRC sh
+  socat - openssl-connect:<ip>:<port>,verify=0
+#+END_SRC
+
+
+
+* 监听端口
+
+** 监听端口，并输出到控制台
+
+#+BEGIN_SRC sh
+socat tcp-l:<port> -
+#+END_SRC
+
+
+* 端口重定向
+
+#+BEGIN_SRC sh
+socat tcp-l:80,reuseaddr,fork tcp:<dst-ip>:<dst-port>
+#+END_SRC
+
+
+* 发送消息
+
+#+BEGIN_SRC sh
+echo "content" | socat - tcp-connect:1.2.3.4:12345
+#+END_SRC
+
+* Telnet
+
+** 服务器端
+
+#+BEGIN_SRC sh
+  socat tcp-listen:8888 exec:'bash -i',pty,setsid,stderr,echo=0
+#+END_SRC
+
+
+** 客户端
+
+#+BEGIN_SRC sh
+  socat readline tcp:<server-ip>:8888
+#+END_SRC
+
+
+* Echo Server
+
+#+BEGIN_SRC sh
+  socat tcp-l:12345,reuseaddr,fork EXEC:cat
+#+END_SRC
+
+
+* 使用 tun/tap
+
+#+BEGIN_SRC sh
+socat -u TUN:10.0.6.1/24,tun-type=tap,up -
+socat -u TUN:10.0.6.1/24,iff-no-pi,up -
+#+END_SRC
