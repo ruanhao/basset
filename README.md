@@ -13,6 +13,7 @@
 
 ## 常用命令
 
+- [awk](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/awk.html)
 - [curl](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/curl.html)
 - [git](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/git.html)
 - [iptables](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/iptables.html)

@@ -1,10 +1,17 @@
-#+TITLE:     awk
+#+TITLE:     AWK
 #+AUTHOR:    Hao Ruan
-#+EMAIL:     ruanhao1116@gmail.com
+#+EMAIL:     haoru@cisco.com
 #+LANGUAGE:  en
 #+LINK_HOME: http://www.github.com/ruanhao
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
-#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+#+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+#+TOC: headlines 3
 #+STARTUP:   showall
 
 
@@ -19,7 +26,7 @@ pattern 或 operation 之一，可以省略：
 - 如果只有 pattern ，表示要显示符合样式的数据行
 - 如果只有 operation ，表示对每一数据行都执行该项操作
 
-awk 常用的格式:
+** awk 常用的格式
 
 1. =awk /pattern/ <filename>= ：把符合样式的数据行显示出来
 
@@ -30,61 +37,66 @@ awk 常用的格式:
 
 * 脚本范式
 
-- 产生伪随机数
+** 产生伪随机数
 
-  产生一个范围在 0-1 之间的伪随机数，（同一秒内生成的随机数相同）
+产生一个范围在 0-1 之间的伪随机数，（同一秒内生成的随机数相同）
 
-  =echo | awk '{ srand(); print rand() }'=
+#+BEGIN_SRC sh
+echo | awk '{ srand(); print rand() }'
+#+END_SRC
 
-- 打印字段
+** 打印字段
 
-  #+BEGIN_SRC sh
+#+BEGIN_SRC sh
     awk '{ print $1, $2, $3 }' <filename>
     awk '{ print $1$2, $3 }' <filename>
 
-    awk '{ print NF, $1, $(NF-1) }' <filename> # any expression can be after $ to denote a field number
+    # any expression can be after $ to denote a field number
+    awk '{ print NF, $1, $(NF-1) }' <filename>
 
     awk '{ print }' <filename>                               # 相当于 cat
     awk '{ tmp = $1; $1 = $2; $2 = tmp; print }' <filename>  # 相当于 print $1,$2,...,$NF
-  #+END_SRC
+#+END_SRC
 
-- 字段匹配
+** 字段匹配
 
-  #+BEGIN_SRC sh
+#+BEGIN_SRC sh
     awk '$3~/hello/ {print NR }' file
     awk '$3!~/hello/ { print NR }' file
-  #+END_SRC
+#+END_SRC
 
 
-- 行匹配
+** 行匹配
 
-  #+BEGIN_SRC sh
+#+BEGIN_SRC sh
     awk '!/hello/' <file>           # 相当于 grep -v
-  #+END_SRC
+#+END_SRC
 
 
-- 内容重定向
+** 内容重定向
 
-  #+BEGIN_SRC sh
+#+BEGIN_SRC sh
     awk 'NR!=1 { if($6 ~ /TIME|ESTABLISHED/) print > "1.txt";
                  else if($6 ~ /LISTEN/) print > "2.txt";
                  else print > "3.txt" }' netstat.txt
-  #+END_SRC
+#+END_SRC
 
 
-- 使用数组
+** 使用数组
 
-  统计每个用户的进程占了多少内存:
+*** 统计每个用户的进程占了多少内存
 
-  #+BEGIN_SRC sh
+#+BEGIN_SRC sh
     ps aux | awk 'NR!=1 { a[$1]+=$6; } END{ for(i in a) print i ", " a[i]"KB"; }'
-  #+END_SRC
+#+END_SRC
 
-- 使用变量
+** 使用变量
 
-  字符串连接：
+*** 字符串连接
 
-  =cat emp.data  | awk '{ names = names $1 " " } END { print names }'=
+#+BEGIN_SRC sh
+  cat emp.data  | awk '{ names = names $1 " " } END { print names }'
+#+END_SRC
 
 * 内建变量
 
