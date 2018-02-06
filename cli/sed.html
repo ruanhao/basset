@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sed</title>
+<!-- 2018-02-06 Tue 23:01 -->
+<meta  charset="utf-8">
+<meta  name="generator" content="Org-mode">
+<meta  name="author" content="Hao Ruan">
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+<link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+<script type="text/javascript" src="http://orgmode.org/mathjax/MathJax.js"></script>
+<script type="text/javascript">
+<!--/*--><![CDATA[/*><!--*/
+    MathJax.Hub.Config({
+        // Only one of the two following lines, depending on user settings
+        // First allows browser-native MathML display, second forces HTML/CSS
+        //  config: ["MMLorHTML.js"], jax: ["input/TeX"],
+            jax: ["input/TeX", "output/HTML-CSS"],
+        extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js",
+                     "TeX/noUndefined.js"],
+        tex2jax: {
+            inlineMath: [ ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"], ["\\begin{displaymath}","\\end{displaymath}"] ],
+            skipTags: ["script","noscript","style","textarea","pre","code"],
+            ignoreClass: "tex2jax_ignore",
+            processEscapes: false,
+            processEnvironments: true,
+            preview: "TeX"
+        },
+        showProcessingMessages: true,
+        displayAlign: "center",
+        displayIndent: "2em",
+
+        "HTML-CSS": {
+             scale: 100,
+             availableFonts: ["STIX","TeX"],
+             preferredFont: "TeX",
+             webFont: "TeX",
+             imageFont: "TeX",
+             showMathMenu: true,
+        },
+        MMLorHTML: {
+             prefer: {
+                 MSIE:    "MML",
+                 Firefox: "MML",
+                 Opera:   "HTML",
+                 other:   "HTML"
+             }
+        }
+    });
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Sed</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 基本原理</a>
+<ul>
+<li><a href="#sec-1-1">1.1. 元字符</a>
+<ul>
+<li><a href="#sec-1-1-1">1.1.1. 不使用扩展正则表达式</a></li>
+<li><a href="#sec-1-1-2">1.1.2. 使用扩展正则表达式 (-r)</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2">1.2. 知识点</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. Patter Space</a></li>
+<li><a href="#sec-1-2-2">1.2.2. Address</a>
+<ul>
+<li><a href="#sec-1-2-2-1">1.2.2.1. 对于像 "addr1,addr2" 这种形式的地址匹配</a></li>
+<li><a href="#sec-1-2-2-2">1.2.2.2. 地址形式</a></li>
+<li><a href="#sec-1-2-2-3">1.2.2.3. 总结</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2-3">1.2.3. Cmd</a>
+<ul>
+<li><a href="#sec-1-2-3-1">1.2.3.1. 常用 Cmd</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2-4">1.2.4. Hold Space</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. 常见用法</a>
+<ul>
+<li><a href="#sec-2-1">2.1. 反序文件</a></li>
+<li><a href="#sec-2-2">2.2. 替换</a>
+<ul>
+<li><a href="#sec-2-2-1">2.2.1. 替换每一行的第一个</a></li>
+<li><a href="#sec-2-2-2">2.2.2. 替换每一行的第二个</a></li>
+<li><a href="#sec-2-2-3">2.2.3. 替换每一行的第三个及以后所有</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-3">2.3. 使用匹配到的字符串</a>
+<ul>
+<li><a href="#sec-2-3-1">2.3.1. 使用 &amp; 来当做被匹配的变量</a></li>
+<li><a href="#sec-2-3-2">2.3.2. 使用圆括号</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-4">2.4. 两行合并一行</a></li>
+<li><a href="#sec-2-5">2.5. 行 ( 前 / 后 ) 进行 ( 插入 / 追加 ) 一行内容</a></li>
+<li><a href="#sec-2-6">2.6. 替换匹配行</a></li>
+<li><a href="#sec-2-7">2.7. 字符转换</a></li>
+<li><a href="#sec-2-8">2.8. 压缩多行空行为一行</a></li>
+<li><a href="#sec-2-9">2.9. 每行后添加一空行</a></li>
+<li><a href="#sec-2-10">2.10. 删除偶数行</a></li>
+<li><a href="#sec-2-11">2.11. 删除奇数行</a></li>
+<li><a href="#sec-2-12">2.12. 忽略大小写匹配</a></li>
+<li><a href="#sec-2-13">2.13. 不执行匹配</a></li>
+<li><a href="#sec-2-14">2.14. 匹配行之前添加空行</a></li>
+<li><a href="#sec-2-15">2.15. 匹配行之前之后添加空行</a></li>
+<li><a href="#sec-2-16">2.16. 每一行后添加两行</a></li>
+<li><a href="#sec-2-17">2.17. 每 5 行添加一个空行</a></li>
+<li><a href="#sec-2-18">2.18. 打印匹配 <i>regex</i> 之前的那一行</a></li>
+<li><a href="#sec-2-19">2.19. 打印匹配 <i>regex</i> 之后的那一行</a></li>
+<li><a href="#sec-2-20">2.20. 打印长于 65 个字符的行</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. 参考列表</a></li>
+</ul>
+</div>
+</div>
+<div class="outline-2" id="meta">
+<table>
+
+
+<colgroup>
+<col  class="left">
+
+<col  class="left">
+</colgroup>
+<tbody>
+<tr>
+<td class="left">Author</td>
+<td class="left">Hao Ruan (haoru@cisco.com)</td>
+</tr>
+
+<tr>
+<td class="left">Date</td>
+<td class="left">2018-02-06 23:01:52</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 基本原理</a>
+<ul>
+<li><a href="#sec-1-1">1.1. 元字符</a>
+<ul>
+<li><a href="#sec-1-1-1">1.1.1. 不使用扩展正则表达式</a></li>
+<li><a href="#sec-1-1-2">1.1.2. 使用扩展正则表达式 (-r)</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2">1.2. 知识点</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. Patter Space</a></li>
+<li><a href="#sec-1-2-2">1.2.2. Address</a>
+<ul>
+<li><a href="#sec-1-2-2-1">1.2.2.1. 对于像 "addr1,addr2" 这种形式的地址匹配</a></li>
+<li><a href="#sec-1-2-2-2">1.2.2.2. 地址形式</a></li>
+<li><a href="#sec-1-2-2-3">1.2.2.3. 总结</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2-3">1.2.3. Cmd</a>
+<ul>
+<li><a href="#sec-1-2-3-1">1.2.3.1. 常用 Cmd</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2-4">1.2.4. Hold Space</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. 常见用法</a>
+<ul>
+<li><a href="#sec-2-1">2.1. 反序文件</a></li>
+<li><a href="#sec-2-2">2.2. 替换</a>
+<ul>
+<li><a href="#sec-2-2-1">2.2.1. 替换每一行的第一个</a></li>
+<li><a href="#sec-2-2-2">2.2.2. 替换每一行的第二个</a></li>
+<li><a href="#sec-2-2-3">2.2.3. 替换每一行的第三个及以后所有</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-3">2.3. 使用匹配到的字符串</a>
+<ul>
+<li><a href="#sec-2-3-1">2.3.1. 使用 &amp; 来当做被匹配的变量</a></li>
+<li><a href="#sec-2-3-2">2.3.2. 使用圆括号</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-4">2.4. 两行合并一行</a></li>
+<li><a href="#sec-2-5">2.5. 行 ( 前 / 后 ) 进行 ( 插入 / 追加 ) 一行内容</a></li>
+<li><a href="#sec-2-6">2.6. 替换匹配行</a></li>
+<li><a href="#sec-2-7">2.7. 字符转换</a></li>
+<li><a href="#sec-2-8">2.8. 压缩多行空行为一行</a></li>
+<li><a href="#sec-2-9">2.9. 每行后添加一空行</a></li>
+<li><a href="#sec-2-10">2.10. 删除偶数行</a></li>
+<li><a href="#sec-2-11">2.11. 删除奇数行</a></li>
+<li><a href="#sec-2-12">2.12. 忽略大小写匹配</a></li>
+<li><a href="#sec-2-13">2.13. 不执行匹配</a></li>
+<li><a href="#sec-2-14">2.14. 匹配行之前添加空行</a></li>
+<li><a href="#sec-2-15">2.15. 匹配行之前之后添加空行</a></li>
+<li><a href="#sec-2-16">2.16. 每一行后添加两行</a></li>
+<li><a href="#sec-2-17">2.17. 每 5 行添加一个空行</a></li>
+<li><a href="#sec-2-18">2.18. 打印匹配 <i>regex</i> 之前的那一行</a></li>
+<li><a href="#sec-2-19">2.19. 打印匹配 <i>regex</i> 之后的那一行</a></li>
+<li><a href="#sec-2-20">2.20. 打印长于 65 个字符的行</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. 参考列表</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> 基本原理</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+<b>sed 只有贪婪模式</b>
+</p>
+</div>
+
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> 元字符</h3>
+<div class="outline-text-3" id="text-1-1">
+</div><div id="outline-container-sec-1-1-1" class="outline-4">
+<h4 id="sec-1-1-1"><span class="section-number-4">1.1.1</span> 不使用扩展正则表达式</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<ul class="org-ul">
+<li>元字符
+
+<p>
+<code>. * ^ $ [ ] \</code>
+</p>
+</li>
+
+<li>字面字符
+
+<p>
+<code>( ) + ? | { } &lt; &gt;</code>
+</p>
+
+<p>
+有些字面字符在表达元字符时需要转义，比如 <code>\&lt;abc</code> 表示以 abc 为首的词， <code>\&gt;</code> 表示词尾
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1-2" class="outline-4">
+<h4 id="sec-1-1-2"><span class="section-number-4">1.1.2</span> 使用扩展正则表达式 (-r)</h4>
+<div class="outline-text-4" id="text-1-1-2">
+<ul class="org-ul">
+<li>元字符
+
+<p>
+<code>. * ^ $ [ ] \ ( ) + ? | { }</code>
+</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> 知识点</h3>
+<div class="outline-text-3" id="text-1-2">
+</div><div id="outline-container-sec-1-2-1" class="outline-4">
+<h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> Patter Space</h4>
+<div class="outline-text-4" id="text-1-2-1">
+<p>
+原理伪码:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">foreach line in file {
+    // 把行放入 panttern_space
+    pattern_space = line;
+
+    // 对每个 pattern space 执行 sed 命令
+    pattern_space = EXEC(sed_cmd, pattern_space);
+
+    // 如果没有指定 -n 则输出处理后的 pattern_space
+    if ( sed_option.notInclude("-n") )  {
+       print pattern_space;
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2-2" class="outline-4">
+<h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> Address</h4>
+<div class="outline-text-4" id="text-1-2-2">
+</div><div id="outline-container-sec-1-2-2-1" class="outline-5">
+<h5 id="sec-1-2-2-1"><span class="section-number-5">1.2.2.1</span> 对于像 "addr1,addr2" 这种形式的地址匹配</h5>
+<div class="outline-text-5" id="text-1-2-2-1">
+<p>
+如果 addr1 匹配，则匹配成功，“开关”打开，在该行上执行命令，此时不管 addr2 是否匹配，即使 addr2 在 addr1 这一行之前
+</p>
+
+<p>
+接下来读入下一行，看 addr2 是否匹配:
+</p>
+
+<ul class="org-ul">
+<li>如果 addr2 在 addr1 之前，则不匹配，不执行命令，关闭“开关”；
+</li>
+<li>如果 addr2 匹配，则执行命令，同样开关“关闭”；
+</li>
+<li>如果 addr2 在 addr1 之后，则一直处理到匹配为止，换句话说，如果 addr2 一直不匹配，则开关一直不关闭，因此会持续执行命令到最后一行
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-2-2" class="outline-5">
+<h5 id="sec-1-2-2-2"><span class="section-number-5">1.2.2.2</span> 地址形式</h5>
+<div class="outline-text-5" id="text-1-2-2-2">
+<ul class="org-ul">
+<li>number
+
+<p>
+略
+</p>
+</li>
+
+<li>first~step
+
+<p>
+从first行开始，每隔step行执行一次命令
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">## 从第一行起每隔两行
+sed -n '1~2p' input.file ## 输出奇数行
+</pre>
+</div>
+</li>
+
+<li><i>regex</i>
+
+<p>
+略
+</p>
+</li>
+
+<li>0,/regex/
+
+<p>
+这种形式的地址对，默认第一个地址是匹配的，也就是匹配开关打开，直到找到匹配 <i>regex</i> 的那行为止，匹配开关关闭。
+大多数情况下和 1, <i>regex</i> 是一样的，除非 <i>regex</i> 匹配文件的第一行，在这种时候，0, <i>regex</i> 就在第一行就关闭了，而 1, <i>regex</i> 会继续往下找匹配的行。
+</p>
+</li>
+
+<li>addr1,+N
+
+<p>
+从匹配的 addr1 行开始，连续 N 行，包括 addr1 这一行
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">## 其中 +3 表示后面连续 3 行
+sed '/dog/,+3s/^/# /g' text.txt
+</pre>
+</div>
+</li>
+
+<li>addr1,~N
+
+<p>
+从匹配的 addr1 行开始，直到某一行，该行的行号是 N 的倍数为止
+</p>
+</li>
+</ul>
+</div>
+</div>
+
+
+
+<div id="outline-container-sec-1-2-2-3" class="outline-5">
+<h5 id="sec-1-2-2-3"><span class="section-number-5">1.2.2.3</span> 总结</h5>
+<div class="outline-text-5" id="text-1-2-2-3">
+<p>
+a. 地址对 addr1, addr2 的匹配方式，从匹配 addr1 的那行开始，打开匹配开关，直到匹配 addr2 的那行结束，关闭匹配开关，
+之后的行会忽略这个地址对，不再做匹配
+</p>
+
+<p>
+b. 地址对 addr1, addr2 的匹配方式，假设 addr1 是 number ，即行号，如果新读入行的行号“大于” addr1，则匹配；小于 addr1，则不匹配
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-3" class="outline-4">
+<h4 id="sec-1-2-3"><span class="section-number-4">1.2.3</span> Cmd</h4>
+<div class="outline-text-4" id="text-1-2-3">
+<p>
+cmd 可以是多个，它们可以用分号分开，可以用大括号括起来作为嵌套命令
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">## 对 3 行到第 6 行执行命令 /This/d
+sed '3,6{/This/d}' pets.txt
+
+## 对 3 行到第 6 行，匹配 /This/ 成功后，再匹配 /fish/，成功后执行 d 命令
+sed '3,6{/This/{/fish/d}}' pets.txt
+
+## 从第一行到最后一行，如果匹配到 This ，则删除之；如果前面有空格，则去除空格
+sed '1,${/This/d;s/^ *//g}' pets.txt
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-3-1" class="outline-5">
+<h5 id="sec-1-2-3-1"><span class="section-number-5">1.2.3.1</span> 常用 Cmd</h5>
+<div class="outline-text-5" id="text-1-2-3-1">
+<dl class="org-dl">
+<dt> n </dt><dd>将下一行的内容提前读入，并且将之前读入的行（在模式空间中的行）输出到屏幕，然后后续的命令会应用到新读入的行上
+</dd>
+
+<dt> N </dt><dd>将下一行的内容读取到当前模式空间，但是与 n 不一样的地方是 N 并没有直接输出当前模式空间中的行，
+而是把下一行追加到当前模式空间，两行之间用回车符 \n 连接
+</dd>
+
+<dt> a </dt><dd>append，在后面追加一行
+</dd>
+
+<dt> i </dt><dd>insert，在前面插入一行
+</dd>
+
+<dt> c </dt><dd>替换匹配行
+</dd>
+
+<dt> d </dt><dd>删除匹配行，同时不会执行接下来的命令，类似 break
+</dd>
+
+<dt> D </dt><dd>只会删除模式空间的第一行，而且删除后会重新在模式空间的内容上执行“整个”编辑命令，类似形成一个循环
+</dd>
+
+<dt> p </dt><dd>打印匹配行
+</dd>
+
+<dt> P </dt><dd>仅打印模式空间的第一行内容。很多情况下，P 命令都是用在 N 命令之后，D 命令之前的。
+这三个命令合起来，可以形成一个输入输出的循环，并且每次只打印一行：
+“读入一行后，N 继续读下一行，P 命令打印第一行，D 命令删除第一行，执行流程回到最开始重复该过程”
+</dd>
+
+<dt> y </dt><dd>字符按照一对一的方式从左到右进行转换
+</dd>
+
+<dt> q </dt><dd>sed 程序退出，不再进行其它的处理
+</dd>
+
+<dt> = </dt><dd>打印行号
+</dd>
+
+<dt> l </dt><dd>同 p，同时打印控制字符
+</dd>
+
+<dt> I </dt><dd>忽略大小写
+</dd>
+</dl>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2-4" class="outline-4">
+<h4 id="sec-1-2-4"><span class="section-number-4">1.2.4</span> Hold Space</h4>
+<div class="outline-text-4" id="text-1-2-4">
+<p>
+Hold Space 是一个和 Pattern Space 类似的变量空间，涉及到的命令有:
+</p>
+
+<dl class="org-dl">
+<dt> g (get) </dt><dd>将 hold space 中的内容拷贝到 pattern space中，原来 pattern space 里的内容清除
+</dd>
+
+<dt> G </dt><dd>将 hold space 中的内容 append 到 pattern space\n 后
+</dd>
+
+<dt> h (hold) </dt><dd>将 pattern space 中的内容拷贝到 hold space 中，原来的 hold space 里的内容被清除
+</dd>
+
+<dt> H </dt><dd>将 pattern space 中的内容 append 到 hold space\n 后
+</dd>
+
+<dt> x (exchange) </dt><dd>交换 pattern space 和 hold space 的内容
+</dd>
+</dl>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> 常见用法</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> 反序文件</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">sed '1!G;h;$!d' t.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> 替换</h3>
+<div class="outline-text-3" id="text-2-2">
+</div><div id="outline-container-sec-2-2-1" class="outline-4">
+<h4 id="sec-2-2-1"><span class="section-number-4">2.2.1</span> 替换每一行的第一个</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">sed 's/s/S/1' my.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2-2" class="outline-4">
+<h4 id="sec-2-2-2"><span class="section-number-4">2.2.2</span> 替换每一行的第二个</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">sed 's/s/S/2' my.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2-3" class="outline-4">
+<h4 id="sec-2-2-3"><span class="section-number-4">2.2.3</span> 替换每一行的第三个及以后所有</h4>
+<div class="outline-text-4" id="text-2-2-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">sed 's/s/S/3g' my.txt
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> 使用匹配到的字符串</h3>
+<div class="outline-text-3" id="text-2-3">
+</div><div id="outline-container-sec-2-3-1" class="outline-4">
+<h4 id="sec-2-3-1"><span class="section-number-4">2.3.1</span> 使用 &amp; 来当做被匹配的变量</h4>
+<div class="outline-text-4" id="text-2-3-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">sed 's/my/[&amp;]/g' my.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-3-2" class="outline-4">
+<h4 id="sec-2-3-2"><span class="section-number-4">2.3.2</span> 使用圆括号</h4>
+<div class="outline-text-4" id="text-2-3-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">sed 's/This is my \([^,]*\),.*is \(.*\)/\1:\2/g' my.txt
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> 两行合并一行</h3>
+<div class="outline-text-3" id="text-2-4">
+<div class="org-src-container">
+
+<pre class="src src-sh">sed 'N;s/\n/ /' pets.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-5" class="outline-3">
+<h3 id="sec-2-5"><span class="section-number-3">2.5</span> 行 ( 前 / 后 ) 进行 ( 插入 / 追加 ) 一行内容</h3>
+<div class="outline-text-3" id="text-2-5">
+<div class="org-src-container">
+
+<pre class="src src-sh">## 第 1 行前插入一行
+sed "1 i helloworld" my.txt
+
+## 在最后一行后追加一行
+sed "$ a helloworld" my.txt
+
+## 匹配到 /fish/ 后就追加一行
+sed "/fish/a helloworld" my.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-6" class="outline-3">
+<h3 id="sec-2-6"><span class="section-number-3">2.6</span> 替换匹配行</h3>
+<div class="outline-text-3" id="text-2-6">
+<div class="org-src-container">
+
+<pre class="src src-sh">## 替换第二行
+sed "2 c helloworld" my.txt
+
+## 替换匹配到的行
+sed "/fish/c helloworld" my.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-7" class="outline-3">
+<h3 id="sec-2-7"><span class="section-number-3">2.7</span> 字符转换</h3>
+<div class="outline-text-3" id="text-2-7">
+<div class="org-src-container">
+
+<pre class="src src-sh">sed 'y/abcde/ABCDE/' text.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-8" class="outline-3">
+<h3 id="sec-2-8"><span class="section-number-3">2.8</span> 压缩多行空行为一行</h3>
+<div class="outline-text-3" id="text-2-8">
+<div class="org-src-container">
+
+<pre class="src src-sh">sed '/^$/{N;/^\n$/D}' text.txt
+cat -s text.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-9" class="outline-3">
+<h3 id="sec-2-9"><span class="section-number-3">2.9</span> 每行后添加一空行</h3>
+<div class="outline-text-3" id="text-2-9">
+<div class="org-src-container">
+
+<pre class="src src-sh">sed G file.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-10" class="outline-3">
+<h3 id="sec-2-10"><span class="section-number-3">2.10</span> 删除偶数行</h3>
+<div class="outline-text-3" id="text-2-10">
+<div class="org-src-container">
+
+<pre class="src src-sh">sed 'n;d' file.txt
+sed '2~2d' file.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-11" class="outline-3">
+<h3 id="sec-2-11"><span class="section-number-3">2.11</span> 删除奇数行</h3>
+<div class="outline-text-3" id="text-2-11">
+<div class="org-src-container">
+
+<pre class="src src-sh">sed '2,$n;d' file.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-12" class="outline-3">
+<h3 id="sec-2-12"><span class="section-number-3">2.12</span> 忽略大小写匹配</h3>
+<div class="outline-text-3" id="text-2-12">
+<div class="org-src-container">
+
+<pre class="src src-sh">sed -n '/abc/I p' file.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-13" class="outline-3">
+<h3 id="sec-2-13"><span class="section-number-3">2.13</span> 不执行匹配</h3>
+<div class="outline-text-3" id="text-2-13">
+<p>
+<code>[address[,address]][!]{cmd}</code>
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2-14" class="outline-3">
+<h3 id="sec-2-14"><span class="section-number-3">2.14</span> 匹配行之前添加空行</h3>
+<div class="outline-text-3" id="text-2-14">
+<div class="org-src-container">
+
+<pre class="src src-sh">sed '/regex/{x;p;x}' test.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-15" class="outline-3">
+<h3 id="sec-2-15"><span class="section-number-3">2.15</span> 匹配行之前之后添加空行</h3>
+<div class="outline-text-3" id="text-2-15">
+<div class="org-src-container">
+
+<pre class="src src-sh">sed '/regex/{x;p;x;G;}' test.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-16" class="outline-3">
+<h3 id="sec-2-16"><span class="section-number-3">2.16</span> 每一行后添加两行</h3>
+<div class="outline-text-3" id="text-2-16">
+<div class="org-src-container">
+
+<pre class="src src-sh">sed 'G;G'
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-17" class="outline-3">
+<h3 id="sec-2-17"><span class="section-number-3">2.17</span> 每 5 行添加一个空行</h3>
+<div class="outline-text-3" id="text-2-17">
+<div class="org-src-container">
+
+<pre class="src src-sh">sed '0~5G' test.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-18" class="outline-3">
+<h3 id="sec-2-18"><span class="section-number-3">2.18</span> 打印匹配 <i>regex</i> 之前的那一行</h3>
+<div class="outline-text-3" id="text-2-18">
+<div class="org-src-container">
+
+<pre class="src src-sh">sed -n '/regex/{g;1!p;};h'
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-19" class="outline-3">
+<h3 id="sec-2-19"><span class="section-number-3">2.19</span> 打印匹配 <i>regex</i> 之后的那一行</h3>
+<div class="outline-text-3" id="text-2-19">
+<div class="org-src-container">
+
+<pre class="src src-sh">sed -n '/regex/{n;p}' test.txt
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-20" class="outline-3">
+<h3 id="sec-2-20"><span class="section-number-3">2.20</span> 打印长于 65 个字符的行</h3>
+<div class="outline-text-3" id="text-2-20">
+<div class="org-src-container">
+
+<pre class="src src-sh">sed -n '/^.{65}/p' test.txt
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> 参考列表</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+<a href="http://kodango.com/">团子的小窝</a></p>
+</div>
+</div>
+</div>
+</body>
+</html>
