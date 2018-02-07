@@ -27,6 +27,7 @@
 - [ps](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/ps.html)
 - [sed](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/sed.html)
 - [socat](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/socat.html)
+- [sort](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/sort.html)
 - [ss](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/ss.html)
 - [ssh](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/ssh.html)
 - [tcpdump](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/tcpdump.html)
