@@ -1,0 +1,29 @@
+#+TITLE:     Tar
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+ #+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+#+TOC: headlines 3
+#+STARTUP:   showall
+
+
+* 打包目录并传至远端服务器
+
+  #+BEGIN_SRC sh
+    tar -c <dir> | gzip | ssh user@remote 'dd of=dir.tar.gz'
+    tar -c <dir> | ssh -C user@remote 'cd /path && tar -x -p'
+  #+END_SRC
+
+* 打包离散文件
+
+  #+BEGIN_SRC sh
+    find . -name '*.txt' | tar -c --files-from=- | bzip2 > dir_txt.tar.bz2
+  #+END_SRC
