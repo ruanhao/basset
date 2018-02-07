@@ -1,0 +1,42 @@
+#+TITLE:     Ps
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS:   h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+STARTUP:   showall
+#+TOC:       headlines 3
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+ #+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+
+
+* 根据字段排序
+
+#+BEGIN_SRC sh
+  ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%mem
+  ps -eo pid,ppid,cmd,pmem,pcpu --sort=-pmem
+#+END_SRC
+
+
+* 查看特定进程的线程信息
+
+#+BEGIN_SRC sh
+  ps -L <pid>
+
+  ps -p <pid> -L -o pid,tid,pcpu,state
+#+END_SRC
+
+
+* 查看启动时间和自启动后至现在的时间
+
+#+BEGIN_SRC sh
+  ps -eo pid,lstart,etime,cmd
+#+END_SRC
+
+- lstart: started time when the command started
+- etime:  elapsed time since the process was started

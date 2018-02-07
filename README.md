@@ -19,6 +19,7 @@
 - [iptables](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/iptables.html)
 - [netcat](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/netcat.html)
 - [openssl](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/openssl.html)
+- [ps](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/ps.html)
 - [sed](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/sed.html)
 - [socat](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/socat.html)
 - [ss](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/ss.html)
