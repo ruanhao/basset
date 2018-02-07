@@ -21,6 +21,7 @@
 - [openssl](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/openssl.html)
 - [sed](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/sed.html)
 - [socat](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/socat.html)
+- [ss](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/ss.html)
 - [ssh](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/ssh.html)
 - [tcpdump](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/tcpdump.html)
 - [tshark](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/tshark.html)

@@ -1,0 +1,228 @@
+#+TITLE:     Ss
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS:   h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+STARTUP:   showall
+#+TOC:       headlines 3
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+#+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+
+* 基本知识
+
+** 统计原理
+
+数据是通过 =/proc/net/sockstat= 统计得出
+
+#+BEGIN_EXAMPLE
+#> ss -s
+Total: 4049 (kernel 4179)
+TCP:   3649 (estab 3291, closed 31, orphaned 0, synrecv 0, timewait 28/0), ports 831
+
+Transport Total     IP        IPv6
+          4179      -         -
+RAW       0         0         0
+UDP       249       138       111
+TCP       3618      3604      14
+INET      3867      3742      125
+FRAG      98        98        0
+#+END_EXAMPLE
+
+*** Total: 4049
+
+已使用的所有协议套接字总量
+
+#+BEGIN_SRC sh
+  cat /proc/net/sockstat | head -1
+#+END_SRC
+
+*** TCP: 3649
+
+=sockstat.tcp_total + slabstat.tcp_syns + sockstat.tcp_tws=
+
+- =sockstat.tcp_total=
+
+  已分配(已建立, 已申请到 sk_buff )的TCP套接字数量
+
+  #+BEGIN_SRC sh
+     grep -o 'alloc [0-9]*' /proc/net/sockstat
+  #+END_SRC
+
+- =slabstat.tcp_syns=
+
+  #+BEGIN_SRC sh
+     grep -o 'tcp_open_request\s*[0-9]*' /proc/slabinfo
+  #+END_SRC
+
+
+- =sockstat.tcp_tws=
+
+  #+BEGIN_SRC sh
+     grep -o 'tw [0-9]*' /proc/net/sockstat
+  #+END_SRC
+
+*** estab 3291
+
+=snmp_stat.tcp_estab=
+
+#+BEGIN_SRC sh
+  grep 'Tcp:' /proc/net/snmp | cut -f10 -d' '
+#+END_SRC
+
+其值等于: =ss -at | grep ESTAB  | wc -l=
+
+*** closed 31
+
+=sockstat.tcp_total - (sockstat.tcp4_hashed + sockstat.tcp6_hashed - sockstat.tcp_tws)=
+
+- =sockstat.tcp4_hashed=
+
+  正在使用(包括侦听)的 TCP 套接字数量
+
+  #+BEGIN_SRC sh
+     grep -o 'TCP: inuse [0-9]*' /proc/net/sockstat
+  #+END_SRC
+
+- =sockstat.tcp6_hashed=
+
+  #+BEGIN_SRC sh
+     grep -o 'TCP6: inuse [0-9]*' /proc/net/sockstat6
+  #+END_SRC
+
+*** orphaned 0
+
+- 无主(不属于任何进程)的 TCP 连接数 (无用, 待销毁的 TCP socket 数)
+- 没有和 fd 绑定的 socket， *通常在 close 之后的一小段时间内存在*
+
+=sockstat.tcp_orphans=
+
+#+BEGIN_SRC sh
+  grep -o 'orphan [0-9]*' /proc/net/sockstat
+#+END_SRC
+
+
+*** synrecv 0
+
+=slabstat.tcp_syns=
+
+#+BEGIN_SRC sh
+  grep -o 'tcp_open_request\s*[0-9]*' /proc/slabinfo
+#+END_SRC
+
+*** ports 831
+
+统计所有正在使用的端口数量
+
+=slabstat.tcp_ports=
+
+#+BEGIN_SRC
+  grep -o 'tcp_bind_bucket\s*[0-9]*' /proc/slabinfo
+#+END_SRC
+
+
+
+
+** 状态
+
+常用 state:
+
+- established
+- syn-sent
+- syn-recv
+- fin-wait-1
+- fin-wait-2
+- time-wait
+- closed
+- close-wait
+- last-ack
+- listen
+- closing
+- all : All of the above states
+- connected : All the states except for listen and closed
+- synchronized : All the connected states except for syn-sent
+- bucket : Show states, which are maintained as minisockets, i.e. time-wait and syn-recv
+- big : Opposite to bucket state
+
+
+* 常见用法
+
+** 显示所有已建立的 HTTP 连接
+
+#+BEGIN_SRC sh
+  ss state established '( dport = :http or sport = :http )'
+#+END_SRC
+
+
+
+** 显示 keepalive 信息
+
+#+BEGIN_SRC sh
+  ss -o
+#+END_SRC
+
+
+
+** 显示 raw sockets
+
+#+BEGIN_SRC sh
+  ss -w
+#+END_SRC
+
+
+** 指定源 IP
+
+#+BEGIN_SRC sh
+  ss src <ip>
+#+END_SRC
+
+
+** 显示使用套接字的进程信息
+
+#+BEGIN_SRC sh
+  ss -p
+#+END_SRC
+
+
+** 端口过滤
+
+#+BEGIN_SRC sh
+  ss dport <op> <port>
+#+END_SRC
+
+=op= 是运算符, =port= 表示端口, 常见运算符：
+
+
+
+- <= or le  : 小于等于
+- >= or ge  : 大于等于
+- == or eq  : 等于
+- != or ne  : 不等于端口
+- <  or lt  : 小于这个端口
+- >  or gt  : 大于端口
+
+
+#+BEGIN_SRC sh
+  ss sport = :http # 也可以是 ss sport = :80
+  ss dport = :http
+
+  ss dport \> :1024
+  ss sport \> :1024
+  ss sport \< :32000
+  ss sport eq :22
+  ss dport != :22
+  ss \( sport = :http or sport = :https \)
+
+  ss state connected sport = :http
+#+END_SRC
+
+** 指定目标网段
+
+#+BEGIN_SRC sh
+  ss -o state fin-wait-1 \( sport = :http or sport = :https \) dst 192.168.1/24
+#+END_SRC
