@@ -19,6 +19,7 @@
 
 - [awk](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/awk.html)
 - [curl](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/curl.html)
+- [find](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/find.html)
 - [git](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/git.html)
 - [iptables](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/iptables.html)
 - [lsof](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/lsof.html)
