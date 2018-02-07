@@ -32,3 +32,4 @@
 - [ssh](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/ssh.html)
 - [tcpdump](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/tcpdump.html)
 - [tshark](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/tshark.html)
+- [uniq](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/uniq.html)
