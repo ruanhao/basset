@@ -1,0 +1,77 @@
+#+TITLE:     Xargs
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+ #+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+#+TOC: headlines 3
+#+STARTUP:   showall
+
+* 基本参数
+
+*xargs 默认命令是 echo*
+
+- -I<replace_str> :: 指定替换的字符串
+- -0              :: 使用 \0 作为定界符
+- -n              :: 指定每行参数的数量
+- -d              :: 指定定界符
+- -r              :: 如果没有参数传入，就不执行后面的命令
+- -p              :: 交互处理
+
+
+* 常见用法
+
+** 多行转单行
+
+#+BEGIN_SRC sh
+  $cat example.txt
+  a b c
+  d e
+  f
+  $cat example.txt | xargs
+  a b c d e f
+#+END_SRC
+
+** 单行转多行
+
+#+BEGIN_SRC sh
+  $cat example.txt | xargs -n 2
+  a b
+  c d
+  e f
+#+END_SRC
+
+** 与 find 联用
+
+#+BEGIN_SRC sh
+  find . -type f -name “*.txt” -print  | xargs     rm -f
+  find . -type f -name “*.txt” -print0 | xargs -r0 rm -f
+#+END_SRC
+
+** 参数替换
+
+#+BEGIN_SRC sh
+  ls *.bak | xargs -I{} cp {} /tmp
+#+END_SRC
+
+
+
+** 查看操作系统对命令列长度的限制
+
+#+BEGIN_SRC sh
+  xargs --show-limits
+#+END_SRC
+
+
+** 查找文件并压缩
+
+#+BEGIN_SRC sh
+  find . -name *.jpg -type f -print | xargs tar -cvzf images.tar.gz
+#+END_SRC
