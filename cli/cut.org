@@ -1,0 +1,61 @@
+#+TITLE:     Cut
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+ #+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+#+TOC: headlines 3
+#+STARTUP:   showall
+
+
+* 参数说明
+
+必须指定 =-b= ， =-c= 或 =-f= 选项之一（这三个选项都可以使用 *Range* 表达式）
+
+* 常见用法
+
+** 以字节（长度）切分
+
+可以配合 Range 表达式
+
+#+BEGIN_SRC sh
+  cut -b 3     sample.txt    ## 输出第 3 字节
+  cut -b 3-    sample.txt    ## 输出第 3 字节及以后所有数据
+  cut -b 1-3   sample.txt    ## 输出第 1 至第 3 字节
+  cut -b -3    sample.txt    ## 同上
+  cut -b 1-3,5 sample.txt    ## 输出第 1 至第 3 字节与第 5 字节
+#+END_SRC
+
+** 指定输出分隔符
+
+#+BEGIN_SRC sh
+  cut -d' ' -f1,3 --output-delimiter=':'   sample.txt
+  cut -d' ' -f1,3 --output-delimiter=$'\n' sample.txt
+#+END_SRC
+
+** 忽略没有分隔符的行
+
+#+BEGIN_SRC sh
+  cut -d' ' -f1,3 -s --output-delimiter=':' sample.txt
+#+END_SRC
+
+如果没有 =-s= 参数，则没有定界符的行也会打印出来
+
+** 反向选择
+
+#+BEGIN_SRC sh
+  cut -b 3 --complement sample.txt  # 输出除第 3 字节之外的所有内容
+#+END_SRC
+
+** 获取最后一栏内容
+
+#+BEGIN_SRC sh
+  echo 'maps.google.com' | rev | cut -d'.' -f1 | rev
+#+END_SRC
