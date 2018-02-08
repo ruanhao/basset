@@ -19,6 +19,7 @@
 
 - [awk](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/awk.html)
 - [curl](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/curl.html)
+- [dig](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/dig.html)
 - [find](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/find.html)
 - [git](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/git.html)
 - [grep](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/grep.html)
