@@ -1,0 +1,279 @@
+#+TITLE:     SpingBoot
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS:   h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+STARTUP:   showall
+#+TOC:       headlines 4
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+#+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+
+
+* 常见用法
+
+
+** Spring Aware
+
+Spring Aware 的目的是为了让 Bean 获得 Spring 容器的服务。
+
+因为 =ApplicationContext= 接口集成了 =MessageSource= 接口， =ApplicationEventPublisher= 接口和 =ResourceLoader= 接口，
+所以 Bean 继承 ApplicationContextAware 可以获得 Spring 容器的所有服务。
+
+
+** @ComponentScan
+
+扫描指定包下所有使用 =@Component=, =@Service=, =@Repository=, =@Controller= 的类，并注册为 Beam 。
+
+默认扫描所在类的同级目录以及子目录。
+
+*** 使用包名指定
+
+#+BEGIN_SRC java
+  @ComponentScan(basePackages="com.cisco.smb")
+#+END_SRC
+
+
+*** 使用类名指定
+
+#+BEGIN_SRC java
+  @SpringBootApplication(scanBasePackageClasses={
+          InventoryServiceApplication.class,
+          ServiceProvider.class,
+          RedisLeader.class,
+          TaskConfig.class,
+          MetricsTask.class,
+          NmRestClientConfig.class },
+      exclude={ DataSourceAutoConfiguration.class, MongoDataAutoConfiguration.class })
+#+END_SRC
+
+
+** @PropertySource
+
+*** 基本用法
+
+#+BEGIN_SRC java
+  @Configuration
+  @PropertySource("classpath:jdbc.properties")
+  public class MyConfig {
+      @Value("${jdbc.url}")
+      private String jdbcUrl;
+  }
+#+END_SRC
+
+
+*** 多个配置文件
+
+#+BEGIN_SRC java
+  @PropertySource({"classpath:jdbc.properties", "classpath:db.properties"})
+#+END_SRC
+
+
+*** 忽略配置文件不存在的情况
+
+#+BEGIN_SRC java
+  @PropertySource(value={"classpath:jdbc.properties"}, ignoreResourceNotFound=true)
+#+END_SRC
+
+
+
+
+** @Value
+
+*** 注入普通字符串
+
+#+BEGIN_SRC java
+  @Value("I love you")
+  String normal;
+#+END_SRC
+
+*** 注入操作系统属性
+
+#+BEGIN_SRC java
+  @Value("#{systemProperties['os.name']}")
+  String osName
+#+END_SRC
+
+*** 注入表达式结果
+
+#+BEGIN_SRC java
+  @Value("#{ T(java.lang.Math).random() * 100.0 }")
+  double randomNumber;
+#+END_SRC
+
+*** 注入其他 Bean 属性
+
+#+BEGIN_SRC java
+  @Value("#{anotherBean.value}")
+  String another;
+#+END_SRC
+
+*** 注入文件资源
+
+#+BEGIN_SRC java
+  @Value("classpath:test.txt")
+  Resource testFile;
+#+END_SRC
+
+*** 注入网址资源
+
+#+BEGIN_SRC java
+  @Value("http://www.baidu.com")
+  Resource testUrl;
+
+#+END_SRC
+
+*** 从配置文件注入
+
+#+BEGIN_SRC java
+  @Value("${server.port}")
+  int port;
+#+END_SRC
+
+
+
+
+
+** WebApplicationInitializer
+
+Spring MVC 提供了一个 =DispatcherServlet= 来开发 Web 应用。
+在 Servlet2.5 及以下的时候，只需在 web.xml 下配置 <servlet> 元素即可。
+若使用 Servlet3.0 无 web.xml 的配置方式，在 Spring MVC 里实现 =WebApplicationInitializer= 接口便可以实现等同于 web.xml 的配置。
+
+** @ControllerAdvice
+
+=@ControllerAdvice= 声明一个控制器建言，它组合了 =@Component= ，所以自动注册为 Bean 。
+
+通过 =@ControllerAdvice= ，可以将对控制器的全局配置放置在同一位置。
+
+*** 拦截所有异常
+
+#+BEGIN_SRC java
+  @ControllerAdvice
+  public class ExceptionHandlerAdvice {
+
+      @ExceptionHandler(Exception.class)
+      @ResponseBody
+      public HttpJsonResult<?> handleException(Exception e, HttpServletRequest request) {
+          log.error("exception: {}", e);
+          return new HttpJsonResult<?>().setSuccess(false);
+      }
+
+  }
+#+END_SRC
+
+
+
+
+* 常用实践
+
+** Application Event
+
+*** [[https://github.com/ruanhao/show-me-the-code/tree/springboot-application-event][示例工程]]
+
+*** SpringApplicationEvent
+
+- ApplicationEnvironmentPreparedEvent
+- ApplicationFailedEvent
+- ApplicationPreparedEvent
+- ApplicationReadyEvent
+- ApplicationStartingEvent
+
+
+
+** Async Method
+
+*** [[https://github.com/ruanhao/show-me-the-code/tree/springboot-async-method][示例工程]]
+
+*** 异常统一捕获
+
+如果需要统一进行异常捕获，可以实现 =AsyncConfigurer= 接口，
+=getAsyncExecutor= 方法返回的 Executor 对象用于处理异步方法调用，
+=getAsyncUncaughtExceptionHandler= 方法返回的对象捕获异步调用期间产生的异常，
+*当且仅当异步调用方法的返回类型为 void* 。
+
+#+BEGIN_SRC java
+  @EnableAsync
+  @Configuration
+  public class AsyncConfiguration implements AsyncConfigurer {
+
+      @Override
+      public Executor getAsyncExecutor() {
+          ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+          taskExecutor.setCorePoolSize(4);
+          taskExecutor.setMaxPoolSize(8);
+          taskExecutor.setQueueCapacity(32);
+          taskExecutor.initialize();
+          return taskExecutor;
+      }
+
+      @Override
+      public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
+          return new SimpleAsyncUncaughtExceptionHandler();
+      }
+
+  }
+#+END_SRC
+
+
+** Scheduling Tasks
+
+*** 启用计划任务
+
+在配置类上使用 =@EnableScheduling= 来开启对计划任务的支持。
+
+
+*** 任务执行
+
+**** 每隔固定时间执行
+
+#+BEGIN_SRC java
+  @Scheduled(fixedRate=5000)
+#+END_SRC
+
+**** 指定任务间隔
+
+#+BEGIN_SRC java
+  // specify the interval between invocations measured
+  // from the completion of the task
+  @Scheduled(fixedDelay=5000)
+#+END_SRC
+
+**** UNIX Cron 风格
+
+#+BEGIN_SRC java
+  @Scheduled(cron="0 28 11 ? * *") // 每天 11 点 28 分 执行
+#+END_SRC
+
+
+** properties 与Bean 关联
+
+*** 配置文件
+
+application.properties:
+
+#+BEGIN_SRC sh
+  author.name=haoruan
+  author.age=32
+#+END_SRC
+
+*** Bean
+
+#+BEGIN_SRC java
+  @Component
+  @ConfigurationProperties(prefix="author")
+  // @ConfigurationProperties(prefix="author", locations={"classpath:application.properties"})
+  @Setter
+  @Getter
+  public class AuthorSettings {
+
+      private String name;
+      private int age;
+  }
+
+#+END_SRC

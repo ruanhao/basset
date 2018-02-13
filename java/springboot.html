@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>SpingBoot</title>
+<!-- 2018-02-13 Tue 23:21 -->
+<meta  charset="utf-8">
+<meta  name="generator" content="Org-mode">
+<meta  name="author" content="Hao Ruan">
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+<link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">SpingBoot</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 常见用法</a>
+<ul>
+<li><a href="#sec-1-1">1.1. Spring Aware</a></li>
+<li><a href="#sec-1-2">1.2. @ComponentScan</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. 使用包名指定</a></li>
+<li><a href="#sec-1-2-2">1.2.2. 使用类名指定</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-3">1.3. @PropertySource</a>
+<ul>
+<li><a href="#sec-1-3-1">1.3.1. 基本用法</a></li>
+<li><a href="#sec-1-3-2">1.3.2. 多个配置文件</a></li>
+<li><a href="#sec-1-3-3">1.3.3. 忽略配置文件不存在的情况</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-4">1.4. @Value</a>
+<ul>
+<li><a href="#sec-1-4-1">1.4.1. 注入普通字符串</a></li>
+<li><a href="#sec-1-4-2">1.4.2. 注入操作系统属性</a></li>
+<li><a href="#sec-1-4-3">1.4.3. 注入表达式结果</a></li>
+<li><a href="#sec-1-4-4">1.4.4. 注入其他 Bean 属性</a></li>
+<li><a href="#sec-1-4-5">1.4.5. 注入文件资源</a></li>
+<li><a href="#sec-1-4-6">1.4.6. 注入网址资源</a></li>
+<li><a href="#sec-1-4-7">1.4.7. 从配置文件注入</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-5">1.5. WebApplicationInitializer</a></li>
+<li><a href="#sec-1-6">1.6. @ControllerAdvice</a>
+<ul>
+<li><a href="#sec-1-6-1">1.6.1. 拦截所有异常</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. 常用实践</a>
+<ul>
+<li><a href="#sec-2-1">2.1. Application Event</a>
+<ul>
+<li><a href="#sec-2-1-1">2.1.1. 示例工程</a></li>
+<li><a href="#sec-2-1-2">2.1.2. SpringApplicationEvent</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-2">2.2. Async Method</a>
+<ul>
+<li><a href="#sec-2-2-1">2.2.1. 示例工程</a></li>
+<li><a href="#sec-2-2-2">2.2.2. 异常统一捕获</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-3">2.3. Scheduling Tasks</a>
+<ul>
+<li><a href="#sec-2-3-1">2.3.1. 启用计划任务</a></li>
+<li><a href="#sec-2-3-2">2.3.2. 任务执行</a>
+<ul>
+<li><a href="#sec-2-3-2-1">2.3.2.1. 每隔固定时间执行</a></li>
+<li><a href="#sec-2-3-2-2">2.3.2.2. 指定任务间隔</a></li>
+<li><a href="#sec-2-3-2-3">2.3.2.3. UNIX Cron 风格</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2-4">2.4. properties 与Bean 关联</a>
+<ul>
+<li><a href="#sec-2-4-1">2.4.1. 配置文件</a></li>
+<li><a href="#sec-2-4-2">2.4.2. Bean</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 常见用法</a>
+<ul>
+<li><a href="#sec-1-1">1.1. Spring Aware</a></li>
+<li><a href="#sec-1-2">1.2. @ComponentScan</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. 使用包名指定</a></li>
+<li><a href="#sec-1-2-2">1.2.2. 使用类名指定</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-3">1.3. @PropertySource</a>
+<ul>
+<li><a href="#sec-1-3-1">1.3.1. 基本用法</a></li>
+<li><a href="#sec-1-3-2">1.3.2. 多个配置文件</a></li>
+<li><a href="#sec-1-3-3">1.3.3. 忽略配置文件不存在的情况</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-4">1.4. @Value</a>
+<ul>
+<li><a href="#sec-1-4-1">1.4.1. 注入普通字符串</a></li>
+<li><a href="#sec-1-4-2">1.4.2. 注入操作系统属性</a></li>
+<li><a href="#sec-1-4-3">1.4.3. 注入表达式结果</a></li>
+<li><a href="#sec-1-4-4">1.4.4. 注入其他 Bean 属性</a></li>
+<li><a href="#sec-1-4-5">1.4.5. 注入文件资源</a></li>
+<li><a href="#sec-1-4-6">1.4.6. 注入网址资源</a></li>
+<li><a href="#sec-1-4-7">1.4.7. 从配置文件注入</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-5">1.5. WebApplicationInitializer</a></li>
+<li><a href="#sec-1-6">1.6. @ControllerAdvice</a>
+<ul>
+<li><a href="#sec-1-6-1">1.6.1. 拦截所有异常</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. 常用实践</a>
+<ul>
+<li><a href="#sec-2-1">2.1. Application Event</a>
+<ul>
+<li><a href="#sec-2-1-1">2.1.1. 示例工程</a></li>
+<li><a href="#sec-2-1-2">2.1.2. SpringApplicationEvent</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-2">2.2. Async Method</a>
+<ul>
+<li><a href="#sec-2-2-1">2.2.1. 示例工程</a></li>
+<li><a href="#sec-2-2-2">2.2.2. 异常统一捕获</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-3">2.3. Scheduling Tasks</a>
+<ul>
+<li><a href="#sec-2-3-1">2.3.1. 启用计划任务</a></li>
+<li><a href="#sec-2-3-2">2.3.2. 任务执行</a>
+<ul>
+<li><a href="#sec-2-3-2-1">2.3.2.1. 每隔固定时间执行</a></li>
+<li><a href="#sec-2-3-2-2">2.3.2.2. 指定任务间隔</a></li>
+<li><a href="#sec-2-3-2-3">2.3.2.3. UNIX Cron 风格</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2-4">2.4. properties 与Bean 关联</a>
+<ul>
+<li><a href="#sec-2-4-1">2.4.1. 配置文件</a></li>
+<li><a href="#sec-2-4-2">2.4.2. Bean</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="outline-2" id="meta">
+<table>
+
+
+<colgroup>
+<col  class="left">
+
+<col  class="left">
+</colgroup>
+<tbody>
+<tr>
+<td class="left">Author</td>
+<td class="left">Hao Ruan (haoru@cisco.com)</td>
+</tr>
+
+<tr>
+<td class="left">Date</td>
+<td class="left">2018-02-13 23:21:03</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> 常见用法</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> Spring Aware</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+Spring Aware 的目的是为了让 Bean 获得 Spring 容器的服务。
+</p>
+
+<p>
+因为 <code>ApplicationContext</code> 接口集成了 <code>MessageSource</code> 接口， <code>ApplicationEventPublisher</code> 接口和 <code>ResourceLoader</code> 接口，
+所以 Bean 继承 ApplicationContextAware 可以获得 Spring 容器的所有服务。
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> @ComponentScan</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+扫描指定包下所有使用 <code>@Component</code>, <code>@Service</code>, <code>@Repository</code>, <code>@Controller</code> 的类，并注册为 Beam 。
+</p>
+
+<p>
+默认扫描所在类的同级目录以及子目录。
+</p>
+</div>
+
+<div id="outline-container-sec-1-2-1" class="outline-4">
+<h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> 使用包名指定</h4>
+<div class="outline-text-4" id="text-1-2-1">
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #00afaf;">@ComponentScan</span>(basePackages=<span style="color: #00afaf;">"com.cisco.smb"</span>)
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2-2" class="outline-4">
+<h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> 使用类名指定</h4>
+<div class="outline-text-4" id="text-1-2-2">
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #00afaf;">@SpringBootApplication</span>(scanBasePackageClasses={
+        InventoryServiceApplication.<span style="color: #5f8700;">class</span>,
+        ServiceProvider.<span style="color: #5f8700;">class</span>,
+        RedisLeader.<span style="color: #5f8700;">class</span>,
+        TaskConfig.<span style="color: #5f8700;">class</span>,
+        MetricsTask.<span style="color: #5f8700;">class</span>,
+        NmRestClientConfig.<span style="color: #5f8700;">class</span> },
+    exclude={ DataSourceAutoConfiguration.<span style="color: #5f8700;">class</span>, MongoDataAutoConfiguration.<span style="color: #5f8700;">class</span> })
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> @PropertySource</h3>
+<div class="outline-text-3" id="text-1-3">
+</div><div id="outline-container-sec-1-3-1" class="outline-4">
+<h4 id="sec-1-3-1"><span class="section-number-4">1.3.1</span> 基本用法</h4>
+<div class="outline-text-4" id="text-1-3-1">
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #00afaf;">@Configuration</span>
+<span style="color: #00afaf;">@PropertySource</span>(<span style="color: #00afaf;">"classpath:jdbc.properties"</span>)
+<span style="color: #5f8700;">public</span> <span style="color: #5f8700;">class</span> <span style="color: #af8700;">MyConfig</span> {
+    <span style="color: #00afaf;">@Value</span>(<span style="color: #00afaf;">"${jdbc.url}"</span>)
+    <span style="color: #5f8700;">private</span> <span style="color: #af8700;">String</span> <span style="color: #0087ff;">jdbcUrl</span>;
+}
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-3-2" class="outline-4">
+<h4 id="sec-1-3-2"><span class="section-number-4">1.3.2</span> 多个配置文件</h4>
+<div class="outline-text-4" id="text-1-3-2">
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #00afaf;">@PropertySource</span>({<span style="color: #00afaf;">"classpath:jdbc.properties"</span>, <span style="color: #00afaf;">"classpath:db.properties"</span>})
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-3-3" class="outline-4">
+<h4 id="sec-1-3-3"><span class="section-number-4">1.3.3</span> 忽略配置文件不存在的情况</h4>
+<div class="outline-text-4" id="text-1-3-3">
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #00afaf;">@PropertySource</span>(value={<span style="color: #00afaf;">"classpath:jdbc.properties"</span>}, ignoreResourceNotFound=<span style="color: #00afaf;">true</span>)
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+<div id="outline-container-sec-1-4" class="outline-3">
+<h3 id="sec-1-4"><span class="section-number-3">1.4</span> @Value</h3>
+<div class="outline-text-3" id="text-1-4">
+</div><div id="outline-container-sec-1-4-1" class="outline-4">
+<h4 id="sec-1-4-1"><span class="section-number-4">1.4.1</span> 注入普通字符串</h4>
+<div class="outline-text-4" id="text-1-4-1">
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #00afaf;">@Value</span>(<span style="color: #00afaf;">"I love you"</span>)
+<span style="color: #af8700;">String</span> <span style="color: #0087ff;">normal</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-4-2" class="outline-4">
+<h4 id="sec-1-4-2"><span class="section-number-4">1.4.2</span> 注入操作系统属性</h4>
+<div class="outline-text-4" id="text-1-4-2">
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #00afaf;">@Value</span>(<span style="color: #00afaf;">"#{systemProperties['os.name']}"</span>)
+<span style="color: #af8700;">String</span> <span style="color: #0087ff;">osName</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-4-3" class="outline-4">
+<h4 id="sec-1-4-3"><span class="section-number-4">1.4.3</span> 注入表达式结果</h4>
+<div class="outline-text-4" id="text-1-4-3">
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #00afaf;">@Value</span>(<span style="color: #00afaf;">"#{ T(java.lang.Math).random() * 100.0 }"</span>)
+<span style="color: #af8700;">double</span> <span style="color: #0087ff;">randomNumber</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-4-4" class="outline-4">
+<h4 id="sec-1-4-4"><span class="section-number-4">1.4.4</span> 注入其他 Bean 属性</h4>
+<div class="outline-text-4" id="text-1-4-4">
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #00afaf;">@Value</span>(<span style="color: #00afaf;">"#{anotherBean.value}"</span>)
+<span style="color: #af8700;">String</span> <span style="color: #0087ff;">another</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-4-5" class="outline-4">
+<h4 id="sec-1-4-5"><span class="section-number-4">1.4.5</span> 注入文件资源</h4>
+<div class="outline-text-4" id="text-1-4-5">
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #00afaf;">@Value</span>(<span style="color: #00afaf;">"classpath:test.txt"</span>)
+<span style="color: #af8700;">Resource</span> <span style="color: #0087ff;">testFile</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-4-6" class="outline-4">
+<h4 id="sec-1-4-6"><span class="section-number-4">1.4.6</span> 注入网址资源</h4>
+<div class="outline-text-4" id="text-1-4-6">
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #00afaf;">@Value</span>(<span style="color: #00afaf;">"http://www.baidu.com"</span>)
+<span style="color: #af8700;">Resource</span> <span style="color: #0087ff;">testUrl</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-4-7" class="outline-4">
+<h4 id="sec-1-4-7"><span class="section-number-4">1.4.7</span> 从配置文件注入</h4>
+<div class="outline-text-4" id="text-1-4-7">
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #00afaf;">@Value</span>(<span style="color: #00afaf;">"${server.port}"</span>)
+<span style="color: #af8700;">int</span> <span style="color: #0087ff;">port</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+
+<div id="outline-container-sec-1-5" class="outline-3">
+<h3 id="sec-1-5"><span class="section-number-3">1.5</span> WebApplicationInitializer</h3>
+<div class="outline-text-3" id="text-1-5">
+<p>
+Spring MVC 提供了一个 <code>DispatcherServlet</code> 来开发 Web 应用。
+在 Servlet2.5 及以下的时候，只需在 web.xml 下配置 &lt;servlet&gt; 元素即可。
+若使用 Servlet3.0 无 web.xml 的配置方式，在 Spring MVC 里实现 <code>WebApplicationInitializer</code> 接口便可以实现等同于 web.xml 的配置。
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-6" class="outline-3">
+<h3 id="sec-1-6"><span class="section-number-3">1.6</span> @ControllerAdvice</h3>
+<div class="outline-text-3" id="text-1-6">
+<p>
+<code>@ControllerAdvice</code> 声明一个控制器建言，它组合了 <code>@Component</code> ，所以自动注册为 Bean 。
+</p>
+
+<p>
+通过 <code>@ControllerAdvice</code> ，可以将对控制器的全局配置放置在同一位置。
+</p>
+</div>
+
+<div id="outline-container-sec-1-6-1" class="outline-4">
+<h4 id="sec-1-6-1"><span class="section-number-4">1.6.1</span> 拦截所有异常</h4>
+<div class="outline-text-4" id="text-1-6-1">
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #00afaf;">@ControllerAdvice</span>
+<span style="color: #5f8700;">public</span> <span style="color: #5f8700;">class</span> <span style="color: #af8700;">ExceptionHandlerAdvice</span> {
+
+    <span style="color: #00afaf;">@ExceptionHandler</span>(Exception.<span style="color: #5f8700;">class</span>)
+    <span style="color: #00afaf;">@ResponseBody</span>
+    <span style="color: #5f8700;">public</span> <span style="color: #af8700;">HttpJsonResult</span>&lt;?&gt; <span style="color: #0087ff;">handleException</span>(<span style="color: #af8700;">Exception</span> <span style="color: #0087ff;">e</span>, <span style="color: #af8700;">HttpServletRequest</span> <span style="color: #0087ff;">request</span>) {
+        log.error(<span style="color: #00afaf;">"exception: {}"</span>, e);
+        <span style="color: #5f8700;">return</span> <span style="color: #5f8700;">new</span> <span style="color: #af8700;">HttpJsonResult</span>&lt;?&gt;().setSuccess(<span style="color: #00afaf;">false</span>);
+    }
+
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> 常用实践</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> Application Event</h3>
+<div class="outline-text-3" id="text-2-1">
+</div><div id="outline-container-sec-2-1-1" class="outline-4">
+<h4 id="sec-2-1-1"><span class="section-number-4">2.1.1</span> <a href="https://github.com/ruanhao/show-me-the-code/tree/springboot-application-event">示例工程</a></h4>
+</div>
+
+<div id="outline-container-sec-2-1-2" class="outline-4">
+<h4 id="sec-2-1-2"><span class="section-number-4">2.1.2</span> SpringApplicationEvent</h4>
+<div class="outline-text-4" id="text-2-1-2">
+<ul class="org-ul">
+<li>ApplicationEnvironmentPreparedEvent
+</li>
+<li>ApplicationFailedEvent
+</li>
+<li>ApplicationPreparedEvent
+</li>
+<li>ApplicationReadyEvent
+</li>
+<li>ApplicationStartingEvent
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> Async Method</h3>
+<div class="outline-text-3" id="text-2-2">
+</div><div id="outline-container-sec-2-2-1" class="outline-4">
+<h4 id="sec-2-2-1"><span class="section-number-4">2.2.1</span> <a href="https://github.com/ruanhao/show-me-the-code/tree/springboot-async-method">示例工程</a></h4>
+</div>
+
+<div id="outline-container-sec-2-2-2" class="outline-4">
+<h4 id="sec-2-2-2"><span class="section-number-4">2.2.2</span> 异常统一捕获</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<p>
+如果需要统一进行异常捕获，可以实现 <code>AsyncConfigurer</code> 接口，
+<code>getAsyncExecutor</code> 方法返回的 Executor 对象用于处理异步方法调用，
+<code>getAsyncUncaughtExceptionHandler</code> 方法返回的对象捕获异步调用期间产生的异常，
+<b>当且仅当异步调用方法的返回类型为 void</b> 。
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #00afaf;">@EnableAsync</span>
+<span style="color: #00afaf;">@Configuration</span>
+<span style="color: #5f8700;">public</span> <span style="color: #5f8700;">class</span> <span style="color: #af8700;">AsyncConfiguration</span> <span style="color: #5f8700;">implements</span> <span style="color: #af8700;">AsyncConfigurer</span> {
+
+    <span style="color: #00afaf;">@Override</span>
+    <span style="color: #5f8700;">public</span> <span style="color: #af8700;">Executor</span> <span style="color: #0087ff;">getAsyncExecutor</span>() {
+        <span style="color: #af8700;">ThreadPoolTaskExecutor</span> <span style="color: #0087ff;">taskExecutor</span> = <span style="color: #5f8700;">new</span> <span style="color: #af8700;">ThreadPoolTaskExecutor</span>();
+        taskExecutor.setCorePoolSize(4);
+        taskExecutor.setMaxPoolSize(8);
+        taskExecutor.setQueueCapacity(32);
+        taskExecutor.initialize();
+        <span style="color: #5f8700;">return</span> taskExecutor;
+    }
+
+    <span style="color: #00afaf;">@Override</span>
+    <span style="color: #5f8700;">public</span> <span style="color: #af8700;">AsyncUncaughtExceptionHandler</span> <span style="color: #0087ff;">getAsyncUncaughtExceptionHandler</span>() {
+        <span style="color: #5f8700;">return</span> <span style="color: #5f8700;">new</span> <span style="color: #af8700;">SimpleAsyncUncaughtExceptionHandler</span>();
+    }
+
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> Scheduling Tasks</h3>
+<div class="outline-text-3" id="text-2-3">
+</div><div id="outline-container-sec-2-3-1" class="outline-4">
+<h4 id="sec-2-3-1"><span class="section-number-4">2.3.1</span> 启用计划任务</h4>
+<div class="outline-text-4" id="text-2-3-1">
+<p>
+在配置类上使用 <code>@EnableScheduling</code> 来开启对计划任务的支持。
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-3-2" class="outline-4">
+<h4 id="sec-2-3-2"><span class="section-number-4">2.3.2</span> 任务执行</h4>
+<div class="outline-text-4" id="text-2-3-2">
+</div><div id="outline-container-sec-2-3-2-1" class="outline-5">
+<h5 id="sec-2-3-2-1"><span class="section-number-5">2.3.2.1</span> 每隔固定时间执行</h5>
+<div class="outline-text-5" id="text-2-3-2-1">
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #00afaf;">@Scheduled</span>(fixedRate=5000)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-3-2-2" class="outline-5">
+<h5 id="sec-2-3-2-2"><span class="section-number-5">2.3.2.2</span> 指定任务间隔</h5>
+<div class="outline-text-5" id="text-2-3-2-2">
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #585858; font-style: italic;">// </span><span style="color: #585858; font-style: italic;">specify the interval between invocations measured</span>
+<span style="color: #585858; font-style: italic;">// </span><span style="color: #585858; font-style: italic;">from the completion of the task</span>
+<span style="color: #00afaf;">@Scheduled</span>(fixedDelay=5000)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-3-2-3" class="outline-5">
+<h5 id="sec-2-3-2-3"><span class="section-number-5">2.3.2.3</span> UNIX Cron 风格</h5>
+<div class="outline-text-5" id="text-2-3-2-3">
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #00afaf;">@Scheduled</span>(cron=<span style="color: #00afaf;">"0 28 11 ? * *"</span>) <span style="color: #585858; font-style: italic;">// </span><span style="color: #585858; font-style: italic;">&#27599;&#22825; 11 &#28857; 28 &#20998; &#25191;&#34892;</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> properties 与Bean 关联</h3>
+<div class="outline-text-3" id="text-2-4">
+</div><div id="outline-container-sec-2-4-1" class="outline-4">
+<h4 id="sec-2-4-1"><span class="section-number-4">2.4.1</span> 配置文件</h4>
+<div class="outline-text-4" id="text-2-4-1">
+<p>
+application.properties:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">author.name=haoruan
+author.age=32
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-4-2" class="outline-4">
+<h4 id="sec-2-4-2"><span class="section-number-4">2.4.2</span> Bean</h4>
+<div class="outline-text-4" id="text-2-4-2">
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #00afaf;">@Component</span>
+<span style="color: #00afaf;">@ConfigurationProperties</span>(prefix=<span style="color: #00afaf;">"author"</span>)
+<span style="color: #585858; font-style: italic;">// </span><span style="color: #585858; font-style: italic;">@ConfigurationProperties(prefix="author", locations={"classpath:application.properties"})</span>
+<span style="color: #00afaf;">@Setter</span>
+<span style="color: #00afaf;">@Getter</span>
+<span style="color: #5f8700;">public</span> <span style="color: #5f8700;">class</span> <span style="color: #af8700;">AuthorSettings</span> {
+
+    <span style="color: #5f8700;">private</span> <span style="color: #af8700;">String</span> <span style="color: #0087ff;">name</span>;
+    <span style="color: #5f8700;">private</span> <span style="color: #af8700;">int</span> <span style="color: #0087ff;">age</span>;
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
