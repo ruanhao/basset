@@ -1,0 +1,56 @@
+#+TITLE:     Pandas
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS:   h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+STARTUP:   showall
+#+TOC:       headlines 3
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+ #+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+
+#+BEGIN_SRC ipython :session :exports none
+    #! /usr/bin/env python3
+    # -*- coding: utf-8 -*-
+
+    import pandas as pd
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import subprocess
+    from PIL import Image
+
+    def show_dataframe(df):
+        global path
+        df.to_html("/tmp/df.html")
+        subprocess.call('webkit2png -F --transparent /tmp/df.html -D /tmp -o df', shell=True)
+        image = Image.open('/tmp/df-full.png')
+        box = image.getbbox()
+        cropped = image.crop(box)
+        w = cropped.size[0]
+        h = cropped.size[1]
+        ratio = 0.618
+        cropped.thumbnail((int(w*ratio), int(h*ratio)), Image.ANTIALIAS)
+        cropped.save(path)
+        cropped.close()
+        image.close()
+#+END_SRC
+
+
+* 数据整形
+
+#+BEGIN_SRC ipython :session :var path="img/fig9446lm0.png"
+  tuples = list(zip(*[['bar', 'bar', 'baz', 'baz',
+                       'foo', 'foo', 'qux', 'qux'],
+                      ['one', 'two', 'one', 'two',
+                       'one', 'two', 'one', 'two']]))
+  index = pd.MultiIndex.from_tuples(tuples, names=['first', 'second'])
+  df = pd.DataFrame(np.random.randn(8, 2), index=index, columns=['A', 'B'])
+  show_dataframe(df)
+#+END_SRC
+
+[[file:img/fig9446lm0.png]]
