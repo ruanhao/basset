@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Numpy</title>
+<!-- 2018-02-16 Fri 16:35 -->
+<meta  charset="utf-8">
+<meta  name="generator" content="Org-mode">
+<meta  name="author" content="Hao Ruan">
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+<link href="../../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Numpy</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 数组</a>
+<ul>
+<li><a href="#sec-1-1">1.1. 创建</a>
+<ul>
+<li><a href="#sec-1-1-1">1.1.1. 一维数组</a></li>
+<li><a href="#sec-1-1-2">1.1.2. 二维数组</a></li>
+<li><a href="#sec-1-1-3">1.1.3. 序列数组 (arange)</a></li>
+<li><a href="#sec-1-1-4">1.1.4. 整形数组 (reshape)</a></li>
+<li><a href="#sec-1-1-5">1.1.5. 全 0 数组 (zeros)</a></li>
+<li><a href="#sec-1-1-6">1.1.6. 全 1 数组 (ones)</a></li>
+<li><a href="#sec-1-1-7">1.1.7. 对角数组 (eye)</a></li>
+<li><a href="#sec-1-1-8">1.1.8. 线性数组 (linspace)</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2">1.2. 索引</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. 一维数组</a></li>
+<li><a href="#sec-1-2-2">1.2.2. 二维数组</a></li>
+<li><a href="#sec-1-2-3">1.2.3. 数组索引</a></li>
+<li><a href="#sec-1-2-4">1.2.4. 布尔索引</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-3">1.3. 运算</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 数组</a>
+<ul>
+<li><a href="#sec-1-1">1.1. 创建</a>
+<ul>
+<li><a href="#sec-1-1-1">1.1.1. 一维数组</a></li>
+<li><a href="#sec-1-1-2">1.1.2. 二维数组</a></li>
+<li><a href="#sec-1-1-3">1.1.3. 序列数组 (arange)</a></li>
+<li><a href="#sec-1-1-4">1.1.4. 整形数组 (reshape)</a></li>
+<li><a href="#sec-1-1-5">1.1.5. 全 0 数组 (zeros)</a></li>
+<li><a href="#sec-1-1-6">1.1.6. 全 1 数组 (ones)</a></li>
+<li><a href="#sec-1-1-7">1.1.7. 对角数组 (eye)</a></li>
+<li><a href="#sec-1-1-8">1.1.8. 线性数组 (linspace)</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2">1.2. 索引</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. 一维数组</a></li>
+<li><a href="#sec-1-2-2">1.2.2. 二维数组</a></li>
+<li><a href="#sec-1-2-3">1.2.3. 数组索引</a></li>
+<li><a href="#sec-1-2-4">1.2.4. 布尔索引</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-3">1.3. 运算</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="outline-2" id="meta">
+<table>
+
+
+<colgroup>
+<col  class="left">
+
+<col  class="left">
+</colgroup>
+<tbody>
+<tr>
+<td class="left">Author</td>
+<td class="left">Hao Ruan (haoru@cisco.com)</td>
+</tr>
+
+<tr>
+<td class="left">Date</td>
+<td class="left">2018-02-16 16:34:59</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> 数组</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> 创建</h3>
+<div class="outline-text-3" id="text-1-1">
+</div><div id="outline-container-sec-1-1-1" class="outline-4">
+<h4 id="sec-1-1-1"><span class="section-number-4">1.1.1</span> 一维数组</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">data</span> = np.array([1,2,4,5], dtype=<span style="color: #d18aff;">int</span>)
+log(<span style="color: #ff4ea3;">"data"</span>, data)
+log(<span style="color: #ff4ea3;">"data.shape"</span>, data.shape)
+log(<span style="color: #ff4ea3;">"data.dtype"</span>, data.dtype)
+<span style="color: #ff8700;">data</span>[1] = 8
+log(<span style="color: #ff4ea3;">"data (modified)"</span>, data)
+</pre>
+</div>
+
+<pre class="example">
+============ data ============
+[1 2 4 5]
+========= data.shape =========
+(4,)
+========= data.dtype =========
+int64
+====== data (modified) =======
+[1 8 4 5]
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1-2" class="outline-4">
+<h4 id="sec-1-1-2"><span class="section-number-4">1.1.2</span> 二维数组</h4>
+<div class="outline-text-4" id="text-1-1-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">data</span> = <span style="color: #ff8700;">data</span> = np.array([[1,2], [3,4]])
+log(<span style="color: #ff4ea3;">"data"</span>, data)
+log(<span style="color: #ff4ea3;">"data.shape"</span>, data.shape)
+log(<span style="color: #ff4ea3;">"data.dtype"</span>, data.dtype)
+<span style="color: #ff8700;">data</span>[1] = 8
+log(<span style="color: #ff4ea3;">"data (modified)"</span>, data)
+</pre>
+</div>
+
+<pre class="example">
+============ data ============
+[[1 2]
+ [3 4]]
+========= data.shape =========
+(2, 2)
+========= data.dtype =========
+int64
+====== data (modified) =======
+[[1 2]
+ [8 8]]
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1-3" class="outline-4">
+<h4 id="sec-1-1-3"><span class="section-number-4">1.1.3</span> 序列数组 (arange)</h4>
+<div class="outline-text-4" id="text-1-1-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"np.arange(10)"</span>, np.arange(10))
+log(<span style="color: #ff4ea3;">"np.arange(1, 10)"</span>, np.arange(1, 10))
+</pre>
+</div>
+
+<pre class="example">
+======= np.arange(10) ========
+[0 1 2 3 4 5 6 7 8 9]
+====== np.arange(1, 10) ======
+[1 2 3 4 5 6 7 8 9]
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1-4" class="outline-4">
+<h4 id="sec-1-1-4"><span class="section-number-4">1.1.4</span> 整形数组 (reshape)</h4>
+<div class="outline-text-4" id="text-1-1-4">
+<p>
+reshape 并不创建新的数组，而是返回一个 <b>视图</b> 。
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">origin</span> = np.arange(9)
+<span style="color: #ff8700;">reshaped</span> = origin.reshape(3, 3)
+log(<span style="color: #ff4ea3;">"reshape 3*3"</span>, reshaped)
+log(<span style="color: #ff4ea3;">"origin (unchaged)"</span>, origin)
+<span style="color: #ff8700;">reshaped</span>[0,1] = 100
+log(<span style="color: #ff4ea3;">"origin (also changed)"</span>, origin)
+</pre>
+</div>
+
+<pre class="example">
+======== reshape 3*3 =========
+[[0 1 2]
+ [3 4 5]
+ [6 7 8]]
+===== origin (unchaged) ======
+[0 1 2 3 4 5 6 7 8]
+=== origin (also changed) ====
+[  0 100   2   3   4   5   6   7   8]
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1-5" class="outline-4">
+<h4 id="sec-1-1-5"><span class="section-number-4">1.1.5</span> 全 0 数组 (zeros)</h4>
+<div class="outline-text-4" id="text-1-1-5">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"np.zeros((2,2))"</span>, np.zeros((2,2)))
+</pre>
+</div>
+
+<pre class="example">
+====== np.zeros((2,2)) =======
+[[ 0.  0.]
+ [ 0.  0.]]
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1-6" class="outline-4">
+<h4 id="sec-1-1-6"><span class="section-number-4">1.1.6</span> 全 1 数组 (ones)</h4>
+<div class="outline-text-4" id="text-1-1-6">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"np.ones((2,2))"</span>, np.ones((2,2)))
+</pre>
+</div>
+
+<pre class="example">
+======= np.ones((2,2)) =======
+[[ 1.  1.]
+ [ 1.  1.]]
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1-7" class="outline-4">
+<h4 id="sec-1-1-7"><span class="section-number-4">1.1.7</span> 对角数组 (eye)</h4>
+<div class="outline-text-4" id="text-1-1-7">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"np.eye(4)"</span>, np.eye(4))
+</pre>
+</div>
+
+<pre class="example">
+========= np.eye(4) ==========
+[[ 1.  0.  0.  0.]
+ [ 0.  1.  0.  0.]
+ [ 0.  0.  1.  0.]
+ [ 0.  0.  0.  1.]]
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-1-8" class="outline-4">
+<h4 id="sec-1-1-8"><span class="section-number-4">1.1.8</span> 线性数组 (linspace)</h4>
+<div class="outline-text-4" id="text-1-1-8">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"np.linspace(0, 10, num=51)"</span>, np.linspace(0, 10, num=51))
+</pre>
+</div>
+
+<pre class="example">
+= np.linspace(0, 10, num=51) =
+[  0.    0.2   0.4   0.6   0.8   1.    1.2   1.4   1.6   1.8   2.    2.2
+   2.4   2.6   2.8   3.    3.2   3.4   3.6   3.8   4.    4.2   4.4   4.6
+   4.8   5.    5.2   5.4   5.6   5.8   6.    6.2   6.4   6.6   6.8   7.
+   7.2   7.4   7.6   7.8   8.    8.2   8.4   8.6   8.8   9.    9.2   9.4
+   9.6   9.8  10. ]
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> 索引</h3>
+<div class="outline-text-3" id="text-1-2">
+</div><div id="outline-container-sec-1-2-1" class="outline-4">
+<h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> 一维数组</h4>
+<div class="outline-text-4" id="text-1-2-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">data</span> = np.arange(100, step=10)
+log(<span style="color: #ff4ea3;">"data"</span>, data)
+log(<span style="color: #ff4ea3;">"data[1:5]"</span>, data[1:5])
+log(<span style="color: #ff4ea3;">"data[4:]"</span>, data[4:])
+log(<span style="color: #ff4ea3;">"data[:4]"</span>, data[:4])
+</pre>
+</div>
+
+<pre class="example">
+============ data ============
+[ 0 10 20 30 40 50 60 70 80 90]
+========= data[1:5] ==========
+[10 20 30 40]
+========== data[4:] ==========
+[40 50 60 70 80 90]
+========== data[:4] ==========
+[ 0 10 20 30]
+</pre>
+</div>
+</div>
+
+
+
+<div id="outline-container-sec-1-2-2" class="outline-4">
+<h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> 二维数组</h4>
+<div class="outline-text-4" id="text-1-2-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">data</span> = np.arange(16).reshape(4, 4)
+log(<span style="color: #ff4ea3;">"data"</span>, data)
+log(<span style="color: #ff4ea3;">"data[1:3]"</span>, data[1:3])
+log(<span style="color: #ff4ea3;">"data[1:]"</span>, data[1:])
+log(<span style="color: #ff4ea3;">"data[:3]"</span>, data[:3])
+log(<span style="color: #ff4ea3;">"data[1:3,1:3]"</span>, data[1:3,1:3])
+log(<span style="color: #ff4ea3;">"data[:,1:3]"</span>, data[:,1:3])
+log(<span style="color: #ff4ea3;">"data[2:4,:]"</span>, data[2:4,:])
+log(<span style="color: #ff4ea3;">"data[2:5]"</span>, data[2:5])
+</pre>
+</div>
+
+<pre class="example">
+============ data ============
+[[ 0  1  2  3]
+ [ 4  5  6  7]
+ [ 8  9 10 11]
+ [12 13 14 15]]
+========= data[1:3] ==========
+[[ 4  5  6  7]
+ [ 8  9 10 11]]
+========== data[1:] ==========
+[[ 4  5  6  7]
+ [ 8  9 10 11]
+ [12 13 14 15]]
+========== data[:3] ==========
+[[ 0  1  2  3]
+ [ 4  5  6  7]
+ [ 8  9 10 11]]
+======= data[1:3,1:3] ========
+[[ 5  6]
+ [ 9 10]]
+======== data[:,1:3] =========
+[[ 1  2]
+ [ 5  6]
+ [ 9 10]
+ [13 14]]
+======== data[2:4,:] =========
+[[ 8  9 10 11]
+ [12 13 14 15]]
+========= data[2:5] ==========
+[[ 8  9 10 11]
+ [12 13 14 15]]
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2-3" class="outline-4">
+<h4 id="sec-1-2-3"><span class="section-number-4">1.2.3</span> 数组索引</h4>
+<div class="outline-text-4" id="text-1-2-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">data</span> = np.arange(16).reshape(4,4)
+log(<span style="color: #ff4ea3;">"data"</span>, data)
+
+<span style="color: #ff8700;">xidx</span> = [0, 2, 3]
+<span style="color: #ff8700;">yidx</span> = [1, 2, 3]
+log(<span style="color: #ff4ea3;">"data[[0,2,3],[1,2,3]]"</span>, data[xidx, yidx])
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">&#20462;&#25913;&#27599;&#34892;&#37324;&#30340;&#29305;&#23450;&#21015;&#30340;&#25968;&#25454;</span>
+<span style="color: #ff8700;">yidx</span> = [0, 3, 2, 0]
+<span style="color: #ff8700;">data</span>[np.arange(4), yidx] += 100
+log(<span style="color: #ff4ea3;">"data"</span>, data)
+</pre>
+</div>
+
+<pre class="example">
+============ data ============
+[[ 0  1  2  3]
+ [ 4  5  6  7]
+ [ 8  9 10 11]
+ [12 13 14 15]]
+=== data[[0,2,3],[1,2,3]] ====
+[ 1 10 15]
+============ data ============
+[[100   1   2   3]
+ [  4   5   6 107]
+ [  8   9 110  11]
+ [112  13  14  15]]
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2-4" class="outline-4">
+<h4 id="sec-1-2-4"><span class="section-number-4">1.2.4</span> 布尔索引</h4>
+<div class="outline-text-4" id="text-1-2-4">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">data</span> = np.arange(16).reshape(4,4)
+log(<span style="color: #ff4ea3;">"data"</span>, data)
+<span style="color: #ff8700;">idx</span> = data &gt;= 10
+log(<span style="color: #ff4ea3;">"idx"</span>, idx)
+log(<span style="color: #ff4ea3;">"data[idx]"</span>, data[idx])
+log(<span style="color: #ff4ea3;">"data[data%2 == 0]"</span>, data[data%2 == 0])
+</pre>
+</div>
+
+<pre class="example">
+============ data ============
+[[ 0  1  2  3]
+ [ 4  5  6  7]
+ [ 8  9 10 11]
+ [12 13 14 15]]
+============ idx =============
+[[False False False False]
+ [False False False False]
+ [False False  True  True]
+ [ True  True  True  True]]
+========= data[idx] ==========
+[10 11 12 13 14 15]
+===== data[data%2 == 0] ======
+[ 0  2  4  6  8 10 12 14]
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> 运算</h3>
+<div class="outline-text-3" id="text-1-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">x</span> = np.arange(1,5).reshape(2,2)
+<span style="color: #ff8700;">y</span> = np.arange(5,9).reshape(2,2)
+log(<span style="color: #ff4ea3;">"x"</span>, x)
+log(<span style="color: #ff4ea3;">"y"</span>, y)
+log(<span style="color: #ff4ea3;">"x + y"</span>, x + y)
+log(<span style="color: #ff4ea3;">"np.add(x, y)"</span>, np.add(x, y))
+log(<span style="color: #ff4ea3;">"y - x"</span>, y - x)
+log(<span style="color: #ff4ea3;">"np.subtract(y, x)"</span>, np.subtract(y, x))
+log(<span style="color: #ff4ea3;">"x * y"</span>, x * y)
+log(<span style="color: #ff4ea3;">"x / y"</span>, x / y)
+<span style="color: #ff8700;">x</span> = np.array(x, dtype=<span style="color: #d18aff;">float</span>)
+<span style="color: #ff8700;">y</span> = np.array(y, dtype=<span style="color: #d18aff;">float</span>)
+log(<span style="color: #ff4ea3;">"x"</span>, x)
+log(<span style="color: #ff4ea3;">"y"</span>, y)
+log(<span style="color: #ff4ea3;">"x / y"</span>, x / y)
+log(<span style="color: #ff4ea3;">"np.sqrt(x)"</span>, np.sqrt(x))
+log(<span style="color: #ff4ea3;">"x + 10"</span>, x + 10)
+
+<span style="color: #ff8700;">data</span> = np.arange(16).reshape(4,4)
+log(<span style="color: #ff4ea3;">"data.sum()"</span>, data.<span style="color: #d18aff;">sum</span>())
+log(<span style="color: #ff4ea3;">"data.sum(axis=0)"</span>, data.<span style="color: #d18aff;">sum</span>(axis=0))
+log(<span style="color: #ff4ea3;">"data.sum(axis=1)"</span>, data.<span style="color: #d18aff;">sum</span>(axis=1))
+</pre>
+</div>
+
+<pre class="example">
+============= x ==============
+[[1 2]
+ [3 4]]
+============= y ==============
+[[5 6]
+ [7 8]]
+=========== x + y ============
+[[ 6  8]
+ [10 12]]
+======== np.add(x, y) ========
+[[ 6  8]
+ [10 12]]
+=========== y - x ============
+[[4 4]
+ [4 4]]
+===== np.subtract(y, x) ======
+[[4 4]
+ [4 4]]
+=========== x * y ============
+[[ 5 12]
+ [21 32]]
+=========== x / y ============
+[[ 0.2         0.33333333]
+ [ 0.42857143  0.5       ]]
+============= x ==============
+[[ 1.  2.]
+ [ 3.  4.]]
+============= y ==============
+[[ 5.  6.]
+ [ 7.  8.]]
+=========== x / y ============
+[[ 0.2         0.33333333]
+ [ 0.42857143  0.5       ]]
+========= np.sqrt(x) =========
+[[ 1.          1.41421356]
+ [ 1.73205081  2.        ]]
+=========== x + 10 ===========
+[[ 11.  12.]
+ [ 13.  14.]]
+========= data.sum() =========
+120
+====== data.sum(axis=0) ======
+[24 28 32 36]
+====== data.sum(axis=1) ======
+[ 6 22 38 54]
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,5 +1,9 @@
 ## [Bash](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/bash/bash.html)
 
+## Python
+
+- [Numpy](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/python3/numpy/numpy.html)
+
 ## Java
 
 - [语法](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/java/grammar.html)
