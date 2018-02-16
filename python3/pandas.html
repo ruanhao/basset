@@ -2,7 +2,7 @@
 <html>
 <head>
 <title>Pandas</title>
-<!-- 2018-02-15 Thu 16:53 -->
+<!-- 2018-02-16 Fri 22:58 -->
 <meta  charset="utf-8">
 <meta  name="generator" content="Org-mode">
 <meta  name="author" content="Hao Ruan">
@@ -142,7 +142,54 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. 数据整形</a></li>
+<li><a href="#sec-1">1. Series</a></li>
+<li><a href="#sec-2">2. DataFrame</a>
+<ul>
+<li><a href="#sec-2-1">2.1. 创建</a>
+<ul>
+<li><a href="#sec-2-1-1">2.1.1. 使用字典创建</a></li>
+<li><a href="#sec-2-1-2">2.1.2. 指定行列索引创建</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-2">2.2. 查看数据</a>
+<ul>
+<li><a href="#sec-2-2-1">2.2.1. 维度</a></li>
+<li><a href="#sec-2-2-2">2.2.2. 行索引信息</a></li>
+<li><a href="#sec-2-2-3">2.2.3. 列索引信息</a></li>
+<li><a href="#sec-2-2-4">2.2.4. 底层数据</a></li>
+<li><a href="#sec-2-2-5">2.2.5. 列类型</a></li>
+<li><a href="#sec-2-2-6">2.2.6. head</a></li>
+<li><a href="#sec-2-2-7">2.2.7. tail</a></li>
+<li><a href="#sec-2-2-8">2.2.8. 统计信息</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-3">2.3. 排序</a>
+<ul>
+<li><a href="#sec-2-3-1">2.3.1. 按列索引排序</a></li>
+<li><a href="#sec-2-3-2">2.3.2. 按列数据排序</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-4">2.4. 数据选择</a>
+<ul>
+<li><a href="#sec-2-4-1">2.4.1. 列数据（Series 类型对象）</a></li>
+<li><a href="#sec-2-4-2">2.4.2. 列数据（DataFrame 类型对象）</a></li>
+<li><a href="#sec-2-4-3">2.4.3. 行数据（Series 类型对象）</a></li>
+<li><a href="#sec-2-4-4">2.4.4. 行数据（DataFrame 类型对象）</a></li>
+<li><a href="#sec-2-4-5">2.4.5. 选择行与列</a></li>
+<li><a href="#sec-2-4-6">2.4.6. 选择指定坐标</a></li>
+<li><a href="#sec-2-4-7">2.4.7. 布尔选择</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-5">2.5. 数据修改</a>
+<ul>
+<li><a href="#sec-2-5-1">2.5.1. 增加列</a></li>
+<li><a href="#sec-2-5-2">2.5.2. 修改列</a></li>
+<li><a href="#sec-2-5-3">2.5.3. 修改指定坐标</a></li>
+<li><a href="#sec-2-5-4">2.5.4. 整体赋值</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -150,7 +197,54 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. 数据整形</a></li>
+<li><a href="#sec-1">1. Series</a></li>
+<li><a href="#sec-2">2. DataFrame</a>
+<ul>
+<li><a href="#sec-2-1">2.1. 创建</a>
+<ul>
+<li><a href="#sec-2-1-1">2.1.1. 使用字典创建</a></li>
+<li><a href="#sec-2-1-2">2.1.2. 指定行列索引创建</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-2">2.2. 查看数据</a>
+<ul>
+<li><a href="#sec-2-2-1">2.2.1. 维度</a></li>
+<li><a href="#sec-2-2-2">2.2.2. 行索引信息</a></li>
+<li><a href="#sec-2-2-3">2.2.3. 列索引信息</a></li>
+<li><a href="#sec-2-2-4">2.2.4. 底层数据</a></li>
+<li><a href="#sec-2-2-5">2.2.5. 列类型</a></li>
+<li><a href="#sec-2-2-6">2.2.6. head</a></li>
+<li><a href="#sec-2-2-7">2.2.7. tail</a></li>
+<li><a href="#sec-2-2-8">2.2.8. 统计信息</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-3">2.3. 排序</a>
+<ul>
+<li><a href="#sec-2-3-1">2.3.1. 按列索引排序</a></li>
+<li><a href="#sec-2-3-2">2.3.2. 按列数据排序</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-4">2.4. 数据选择</a>
+<ul>
+<li><a href="#sec-2-4-1">2.4.1. 列数据（Series 类型对象）</a></li>
+<li><a href="#sec-2-4-2">2.4.2. 列数据（DataFrame 类型对象）</a></li>
+<li><a href="#sec-2-4-3">2.4.3. 行数据（Series 类型对象）</a></li>
+<li><a href="#sec-2-4-4">2.4.4. 行数据（DataFrame 类型对象）</a></li>
+<li><a href="#sec-2-4-5">2.4.5. 选择行与列</a></li>
+<li><a href="#sec-2-4-6">2.4.6. 选择指定坐标</a></li>
+<li><a href="#sec-2-4-7">2.4.7. 布尔选择</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-5">2.5. 数据修改</a>
+<ul>
+<li><a href="#sec-2-5-1">2.5.1. 增加列</a></li>
+<li><a href="#sec-2-5-2">2.5.2. 修改列</a></li>
+<li><a href="#sec-2-5-3">2.5.3. 修改指定坐标</a></li>
+<li><a href="#sec-2-5-4">2.5.4. 整体赋值</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -171,30 +265,628 @@ for the JavaScript code in this tag.
 
 <tr>
 <td class="left">Date</td>
-<td class="left">2018-02-15 16:53:50</td>
+<td class="left">2018-02-16 22:57:57</td>
 </tr>
 </tbody>
 </table>
 </div>
 
 <div id="outline-container-sec-1" class="outline-2">
-<h2 id="sec-1"><span class="section-number-2">1</span> 数据整形</h2>
+<h2 id="sec-1"><span class="section-number-2">1</span> Series</h2>
 <div class="outline-text-2" id="text-1">
+<p>
+Series 对象可以理解为一维数组
+</p>
+
 <div class="org-src-container">
 
-<pre class="src src-ipython"><span style="color: #ff8700;">tuples</span> = <span style="color: #d18aff;">list</span>(<span style="color: #d18aff;">zip</span>(*[[<span style="color: #ff4ea3;">'bar'</span>, <span style="color: #ff4ea3;">'bar'</span>, <span style="color: #ff4ea3;">'baz'</span>, <span style="color: #ff4ea3;">'baz'</span>,
-                     <span style="color: #ff4ea3;">'foo'</span>, <span style="color: #ff4ea3;">'foo'</span>, <span style="color: #ff4ea3;">'qux'</span>, <span style="color: #ff4ea3;">'qux'</span>],
-                    [<span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'two'</span>, <span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'two'</span>,
-                     <span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'two'</span>, <span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'two'</span>]]))
-<span style="color: #ff8700;">index</span> = pd.MultiIndex.from_tuples(tuples, names=[<span style="color: #ff4ea3;">'first'</span>, <span style="color: #ff4ea3;">'second'</span>])
-<span style="color: #ff8700;">df</span> = pd.DataFrame(np.random.randn(8, 2), index=index, columns=[<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'B'</span>])
+<pre class="src src-ipython"><span style="color: #ff8700;">s</span> = pd.Series([1, 3, 5, np.nan, 6, 8])
+log(<span style="color: #ff4ea3;">"s"</span>, s)
+</pre>
+</div>
+
+<pre class="example">
+====================================== s =======================================
+0    1.0
+1    3.0
+2    5.0
+3    NaN
+4    6.0
+5    8.0
+dtype: float64
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> DataFrame</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+DataFrame 对象可以理解为二维数组， <b>本质上 DataFrame 是对 Numpy array 的封装</b> 。
+</p>
+
+<p>
+<b>DataFrame 中每一行 / 列是由一个 Series 对象组成的</b> 。
+</p>
+</div>
+
+
+<div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> 创建</h3>
+<div class="outline-text-3" id="text-2-1">
+</div><div id="outline-container-sec-2-1-1" class="outline-4">
+<h4 id="sec-2-1-1"><span class="section-number-4">2.1.1</span> 使用字典创建</h4>
+<div class="outline-text-4" id="text-2-1-1">
+<p>
+key 为 DataFrame 的列；value 为对应列下的值
+</p>
+
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">df</span> = pd.DataFrame({
+                  <span style="color: #ff4ea3;">'A'</span>: 1,
+                  <span style="color: #ff4ea3;">'B'</span>: pd.Timestamp(<span style="color: #ff4ea3;">'20160301'</span>),
+                  <span style="color: #ff4ea3;">'C'</span>: <span style="color: #d18aff;">range</span>(4),
+                  <span style="color: #ff4ea3;">'D'</span>: np.arange(5, 9),
+                  <span style="color: #ff4ea3;">'E'</span>: <span style="color: #ff4ea3;">'text'</span>,
+                  <span style="color: #ff4ea3;">'F'</span>: [<span style="color: #ff4ea3;">'AA'</span>, <span style="color: #ff4ea3;">'BB'</span>, <span style="color: #ff4ea3;">'CC'</span>, <span style="color: #ff4ea3;">'DD'</span>]})
 show_dataframe(df)
 </pre>
 </div>
 
 
 <div class="figure">
-<p><img src="img/fig9446lm0.png" alt="fig9446lm0.png"></p>
+<p><img src="img/fig51559vxS.png" alt="fig51559vxS.png">
+</p>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-sec-2-1-2" class="outline-4">
+<h4 id="sec-2-1-2"><span class="section-number-4">2.1.2</span> 指定行列索引创建</h4>
+<div class="outline-text-4" id="text-2-1-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">dates</span> = pd.date_range(<span style="color: #ff4ea3;">'20160301'</span>, periods=6)
+log(<span style="color: #ff4ea3;">"dates"</span>, dates)
+</pre>
+</div>
+
+<pre class="example">
+==================================== dates =====================================
+DatetimeIndex(['2016-03-01', '2016-03-02', '2016-03-03', '2016-03-04',
+               '2016-03-05', '2016-03-06'],
+              dtype='datetime64[ns]', freq='D')
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">df</span> = pd.DataFrame(np.random.randn(6,4), index=dates, columns=<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'ABCD'</span>))
+show_dataframe(df)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig51559VdG.png" alt="fig51559VdG.png">
+</p>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> 查看数据</h3>
+<div class="outline-text-3" id="text-2-2">
+</div><div id="outline-container-sec-2-2-1" class="outline-4">
+<h4 id="sec-2-2-1"><span class="section-number-4">2.2.1</span> 维度</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.shape"</span>, df.shape)
+</pre>
+</div>
+
+<pre class="example">
+=================================== df.shape ===================================
+(6, 4)
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-2-2" class="outline-4">
+<h4 id="sec-2-2-2"><span class="section-number-4">2.2.2</span> 行索引信息</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.index"</span>, df.index)
+</pre>
+</div>
+
+<pre class="example">
+=================================== df.index ===================================
+DatetimeIndex(['2016-03-01', '2016-03-02', '2016-03-03', '2016-03-04',
+               '2016-03-05', '2016-03-06'],
+              dtype='datetime64[ns]', freq='D')
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-2-3" class="outline-4">
+<h4 id="sec-2-2-3"><span class="section-number-4">2.2.3</span> 列索引信息</h4>
+<div class="outline-text-4" id="text-2-2-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.columns"</span>, df.columns)
+</pre>
+</div>
+
+<pre class="example">
+================================== df.columns ==================================
+Index(['A', 'B', 'C', 'D'], dtype='object')
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-2-4" class="outline-4">
+<h4 id="sec-2-2-4"><span class="section-number-4">2.2.4</span> 底层数据</h4>
+<div class="outline-text-4" id="text-2-2-4">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.values"</span>, df.values)
+log(<span style="color: #ff4ea3;">"type(df.values)"</span>, <span style="color: #d18aff;">type</span>(df.values))
+</pre>
+</div>
+
+<pre class="example">
+================================== df.values ===================================
+[[-1.25125359  0.2635407   3.26002078  0.81661338]
+ [-1.0231705   0.45412576 -1.54108404 -1.08147038]
+ [-0.01286819  0.56999452  2.46063294  1.34982898]
+ [ 0.35142309 -1.78255994 -0.68435815 -2.29981174]
+ [ 0.24063717  0.11649655 -0.45423074 -0.94044457]
+ [-0.27633016 -1.29935719  1.18071339  1.04504599]]
+=============================== type(df.values) ================================
+&lt;class 'numpy.ndarray'&gt;
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-2-5" class="outline-4">
+<h4 id="sec-2-2-5"><span class="section-number-4">2.2.5</span> 列类型</h4>
+<div class="outline-text-4" id="text-2-2-5">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.dtypes"</span>, df.dtypes)
+</pre>
+</div>
+
+<pre class="example">
+================================== df.dtypes ===================================
+A    float64
+B    float64
+C    float64
+D    float64
+dtype: object
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-2-6" class="outline-4">
+<h4 id="sec-2-2-6"><span class="section-number-4">2.2.6</span> head</h4>
+<div class="outline-text-4" id="text-2-2-6">
+<p>
+默认返回前五行
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython">show_dataframe(df.head(3))
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig51559JGf.png" alt="fig51559JGf.png">
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-2-7" class="outline-4">
+<h4 id="sec-2-2-7"><span class="section-number-4">2.2.7</span> tail</h4>
+<div class="outline-text-4" id="text-2-2-7">
+<p>
+默认返回最后五行
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython">show_dataframe(df.tail(3))
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig51559jar.png" alt="fig51559jar.png">
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-2-8" class="outline-4">
+<h4 id="sec-2-2-8"><span class="section-number-4">2.2.8</span> 统计信息</h4>
+<div class="outline-text-4" id="text-2-2-8">
+<div class="org-src-container">
+
+<pre class="src src-ipython">show_dataframe(df.describe())
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig51559iuA.png" alt="fig51559iuA.png">
+</p>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> 排序</h3>
+<div class="outline-text-3" id="text-2-3">
+</div><div id="outline-container-sec-2-3-1" class="outline-4">
+<h4 id="sec-2-3-1"><span class="section-number-4">2.3.1</span> 按列索引排序</h4>
+<div class="outline-text-4" id="text-2-3-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython">show_dataframe(df.sort_index(axis=1, ascending=<span style="color: #5fafd7;">False</span>))
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig51559WXZ.png" alt="fig51559WXZ.png">
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-3-2" class="outline-4">
+<h4 id="sec-2-3-2"><span class="section-number-4">2.3.2</span> 按列数据排序</h4>
+<div class="outline-text-4" id="text-2-3-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython">show_dataframe(df.sort_values(by=<span style="color: #ff4ea3;">'C'</span>))
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig51559wrl.png" alt="fig51559wrl.png">
+</p>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> 数据选择</h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
+使用基于标签的 <code>loc</code> 函数选择数据效率较高。
+</p>
+</div>
+
+<div id="outline-container-sec-2-4-1" class="outline-4">
+<h4 id="sec-2-4-1"><span class="section-number-4">2.4.1</span> 列数据（Series 类型对象）</h4>
+<div class="outline-text-4" id="text-2-4-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df['A']"</span>, df[<span style="color: #ff4ea3;">'A'</span>])         <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">&#31561;&#25928;&#20110; df.A</span>
+log(<span style="color: #ff4ea3;">"df.iloc[0]"</span>, df.iloc[0])
+</pre>
+</div>
+
+<pre class="example">
+=================================== df['A'] ====================================
+2016-03-01   -1.251254
+2016-03-02   -1.023170
+2016-03-03   -0.012868
+2016-03-04    0.351423
+2016-03-05    0.240637
+2016-03-06   -0.276330
+Freq: D, Name: A, dtype: float64
+================================== df.iloc[0] ==================================
+A   -1.251254
+B    0.263541
+C    3.260021
+D    0.816613
+Name: 2016-03-01 00:00:00, dtype: float64
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-2-4-2" class="outline-4">
+<h4 id="sec-2-4-2"><span class="section-number-4">2.4.2</span> 列数据（DataFrame 类型对象）</h4>
+<div class="outline-text-4" id="text-2-4-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython">show_dataframe(df.loc[:, [<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'B'</span>]])
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig5155998f.png" alt="fig5155998f.png">
+</p>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython">show_dataframe(df.iloc[:, 1:2])
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig51559KOa.png" alt="fig51559KOa.png">
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-4-3" class="outline-4">
+<h4 id="sec-2-4-3"><span class="section-number-4">2.4.3</span> 行数据（Series 类型对象）</h4>
+<div class="outline-text-4" id="text-2-4-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.loc['20160301']"</span>, df.loc[<span style="color: #ff4ea3;">'20160301'</span>])
+log(<span style="color: #ff4ea3;">"df.iloc[0]"</span>, df.iloc[0])
+</pre>
+</div>
+
+<pre class="example">
+============================== df.loc['20160301'] ==============================
+A   -1.251254
+B    0.263541
+C    3.260021
+D    0.816613
+Name: 2016-03-01 00:00:00, dtype: float64
+================================== df.iloc[0] ==================================
+A   -1.251254
+B    0.263541
+C    3.260021
+D    0.816613
+Name: 2016-03-01 00:00:00, dtype: float64
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-2-4-4" class="outline-4">
+<h4 id="sec-2-4-4"><span class="section-number-4">2.4.4</span> 行数据（DataFrame 类型对象）</h4>
+<div class="outline-text-4" id="text-2-4-4">
+<div class="org-src-container">
+
+<pre class="src src-ipython">show_dataframe(df[2:4])
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig51559JUH.png" alt="fig51559JUH.png">
+</p>
+</div>
+
+
+<div class="org-src-container">
+
+<pre class="src src-ipython">show_dataframe(df[<span style="color: #ff4ea3;">'20160302'</span>:<span style="color: #ff4ea3;">'20160305'</span>])
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig51559joT.png" alt="fig51559joT.png">
+</p>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython">show_dataframe(df.iloc[1:3])
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig51559WlB.png" alt="fig51559WlB.png">
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-4-5" class="outline-4">
+<h4 id="sec-2-4-5"><span class="section-number-4">2.4.5</span> 选择行与列</h4>
+<div class="outline-text-4" id="text-2-4-5">
+<div class="org-src-container">
+
+<pre class="src src-ipython">show_dataframe(df.loc[<span style="color: #ff4ea3;">'20160301'</span>:<span style="color: #ff4ea3;">'20160305'</span>, [<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'B'</span>]])
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig51559XRs.png" alt="fig51559XRs.png">
+</p>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython">show_dataframe(df.iloc[1:3, 2:4])
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig51559w5N.png" alt="fig51559w5N.png">
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-4-6" class="outline-4">
+<h4 id="sec-2-4-6"><span class="section-number-4">2.4.6</span> 选择指定坐标</h4>
+<div class="outline-text-4" id="text-2-4-6">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.loc['2016-03-01', 'A']"</span>, df.loc[<span style="color: #ff4ea3;">'2016-03-01'</span>, <span style="color: #ff4ea3;">'A'</span>])
+log(<span style="color: #ff4ea3;">"df.at[pd.Timestamp('2016-03-01'), 'A']"</span>, df.at[pd.Timestamp(<span style="color: #ff4ea3;">'2016-03-01'</span>), <span style="color: #ff4ea3;">'A'</span>])
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">df.at['2016-03-01', 'A'] will raise error</span>
+log(<span style="color: #ff4ea3;">"df.iloc[1, 1]"</span>, df.iloc[1, 1])
+log(<span style="color: #ff4ea3;">"df.iat[1, 1]"</span>, df.iat[1, 1])
+</pre>
+</div>
+
+<pre class="example">
+========================== df.loc['2016-03-01', 'A'] ===========================
+-1.2512535946130614
+==================== df.at[pd.Timestamp('2016-03-01'), 'A'] ====================
+-1.2512535946130614
+================================ df.iloc[1, 1] =================================
+0.4541257552911061
+================================= df.iat[1, 1] =================================
+0.4541257552911061
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-2-4-7" class="outline-4">
+<h4 id="sec-2-4-7"><span class="section-number-4">2.4.7</span> 布尔选择</h4>
+<div class="outline-text-4" id="text-2-4-7">
+<div class="org-src-container">
+
+<pre class="src src-ipython">show_dataframe(df[df.A &lt; 0])
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig51559kim.png" alt="fig51559kim.png">
+</p>
+</div>
+
+
+<div class="org-src-container">
+
+<pre class="src src-ipython">show_dataframe(df[df &gt; 0])
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig51559-2y.png" alt="fig51559-2y.png">
+</p>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-5" class="outline-3">
+<h3 id="sec-2-5"><span class="section-number-3">2.5</span> 数据修改</h3>
+<div class="outline-text-3" id="text-2-5">
+</div><div id="outline-container-sec-2-5-1" class="outline-4">
+<h4 id="sec-2-5-1"><span class="section-number-4">2.5.1</span> 增加列</h4>
+<div class="outline-text-4" id="text-2-5-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">s</span> = pd.Series(np.arange(6), index=pd.date_range(<span style="color: #ff4ea3;">'20160301'</span>, periods=6))
+<span style="color: #ff8700;">df</span>[<span style="color: #ff4ea3;">'E'</span>] = s
+show_dataframe(df)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig515599KI.png" alt="fig515599KI.png">
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-5-2" class="outline-4">
+<h4 id="sec-2-5-2"><span class="section-number-4">2.5.2</span> 修改列</h4>
+<div class="outline-text-4" id="text-2-5-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">df.loc</span>[:, <span style="color: #ff4ea3;">'A'</span>] = np.arange(10, 16)
+show_dataframe(df)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig51559xzg.png" alt="fig51559xzg.png">
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-5-3" class="outline-4">
+<h4 id="sec-2-5-3"><span class="section-number-4">2.5.3</span> 修改指定坐标</h4>
+<div class="outline-text-4" id="text-2-5-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">df.loc</span>[<span style="color: #ff4ea3;">'20160301'</span>, <span style="color: #ff4ea3;">'A'</span>] = 0.2
+<span style="color: #ff8700;">df.at</span>[pd.Timestamp(<span style="color: #ff4ea3;">'20160301'</span>), <span style="color: #ff4ea3;">'A'</span>] = 0.4
+<span style="color: #ff8700;">df.iat</span>[0, 0] = 0.6
+show_dataframe(df)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig51559XfU.png" alt="fig51559XfU.png">
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-5-4" class="outline-4">
+<h4 id="sec-2-5-4"><span class="section-number-4">2.5.4</span> 整体赋值</h4>
+<div class="outline-text-4" id="text-2-5-4">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">df2</span> = df.loc[:, [<span style="color: #ff4ea3;">'B'</span>, <span style="color: #ff4ea3;">'C'</span>]].copy()
+<span style="color: #ff8700;">df2</span>[df2 &gt; 0] = -df2
+show_dataframe(df2)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig51559LIt.png" alt="fig51559LIt.png">
+</p>
+</div>
+</div>
 </div>
 </div>
 </div>

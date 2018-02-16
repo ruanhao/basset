@@ -3,6 +3,7 @@
 ## Python
 
 - [Numpy](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/python3/numpy/numpy.html)
+- [Pandas](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/python3/pandas.html)
 
 ## Java
 
