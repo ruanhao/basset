@@ -4,7 +4,6 @@
 #+LANGUAGE:  en
 #+LINK_HOME: http://www.github.com/ruanhao
 #+OPTIONS:   h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
-#+STARTUP:   showall
 #+TOC:       headlines 4
 #+HTML_DOCTYPE: <!DOCTYPE html>
 #+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
@@ -14,169 +13,238 @@
 | Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
 #+HTML: </div>
 
-
-* 常见用法
-
-
-** Spring Aware
-
-Spring Aware 的目的是为了让 Bean 获得 Spring 容器的服务。
-
-因为 =ApplicationContext= 接口集成了 =MessageSource= 接口， =ApplicationEventPublisher= 接口和 =ResourceLoader= 接口，
-所以 Bean 继承 ApplicationContextAware 可以获得 Spring 容器的所有服务。
-
-
-** @ComponentScan
-
-扫描指定包下所有使用 =@Component=, =@Service=, =@Repository=, =@Controller= 的类，并注册为 Beam 。
-
-默认扫描所在类的同级目录以及子目录。
-
-*** 使用包名指定
-
-#+BEGIN_SRC java
-  @ComponentScan(basePackages="com.cisco.smb")
-#+END_SRC
-
-
-*** 使用类名指定
-
-#+BEGIN_SRC java
-  @SpringBootApplication(scanBasePackageClasses={
-          InventoryServiceApplication.class,
-          ServiceProvider.class,
-          RedisLeader.class,
-          TaskConfig.class,
-          MetricsTask.class,
-          NmRestClientConfig.class },
-      exclude={ DataSourceAutoConfiguration.class, MongoDataAutoConfiguration.class })
-#+END_SRC
-
-
-** @PropertySource
-
-*** 基本用法
-
-#+BEGIN_SRC java
-  @Configuration
-  @PropertySource("classpath:jdbc.properties")
-  public class MyConfig {
-      @Value("${jdbc.url}")
-      private String jdbcUrl;
-  }
-#+END_SRC
-
-
-*** 多个配置文件
-
-#+BEGIN_SRC java
-  @PropertySource({"classpath:jdbc.properties", "classpath:db.properties"})
-#+END_SRC
-
-
-*** 忽略配置文件不存在的情况
-
-#+BEGIN_SRC java
-  @PropertySource(value={"classpath:jdbc.properties"}, ignoreResourceNotFound=true)
-#+END_SRC
-
-
-
-
-** @Value
-
-*** 注入普通字符串
-
-#+BEGIN_SRC java
-  @Value("I love you")
-  String normal;
-#+END_SRC
-
-*** 注入操作系统属性
-
-#+BEGIN_SRC java
-  @Value("#{systemProperties['os.name']}")
-  String osName
-#+END_SRC
-
-*** 注入表达式结果
-
-#+BEGIN_SRC java
-  @Value("#{ T(java.lang.Math).random() * 100.0 }")
-  double randomNumber;
-#+END_SRC
-
-*** 注入其他 Bean 属性
-
-#+BEGIN_SRC java
-  @Value("#{anotherBean.value}")
-  String another;
-#+END_SRC
-
-*** 注入文件资源
-
-#+BEGIN_SRC java
-  @Value("classpath:test.txt")
-  Resource testFile;
-#+END_SRC
-
-*** 注入网址资源
-
-#+BEGIN_SRC java
-  @Value("http://www.baidu.com")
-  Resource testUrl;
-
-#+END_SRC
-
-*** 从配置文件注入
-
-#+BEGIN_SRC java
-  @Value("${server.port}")
-  int port;
-#+END_SRC
-
-
-
-
-
-** WebApplicationInitializer
-
-Spring MVC 提供了一个 =DispatcherServlet= 来开发 Web 应用。
-在 Servlet2.5 及以下的时候，只需在 web.xml 下配置 <servlet> 元素即可。
-若使用 Servlet3.0 无 web.xml 的配置方式，在 Spring MVC 里实现 =WebApplicationInitializer= 接口便可以实现等同于 web.xml 的配置。
-
-** @ControllerAdvice
-
-=@ControllerAdvice= 声明一个控制器建言，它组合了 =@Component= ，所以自动注册为 Bean 。
-
-通过 =@ControllerAdvice= ，可以将对控制器的全局配置放置在同一位置。
-
-*** 拦截所有异常
-
-#+BEGIN_SRC java
-  @ControllerAdvice
-  public class ExceptionHandlerAdvice {
-
-      @ExceptionHandler(Exception.class)
-      @ResponseBody
-      public HttpJsonResult<?> handleException(Exception e, HttpServletRequest request) {
-          log.error("exception: {}", e);
-          return new HttpJsonResult<?>().setSuccess(false);
-      }
-
-  }
-#+END_SRC
-
-
-
+* 原理概念
 
 * 常用实践
 
-** Application Event
+** [[https://github.com/ruanhao/show-me-the-code/tree/springboot-restful-service][Restful Service (MVC)]]
 
-*** [[https://github.com/ruanhao/show-me-the-code/tree/springboot-application-event][示例工程]]
+*** WebApplicationInitializer
 
-*** SpringApplicationEvent
+实现 =WebApplicationInitializer= 接口便可以实现等同于对 =web.xml= 进行配置
+
+*** Controller
+
+#+BEGIN_SRC java
+  @RestController
+  @RequestMapping("/{userId}/bookmarks")
+  class BookmarkRestController {
+
+      @PostMapping
+      ResponseEntity<?> add(@PathVariable String userId, @RequestBody Bookmark input) {
+          return ResponseEntity.noContent().build();
+      }
+  }
+#+END_SRC
+
+
+*** HttpMessageConverter
+
+对每个 HTTP 请求，Spring MVC 将遍历所有配置的 HttpMessageConverter 对象，
+直到找到一个合适的对象可以将返回的 POJO 转换成 Accept header 中指定的 content type 。
+
+Spring Boot 会自动组装一个可以转换成 JSON 类型的 HttpMessageConverter 对象。
+
+HttpMessageConverter 工作于两个方向：
+- 请求（ content-type => Java object ）
+- 响应（ Java object => content-type ）
+
+
+*** 异常处理
+
+**** 异常级别
+
+正常情况下，任何未被处理的异常将导致服务器返回 HTTP 500 Response 。
+自定义的异常可以通过添加 =@ResponseStatus= 注解从而使用指定的 status code 。
+
+#+BEGIN_SRC java
+   @ResponseStatus(value=HttpStatus.NOT_FOUND, reason="No such Order")  // 404
+   public class OrderNotFoundException extends RuntimeException {
+       // TODO
+   }
+#+END_SRC
+
+#+BEGIN_SRC java
+  @RequestMapping(value="/orders/{id}", method=GET)
+  public String showOrder(@PathVariable("id") long id, Model model) {
+      Order order = orderRepository.findOrderById(id);
+
+      if (order == null) throw new OrderNotFoundException(id);
+
+      model.addAttribute(order);
+      return "orderDetail";
+  }
+#+END_SRC
+
+
+
+**** 控制器级别
+
+使用 =@ExceptionHandler= 注解处理同一个控制器中抛出的异常，这种方式的优点：
+
+- 可以处理没有被 =@ResponseStatus= 注解过的异常
+- 可以将用户重定向到专门的错误页面
+- 组装一个完全定制化的 error response
+
+#+BEGIN_SRC java
+  @Controller
+  public class ExceptionHandlingController {
+
+      // @RequestHandler methods that maybe throw exception
+      ...
+
+
+      // Exception handling methods:
+
+      // Convert a predefined exception to an HTTP Status code
+      @ResponseStatus(value=HttpStatus.CONFLICT, reason="Data integrity violation")  // 409
+      @ExceptionHandler(DataIntegrityViolationException.class)
+      public void conflict() {
+          // TODO
+      }
+
+      // Specify name of a specific view that will be used to display the error:
+      @ExceptionHandler({SQLException.class, DataAccessException.class})
+      public String databaseError() {
+          // Nothing to do.  Returns the logical view name of an error page, passed
+          // to the view-resolver(s) in usual way.
+          return "databaseError";
+      }
+
+      // Total control - setup a model and return the view name yourself. Or
+      // consider subclassing ExceptionHandlerExceptionResolver.
+      @ExceptionHandler(Exception.class)
+      public ModelAndView handleError(HttpServletRequest req, Exception ex) {
+          logger.error("Request: " + req.getRequestURL() + " raised " + ex);
+
+          ModelAndView mav = new ModelAndView();
+          mav.addObject("exception", ex);
+          mav.addObject("url", req.getRequestURL());
+          mav.setViewName("error");
+          return mav;
+      }
+  }
+#+END_SRC
+
+**** 全局级别
+
+任何标注 =@ControllerAdvice= / =@RestControllerAdvice= 注解的类支持 3 种类型的方法：
+
+- Exception handling methods annotated with =@ExceptionHandler=
+- Model enhancement methods (for adding additional data to the model) annotated with =@ModelAttribute=
+- Binder initialization methods (used for configuring form-handling) annotated with =@InitBinder=
+
+
+#+BEGIN_SRC java
+  @ControllerAdvice
+  class GlobalControllerExceptionHandler {
+      @ResponseStatus(HttpStatus.CONFLICT)  // 409
+      @ExceptionHandler(DataIntegrityViolationException.class)
+      public void handleConflict() {
+          // Nothing to do
+      }
+  }
+#+END_SRC
+
+***** 重新抛出
+
+#+BEGIN_SRC java
+  @ControllerAdvice
+  class GlobalDefaultExceptionHandler {
+    public static final String DEFAULT_ERROR_VIEW = "error";
+
+    @ExceptionHandler(value = Exception.class)
+    public ModelAndView defaultErrorHandler(HttpServletRequest req, Exception e) throws Exception {
+      // If the exception is annotated with @ResponseStatus rethrow it and let
+      // the framework handle it - like the OrderNotFoundException example
+      // at the start of this post.
+      // AnnotationUtils is a Spring Framework utility class.
+      if (AnnotationUtils.findAnnotation(e.getClass(), ResponseStatus.class) != null)
+        throw e;
+
+      // Otherwise setup and send the user to a default error-view.
+      ModelAndView mav = new ModelAndView();
+      mav.addObject("exception", e);
+      mav.addObject("url", req.getRequestURL());
+      mav.setViewName(DEFAULT_ERROR_VIEW);
+      return mav;
+    }
+  }
+#+END_SRC
+
+
+
+** [[https://github.com/ruanhao/show-me-the-code/tree/springboot-application-event][Application Event]]
+
+*** Event
+
+    #+BEGIN_SRC java
+  @ToString
+  public class Event extends ApplicationEvent {
+
+      private static final long serialVersionUID = 1L;
+
+      @Getter
+      private String message;
+
+      public Event(Object source, String message) {
+          super(source);
+          this.message = message;
+      }
+
+  }
+    #+END_SRC
+
+
+*** Listener
+
+    #+BEGIN_SRC java
+  @Component
+  @Slf4j
+  public class Listener {
+
+      @EventListener
+      public void handlerEvent(Event event) {
+          log.info("Receive event: {}", event);
+      }
+
+  }
+    #+END_SRC
+
+
+*** Publisher
+
+    #+BEGIN_SRC java
+  @Service
+  @Slf4j
+  public class Publisher {
+
+      @Autowired
+      private ApplicationContext applicationContext;
+
+      public void publish(String message) {
+          log.info("Sending message: {}", message);
+          applicationContext.publishEvent(new Event(this, message));
+      }
+
+  }
+    #+END_SRC
+
+
+*** 自定义 applicationEventMulticaster
+
+    #+BEGIN_SRC java
+  @Bean(name="applicationEventMulticaster")
+  public ApplicationEventMulticaster simpleApplicationEventMulticaster() {
+      SimpleApplicationEventMulticaster eventMulticaster
+          = new SimpleApplicationEventMulticaster();
+      eventMulticaster.setTaskExecutor(new SimpleAsyncTaskExecutor());
+      return eventMulticaster;
+  }
+    #+END_SRC
+
+
+*** 常见 SpringApplicationEvent
 
 - ApplicationEnvironmentPreparedEvent
 - ApplicationFailedEvent
@@ -186,18 +254,17 @@ Spring MVC 提供了一个 =DispatcherServlet= 来开发 Web 应用。
 
 
 
-** Async Method
+** [[https://github.com/ruanhao/show-me-the-code/tree/springboot-async-method][Async Method]]
 
-*** [[https://github.com/ruanhao/show-me-the-code/tree/springboot-async-method][示例工程]]
 
 *** 异常统一捕获
 
-如果需要统一进行异常捕获，可以实现 =AsyncConfigurer= 接口，
-=getAsyncExecutor= 方法返回的 Executor 对象用于处理异步方法调用，
-=getAsyncUncaughtExceptionHandler= 方法返回的对象捕获异步调用期间产生的异常，
-*当且仅当异步调用方法的返回类型为 void* 。
+    如果需要统一进行异常捕获，可以实现 =AsyncConfigurer= 接口，
+    =getAsyncExecutor= 方法返回的 Executor 对象用于处理异步方法调用，
+    =getAsyncUncaughtExceptionHandler= 方法返回的对象捕获异步调用期间产生的异常，
+    *当且仅当异步调用方法的返回类型为 void* 。
 
-#+BEGIN_SRC java
+    #+BEGIN_SRC java
   @EnableAsync
   @Configuration
   public class AsyncConfiguration implements AsyncConfigurer {
@@ -218,62 +285,166 @@ Spring MVC 提供了一个 =DispatcherServlet= 来开发 Web 应用。
       }
 
   }
-#+END_SRC
+    #+END_SRC
 
 
 ** Scheduling Tasks
 
 *** 启用计划任务
 
-在配置类上使用 =@EnableScheduling= 来开启对计划任务的支持。
+    在配置类上使用 =@EnableScheduling= 来开启对计划任务的支持。
 
 
 *** 任务执行
 
 **** 每隔固定时间执行
 
-#+BEGIN_SRC java
+     #+BEGIN_SRC java
   @Scheduled(fixedRate=5000)
-#+END_SRC
+     #+END_SRC
 
 **** 指定任务间隔
 
-#+BEGIN_SRC java
+     #+BEGIN_SRC java
   // specify the interval between invocations measured
   // from the completion of the task
   @Scheduled(fixedDelay=5000)
-#+END_SRC
+     #+END_SRC
 
 **** UNIX Cron 风格
 
-#+BEGIN_SRC java
+     #+BEGIN_SRC java
   @Scheduled(cron="0 28 11 ? * *") // 每天 11 点 28 分 执行
-#+END_SRC
+     #+END_SRC
 
 
-** properties 与Bean 关联
+** [[https://github.com/ruanhao/show-me-the-code/tree/springboot-type-safe-configuration-properties][Type Safe Configuration Properties]]
 
 *** 配置文件
 
-application.properties:
+    #+BEGIN_SRC sh
+  #Simple properties
+  mail.host=mailer@mail.com
+  mail.port=9000
+  mail.from=mailer@mail.com
 
-#+BEGIN_SRC sh
-  author.name=haoruan
-  author.age=32
-#+END_SRC
+  #List properties
+  mail.defaultRecipients[0]=admin@mail.com
+  mail.defaultRecipients[1]=owner@mail.com
 
-*** Bean
+  #Map Properties
+  mail.additionalHeaders.redelivery=true
+  mail.additionalHeaders.secure=true
 
-#+BEGIN_SRC java
-  @Component
-  @ConfigurationProperties(prefix="author")
-  // @ConfigurationProperties(prefix="author", locations={"classpath:application.properties"})
-  @Setter
+  #Object properties
+  mail.credentials.username=john
+  mail.credentials.password=password
+  mail.credentials.authMethod=SHA1
+    #+END_SRC
+
+
+*** Properties Bean
+
+    #+BEGIN_SRC java
   @Getter
-  public class AuthorSettings {
+  @Setter
+  @ToString
+  @Configuration
+  @Validated
+  @PropertySource("classpath:configprops.properties")
+  @ConfigurationProperties(prefix="mail")
+  public class ConfigProperties {
 
-      private String name;
-      private int age;
+      @Getter
+      @Setter
+      @ToString
+      public static class Credentials {
+          @Length(max=4, min=1)
+          private String authMethod;
+          private String username;
+          private String password;
+      }
+
+      @NotBlank
+      private String host;
+      @Min(1025)
+      @Max(65536)
+      private int port;
+      @Pattern(regexp="^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,6}$")
+      private String from;
+
+      // In order to validate values of nested properties,
+      // you must annotate the associated field as @Valid to trigger its validation.
+      @Valid
+      private Credentials credentials;
+      private List<String> defaultRecipients;
+      private Map<String, String> additionalHeaders;
+
   }
 
-#+END_SRC
+    #+END_SRC
+
+
+** 内容注入
+
+*** 注入普通字符串
+
+    #+BEGIN_SRC java
+  @Value("I love you")
+  String normal;
+    #+END_SRC
+
+
+*** 注入操作系统属性
+
+    #+BEGIN_SRC java
+  @Value("#{systemProperties['os.name']}")
+  String osName
+    #+END_SRC
+
+
+*** 注入表达式结果
+
+    #+BEGIN_SRC java
+  @Value("#{ T(java.lang.Math).random() * 100.0 }")
+  double randomNumber;
+    #+END_SRC
+
+
+*** 注入其他 Bean 属性
+
+    #+BEGIN_SRC java
+  @Value("#{anotherBean.value}")
+  String another;
+    #+END_SRC
+
+
+*** 注入文件资源
+
+    #+BEGIN_SRC java
+  @Value("classpath:test.txt")
+  Resource testFile;
+    #+END_SRC
+
+
+*** 注入网址资源
+
+    #+BEGIN_SRC java
+  @Value("http://www.baidu.com")
+  Resource testUrl;
+
+    #+END_SRC
+
+
+*** 从配置文件注入
+
+    #+BEGIN_SRC java
+      @Configuration
+      @PropertySource("classpath:jdbc.properties")
+      public class MyConfig {
+          @Value("${jdbc.url}")
+          private String jdbcUrl;
+      }
+
+
+    #+END_SRC
