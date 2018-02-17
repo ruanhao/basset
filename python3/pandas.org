@@ -47,31 +47,14 @@
 #+END_SRC
 
 
-* Series
 
-Series 对象可以理解为一维数组
+* 创建
 
-#+BEGIN_SRC ipython :session :results output :exports both
-  s = pd.Series([1, 3, 5, np.nan, 6, 8])
-  log("s", s)
-#+END_SRC
-
-
-* DataFrame
-
-DataFrame 对象可以理解为二维数组， *本质上 DataFrame 是对 Numpy array 的封装* 。
-
-*DataFrame 中每一行 / 列是由一个 Series 对象组成的* 。
-
-
-** 创建
-
-*** 使用字典创建
+** 使用字典创建
 
 key 为 DataFrame 的列；value 为对应列下的值
 
-
-#+BEGIN_SRC ipython :session :var path="img/fig51559vxS.png"
+#+BEGIN_SRC ipython :session :exports both :results output
   df = pd.DataFrame({
                     'A': 1,
                     'B': pd.Timestamp('20160301'),
@@ -79,122 +62,110 @@ key 为 DataFrame 的列；value 为对应列下的值
                     'D': np.arange(5, 9),
                     'E': 'text',
                     'F': ['AA', 'BB', 'CC', 'DD']})
-  show_dataframe(df)
+  log("df", df)
 #+END_SRC
 
-[[file:img/fig51559vxS.png]]
 
-
-
-*** 指定行列索引创建
+** 指定行列索引创建
 
 #+BEGIN_SRC ipython :session :results output :exports both
   dates = pd.date_range('20160301', periods=6)
   log("dates", dates)
-#+END_SRC
 
-#+BEGIN_SRC ipython :session :var path="img/fig51559VdG.png"
   df = pd.DataFrame(np.random.randn(6,4), index=dates, columns=list('ABCD'))
-  show_dataframe(df)
+  log("df", df)
+
 #+END_SRC
 
-[[file:img/fig51559VdG.png]]
 
+* 查看数据
 
-
-** 查看数据
-
-*** 维度
+** 维度
 
 #+BEGIN_SRC ipython :session :results output :exports both
   log("df.shape", df.shape)
 #+END_SRC
 
+DataFrame 对象可以理解为二维数组
 
-*** 行索引信息
+** 行索引信息
 
 #+BEGIN_SRC ipython :session :results output :exports both
   log("df.index", df.index)
 #+END_SRC
 
 
-*** 列索引信息
+** 列索引信息
 
 #+BEGIN_SRC ipython :session :results output :exports both
   log("df.columns", df.columns)
 #+END_SRC
 
 
-*** 底层数据
+** 底层数据
 
 #+BEGIN_SRC ipython :session :results output :exports both
   log("df.values", df.values)
   log("type(df.values)", type(df.values))
 #+END_SRC
 
+*本质上 DataFrame 是对 Numpy array 的封装*
 
-*** 列类型
+** 列类型
 
 #+BEGIN_SRC ipython :session :results output :exports both
 log("df.dtypes", df.dtypes)
 #+END_SRC
 
 
-*** head
+** head
 
 默认返回前五行
 
-#+BEGIN_SRC ipython :session :var path="img/fig51559JGf.png"
-  show_dataframe(df.head(3))
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.head(3)", df.head(3))
 #+END_SRC
 
-[[file:img/fig51559JGf.png]]
 
-
-*** tail
+** tail
 
 默认返回最后五行
 
-#+BEGIN_SRC ipython :session :var path="img/fig51559jar.png"
-  show_dataframe(df.tail(3))
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.tail(3)", df.tail(3))
 #+END_SRC
 
-[[file:img/fig51559jar.png]]
 
 
-*** 统计信息
+** 统计信息
 
-#+BEGIN_SRC ipython :session :var path="img/fig51559iuA.png"
-  show_dataframe(df.describe())
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.describe()", df.describe())
 #+END_SRC
 
-[[file:img/fig51559iuA.png]]
 
+* 排序
 
-** 排序
+** 按列索引排序
 
-*** 按列索引排序
-
-#+BEGIN_SRC ipython :session :var path="img/fig51559WXZ.png"
-  show_dataframe(df.sort_index(axis=1, ascending=False))
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.sort_index(axis=1, ascending=False)", df.sort_index(axis=1, ascending=False))
 #+END_SRC
 
-[[file:img/fig51559WXZ.png]]
+** 按列数据排序
 
-*** 按列数据排序
-
-#+BEGIN_SRC ipython :session :var path="img/fig51559wrl.png"
-  show_dataframe(df.sort_values(by='C'))
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.sort_values(by='C')", df.sort_values(by='C'))
 #+END_SRC
 
-[[file:img/fig51559wrl.png]]
 
-
-** 数据选择
+* 数据选择
 
 使用基于标签的 =loc= 函数选择数据效率较高。
 
-*** 列数据（Series 类型对象）
+*DataFrame 中每一行 / 列是由一个 Series 对象组成的* 。
+
+** 列数据（Series 类型对象）
 
 #+BEGIN_SRC ipython :session :results output :exports both
   log("df['A']", df['A'])         # 等效于 df.A
@@ -202,21 +173,15 @@ log("df.dtypes", df.dtypes)
 
 #+END_SRC
 
-*** 列数据（DataFrame 类型对象）
+** 列数据（DataFrame 类型对象）
 
-#+BEGIN_SRC ipython :session :var path="img/fig5155998f.png"
-  show_dataframe(df.loc[:, ['A', 'B']])
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.loc[:, ['A', 'B']]", df.loc[:, ['A', 'B']])
+  log("df.iloc[:, 1:2]", df.iloc[:, 1:2])
 #+END_SRC
 
-[[file:img/fig5155998f.png]]
 
-#+BEGIN_SRC ipython :session :var path="img/fig51559KOa.png"
-  show_dataframe(df.iloc[:, 1:2])
-#+END_SRC
-
-[[file:img/fig51559KOa.png]]
-
-*** 行数据（Series 类型对象）
+** 行数据（Series 类型对象）
 
 #+BEGIN_SRC ipython :session :results output :exports both
   log("df.loc['20160301']", df.loc['20160301'])
@@ -224,44 +189,25 @@ log("df.dtypes", df.dtypes)
 
 #+END_SRC
 
-*** 行数据（DataFrame 类型对象）
+** 行数据（DataFrame 类型对象）
 
-#+BEGIN_SRC ipython :session :var path="img/fig51559JUH.png"
-  show_dataframe(df[2:4])
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df[2:4]", df[2:4])
+  log("df['20160302':'20160305']", df['20160302':'20160305'])
+  log("df.iloc[1:3]", df.iloc[1:3])
+
 #+END_SRC
 
-[[file:img/fig51559JUH.png]]
 
+** 选择行与列
 
-#+BEGIN_SRC ipython :session :var path="img/fig51559joT.png"
-  show_dataframe(df['20160302':'20160305'])
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.loc['20160301':'20160305', ['A', 'B']]", df.loc['20160301':'20160305', ['A', 'B']])
+  log("df.iloc[1:3, 2:4]", df.iloc[1:3, 2:4])
 #+END_SRC
 
-[[file:img/fig51559joT.png]]
 
-#+BEGIN_SRC ipython :session :var path="img/fig51559WlB.png"
-  show_dataframe(df.iloc[1:3])
-#+END_SRC
-
-[[file:img/fig51559WlB.png]]
-
-
-*** 选择行与列
-
-#+BEGIN_SRC ipython :session :var path="img/fig51559XRs.png"
-  show_dataframe(df.loc['20160301':'20160305', ['A', 'B']])
-#+END_SRC
-
-[[file:img/fig51559XRs.png]]
-
-#+BEGIN_SRC ipython :session :var path="img/fig51559w5N.png"
-  show_dataframe(df.iloc[1:3, 2:4])
-#+END_SRC
-
-[[file:img/fig51559w5N.png]]
-
-
-*** 选择指定坐标
+** 选择指定坐标
 
 #+BEGIN_SRC ipython :session :results output :exports both
   log("df.loc['2016-03-01', 'A']", df.loc['2016-03-01', 'A'])
@@ -271,61 +217,47 @@ log("df.dtypes", df.dtypes)
   log("df.iat[1, 1]", df.iat[1, 1])
 #+END_SRC
 
-*** 布尔选择
+** 布尔选择
 
-#+BEGIN_SRC ipython :session :var path="img/fig51559kim.png"
-  show_dataframe(df[df.A < 0])
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df[df.A < 0]", df[df.A < 0])
+  log("df[df > 0]", df[df > 0])
 #+END_SRC
 
-[[file:img/fig51559kim.png]]
 
+* 数据修改
 
-#+BEGIN_SRC ipython :session :var path="img/fig51559-2y.png"
-  show_dataframe(df[df > 0])
-#+END_SRC
+** 增加列
 
-[[file:img/fig51559-2y.png]]
-
-
-** 数据修改
-
-*** 增加列
-
-#+BEGIN_SRC ipython :session :var path="img/fig515599KI.png"
+#+BEGIN_SRC ipython :session :exports both :results output
   s = pd.Series(np.arange(6), index=pd.date_range('20160301', periods=6))
   df['E'] = s
-  show_dataframe(df)
+  log("df", df)
 #+END_SRC
 
-[[file:img/fig515599KI.png]]
 
-*** 修改列
+** 修改列
 
-#+BEGIN_SRC ipython :session :var path="img/fig51559xzg.png"
+#+BEGIN_SRC ipython :session :exports both :results output
   df.loc[:, 'A'] = np.arange(10, 16)
-  show_dataframe(df)
+  log("df", df)
 #+END_SRC
 
-[[file:img/fig51559xzg.png]]
 
-*** 修改指定坐标
+** 修改指定坐标
 
-#+BEGIN_SRC ipython :session :var path="img/fig51559XfU.png"
+#+BEGIN_SRC ipython :session :exports both :results output
   df.loc['20160301', 'A'] = 0.2
   df.at[pd.Timestamp('20160301'), 'A'] = 0.4
   df.iat[0, 0] = 0.6
-  show_dataframe(df)
+  log("df", df)
 #+END_SRC
 
-[[file:img/fig51559XfU.png]]
 
+** 整体赋值
 
-*** 整体赋值
-
-#+BEGIN_SRC ipython :session :var path="img/fig51559LIt.png"
+#+BEGIN_SRC ipython :session :exports both :results output
   df2 = df.loc[:, ['B', 'C']].copy()
   df2[df2 > 0] = -df2
-  show_dataframe(df2)
+  log("df2", df2)
 #+END_SRC
-
-[[file:img/fig51559LIt.png]]
