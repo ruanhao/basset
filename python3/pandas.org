@@ -40,6 +40,12 @@
       cropped.close()
       image.close()
 
+  def show_fig(o):
+      global path
+      plt.clf()
+      o.plot()
+      plt.savefig(path)
+
 
   def log(title0, value):
       title1 = ' ' + title0 + ' '
@@ -78,7 +84,7 @@ key 为 DataFrame 的列；value 为对应列下的值
 #+END_SRC
 
 
-* 查看数据
+* 查看信息
 
 ** 维度
 
@@ -87,6 +93,7 @@ key 为 DataFrame 的列；value 为对应列下的值
 #+END_SRC
 
 DataFrame 对象可以理解为二维数组
+
 
 ** 行索引信息
 
@@ -111,6 +118,7 @@ DataFrame 对象可以理解为二维数组
 
 *本质上 DataFrame 是对 Numpy array 的封装*
 
+
 ** 列类型
 
 #+BEGIN_SRC ipython :session :results output :exports both
@@ -118,30 +126,7 @@ log("df.dtypes", df.dtypes)
 #+END_SRC
 
 
-** head
 
-默认返回前五行
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  log("df.head(3)", df.head(3))
-#+END_SRC
-
-
-** tail
-
-默认返回最后五行
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  log("df.tail(3)", df.tail(3))
-#+END_SRC
-
-
-
-** 统计信息
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  log("df.describe()", df.describe())
-#+END_SRC
 
 
 * 排序
@@ -151,6 +136,7 @@ log("df.dtypes", df.dtypes)
 #+BEGIN_SRC ipython :session :exports both :results output
   log("df.sort_index(axis=1, ascending=False)", df.sort_index(axis=1, ascending=False))
 #+END_SRC
+
 
 ** 按列数据排序
 
@@ -225,7 +211,66 @@ log("df.dtypes", df.dtypes)
 #+END_SRC
 
 
-* 数据修改
+
+* 处理丢失数据
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  dates = pd.date_range('20160301', periods=6)
+  df = pd.DataFrame(data=np.random.randn(6, 4), index=dates, columns=list('ABCD'))
+  df1 = df.reindex(index=dates[0:4], columns=list(df.columns) + ['E'])
+  df1.loc[dates[1:3], 'E'] = 1
+  log("df1", df1)
+#+END_SRC
+
+** 丢弃 NaN 行
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df1.dropna(how='any')", df1.dropna(how='any'))
+#+END_SRC
+
+** 用默认值替换 NaN
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df1.fillna(value=5)", df1.fillna(value=5))
+#+END_SRC
+
+** 判断数据集是否包含 NaN
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("pd.isnull(df1)", pd.isnull(df1))
+  log("pd.isnull(df1).any()", pd.isnull(df1).any())
+  log("pd.isnull(df1).any().any()", pd.isnull(df1).any().any())
+#+END_SRC
+
+
+** NaN 不参与运算
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df1.mean()", df1.mean())
+  log("df1.mean(axis=1)", df1.mean(axis=1))
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df1.sum()", df1.sum())
+  log("df1.sum(axis=1)", df1.sum(axis=1))
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series([1,3,5,np.nan,6,8], index=dates).shift(2)
+  log("s", s)
+  log("df", df)
+  log("df.sub(s, axis='index')", df.sub(s, axis='index'))
+#+END_SRC
+
+
+* 数据操作
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  dates = pd.date_range('20160301', periods=6)
+  df = pd.DataFrame(data=np.random.randn(6, 4), index=dates, columns=list('ABCD'))
+  log("df", df)
+#+END_SRC
+
 
 ** 增加列
 
@@ -260,4 +305,347 @@ log("df.dtypes", df.dtypes)
   df2 = df.loc[:, ['B', 'C']].copy()
   df2[df2 > 0] = -df2
   log("df2", df2)
+#+END_SRC
+
+
+
+** apply
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.apply(np.cumsum)", df.apply(np.cumsum))
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.apply(lambda x: x.max() - x.min())", df.apply(lambda x: x.max() - x.min()))
+#+END_SRC
+
+
+** concat
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df = pd.DataFrame(np.random.randn(10, 4), columns=list('ABCD'))
+  log("df", df)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result = pd.concat([df.iloc[:3], df.iloc[3:7], df.iloc[7:]])
+  log("result", result)
+  log("(result == df).all().all()", (result == df).all().all())
+#+END_SRC
+
+
+** merge
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  left = pd.DataFrame({'key': ['foo', 'foo'], 'lval': [1, 2]})
+  right = pd.DataFrame({'key': ['foo', 'foo'], 'rval': [4, 5]})
+  log("left", left)
+  log("right", right)
+
+  # SELECT * FROM left INNER JOIN right ON left.key = right.key;
+  result = pd.merge(left, right, on='key')
+  log("result", result)
+#+END_SRC
+
+
+** append
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series(np.random.randint(1, 5, size=4), index=list('ABCD'))
+  log("s", s)
+  result = df.append(s, ignore_index=True)
+  log("result", result)
+#+END_SRC
+
+
+** 数据整形
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  tuples = list(zip(*[['bar', 'bar', 'baz', 'baz',
+                       'foo', 'foo', 'qux', 'qux'],
+                      ['one', 'two', 'one', 'two',
+                       'one', 'two', 'one', 'two']]))
+  log("tuples", tuples)
+  index = pd.MultiIndex.from_tuples(tuples, names=['first', 'second'])
+  df = pd.DataFrame(np.random.randn(8, 2), index=index, columns=['A', 'B'])
+  log("df", df)
+#+END_SRC
+
+*** 将列索引变为行索引 (stack)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+stacked = df.stack()
+log("stacked", stacked)
+log("type(stacked)", type(stacked))
+log("stacked.index", stacked.index)
+#+END_SRC
+
+*** 将行索引变为列索引 (unstack)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+log("stacked.unstack()", stacked.unstack())
+#+END_SRC
+
+*** 透视图（pivot_table）
+
+只观察 data frame 中一部分数据
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df = pd.DataFrame({'A' : ['one', 'one', 'two', 'three'] * 3,
+                     'B' : ['A', 'B', 'C'] * 4,
+                     'C' : ['foo', 'foo', 'foo', 'bar', 'bar', 'bar'] * 2,
+                     'D' : np.random.randn(12),
+                     'E' : np.random.randn(12)})
+
+  log("df", df)
+#+END_SRC
+
+以 A ，B 为行索引，以 C 为列索引的，针对 D 的数据：
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result = pd.pivot_table(df, values='D', index=['A', 'B'], columns=['C'])
+  log("result", result)
+
+#+END_SRC
+
+*当透视表结果为多个值的时候，返回平均值* ，如：
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result = pd.pivot_table(df, values=['E'], index=['A'], columns=['C'])
+  log("result", result)
+#+END_SRC
+
+针对 A 为 one 的那行数据，其计算过程相当于：
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result = df[df.A=='one'].groupby('C').mean()
+  log("result", result)
+#+END_SRC
+
+
+** Category
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df = pd.DataFrame({"id":[1,2,3,4,5,6], "raw_grade":['a', 'b', 'b', 'a', 'a', 'e']})
+  df["grade"] = df["raw_grade"].astype("category")
+  log("df", df)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.grade", df.grade)
+  log("df.grade.cat.categories", df.grade.cat.categories)
+  df.grade.cat.categories = ['very good', 'good', 'bad']
+  log("df", df)
+  # 以 raw_grade 列为排序标准
+  sort_result = df.sort_values(by='grade', ascending=False)
+  log("sort_result", sort_result)
+#+END_SRC
+
+
+* 信息统计
+
+** describe
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  dates = pd.date_range('20160301', periods=6)
+  df = pd.DataFrame(np.random.randn(6,4), index=dates, columns=list('ABCD'))
+  log("df", df)
+  log("df.describe()", df.describe())
+#+END_SRC
+
+** value_counts
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series(np.random.randint(10, 20, size=10))
+  log("s", s)
+  log("s.value_counts()", s.value_counts())
+#+END_SRC
+
+** mode
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s.mode()", s.mode())
+#+END_SRC
+
+
+* 分组统计
+
+执行步骤：
+
+1. 数据分组
+2. 每个组应用一个函数，输出一个结果
+3. 合并每个组的结果构成最终输出
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df = pd.DataFrame({'A' : ['foo', 'bar', 'foo', 'bar',
+                            'foo', 'bar', 'foo', 'foo'],
+                     'B' : ['one', 'one', 'two', 'three',
+                            'two', 'two', 'one', 'three'],
+                     'C' : np.random.randn(8),
+                     'D' : np.random.randn(8)})
+  log("df", df)
+#+END_SRC
+
+** 对单列分组
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result = df.groupby('A').sum()
+  log("result", result)
+#+END_SRC
+
+
+** 对多列分组
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result = df.groupby(['A', 'B']).sum()
+  log("result", result)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result = df.groupby(['B', 'A']).sum()
+  log("result", result)
+#+END_SRC
+
+
+* 时间序列
+
+pandas 提供了强大的时间序列功能，比如把秒级的股票数据转换为 5 分钟周期数据等。
+
+** data_range
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  rng = pd.date_range('20160301', periods=600, freq='s')
+  log("rng", rng)
+  ts = pd.Series(np.random.randint(0, 500, len(rng)), index=rng)
+  log("ts", ts)
+#+END_SRC
+
+** 重采样
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result_sum = ts.resample('2Min', how='sum')
+  log("result_sum", result_sum)
+  result_mean = ts.resample('2Min', how='mean')
+  log("result_mean", result_mean)
+#+END_SRC
+
+** period_range
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  rng = pd.period_range('2000Q1', '2016Q1', freq='Q')
+  log("rng", rng)
+  log("rng.to_timestamp()", rng.to_timestamp())
+#+END_SRC
+
+** 时间计算
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("pd.Timestamp('20160301') - pd.Timestamp('20160201')", pd.Timestamp('20160301') - pd.Timestamp('20160201'))
+  log("pd.Timestamp('20160301') + pd.Timedelta(days=5)", pd.Timestamp('20160301') + pd.Timedelta(days=5))
+
+#+END_SRC
+
+
+* 可视化
+
+** Series
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428HE0.png"
+  ts = pd.Series(np.random.randn(1000), index=pd.date_range('20000101', periods=1000))
+  ts = ts.cumsum()
+  show_fig(ts)
+#+END_SRC
+
+[[file:img/fig75428HE0.png]]
+
+
+* 导入导出
+
+** 导出 csv
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df = pd.DataFrame(np.random.randn(100, 4), columns=list('ABCD'))
+  df.to_csv("/tmp/df.csv")
+#+END_SRC
+
+** 导入 csv
+
+#+BEGIN_SRC ipython :session :exports both :results output
+pd.read_csv('/tmp/df.csv', index_col=0)
+#+END_SRC
+
+
+* 示例工程
+
+** 电影数据分析
+
+*** 数据读取
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  user_names = ['user_id', 'gender', 'age', 'occupation', 'zip']
+  users = pd.read_table('data/ml-1m/users.dat', sep='::', header=None, names=user_names, engine='python')
+
+  rating_names = ['user_id', 'movie_id', 'rating', 'timestamp']
+  ratings = pd.read_table('data/ml-1m/ratings.dat', sep='::', header=None, names=rating_names, engine='python')
+
+  movie_names = ['movie_id', 'title', 'genres']
+  movies = pd.read_table('data/ml-1m/movies.dat', sep='::', header=None, names=movie_names, engine='python')
+
+  log("users.head()", users.head())
+  log("ratings.head()", ratings.head())
+  log("movies.head()", movies.head())
+#+END_SRC
+
+*** 数据合并 (merge)
+
+在 pandas 中，数据只有合并后才能进行分析
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428GYJ.png"
+  data = pd.merge(pd.merge(users, ratings), movies)
+  show_dataframe(data.head())
+#+END_SRC
+
+[[file:img/fig75428GYJ.png]]
+
+*** 按性别查看各个电影的平均评分 (pivot_table)
+
+*关心的值* 是 rating ，以 title 作为 *行索引* ，gender 作为 *列索引*
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  mean_ratings_gender = data.pivot_table(values='rating', index='title', columns='gender', aggfunc='mean')
+  log("mean_ratings_gender.head()", mean_ratings_gender.head())
+
+#+END_SRC
+
+*** 男女意见想差最大的电影 (sort_values)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  mean_ratings_gender['diff'] = mean_ratings_gender.F - mean_ratings_gender.M
+  result = mean_ratings_gender.sort_values(by='diff', ascending=True)
+  log("result.head()", result.head())
+#+END_SRC
+
+*** 参与评分人数最多 (group_by)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+
+  ratings_by_movie_title = data.groupby('title').size()
+  top_ratings = ratings_by_movie_title[ratings_by_movie_title > 1000]
+  top_10_ratings = top_ratings.sort_values(ascending=False).head()
+  log("top_10_ratings", top_10_ratings)
+#+END_SRC
+
+
+*** 活跃度超过 1000 的高分电影
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  mean_ratings = data.pivot_table(values='rating', index='title', aggfunc='mean')
+  top_10_movies = mean_ratings.loc[top_ratings.index].sort_values(by='rating', ascending=False).head(10)
+  # 把平均评分和热度综合起来
+  df_top_10_movies = pd.DataFrame(top_10_movies)
+  df_top_10_movies['hot'] = top_ratings.loc[top_10_movies.index]
+  log("df_top_10_movies", df_top_10_movies)
+
 #+END_SRC
