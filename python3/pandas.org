@@ -913,9 +913,10 @@ Panel 由三个标签组成：
 [[file:img/fig75428UjW.png]]
 
 
-***** 还原
 
-对由列转换成的多级索引 DataFrame 进行还原
+***** 索引转换为列
+
+将所有索引转换为列
 
 #+BEGIN_SRC ipython :session :var path="img/fig75428u3i.png"
   show_dataframe(df2.reset_index().sort_index('columns'))
@@ -1110,9 +1111,173 @@ Panel 由三个标签组成：
 
 [[file:img/fig37020FNM.png]]
 
-** 聚合
+** 数据聚合
+
+
+
+
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020fhY.png"
+  df = pd.DataFrame({'key1': ['a', 'a', 'b', 'b', 'a'],
+                     'key2': ['one', 'two', 'one', 'two', 'one'],
+                     'data1': np.random.randint(1, 10, 5),
+                     'data2': np.random.randint(1, 10, 5),
+                     'data3': np.random.randint(1, 10, 5)})
+  show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig37020fhY.png
+#+CAPTION: 示例数据
+[[file:img/fig37020fhY.png]]
 
 *** 内置聚合函数
+
+**** sum
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020TKx.png"
+  show_dataframe(df.groupby('key1').sum())
+#+END_SRC
+
+#+NAME: img/fig37020TKx.png
+#+CAPTION: sum
+[[file:img/fig37020TKx.png]]
+
+**** mean
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020SeG.png"
+  show_dataframe(df.groupby('key1').mean())
+#+END_SRC
+
+#+NAME: img/fig37020SeG.png
+#+CAPTION: mean
+[[file:img/fig37020SeG.png]]
+
+**** size
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.groupby('key1').size()", df.groupby('key1').size())
+#+END_SRC
+
+**** count
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020GHf.png"
+  show_dataframe(df.groupby('key1').count())
+#+END_SRC
+
+#+NAME: img/fig37020GHf.png
+#+CAPTION: count
+[[file:img/fig37020GHf.png]]
+
+**** min/max
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020gbr.png"
+  show_dataframe(df.groupby('key1').min())
+#+END_SRC
+
+#+NAME: img/fig37020gbr.png
+#+CAPTION: min
+[[file:img/fig37020gbr.png]]
+
+**** describe
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020fvA.png"
+  show_dataframe(df.groupby('key1').describe())
+#+END_SRC
+
+#+NAME: img/fig37020fvA.png
+#+CAPTION: describe
+[[file:img/fig37020fvA.png]]
+
+*** 自定义聚合函数
+
+自定义聚合函数时，需使用 =agg()= 或 =aggregate()= 函数。
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  def peak_range(s):
+      print(s)
+      print(type(s))
+      print('=====')
+      return s.max() - s.min()
+
+  grouped = df.groupby('key1')
+  result = grouped.agg(peak_range)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :var path="img/fig3702051k.png"
+  show_dataframe(result)
+#+END_SRC
+
+[[file:img/fig3702051k.png]]
+
+*** 应用多个聚合函数
+
+#+BEGIN_SRC ipython :session :var path="img/fig370205DN.png"
+  show_dataframe(grouped.agg(['std', 'mean', peak_range]))
+#+END_SRC
+
+#+NAME: img/fig370205DN.png
+#+CAPTION: 多个聚合函数
+[[file:img/fig370205DN.png]]
+
+
+*** 给聚合后的列起别名
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020TYZ.png"
+  show_dataframe(grouped.agg(['std', 'mean', ('high-low', peak_range)]))
+#+END_SRC
+
+#+NAME: img/fig37020TYZ.png
+#+CAPTION: 别名
+[[file:img/fig37020TYZ.png]]
+
+
+*** 自定义需要显示的列
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020tsl.png"
+  show_dataframe(grouped.sum())
+#+END_SRC
+
+#+NAME: img/fig37020tsl.png
+#+CAPTION: 所有列
+[[file:img/fig37020tsl.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020HBy.png"
+  show_dataframe(grouped['data1', 'data3'].sum())
+#+END_SRC
+
+#+NAME: img/fig37020HBy.png
+#+CAPTION: 自定义后的列
+[[file:img/fig37020HBy.png]]
+
+
+
+*** 给不同的列应用不同的聚合函数
+
+使用 dict 作为参数来实现，此方法也能实现自定义需要显示的列。
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020GVH.png"
+  d = {'data1': ['mean', peak_range, 'max', 'min'],
+       'data2': 'sum'}
+  show_dataframe(grouped.agg(d))
+#+END_SRC
+
+#+NAME: img/fig37020GVH.png
+#+CAPTION: 不同的聚合函数
+[[file:img/fig37020GVH.png]]
+
+
+*** 索引重置
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020gpT.png"
+  # 等效于 df.groupby('key1', as_index=False).agg(d)
+  show_dataframe(grouped.agg(d).reset_index())
+#+END_SRC
+
+#+NAME: img/fig37020gpT.png
+#+CAPTION: reset_index 效果
+[[file:img/fig37020gpT.png]]
 
 
 * 处理丢失数据
@@ -1299,16 +1464,6 @@ log("stacked.unstack()", stacked.unstack())
 
 
 * 信息统计
-
-** describe
-
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  dates = pd.date_range('20160301', periods=6)
-  df = pd.DataFrame(np.random.randn(6,4), index=dates, columns=list('ABCD'))
-  log("df", df)
-  log("df.describe()", df.describe())
-#+END_SRC
 
 
 ** mode
