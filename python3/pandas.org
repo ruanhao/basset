@@ -52,13 +52,135 @@
       print("{}\n{}".format(title1.center(80, '='), value))
 #+END_SRC
 
+* 核心数据结构
+
+** Series
+
+Series 是一维带标签的数组，数组里可以放任意的数据（整数，浮点数，字符串，Python Object）。
+
+其基本的创建函数是： =pd.Series(data, index=index)=
+
+其中 index 是一个列表，用来作为数据的标签。data 可以是不同的数据类型：
+
+- Python 字典
+- ndarray 对象
+- 一个标量值，如 5
+
+*** 创建
+
+**** 从 ndarray 创建
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series(np.random.randn(5), index=['a', 'b', 'c', 'd', 'e'])
+  log("s", s)
+  log("s.index", s.index)
+  s2 = pd.Series(np.random.randn(5))
+  log("s2", s2)
+  log("s2.index", s2.index)
+#+END_SRC
+
+**** 从字典创建
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  d = {'a' : 0., 'b' : 1., 'd' : 3}
+  s = pd.Series(d, index=list('abcd'))
+  log("s", s)
+#+END_SRC
+
+**** 从标量创建
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series(3, index=list('abcde'))
+  log("s", s)
+#+END_SRC
 
 
-* 创建
+*** 特性
 
-** 使用字典创建
+**** 类 ndarray 对象
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series(np.random.randn(5))
+
+  log("s[0]", s[0])
+  log("s[:3]", s[:3])
+  log("s[[1, 3, 4]]", s[[1, 3, 4]])
+  log("np.exp(s)", np.exp(s))
+  log("np.sin(s)", np.sin(s))
+#+END_SRC
+
+
+**** 类字典对象
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series(np.random.randn(5), index=['a', 'b', 'c', 'd', 'e'])
+  s['e'] = 5
+  log("s", s)
+  log("'e' in s", 'e' in s)
+  log("s.get('f', np.nan)", s.get('f', np.nan))
+#+END_SRC
+
+
+**** 标签对齐
+
+相同索引值才进行操作
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s1 = pd.Series(np.random.randn(3), index=['a', 'c', 'e'])
+  s2 = pd.Series(np.random.randn(3), index=['a', 'd', 'e'])
+
+  log("s1", s1)
+  log("s2", s2)
+
+
+  log("s1 + s2", s1 + s2)
+#+END_SRC
+
+
+** DataFrame
+
+DataFrame 是 *二维带行标签和列标签的数组* 。
+
+可以把 DataFrame 想象成一个 Excel 表格或一个 SQL 数据库的表格，还可以想象成是一个 Series 对象字典。
+
+它是 Pandas 里最常用的数据结构。
+
+创建 DataFrame 的基本格式是：
+
+#+BEGIN_SRC ipython
+  pd.DataFrame(data, index=index, columns=columns)
+#+END_SRC
+
+其中 index 是行标签，columns 是列标签，data 可以是下面的数据：
+
+- 由一维 numpy 数组，list，Series 构成的字典
+- 二维 numpy 数组
+- 一个 Series
+- 另外的 DataFrame 对象
+
+*** 创建
+
+**** 从字典创建
 
 key 为 DataFrame 的列；value 为对应列下的值
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  d = {'one' : pd.Series([1, 2, 3], index=['a', 'b', 'c']),
+       'two' : pd.Series([1, 2, 3, 4], index=['a', 'b', 'c', 'd'])}
+
+  log("pd.DataFrame(d)", pd.DataFrame(d))
+  log("pd.DataFrame(d, index=['d', 'b', 'a'])", pd.DataFrame(d, index=['d', 'b', 'a']))
+  log("pd.DataFrame(d, index=['d', 'b', 'a'], columns=['two', 'three'])", pd.DataFrame(d, index=['d', 'b', 'a'], columns=['two', 'three']))
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  d = {'one' : [1, 2, 3, 4],
+       'two' : [21, 22, 23, 24]}
+
+  log("pd.DataFrame(d)", pd.DataFrame(d))
+  log("pd.DataFrame(d, index=['a', 'b', 'c', 'd'])", pd.DataFrame(d, index=['a', 'b', 'c', 'd']))
+#+END_SRC
+
 
 #+BEGIN_SRC ipython :session :exports both :results output
   df = pd.DataFrame({
@@ -72,7 +194,61 @@ key 为 DataFrame 的列；value 为对应列下的值
 #+END_SRC
 
 
-** 指定行列索引创建
+**** 从结构化数据列表创建
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  data = [(1, 2.2, 'Hello'), (2, 3., "World")]
+
+  log("pd.DataFrame(data)", pd.DataFrame(data))
+  log("pd.DataFrame(data, index=['first', 'second'], columns=['A', 'B', 'C'])",
+      pd.DataFrame(data, index=['first', 'second'], columns=['A', 'B', 'C']))
+#+END_SRC
+
+
+**** 从字典列表创建
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  data = [{'a': 1, 'b': 2}, {'a': 5, 'b': 10, 'c': 20}]
+
+  log("pd.DataFrame(data)", pd.DataFrame(data))
+  log("pd.DataFrame(data, index=['first', 'second'])",
+      pd.DataFrame(data, index=['first', 'second']))
+  log("pd.DataFrame(data, columns=['a', 'b'])",
+      pd.DataFrame(data, columns=['a', 'b']))
+
+#+END_SRC
+
+
+**** 从元组字典创建
+
+实际应用中，会通过数据清洗的方式，把数据整理成方便 Pandas 导入且可读性好的格式。
+然后再通过 *reindex/groupby* 等方式转换成复杂数据结构。
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  d = {('a', 'b'): {('A', 'B'): 1, ('A', 'C'): 2},
+       ('a', 'a'): {('A', 'C'): 3, ('A', 'B'): 4},
+       ('a', 'c'): {('A', 'B'): 5, ('A', 'C'): 6},
+       ('b', 'a'): {('A', 'C'): 7, ('A', 'B'): 8},
+       ('b', 'b'): {('A', 'D'): 9, ('A', 'B'): 10}}
+
+  # 多级标签
+  log("pd.DataFrame(d)", pd.DataFrame(d))
+#+END_SRC
+
+
+**** 从 Series 创建
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series(np.random.randn(5), index=['a', 'b', 'c', 'd', 'e'])
+  log("pd.DataFrame(s)", pd.DataFrame(s))
+  log("pd.DataFrame(s, index=['a', 'c', 'd'])",
+      pd.DataFrame(s, index=['a', 'c', 'd']))
+  log("pd.DataFrame(s, index=['a', 'c', 'd'], columns=['A'])",
+      pd.DataFrame(s, index=['a', 'c', 'd'], columns=['A']))
+#+END_SRC
+
+
+**** 指定行列索引创建
 
 #+BEGIN_SRC ipython :session :results output :exports both
   dates = pd.date_range('20160301', periods=6)
@@ -80,135 +256,366 @@ key 为 DataFrame 的列；value 为对应列下的值
 
   df = pd.DataFrame(np.random.randn(6,4), index=dates, columns=list('ABCD'))
   log("df", df)
-
 #+END_SRC
 
 
-* 查看信息
-
-** 维度
-
-#+BEGIN_SRC ipython :session :results output :exports both
-  log("df.shape", df.shape)
-#+END_SRC
-
-DataFrame 对象可以理解为二维数组
-
-
-** 行索引信息
-
-#+BEGIN_SRC ipython :session :results output :exports both
-  log("df.index", df.index)
-#+END_SRC
-
-
-** 列索引信息
-
-#+BEGIN_SRC ipython :session :results output :exports both
-  log("df.columns", df.columns)
-#+END_SRC
-
-
-** 底层数据
-
-#+BEGIN_SRC ipython :session :results output :exports both
-  log("df.values", df.values)
-  log("type(df.values)", type(df.values))
-#+END_SRC
-
-*本质上 DataFrame 是对 Numpy array 的封装*
-
-
-** 列类型
-
-#+BEGIN_SRC ipython :session :results output :exports both
-log("df.dtypes", df.dtypes)
-#+END_SRC
-
-
-
-
-
-* 排序
-
-** 按列索引排序
+*** 数据操作
 
 #+BEGIN_SRC ipython :session :exports both :results output
-  log("df.sort_index(axis=1, ascending=False)", df.sort_index(axis=1, ascending=False))
+  df = pd.DataFrame(np.random.randn(6, 4),
+                    index=list('ABCDEF'),
+                    columns=['one', 'two', 'three', 'four'])
+  log("df", df)
 #+END_SRC
 
-
-** 按列数据排序
+**** 列选择(Series)
 
 #+BEGIN_SRC ipython :session :exports both :results output
-  log("df.sort_values(by='C')", df.sort_values(by='C'))
+  log("df['one']", df['one'])
+  log("df.one", df.one)
 #+END_SRC
 
 
-* 数据选择
+**** 列选择(DataFrame)
 
-使用基于标签的 =loc= 函数选择数据效率较高。
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.loc[:, ['one', 'two']]", df.loc[:, ['one', 'two']])
+  log("df.iloc[:, 0:1]", df.iloc[:, 0:1])
+#+END_SRC
 
-*DataFrame 中每一行 / 列是由一个 Series 对象组成的* 。
 
-** 列数据（Series 类型对象）
+**** 列赋值
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df['three'] = df['one'] + df['two']
+  log("df", df)
+#+END_SRC
+
+
+**** 列删除
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  del df['three']
+  log("df", df)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = df.pop('four')
+  log("s", s)
+  log("df", df)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result = df.drop(['one', 'two'], axis=1)  # df 不变
+  log("result", result)
+#+END_SRC
+
+
+**** 增加列
+
+***** 添加到最后
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df['flag'] = df['one'] > 0
+  df['five'] = 5
+  df['one_trunc'] = df['one'][:2]
+  log("df", df)
+#+END_SRC
+
+***** 指定位置添加
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df.insert(1, 'bar', df.one + df.two)
+  log("df", df)
+#+END_SRC
+
+
+***** assign()
+
+assign 方法并不会 inplace 地改变原来的 dataframe ，
+该方法的 *优势* 在于可以对 dataframe 对象使用链式操作。
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df1 = df.assign(Ratio=df.one/df.two)
+  log("df1", df1)
+  log("df", df)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.assign(Ratio=lambda x: x.one - x.two)",
+      df.assign(Ratio=lambda x: x.one - x.two))
+
+  log("df.assign(ABRatio=df.one/df.two).assign(BarValue=lambda x: x.ABRatio*x.bar)",
+      df.assign(ABRatio=df.one/df.two).assign(BarValue=lambda x: x.ABRatio*x.bar))
+
+#+END_SRC
+
+
+**** 行选择(Series)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.loc['A']", df.loc['A'])  # 行标签方式
+  log("df.iloc[0]", df.iloc[0])    # 行位置方式
+#+END_SRC
+
+
+**** 行选择(DataFrame)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+   log("df[2:4]", df[2:4])
+   log("df['A':'C']", df['A':'C'])
+   log("df.iloc[2:4]", df.iloc[2:4])         # 效率高
+   log("df[df.one > 0.5]", df[df.one > 0.5])  # 布尔方式
+   log("df[df > 0]", df[df > 0])             # 布尔方式
+   log("df[[False, True, True, False, True, False]]",
+       df[[False, True, True, False, True, False]])  # 布尔方式
+
+#+END_SRC
+
+
+**** 行删除
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result = df.drop('A')           # result 是一份新的数据拷贝
+  log("result", result)
+#+END_SRC
+
+**** 行与列选择
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.loc['A':'B', ['one', 'two']]", df.loc['A':'B', ['one', 'two']])
+  log("df.iloc[0:2, 0:3]", df.iloc[0:2, 0:3])
+#+END_SRC
+
+
+**** 选择指定坐标
 
 #+BEGIN_SRC ipython :session :results output :exports both
-  log("df['A']", df['A'])         # 等效于 df.A
-  log("df.iloc[0]", df.iloc[0])
-
-#+END_SRC
-
-** 列数据（DataFrame 类型对象）
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  log("df.loc[:, ['A', 'B']]", df.loc[:, ['A', 'B']])
-  log("df.iloc[:, 1:2]", df.iloc[:, 1:2])
-#+END_SRC
-
-
-** 行数据（Series 类型对象）
-
-#+BEGIN_SRC ipython :session :results output :exports both
-  log("df.loc['20160301']", df.loc['20160301'])
-  log("df.iloc[0]", df.iloc[0])
-
-#+END_SRC
-
-** 行数据（DataFrame 类型对象）
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  log("df[2:4]", df[2:4])
-  log("df['20160302':'20160305']", df['20160302':'20160305'])
-  log("df.iloc[1:3]", df.iloc[1:3])
-
-#+END_SRC
-
-
-** 选择行与列
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  log("df.loc['20160301':'20160305', ['A', 'B']]", df.loc['20160301':'20160305', ['A', 'B']])
-  log("df.iloc[1:3, 2:4]", df.iloc[1:3, 2:4])
-#+END_SRC
-
-
-** 选择指定坐标
-
-#+BEGIN_SRC ipython :session :results output :exports both
-  log("df.loc['2016-03-01', 'A']", df.loc['2016-03-01', 'A'])
-  log("df.at[pd.Timestamp('2016-03-01'), 'A']", df.at[pd.Timestamp('2016-03-01'), 'A'])
-  # df.at['2016-03-01', 'A'] will raise error
+  log("df.loc['A', 'one']", df.loc['A', 'one'])
+  log("df.at['A', 'one']", df.at['A', 'one'])
   log("df.iloc[1, 1]", df.iloc[1, 1])
   log("df.iat[1, 1]", df.iat[1, 1])
 #+END_SRC
 
-** 布尔选择
+
+**** 数据对齐
+
+DataFrame 在进行数据计算时， *会自动按行和列进行数据对齐* 。
+最终的计算结果会合并两个 DataFrame 。
 
 #+BEGIN_SRC ipython :session :exports both :results output
-  log("df[df.A < 0]", df[df.A < 0])
-  log("df[df > 0]", df[df > 0])
+  df1 = pd.DataFrame(np.random.randn(10, 4),
+                     index=list('abcdefghij'),
+                     columns=['A', 'B', 'C', 'D'])
+
+  df2 = pd.DataFrame(np.random.randn(7, 3),
+                     index=list('cdefghi'),
+                     columns=['A', 'B', 'C'])
+
+  log("df1", df1)
+  log("df2", df2)
+
+  log("df1 + df2", df1 + df2)
+  log("df1 - df1.iloc[0]", df1 - df1.iloc[0])
 #+END_SRC
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df3 = df2.loc[:, ['B', 'C']].copy()
+  log("df3 (before)", df3)
+  df3[df3 > 0] = -df3
+  log("df3 (after)", df3)
+#+END_SRC
+
+**** 使用 numpy 函数
+
+因为从本质上讲，DataFrame 内部用的数据结构就是 numpy 的 ndarray 。
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df = pd.DataFrame(np.random.randn(10, 4), columns=['one', 'two', 'three', 'four'])
+  log("np.exp(df)", np.exp(df))
+  log("np.sin(df)", np.sin(df))
+#+END_SRC
+
+***** DataFrame 转换为 ndarray 对象
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  ary = np.asarray(df)
+  log("ary", ary)
+  log("ary == df.values", ary == df.values)
+  log("ary == df", ary == df)
+#+END_SRC
+
+
+** Panel
+
+Panel 是三维带标签的数组。
+
+Panel 由三个标签组成：
+
+- items :: 坐标轴 0 ，索引对应的元素是一个 DataFrame
+- major_axis :: 坐标轴 1 , DataFrame 里的行标签
+- minor_axis :: 坐标轴 2 , DataFrame 里的列标签
+
+
+
+* 函数应用
+
+** 将数据按行或列进行计算(apply)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df = pd.DataFrame(np.arange(12).reshape(4, 3),
+                    index=['one', 'two', 'three', 'four'],
+                    columns=list('ABC'))
+
+  log("df", df)
+#+END_SRC
+
+**** 按列进行运算
+
+每一列作为一个 Series 作为参数传递给 lambda 函数
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result = df.apply(lambda x: x.max() - x.min())
+  log("result", result)
+#+END_SRC
+
+**** 按行进行运算
+
+每一行作为一个 Series 作为参数传递给 lambda 函数
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result = df.apply(lambda x: x.max() - x.min(), axis=1)
+  log("result", result)
+#+END_SRC
+
+**** 返回多个值组成的 Series
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  def min_max(x):
+      return pd.Series([x.min(), x.max()], index=['min', 'max'])
+  result = df.apply(min_max, axis=1)
+  log("result", result)
+#+END_SRC
+
+
+** 逐元素运算(applymap)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df = pd.DataFrame(np.random.randn(4, 3),
+                    index=['one', 'two', 'three', 'four'],
+                    columns=list('ABC'))
+
+  log("df", df)
+#+END_SRC
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  # x 表示 dataframe 中的每个元素
+  result = df.applymap(lambda x: '{0:.03f}'.format(x))
+  log("result", result)
+#+END_SRC
+
+
+** 排序(sort_values)
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df = pd.DataFrame(np.random.randint(1, 10, (4, 3)),
+                    index=list('ABCD'),
+                    columns=['one', 'two', 'three'])
+
+  log("df", df)
+#+END_SRC
+
+
+*** 按列排序
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result = df.sort_values(by='two', ascending=False)
+  log("result", result)
+#+END_SRC
+
+*** 按行排序
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result = df.sort_values(by='C', axis=1, ascending=False)
+  log("result", result)
+#+END_SRC
+
+
+** 索引排序(sort_index)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df = pd.DataFrame(np.random.randint(1, 10, (4, 3)),
+                    index=list('ABCD'),
+                    columns=['one', 'two', 'three'])
+
+  log("df", df)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  col_sort = df.sort_index(axis=1, ascending=False)
+  row_sort = df.sort_index(ascending=False)
+
+  log("col_sort", col_sort)
+  log("row_sort", row_sort)
+
+#+END_SRC
+
+
+** 排名(rank)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series([3, 6, 2, 6, 4])
+  df = pd.DataFrame(np.random.randint(1, 10, (4, 3)),
+                    index=list('ABCD'),
+                    columns=['one', 'two', 'three'])
+
+  log("s", s)
+  log("df", df)
+#+END_SRC
+
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s_result = s.rank(method='first', ascending=False)
+  log("s_result", s_result)
+#+END_SRC
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df_result = df.rank(method='first')
+  log("df_result", df_result)
+#+END_SRC
+
+
+** Series 元素统计
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series(list('abbcdabacad'))
+  log("s", s)
+#+END_SRC
+
+*** 个数统计(value_counts)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s.value_counts()", s.value_counts())
+#+END_SRC
+
+*** 唯一性统计(uniq)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s.unique()", s.unique())
+#+END_SRC
+
+
+*** 成员资格统计(isin)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s.isin(['a', 'b', 'c'])", s.isin(['a', 'b', 'c']))
+#+END_SRC
+
 
 
 
@@ -271,53 +678,6 @@ log("df.dtypes", df.dtypes)
   log("df", df)
 #+END_SRC
 
-
-** 增加列
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  s = pd.Series(np.arange(6), index=pd.date_range('20160301', periods=6))
-  df['E'] = s
-  log("df", df)
-#+END_SRC
-
-
-** 修改列
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  df.loc[:, 'A'] = np.arange(10, 16)
-  log("df", df)
-#+END_SRC
-
-
-** 修改指定坐标
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  df.loc['20160301', 'A'] = 0.2
-  df.at[pd.Timestamp('20160301'), 'A'] = 0.4
-  df.iat[0, 0] = 0.6
-  log("df", df)
-#+END_SRC
-
-
-** 整体赋值
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  df2 = df.loc[:, ['B', 'C']].copy()
-  df2[df2 > 0] = -df2
-  log("df2", df2)
-#+END_SRC
-
-
-
-** apply
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  log("df.apply(np.cumsum)", df.apply(np.cumsum))
-#+END_SRC
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  log("df.apply(lambda x: x.max() - x.min())", df.apply(lambda x: x.max() - x.min()))
-#+END_SRC
 
 
 ** concat
@@ -454,13 +814,6 @@ log("stacked.unstack()", stacked.unstack())
   log("df.describe()", df.describe())
 #+END_SRC
 
-** value_counts
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  s = pd.Series(np.random.randint(10, 20, size=10))
-  log("s", s)
-  log("s.value_counts()", s.value_counts())
-#+END_SRC
 
 ** mode
 
@@ -649,3 +1002,298 @@ pd.read_csv('/tmp/df.csv', index_col=0)
   log("df_top_10_movies", df_top_10_movies)
 
 #+END_SRC
+
+
+
+
+
+
+
+* 重新索引
+
+即把索引值进行重新赋值， *以增加一些行的数据* 。
+
+** Series
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series([1, 3, 5, 6, 8], index=list('acefh'))
+  log("s", s)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s.reindex(list('abcdefgh'))",
+      s.reindex(list('abcdefgh')))
+#+END_SRC
+
+
+**** 填充默认值
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s.reindex(list('abcdefgh'), fill_value=0)",
+      s.reindex(list('abcdefgh'), fill_value=0))
+#+END_SRC
+
+**** 往前填充
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s.reindex(list('abcdefgh'), method='ffill')",
+      s.reindex(list('abcdefgh'), method='ffill'))
+#+END_SRC
+
+
+**** 往后填充
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s.reindex(list('abcdefgh'), method='bfill')",
+      s.reindex(list('abcdefgh'), method='bfill'))
+#+END_SRC
+
+
+** DataFrame
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df = pd.DataFrame(np.random.randn(4, 6),
+                    index=list('ADFH'),
+                    columns=['one', 'two', 'three', 'four', 'five', 'six'])
+  log("df", df)
+#+END_SRC
+
+**** 对行重新索引
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.reindex(index=list('ABCDEFGH'))",
+      df.reindex(index=list('ABCDEFGH')))
+#+END_SRC
+
+***** 向前填充
+
+*fill method 只对行重新索引有效，不适用列*
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.reindex(index=list('ABCDEFGH'), method='ffill')",
+      df.reindex(index=list('ABCDEFGH'), method='ffill'))
+#+END_SRC
+
+**** 对列重新索引
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.reindex(columns=['one', 'three', 'five', 'seven'], fill_value=0)",
+      df.reindex(columns=['one', 'three', 'five', 'seven'], fill_value=0))
+#+END_SRC
+
+
+
+
+
+* 索引
+
+** 索引命名
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series(np.random.rand(5), index=list('abcde'))
+  df = pd.DataFrame(np.random.randn(4, 3), columns=['one', 'two', 'three'])
+
+  log("s", s)
+  log("df", df)
+
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s.index", s.index)
+  s.index.name = 'alpha'
+  log("s", s)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.index", df.index)
+  log("df.columns", df.columns)
+
+  df.index.name = 'row'
+  df.columns.name = 'col'
+
+  log("df", df)
+#+END_SRC
+
+
+** 重复索引
+
+索引值有重复项的索引
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series(np.arange(6), index=list('abcbda'))
+  log("s", s)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s['a']", s['a'])
+  log("s.index.is_unique", s.index.is_unique)
+#+END_SRC
+
+
+*** 对重复索引的处理（清洗）
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  sum_result = s.groupby(s.index).sum()  # 对重复索引内容进行求和
+  log("sum_result", sum_result)
+
+  first_result = s.groupby(s.index).first()  # 对重复索引内容只取第一项
+  log("first_result", first_result)
+
+  avg_result = s.groupby(s.index).mean()  # 对重复索引内容取平均值
+  log("avg_result", avg_result)
+#+END_SRC
+
+
+** 多级索引
+
+*用二维的数据表达更高维度的数据* ，使数据组织方式更清晰，它使用 =pd.MultiIndex= 类来表示。
+
+*** 层次化索引的作用
+
+比如在分析股票数据：
+- 一级行索引可以是日期
+- 二级行索引可以是股票代码
+- 列索引可以是股票的交易量，开盘价，收盘价等等
+
+这样就可以把多个股票放在同一个时间维度下进行考察和分析。
+
+
+*** Series 多级索引
+
+
+**** 创建
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  a = [['a', 'a', 'a', 'b', 'b', 'c', 'c'], [1, 2, 3, 1, 2, 2, 3]]
+  tuples = list(zip(*a))
+  log("tuples", tuples)
+  index = pd.MultiIndex.from_tuples(tuples, names=['first', 'second'])
+  log("index", index)
+  s = pd.Series(np.random.randn(7), index=index)
+  log("s", s)
+  log("s.index", s.index)
+  log("s.index.levels[1]", s.index.levels[1])
+#+END_SRC
+
+**** 选取
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s['b']", s['b'])
+  log("s['b':'c']", s['b':'c'])
+  log("s[['b', 'a']]", s[['b', 'a']])
+  log("s['b', 1]", s['b', 1])
+  log("s[:, 2]", s[:, 2])
+#+END_SRC
+
+*** DataFrame 多级索引
+
+**** 创建
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428gsV.png"
+  df = pd.DataFrame(np.random.randint(1, 10, (4, 3)),  # 1-10 之间的随机数，4 行 3 列
+                    index=[['a', 'a', 'b', 'b'], [1, 2, 1, 2]],
+                    columns=[['one', 'one', 'two'], ['blue', 'red', 'blue']])
+  df.index.names = ['row-1', 'row-2']
+  df.columns.names = ['col-1', 'col-2']
+  show_dataframe(df)
+#+END_SRC
+
+[[file:img/fig75428gsV.png]]
+
+**** 选取
+
+#+BEGIN_SRC ipython :session :var path="img/fig754286Ai.png"
+  show_dataframe(df.loc['a'])
+#+END_SRC
+
+[[file:img/fig754286Ai.png]]
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.loc['a', 1]", df.loc['a', 1])
+#+END_SRC
+
+
+**** 多级索引交换
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428UVu.png"
+  df2 = df.swaplevel('row-1', 'row-2')
+  show_dataframe(df2)
+#+END_SRC
+
+[[file:img/fig75428UVu.png]]
+
+
+**** 多级索引排序
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428TpD.png"
+  show_dataframe(df2.sortlevel(0))  # 0 表示根据一级索引进行排序
+#+END_SRC
+
+[[file:img/fig75428TpD.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428t9P.png"
+  show_dataframe(df2.sortlevel(1))  # 根据二级索引进行排序
+#+END_SRC
+
+[[file:img/fig75428t9P.png]]
+
+
+**** 多级索引统计
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428HSc.png"
+  show_dataframe(df.sum(level=0))
+#+END_SRC
+
+[[file:img/fig75428HSc.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428hmo.png"
+  show_dataframe(df.sum(level=1))
+#+END_SRC
+
+[[file:img/fig75428hmo.png]]
+
+
+**** 列与索引的转换
+
+创建多级索引比较复杂，一般情况下会从文件中读取一个 DataFrame ，
+然后将其中某个列转换为多级索引，最终得到一个基于多级索引的 DataFrame 。
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428760.png"
+  df = pd.DataFrame({
+      'a': range(7),
+      'b': range(7, 0, -1),
+      'c': ['one', 'one', 'one', 'two', 'two', 'two', 'two'],
+      'd': [0, 1, 2, 0, 1, 2, 3]
+  })
+  show_dataframe(df)
+#+END_SRC
+
+[[file:img/fig75428760.png]]
+
+***** 列转换为索引
+
+#+BEGIN_SRC ipython :session :var path="img/fig754286OK.png"
+  show_dataframe(df.set_index('c'))
+#+END_SRC
+
+[[file:img/fig754286OK.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428UjW.png"
+  df2 = df.set_index(['c', 'd'])
+  show_dataframe(df2)
+#+END_SRC
+
+[[file:img/fig75428UjW.png]]
+
+
+***** 还原
+
+对由列转换成的多级索引 DataFrame 进行还原
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428u3i.png"
+  show_dataframe(df2.reset_index().sort_index('columns'))
+#+END_SRC
+
+[[file:img/fig75428u3i.png]]

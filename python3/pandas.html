@@ -2,7 +2,7 @@
 <html>
 <head>
 <title>Pandas</title>
-<!-- 2018-02-18 Sun 18:41 -->
+<!-- 2018-02-19 Mon 17:51 -->
 <meta  charset="utf-8">
 <meta  name="generator" content="Org-mode">
 <meta  name="author" content="Hao Ruan">
@@ -142,108 +142,229 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. 创建</a>
+<li><a href="#sec-1">1. 核心数据结构</a>
 <ul>
-<li><a href="#sec-1-1">1.1. 使用字典创建</a></li>
-<li><a href="#sec-1-2">1.2. 指定行列索引创建</a></li>
+<li><a href="#sec-1-1">1.1. Series</a>
+<ul>
+<li><a href="#sec-1-1-1">1.1.1. 创建</a>
+<ul>
+<li><a href="#sec-1-1-1-1">1.1.1.1. 从 ndarray 创建</a></li>
+<li><a href="#sec-1-1-1-2">1.1.1.2. 从字典创建</a></li>
+<li><a href="#sec-1-1-1-3">1.1.1.3. 从标量创建</a></li>
 </ul>
 </li>
-<li><a href="#sec-2">2. 查看信息</a>
+<li><a href="#sec-1-1-2">1.1.2. 特性</a>
 <ul>
-<li><a href="#sec-2-1">2.1. 维度</a></li>
-<li><a href="#sec-2-2">2.2. 行索引信息</a></li>
-<li><a href="#sec-2-3">2.3. 列索引信息</a></li>
-<li><a href="#sec-2-4">2.4. 底层数据</a></li>
-<li><a href="#sec-2-5">2.5. 列类型</a></li>
+<li><a href="#sec-1-1-2-1">1.1.2.1. 类 ndarray 对象</a></li>
+<li><a href="#sec-1-1-2-2">1.1.2.2. 类字典对象</a></li>
+<li><a href="#sec-1-1-2-3">1.1.2.3. 标签对齐</a></li>
 </ul>
 </li>
-<li><a href="#sec-3">3. 排序</a>
-<ul>
-<li><a href="#sec-3-1">3.1. 按列索引排序</a></li>
-<li><a href="#sec-3-2">3.2. 按列数据排序</a></li>
 </ul>
 </li>
-<li><a href="#sec-4">4. 数据选择</a>
+<li><a href="#sec-1-2">1.2. DataFrame</a>
 <ul>
-<li><a href="#sec-4-1">4.1. 列数据（Series 类型对象）</a></li>
-<li><a href="#sec-4-2">4.2. 列数据（DataFrame 类型对象）</a></li>
-<li><a href="#sec-4-3">4.3. 行数据（Series 类型对象）</a></li>
-<li><a href="#sec-4-4">4.4. 行数据（DataFrame 类型对象）</a></li>
-<li><a href="#sec-4-5">4.5. 选择行与列</a></li>
-<li><a href="#sec-4-6">4.6. 选择指定坐标</a></li>
-<li><a href="#sec-4-7">4.7. 布尔选择</a></li>
+<li><a href="#sec-1-2-1">1.2.1. 创建</a>
+<ul>
+<li><a href="#sec-1-2-1-1">1.2.1.1. 从字典创建</a></li>
+<li><a href="#sec-1-2-1-2">1.2.1.2. 从结构化数据列表创建</a></li>
+<li><a href="#sec-1-2-1-3">1.2.1.3. 从字典列表创建</a></li>
+<li><a href="#sec-1-2-1-4">1.2.1.4. 从元组字典创建</a></li>
+<li><a href="#sec-1-2-1-5">1.2.1.5. 从 Series 创建</a></li>
+<li><a href="#sec-1-2-1-6">1.2.1.6. 指定行列索引创建</a></li>
 </ul>
 </li>
-<li><a href="#sec-5">5. 处理丢失数据</a>
+<li><a href="#sec-1-2-2">1.2.2. 数据操作</a>
 <ul>
-<li><a href="#sec-5-1">5.1. 丢弃 NaN 行</a></li>
-<li><a href="#sec-5-2">5.2. 用默认值替换 NaN</a></li>
-<li><a href="#sec-5-3">5.3. 判断数据集是否包含 NaN</a></li>
-<li><a href="#sec-5-4">5.4. NaN 不参与运算</a></li>
+<li><a href="#sec-1-2-2-1">1.2.2.1. 列选择(Series)</a></li>
+<li><a href="#sec-1-2-2-2">1.2.2.2. 列选择(DataFrame)</a></li>
+<li><a href="#sec-1-2-2-3">1.2.2.3. 列赋值</a></li>
+<li><a href="#sec-1-2-2-4">1.2.2.4. 列删除</a></li>
+<li><a href="#sec-1-2-2-5">1.2.2.5. 增加列</a>
+<ul>
+<li><a href="#sec-1-2-2-5-1">1.2.2.5.1. 添加到最后</a></li>
+<li><a href="#sec-1-2-2-5-2">1.2.2.5.2. 指定位置添加</a></li>
+<li><a href="#sec-1-2-2-5-3">1.2.2.5.3. assign()</a></li>
 </ul>
 </li>
-<li><a href="#sec-6">6. 数据操作</a>
+<li><a href="#sec-1-2-2-6">1.2.2.6. 行选择(Series)</a></li>
+<li><a href="#sec-1-2-2-7">1.2.2.7. 行选择(DataFrame)</a></li>
+<li><a href="#sec-1-2-2-8">1.2.2.8. 行删除</a></li>
+<li><a href="#sec-1-2-2-9">1.2.2.9. 行与列选择</a></li>
+<li><a href="#sec-1-2-2-10">1.2.2.10. 选择指定坐标</a></li>
+<li><a href="#sec-1-2-2-11">1.2.2.11. 数据对齐</a></li>
+<li><a href="#sec-1-2-2-12">1.2.2.12. 使用 numpy 函数</a>
 <ul>
-<li><a href="#sec-6-1">6.1. 增加列</a></li>
-<li><a href="#sec-6-2">6.2. 修改列</a></li>
-<li><a href="#sec-6-3">6.3. 修改指定坐标</a></li>
-<li><a href="#sec-6-4">6.4. 整体赋值</a></li>
-<li><a href="#sec-6-5">6.5. apply</a></li>
-<li><a href="#sec-6-6">6.6. concat</a></li>
-<li><a href="#sec-6-7">6.7. merge</a></li>
-<li><a href="#sec-6-8">6.8. append</a></li>
-<li><a href="#sec-6-9">6.9. 数据整形</a>
-<ul>
-<li><a href="#sec-6-9-1">6.9.1. 将列索引变为行索引 (stack)</a></li>
-<li><a href="#sec-6-9-2">6.9.2. 将行索引变为列索引 (unstack)</a></li>
-<li><a href="#sec-6-9-3">6.9.3. 透视图（pivot_table）</a></li>
+<li><a href="#sec-1-2-2-12-1">1.2.2.12.1. DataFrame 转换为 ndarray 对象</a></li>
 </ul>
 </li>
-<li><a href="#sec-6-10">6.10. Category</a></li>
 </ul>
 </li>
-<li><a href="#sec-7">7. 信息统计</a>
-<ul>
-<li><a href="#sec-7-1">7.1. describe</a></li>
-<li><a href="#sec-7-2">7.2. value_counts</a></li>
-<li><a href="#sec-7-3">7.3. mode</a></li>
 </ul>
 </li>
-<li><a href="#sec-8">8. 分组统计</a>
-<ul>
-<li><a href="#sec-8-1">8.1. 对单列分组</a></li>
-<li><a href="#sec-8-2">8.2. 对多列分组</a></li>
+<li><a href="#sec-1-3">1.3. Panel</a></li>
 </ul>
 </li>
-<li><a href="#sec-9">9. 时间序列</a>
+<li><a href="#sec-2">2. 函数应用</a>
 <ul>
-<li><a href="#sec-9-1">9.1. data_range</a></li>
-<li><a href="#sec-9-2">9.2. 重采样</a></li>
-<li><a href="#sec-9-3">9.3. period_range</a></li>
-<li><a href="#sec-9-4">9.4. 时间计算</a></li>
+<li><a href="#sec-2-1">2.1. 将数据按行或列进行计算(apply)</a>
+<ul>
+<li>
+<ul>
+<li><a href="#sec-2-1-0-1">2.1.0.1. 按列进行运算</a></li>
+<li><a href="#sec-2-1-0-2">2.1.0.2. 按行进行运算</a></li>
+<li><a href="#sec-2-1-0-3">2.1.0.3. 返回多个值组成的 Series</a></li>
 </ul>
 </li>
-<li><a href="#sec-10">10. 可视化</a>
-<ul>
-<li><a href="#sec-10-1">10.1. Series</a></li>
 </ul>
 </li>
-<li><a href="#sec-11">11. 导入导出</a>
+<li><a href="#sec-2-2">2.2. 逐元素运算(applymap)</a></li>
+<li><a href="#sec-2-3">2.3. 排序(sort_values)</a>
 <ul>
-<li><a href="#sec-11-1">11.1. 导出 csv</a></li>
-<li><a href="#sec-11-2">11.2. 导入 csv</a></li>
+<li><a href="#sec-2-3-1">2.3.1. 按列排序</a></li>
+<li><a href="#sec-2-3-2">2.3.2. 按行排序</a></li>
 </ul>
 </li>
-<li><a href="#sec-12">12. 示例工程</a>
+<li><a href="#sec-2-4">2.4. 索引排序(sort_index)</a></li>
+<li><a href="#sec-2-5">2.5. 排名(rank)</a></li>
+<li><a href="#sec-2-6">2.6. Series 元素统计</a>
 <ul>
-<li><a href="#sec-12-1">12.1. 电影数据分析</a>
+<li><a href="#sec-2-6-1">2.6.1. 个数统计(value_counts)</a></li>
+<li><a href="#sec-2-6-2">2.6.2. 唯一性统计(uniq)</a></li>
+<li><a href="#sec-2-6-3">2.6.3. 成员资格统计(isin)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-3">3. 处理丢失数据</a>
 <ul>
-<li><a href="#sec-12-1-1">12.1.1. 数据读取</a></li>
-<li><a href="#sec-12-1-2">12.1.2. 数据合并 (merge)</a></li>
-<li><a href="#sec-12-1-3">12.1.3. 按性别查看各个电影的平均评分 (pivot_table)</a></li>
-<li><a href="#sec-12-1-4">12.1.4. 男女意见想差最大的电影 (sort_values)</a></li>
-<li><a href="#sec-12-1-5">12.1.5. 参与评分人数最多 (group_by)</a></li>
-<li><a href="#sec-12-1-6">12.1.6. 活跃度超过 1000 的高分电影</a></li>
+<li><a href="#sec-3-1">3.1. 丢弃 NaN 行</a></li>
+<li><a href="#sec-3-2">3.2. 用默认值替换 NaN</a></li>
+<li><a href="#sec-3-3">3.3. 判断数据集是否包含 NaN</a></li>
+<li><a href="#sec-3-4">3.4. NaN 不参与运算</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. 数据操作</a>
+<ul>
+<li><a href="#sec-4-1">4.1. concat</a></li>
+<li><a href="#sec-4-2">4.2. merge</a></li>
+<li><a href="#sec-4-3">4.3. append</a></li>
+<li><a href="#sec-4-4">4.4. 数据整形</a>
+<ul>
+<li><a href="#sec-4-4-1">4.4.1. 将列索引变为行索引 (stack)</a></li>
+<li><a href="#sec-4-4-2">4.4.2. 将行索引变为列索引 (unstack)</a></li>
+<li><a href="#sec-4-4-3">4.4.3. 透视图（pivot_table）</a></li>
+</ul>
+</li>
+<li><a href="#sec-4-5">4.5. Category</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. 信息统计</a>
+<ul>
+<li><a href="#sec-5-1">5.1. describe</a></li>
+<li><a href="#sec-5-2">5.2. mode</a></li>
+</ul>
+</li>
+<li><a href="#sec-6">6. 分组统计</a>
+<ul>
+<li><a href="#sec-6-1">6.1. 对单列分组</a></li>
+<li><a href="#sec-6-2">6.2. 对多列分组</a></li>
+</ul>
+</li>
+<li><a href="#sec-7">7. 时间序列</a>
+<ul>
+<li><a href="#sec-7-1">7.1. data_range</a></li>
+<li><a href="#sec-7-2">7.2. 重采样</a></li>
+<li><a href="#sec-7-3">7.3. period_range</a></li>
+<li><a href="#sec-7-4">7.4. 时间计算</a></li>
+</ul>
+</li>
+<li><a href="#sec-8">8. 可视化</a>
+<ul>
+<li><a href="#sec-8-1">8.1. Series</a></li>
+</ul>
+</li>
+<li><a href="#sec-9">9. 导入导出</a>
+<ul>
+<li><a href="#sec-9-1">9.1. 导出 csv</a></li>
+<li><a href="#sec-9-2">9.2. 导入 csv</a></li>
+</ul>
+</li>
+<li><a href="#sec-10">10. 示例工程</a>
+<ul>
+<li><a href="#sec-10-1">10.1. 电影数据分析</a>
+<ul>
+<li><a href="#sec-10-1-1">10.1.1. 数据读取</a></li>
+<li><a href="#sec-10-1-2">10.1.2. 数据合并 (merge)</a></li>
+<li><a href="#sec-10-1-3">10.1.3. 按性别查看各个电影的平均评分 (pivot_table)</a></li>
+<li><a href="#sec-10-1-4">10.1.4. 男女意见想差最大的电影 (sort_values)</a></li>
+<li><a href="#sec-10-1-5">10.1.5. 参与评分人数最多 (group_by)</a></li>
+<li><a href="#sec-10-1-6">10.1.6. 活跃度超过 1000 的高分电影</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-11">11. 重新索引</a>
+<ul>
+<li><a href="#sec-11-1">11.1. Series</a>
+<ul>
+<li>
+<ul>
+<li><a href="#sec-11-1-0-1">11.1.0.1. 填充默认值</a></li>
+<li><a href="#sec-11-1-0-2">11.1.0.2. 往前填充</a></li>
+<li><a href="#sec-11-1-0-3">11.1.0.3. 往后填充</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-11-2">11.2. DataFrame</a>
+<ul>
+<li>
+<ul>
+<li><a href="#sec-11-2-0-1">11.2.0.1. 对行重新索引</a>
+<ul>
+<li><a href="#sec-11-2-0-1-1">11.2.0.1.1. 向前填充</a></li>
+</ul>
+</li>
+<li><a href="#sec-11-2-0-2">11.2.0.2. 对列重新索引</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-12">12. 索引</a>
+<ul>
+<li><a href="#sec-12-1">12.1. 索引命名</a></li>
+<li><a href="#sec-12-2">12.2. 重复索引</a>
+<ul>
+<li><a href="#sec-12-2-1">12.2.1. 对重复索引的处理（清洗）</a></li>
+</ul>
+</li>
+<li><a href="#sec-12-3">12.3. 多级索引</a>
+<ul>
+<li><a href="#sec-12-3-1">12.3.1. 层次化索引的作用</a></li>
+<li><a href="#sec-12-3-2">12.3.2. Series 多级索引</a>
+<ul>
+<li><a href="#sec-12-3-2-1">12.3.2.1. 创建</a></li>
+<li><a href="#sec-12-3-2-2">12.3.2.2. 选取</a></li>
+</ul>
+</li>
+<li><a href="#sec-12-3-3">12.3.3. DataFrame 多级索引</a>
+<ul>
+<li><a href="#sec-12-3-3-1">12.3.3.1. 创建</a></li>
+<li><a href="#sec-12-3-3-2">12.3.3.2. 选取</a></li>
+<li><a href="#sec-12-3-3-3">12.3.3.3. 多级索引交换</a></li>
+<li><a href="#sec-12-3-3-4">12.3.3.4. 多级索引排序</a></li>
+<li><a href="#sec-12-3-3-5">12.3.3.5. 多级索引统计</a></li>
+<li><a href="#sec-12-3-3-6">12.3.3.6. 列与索引的转换</a>
+<ul>
+<li><a href="#sec-12-3-3-6-1">12.3.3.6.1. 列转换为索引</a></li>
+<li><a href="#sec-12-3-3-6-2">12.3.3.6.2. 还原</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -255,108 +376,210 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. 创建</a>
+<li><a href="#sec-1">1. 核心数据结构</a>
 <ul>
-<li><a href="#sec-1-1">1.1. 使用字典创建</a></li>
-<li><a href="#sec-1-2">1.2. 指定行列索引创建</a></li>
+<li><a href="#sec-1-1">1.1. Series</a>
+<ul>
+<li><a href="#sec-1-1-1">1.1.1. 创建</a>
+<ul>
+<li><a href="#sec-1-1-1-1">1.1.1.1. 从 ndarray 创建</a></li>
+<li><a href="#sec-1-1-1-2">1.1.1.2. 从字典创建</a></li>
+<li><a href="#sec-1-1-1-3">1.1.1.3. 从标量创建</a></li>
 </ul>
 </li>
-<li><a href="#sec-2">2. 查看信息</a>
+<li><a href="#sec-1-1-2">1.1.2. 特性</a>
 <ul>
-<li><a href="#sec-2-1">2.1. 维度</a></li>
-<li><a href="#sec-2-2">2.2. 行索引信息</a></li>
-<li><a href="#sec-2-3">2.3. 列索引信息</a></li>
-<li><a href="#sec-2-4">2.4. 底层数据</a></li>
-<li><a href="#sec-2-5">2.5. 列类型</a></li>
+<li><a href="#sec-1-1-2-1">1.1.2.1. 类 ndarray 对象</a></li>
+<li><a href="#sec-1-1-2-2">1.1.2.2. 类字典对象</a></li>
+<li><a href="#sec-1-1-2-3">1.1.2.3. 标签对齐</a></li>
 </ul>
 </li>
-<li><a href="#sec-3">3. 排序</a>
-<ul>
-<li><a href="#sec-3-1">3.1. 按列索引排序</a></li>
-<li><a href="#sec-3-2">3.2. 按列数据排序</a></li>
 </ul>
 </li>
-<li><a href="#sec-4">4. 数据选择</a>
+<li><a href="#sec-1-2">1.2. DataFrame</a>
 <ul>
-<li><a href="#sec-4-1">4.1. 列数据（Series 类型对象）</a></li>
-<li><a href="#sec-4-2">4.2. 列数据（DataFrame 类型对象）</a></li>
-<li><a href="#sec-4-3">4.3. 行数据（Series 类型对象）</a></li>
-<li><a href="#sec-4-4">4.4. 行数据（DataFrame 类型对象）</a></li>
-<li><a href="#sec-4-5">4.5. 选择行与列</a></li>
-<li><a href="#sec-4-6">4.6. 选择指定坐标</a></li>
-<li><a href="#sec-4-7">4.7. 布尔选择</a></li>
+<li><a href="#sec-1-2-1">1.2.1. 创建</a>
+<ul>
+<li><a href="#sec-1-2-1-1">1.2.1.1. 从字典创建</a></li>
+<li><a href="#sec-1-2-1-2">1.2.1.2. 从结构化数据列表创建</a></li>
+<li><a href="#sec-1-2-1-3">1.2.1.3. 从字典列表创建</a></li>
+<li><a href="#sec-1-2-1-4">1.2.1.4. 从元组字典创建</a></li>
+<li><a href="#sec-1-2-1-5">1.2.1.5. 从 Series 创建</a></li>
+<li><a href="#sec-1-2-1-6">1.2.1.6. 指定行列索引创建</a></li>
 </ul>
 </li>
-<li><a href="#sec-5">5. 处理丢失数据</a>
+<li><a href="#sec-1-2-2">1.2.2. 数据操作</a>
 <ul>
-<li><a href="#sec-5-1">5.1. 丢弃 NaN 行</a></li>
-<li><a href="#sec-5-2">5.2. 用默认值替换 NaN</a></li>
-<li><a href="#sec-5-3">5.3. 判断数据集是否包含 NaN</a></li>
-<li><a href="#sec-5-4">5.4. NaN 不参与运算</a></li>
+<li><a href="#sec-1-2-2-1">1.2.2.1. 列选择(Series)</a></li>
+<li><a href="#sec-1-2-2-2">1.2.2.2. 列选择(DataFrame)</a></li>
+<li><a href="#sec-1-2-2-3">1.2.2.3. 列赋值</a></li>
+<li><a href="#sec-1-2-2-4">1.2.2.4. 列删除</a></li>
+<li><a href="#sec-1-2-2-5">1.2.2.5. 增加列</a></li>
+<li><a href="#sec-1-2-2-6">1.2.2.6. 行选择(Series)</a></li>
+<li><a href="#sec-1-2-2-7">1.2.2.7. 行选择(DataFrame)</a></li>
+<li><a href="#sec-1-2-2-8">1.2.2.8. 行删除</a></li>
+<li><a href="#sec-1-2-2-9">1.2.2.9. 行与列选择</a></li>
+<li><a href="#sec-1-2-2-10">1.2.2.10. 选择指定坐标</a></li>
+<li><a href="#sec-1-2-2-11">1.2.2.11. 数据对齐</a></li>
+<li><a href="#sec-1-2-2-12">1.2.2.12. 使用 numpy 函数</a></li>
 </ul>
 </li>
-<li><a href="#sec-6">6. 数据操作</a>
-<ul>
-<li><a href="#sec-6-1">6.1. 增加列</a></li>
-<li><a href="#sec-6-2">6.2. 修改列</a></li>
-<li><a href="#sec-6-3">6.3. 修改指定坐标</a></li>
-<li><a href="#sec-6-4">6.4. 整体赋值</a></li>
-<li><a href="#sec-6-5">6.5. apply</a></li>
-<li><a href="#sec-6-6">6.6. concat</a></li>
-<li><a href="#sec-6-7">6.7. merge</a></li>
-<li><a href="#sec-6-8">6.8. append</a></li>
-<li><a href="#sec-6-9">6.9. 数据整形</a>
-<ul>
-<li><a href="#sec-6-9-1">6.9.1. 将列索引变为行索引 (stack)</a></li>
-<li><a href="#sec-6-9-2">6.9.2. 将行索引变为列索引 (unstack)</a></li>
-<li><a href="#sec-6-9-3">6.9.3. 透视图（pivot_table）</a></li>
 </ul>
 </li>
-<li><a href="#sec-6-10">6.10. Category</a></li>
+<li><a href="#sec-1-3">1.3. Panel</a></li>
 </ul>
 </li>
-<li><a href="#sec-7">7. 信息统计</a>
+<li><a href="#sec-2">2. 函数应用</a>
 <ul>
-<li><a href="#sec-7-1">7.1. describe</a></li>
-<li><a href="#sec-7-2">7.2. value_counts</a></li>
-<li><a href="#sec-7-3">7.3. mode</a></li>
+<li><a href="#sec-2-1">2.1. 将数据按行或列进行计算(apply)</a>
+<ul>
+<li>
+<ul>
+<li><a href="#sec-2-1-0-1">2.1.0.1. 按列进行运算</a></li>
+<li><a href="#sec-2-1-0-2">2.1.0.2. 按行进行运算</a></li>
+<li><a href="#sec-2-1-0-3">2.1.0.3. 返回多个值组成的 Series</a></li>
 </ul>
 </li>
-<li><a href="#sec-8">8. 分组统计</a>
-<ul>
-<li><a href="#sec-8-1">8.1. 对单列分组</a></li>
-<li><a href="#sec-8-2">8.2. 对多列分组</a></li>
 </ul>
 </li>
-<li><a href="#sec-9">9. 时间序列</a>
+<li><a href="#sec-2-2">2.2. 逐元素运算(applymap)</a></li>
+<li><a href="#sec-2-3">2.3. 排序(sort_values)</a>
 <ul>
-<li><a href="#sec-9-1">9.1. data_range</a></li>
-<li><a href="#sec-9-2">9.2. 重采样</a></li>
-<li><a href="#sec-9-3">9.3. period_range</a></li>
-<li><a href="#sec-9-4">9.4. 时间计算</a></li>
+<li><a href="#sec-2-3-1">2.3.1. 按列排序</a></li>
+<li><a href="#sec-2-3-2">2.3.2. 按行排序</a></li>
 </ul>
 </li>
-<li><a href="#sec-10">10. 可视化</a>
+<li><a href="#sec-2-4">2.4. 索引排序(sort_index)</a></li>
+<li><a href="#sec-2-5">2.5. 排名(rank)</a></li>
+<li><a href="#sec-2-6">2.6. Series 元素统计</a>
 <ul>
-<li><a href="#sec-10-1">10.1. Series</a></li>
+<li><a href="#sec-2-6-1">2.6.1. 个数统计(value_counts)</a></li>
+<li><a href="#sec-2-6-2">2.6.2. 唯一性统计(uniq)</a></li>
+<li><a href="#sec-2-6-3">2.6.3. 成员资格统计(isin)</a></li>
 </ul>
 </li>
-<li><a href="#sec-11">11. 导入导出</a>
-<ul>
-<li><a href="#sec-11-1">11.1. 导出 csv</a></li>
-<li><a href="#sec-11-2">11.2. 导入 csv</a></li>
 </ul>
 </li>
-<li><a href="#sec-12">12. 示例工程</a>
+<li><a href="#sec-3">3. 处理丢失数据</a>
 <ul>
-<li><a href="#sec-12-1">12.1. 电影数据分析</a>
+<li><a href="#sec-3-1">3.1. 丢弃 NaN 行</a></li>
+<li><a href="#sec-3-2">3.2. 用默认值替换 NaN</a></li>
+<li><a href="#sec-3-3">3.3. 判断数据集是否包含 NaN</a></li>
+<li><a href="#sec-3-4">3.4. NaN 不参与运算</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. 数据操作</a>
 <ul>
-<li><a href="#sec-12-1-1">12.1.1. 数据读取</a></li>
-<li><a href="#sec-12-1-2">12.1.2. 数据合并 (merge)</a></li>
-<li><a href="#sec-12-1-3">12.1.3. 按性别查看各个电影的平均评分 (pivot_table)</a></li>
-<li><a href="#sec-12-1-4">12.1.4. 男女意见想差最大的电影 (sort_values)</a></li>
-<li><a href="#sec-12-1-5">12.1.5. 参与评分人数最多 (group_by)</a></li>
-<li><a href="#sec-12-1-6">12.1.6. 活跃度超过 1000 的高分电影</a></li>
+<li><a href="#sec-4-1">4.1. concat</a></li>
+<li><a href="#sec-4-2">4.2. merge</a></li>
+<li><a href="#sec-4-3">4.3. append</a></li>
+<li><a href="#sec-4-4">4.4. 数据整形</a>
+<ul>
+<li><a href="#sec-4-4-1">4.4.1. 将列索引变为行索引 (stack)</a></li>
+<li><a href="#sec-4-4-2">4.4.2. 将行索引变为列索引 (unstack)</a></li>
+<li><a href="#sec-4-4-3">4.4.3. 透视图（pivot_table）</a></li>
+</ul>
+</li>
+<li><a href="#sec-4-5">4.5. Category</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. 信息统计</a>
+<ul>
+<li><a href="#sec-5-1">5.1. describe</a></li>
+<li><a href="#sec-5-2">5.2. mode</a></li>
+</ul>
+</li>
+<li><a href="#sec-6">6. 分组统计</a>
+<ul>
+<li><a href="#sec-6-1">6.1. 对单列分组</a></li>
+<li><a href="#sec-6-2">6.2. 对多列分组</a></li>
+</ul>
+</li>
+<li><a href="#sec-7">7. 时间序列</a>
+<ul>
+<li><a href="#sec-7-1">7.1. data_range</a></li>
+<li><a href="#sec-7-2">7.2. 重采样</a></li>
+<li><a href="#sec-7-3">7.3. period_range</a></li>
+<li><a href="#sec-7-4">7.4. 时间计算</a></li>
+</ul>
+</li>
+<li><a href="#sec-8">8. 可视化</a>
+<ul>
+<li><a href="#sec-8-1">8.1. Series</a></li>
+</ul>
+</li>
+<li><a href="#sec-9">9. 导入导出</a>
+<ul>
+<li><a href="#sec-9-1">9.1. 导出 csv</a></li>
+<li><a href="#sec-9-2">9.2. 导入 csv</a></li>
+</ul>
+</li>
+<li><a href="#sec-10">10. 示例工程</a>
+<ul>
+<li><a href="#sec-10-1">10.1. 电影数据分析</a>
+<ul>
+<li><a href="#sec-10-1-1">10.1.1. 数据读取</a></li>
+<li><a href="#sec-10-1-2">10.1.2. 数据合并 (merge)</a></li>
+<li><a href="#sec-10-1-3">10.1.3. 按性别查看各个电影的平均评分 (pivot_table)</a></li>
+<li><a href="#sec-10-1-4">10.1.4. 男女意见想差最大的电影 (sort_values)</a></li>
+<li><a href="#sec-10-1-5">10.1.5. 参与评分人数最多 (group_by)</a></li>
+<li><a href="#sec-10-1-6">10.1.6. 活跃度超过 1000 的高分电影</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-11">11. 重新索引</a>
+<ul>
+<li><a href="#sec-11-1">11.1. Series</a>
+<ul>
+<li>
+<ul>
+<li><a href="#sec-11-1-0-1">11.1.0.1. 填充默认值</a></li>
+<li><a href="#sec-11-1-0-2">11.1.0.2. 往前填充</a></li>
+<li><a href="#sec-11-1-0-3">11.1.0.3. 往后填充</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-11-2">11.2. DataFrame</a>
+<ul>
+<li>
+<ul>
+<li><a href="#sec-11-2-0-1">11.2.0.1. 对行重新索引</a></li>
+<li><a href="#sec-11-2-0-2">11.2.0.2. 对列重新索引</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-12">12. 索引</a>
+<ul>
+<li><a href="#sec-12-1">12.1. 索引命名</a></li>
+<li><a href="#sec-12-2">12.2. 重复索引</a>
+<ul>
+<li><a href="#sec-12-2-1">12.2.1. 对重复索引的处理（清洗）</a></li>
+</ul>
+</li>
+<li><a href="#sec-12-3">12.3. 多级索引</a>
+<ul>
+<li><a href="#sec-12-3-1">12.3.1. 层次化索引的作用</a></li>
+<li><a href="#sec-12-3-2">12.3.2. Series 多级索引</a>
+<ul>
+<li><a href="#sec-12-3-2-1">12.3.2.1. 创建</a></li>
+<li><a href="#sec-12-3-2-2">12.3.2.2. 选取</a></li>
+</ul>
+</li>
+<li><a href="#sec-12-3-3">12.3.3. DataFrame 多级索引</a>
+<ul>
+<li><a href="#sec-12-3-3-1">12.3.3.1. 创建</a></li>
+<li><a href="#sec-12-3-3-2">12.3.3.2. 选取</a></li>
+<li><a href="#sec-12-3-3-3">12.3.3.3. 多级索引交换</a></li>
+<li><a href="#sec-12-3-3-4">12.3.3.4. 多级索引排序</a></li>
+<li><a href="#sec-12-3-3-5">12.3.3.5. 多级索引统计</a></li>
+<li><a href="#sec-12-3-3-6">12.3.3.6. 列与索引的转换</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -381,21 +604,356 @@ for the JavaScript code in this tag.
 
 <tr>
 <td class="left">Date</td>
-<td class="left">2018-02-18 18:40:59</td>
+<td class="left">2018-02-19 17:50:27</td>
 </tr>
 </tbody>
 </table>
 </div>
 
 <div id="outline-container-sec-1" class="outline-2">
-<h2 id="sec-1"><span class="section-number-2">1</span> 创建</h2>
+<h2 id="sec-1"><span class="section-number-2">1</span> 核心数据结构</h2>
 <div class="outline-text-2" id="text-1">
 </div><div id="outline-container-sec-1-1" class="outline-3">
-<h3 id="sec-1-1"><span class="section-number-3">1.1</span> 使用字典创建</h3>
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> Series</h3>
 <div class="outline-text-3" id="text-1-1">
+<p>
+Series 是一维带标签的数组，数组里可以放任意的数据（整数，浮点数，字符串，Python Object）。
+</p>
+
+<p>
+其基本的创建函数是： <code>pd.Series(data, index=index)</code>
+</p>
+
+<p>
+其中 index 是一个列表，用来作为数据的标签。data 可以是不同的数据类型：
+</p>
+
+<ul class="org-ul">
+<li>Python 字典
+</li>
+<li>ndarray 对象
+</li>
+<li>一个标量值，如 5
+</li>
+</ul>
+</div>
+
+<div id="outline-container-sec-1-1-1" class="outline-4">
+<h4 id="sec-1-1-1"><span class="section-number-4">1.1.1</span> 创建</h4>
+<div class="outline-text-4" id="text-1-1-1">
+</div><div id="outline-container-sec-1-1-1-1" class="outline-5">
+<h5 id="sec-1-1-1-1"><span class="section-number-5">1.1.1.1</span> 从 ndarray 创建</h5>
+<div class="outline-text-5" id="text-1-1-1-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">s</span> = pd.Series(np.random.randn(5), index=[<span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'b'</span>, <span style="color: #ff4ea3;">'c'</span>, <span style="color: #ff4ea3;">'d'</span>, <span style="color: #ff4ea3;">'e'</span>])
+log(<span style="color: #ff4ea3;">"s"</span>, s)
+log(<span style="color: #ff4ea3;">"s.index"</span>, s.index)
+<span style="color: #ff8700;">s2</span> = pd.Series(np.random.randn(5))
+log(<span style="color: #ff4ea3;">"s2"</span>, s2)
+log(<span style="color: #ff4ea3;">"s2.index"</span>, s2.index)
+</pre>
+</div>
+
+<pre class="example">
+====================================== s =======================================
+a    0.968763
+b    1.122273
+c   -0.899717
+d   -0.551866
+e   -0.607922
+dtype: float64
+=================================== s.index ====================================
+Index(['a', 'b', 'c', 'd', 'e'], dtype='object')
+====================================== s2 ======================================
+0    0.286357
+1    0.461955
+2    1.192868
+3   -0.626278
+4   -0.902780
+dtype: float64
+=================================== s2.index ===================================
+RangeIndex(start=0, stop=5, step=1)
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1-1-2" class="outline-5">
+<h5 id="sec-1-1-1-2"><span class="section-number-5">1.1.1.2</span> 从字典创建</h5>
+<div class="outline-text-5" id="text-1-1-1-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">d</span> = {<span style="color: #ff4ea3;">'a'</span> : 0., <span style="color: #ff4ea3;">'b'</span> : 1., <span style="color: #ff4ea3;">'d'</span> : 3}
+<span style="color: #ff8700;">s</span> = pd.Series(d, index=<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'abcd'</span>))
+log(<span style="color: #ff4ea3;">"s"</span>, s)
+</pre>
+</div>
+
+<pre class="example">
+====================================== s =======================================
+a    0.0
+b    1.0
+c    NaN
+d    3.0
+dtype: float64
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1-1-3" class="outline-5">
+<h5 id="sec-1-1-1-3"><span class="section-number-5">1.1.1.3</span> 从标量创建</h5>
+<div class="outline-text-5" id="text-1-1-1-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">s</span> = pd.Series(3, index=<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'abcde'</span>))
+log(<span style="color: #ff4ea3;">"s"</span>, s)
+</pre>
+</div>
+
+<pre class="example">
+====================================== s =======================================
+a    3
+b    3
+c    3
+d    3
+e    3
+dtype: int64
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-1-2" class="outline-4">
+<h4 id="sec-1-1-2"><span class="section-number-4">1.1.2</span> 特性</h4>
+<div class="outline-text-4" id="text-1-1-2">
+</div><div id="outline-container-sec-1-1-2-1" class="outline-5">
+<h5 id="sec-1-1-2-1"><span class="section-number-5">1.1.2.1</span> 类 ndarray 对象</h5>
+<div class="outline-text-5" id="text-1-1-2-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">s</span> = pd.Series(np.random.randn(5))
+
+log(<span style="color: #ff4ea3;">"s[0]"</span>, s[0])
+log(<span style="color: #ff4ea3;">"s[:3]"</span>, s[:3])
+log(<span style="color: #ff4ea3;">"s[[1, 3, 4]]"</span>, s[[1, 3, 4]])
+log(<span style="color: #ff4ea3;">"np.exp(s)"</span>, np.exp(s))
+log(<span style="color: #ff4ea3;">"np.sin(s)"</span>, np.sin(s))
+</pre>
+</div>
+
+<pre class="example">
+===================================== s[0] =====================================
+0.20645592579635394
+==================================== s[:3] =====================================
+0    0.206456
+1    2.752907
+2    0.429381
+dtype: float64
+================================= s[[1, 3, 4]] =================================
+1    2.752907
+3   -0.424543
+4   -2.169199
+dtype: float64
+================================== np.exp(s) ===================================
+0     1.229314
+1    15.688165
+2     1.536307
+3     0.654069
+4     0.114269
+dtype: float64
+================================== np.sin(s) ===================================
+0    0.204992
+1    0.378973
+2    0.416308
+3   -0.411904
+4   -0.826237
+dtype: float64
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-1-2-2" class="outline-5">
+<h5 id="sec-1-1-2-2"><span class="section-number-5">1.1.2.2</span> 类字典对象</h5>
+<div class="outline-text-5" id="text-1-1-2-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">s</span> = pd.Series(np.random.randn(5), index=[<span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'b'</span>, <span style="color: #ff4ea3;">'c'</span>, <span style="color: #ff4ea3;">'d'</span>, <span style="color: #ff4ea3;">'e'</span>])
+<span style="color: #ff8700;">s</span>[<span style="color: #ff4ea3;">'e'</span>] = 5
+log(<span style="color: #ff4ea3;">"s"</span>, s)
+log(<span style="color: #ff4ea3;">"'e' in s"</span>, <span style="color: #ff4ea3;">'e'</span> <span style="color: #a1db00;">in</span> s)
+log(<span style="color: #ff4ea3;">"s.get('f', np.nan)"</span>, s.get(<span style="color: #ff4ea3;">'f'</span>, np.nan))
+</pre>
+</div>
+
+<pre class="example">
+====================================== s =======================================
+a    1.764824
+b   -2.053756
+c    1.056781
+d   -1.858303
+e    5.000000
+dtype: float64
+=================================== 'e' in s ===================================
+True
+============================== s.get('f', np.nan) ==============================
+nan
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-1-2-3" class="outline-5">
+<h5 id="sec-1-1-2-3"><span class="section-number-5">1.1.2.3</span> 标签对齐</h5>
+<div class="outline-text-5" id="text-1-1-2-3">
+<p>
+相同索引值才进行操作
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">s1</span> = pd.Series(np.random.randn(3), index=[<span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'c'</span>, <span style="color: #ff4ea3;">'e'</span>])
+<span style="color: #ff8700;">s2</span> = pd.Series(np.random.randn(3), index=[<span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'d'</span>, <span style="color: #ff4ea3;">'e'</span>])
+
+log(<span style="color: #ff4ea3;">"s1"</span>, s1)
+log(<span style="color: #ff4ea3;">"s2"</span>, s2)
+
+
+log(<span style="color: #ff4ea3;">"s1 + s2"</span>, s1 + s2)
+</pre>
+</div>
+
+<pre class="example">
+====================================== s1 ======================================
+a    0.364437
+c    0.862209
+e    0.850188
+dtype: float64
+====================================== s2 ======================================
+a   -0.485686
+d    1.219886
+e    1.079799
+dtype: float64
+=================================== s1 + s2 ====================================
+a   -0.121248
+c         NaN
+d         NaN
+e    1.929987
+dtype: float64
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> DataFrame</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+DataFrame 是 <b>二维带行标签和列标签的数组</b> 。
+</p>
+
+<p>
+可以把 DataFrame 想象成一个 Excel 表格或一个 SQL 数据库的表格，还可以想象成是一个 Series 对象字典。
+</p>
+
+<p>
+它是 Pandas 里最常用的数据结构。
+</p>
+
+<p>
+创建 DataFrame 的基本格式是：
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython">pd.DataFrame(data, index=index, columns=columns)
+</pre>
+</div>
+
+<p>
+其中 index 是行标签，columns 是列标签，data 可以是下面的数据：
+</p>
+
+<ul class="org-ul">
+<li>由一维 numpy 数组，list，Series 构成的字典
+</li>
+<li>二维 numpy 数组
+</li>
+<li>一个 Series
+</li>
+<li>另外的 DataFrame 对象
+</li>
+</ul>
+</div>
+
+<div id="outline-container-sec-1-2-1" class="outline-4">
+<h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> 创建</h4>
+<div class="outline-text-4" id="text-1-2-1">
+</div><div id="outline-container-sec-1-2-1-1" class="outline-5">
+<h5 id="sec-1-2-1-1"><span class="section-number-5">1.2.1.1</span> 从字典创建</h5>
+<div class="outline-text-5" id="text-1-2-1-1">
 <p>
 key 为 DataFrame 的列；value 为对应列下的值
 </p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">d</span> = {<span style="color: #ff4ea3;">'one'</span> : pd.Series([1, 2, 3], index=[<span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'b'</span>, <span style="color: #ff4ea3;">'c'</span>]),
+     <span style="color: #ff4ea3;">'two'</span> : pd.Series([1, 2, 3, 4], index=[<span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'b'</span>, <span style="color: #ff4ea3;">'c'</span>, <span style="color: #ff4ea3;">'d'</span>])}
+
+log(<span style="color: #ff4ea3;">"pd.DataFrame(d)"</span>, pd.DataFrame(d))
+log(<span style="color: #ff4ea3;">"pd.DataFrame(d, index=['d', 'b', 'a'])"</span>, pd.DataFrame(d, index=[<span style="color: #ff4ea3;">'d'</span>, <span style="color: #ff4ea3;">'b'</span>, <span style="color: #ff4ea3;">'a'</span>]))
+log(<span style="color: #ff4ea3;">"pd.DataFrame(d, index=['d', 'b', 'a'], columns=['two', 'three'])"</span>, pd.DataFrame(d, index=[<span style="color: #ff4ea3;">'d'</span>, <span style="color: #ff4ea3;">'b'</span>, <span style="color: #ff4ea3;">'a'</span>], columns=[<span style="color: #ff4ea3;">'two'</span>, <span style="color: #ff4ea3;">'three'</span>]))
+</pre>
+</div>
+
+<pre class="example">
+=============================== pd.DataFrame(d) ================================
+   one  two
+a  1.0    1
+b  2.0    2
+c  3.0    3
+d  NaN    4
+==================== pd.DataFrame(d, index=['d', 'b', 'a']) ====================
+   one  two
+d  NaN    4
+b  2.0    2
+a  1.0    1
+======= pd.DataFrame(d, index=['d', 'b', 'a'], columns=['two', 'three']) =======
+   two three
+d    4   NaN
+b    2   NaN
+a    1   NaN
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">d</span> = {<span style="color: #ff4ea3;">'one'</span> : [1, 2, 3, 4],
+     <span style="color: #ff4ea3;">'two'</span> : [21, 22, 23, 24]}
+
+log(<span style="color: #ff4ea3;">"pd.DataFrame(d)"</span>, pd.DataFrame(d))
+log(<span style="color: #ff4ea3;">"pd.DataFrame(d, index=['a', 'b', 'c', 'd'])"</span>, pd.DataFrame(d, index=[<span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'b'</span>, <span style="color: #ff4ea3;">'c'</span>, <span style="color: #ff4ea3;">'d'</span>]))
+</pre>
+</div>
+
+<pre class="example">
+=============================== pd.DataFrame(d) ================================
+   one  two
+0    1   21
+1    2   22
+2    3   23
+3    4   24
+================= pd.DataFrame(d, index=['a', 'b', 'c', 'd']) ==================
+   one  two
+a    1   21
+b    2   22
+c    3   23
+d    4   24
+</pre>
+
 
 <div class="org-src-container">
 
@@ -422,9 +980,139 @@ log(<span style="color: #ff4ea3;">"df"</span>, df)
 </div>
 
 
-<div id="outline-container-sec-1-2" class="outline-3">
-<h3 id="sec-1-2"><span class="section-number-3">1.2</span> 指定行列索引创建</h3>
-<div class="outline-text-3" id="text-1-2">
+<div id="outline-container-sec-1-2-1-2" class="outline-5">
+<h5 id="sec-1-2-1-2"><span class="section-number-5">1.2.1.2</span> 从结构化数据列表创建</h5>
+<div class="outline-text-5" id="text-1-2-1-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">data</span> = [(1, 2.2, <span style="color: #ff4ea3;">'Hello'</span>), (2, 3., <span style="color: #ff4ea3;">"World"</span>)]
+
+log(<span style="color: #ff4ea3;">"pd.DataFrame(data)"</span>, pd.DataFrame(data))
+log(<span style="color: #ff4ea3;">"pd.DataFrame(data, index=['first', 'second'], columns=['A', 'B', 'C'])"</span>,
+    pd.DataFrame(data, index=[<span style="color: #ff4ea3;">'first'</span>, <span style="color: #ff4ea3;">'second'</span>], columns=[<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'B'</span>, <span style="color: #ff4ea3;">'C'</span>]))
+</pre>
+</div>
+
+<pre class="example">
+============================== pd.DataFrame(data) ==============================
+   0    1      2
+0  1  2.2  Hello
+1  2  3.0  World
+==== pd.DataFrame(data, index=['first', 'second'], columns=['A', 'B', 'C']) ====
+        A    B      C
+first   1  2.2  Hello
+second  2  3.0  World
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2-1-3" class="outline-5">
+<h5 id="sec-1-2-1-3"><span class="section-number-5">1.2.1.3</span> 从字典列表创建</h5>
+<div class="outline-text-5" id="text-1-2-1-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">data</span> = [{<span style="color: #ff4ea3;">'a'</span>: 1, <span style="color: #ff4ea3;">'b'</span>: 2}, {<span style="color: #ff4ea3;">'a'</span>: 5, <span style="color: #ff4ea3;">'b'</span>: 10, <span style="color: #ff4ea3;">'c'</span>: 20}]
+
+log(<span style="color: #ff4ea3;">"pd.DataFrame(data)"</span>, pd.DataFrame(data))
+log(<span style="color: #ff4ea3;">"pd.DataFrame(data, index=['first', 'second'])"</span>,
+    pd.DataFrame(data, index=[<span style="color: #ff4ea3;">'first'</span>, <span style="color: #ff4ea3;">'second'</span>]))
+log(<span style="color: #ff4ea3;">"pd.DataFrame(data, columns=['a', 'b'])"</span>,
+    pd.DataFrame(data, columns=[<span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'b'</span>]))
+</pre>
+</div>
+
+<pre class="example">
+============================== pd.DataFrame(data) ==============================
+   a   b     c
+0  1   2   NaN
+1  5  10  20.0
+================ pd.DataFrame(data, index=['first', 'second']) =================
+        a   b     c
+first   1   2   NaN
+second  5  10  20.0
+==================== pd.DataFrame(data, columns=['a', 'b']) ====================
+   a   b
+0  1   2
+1  5  10
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2-1-4" class="outline-5">
+<h5 id="sec-1-2-1-4"><span class="section-number-5">1.2.1.4</span> 从元组字典创建</h5>
+<div class="outline-text-5" id="text-1-2-1-4">
+<p>
+实际应用中，会通过数据清洗的方式，把数据整理成方便 Pandas 导入且可读性好的格式。
+然后再通过 <b>reindex/groupby</b> 等方式转换成复杂数据结构。
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">d</span> = {(<span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'b'</span>): {(<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'B'</span>): 1, (<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'C'</span>): 2},
+     (<span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'a'</span>): {(<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'C'</span>): 3, (<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'B'</span>): 4},
+     (<span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'c'</span>): {(<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'B'</span>): 5, (<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'C'</span>): 6},
+     (<span style="color: #ff4ea3;">'b'</span>, <span style="color: #ff4ea3;">'a'</span>): {(<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'C'</span>): 7, (<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'B'</span>): 8},
+     (<span style="color: #ff4ea3;">'b'</span>, <span style="color: #ff4ea3;">'b'</span>): {(<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'D'</span>): 9, (<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'B'</span>): 10}}
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">&#22810;&#32423;&#26631;&#31614;</span>
+log(<span style="color: #ff4ea3;">"pd.DataFrame(d)"</span>, pd.DataFrame(d))
+</pre>
+</div>
+
+<pre class="example">
+=============================== pd.DataFrame(d) ================================
+       a              b
+       a    b    c    a     b
+A B  4.0  1.0  5.0  8.0  10.0
+  C  3.0  2.0  6.0  7.0   NaN
+  D  NaN  NaN  NaN  NaN   9.0
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2-1-5" class="outline-5">
+<h5 id="sec-1-2-1-5"><span class="section-number-5">1.2.1.5</span> 从 Series 创建</h5>
+<div class="outline-text-5" id="text-1-2-1-5">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">s</span> = pd.Series(np.random.randn(5), index=[<span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'b'</span>, <span style="color: #ff4ea3;">'c'</span>, <span style="color: #ff4ea3;">'d'</span>, <span style="color: #ff4ea3;">'e'</span>])
+log(<span style="color: #ff4ea3;">"pd.DataFrame(s)"</span>, pd.DataFrame(s))
+log(<span style="color: #ff4ea3;">"pd.DataFrame(s, index=['a', 'c', 'd'])"</span>,
+    pd.DataFrame(s, index=[<span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'c'</span>, <span style="color: #ff4ea3;">'d'</span>]))
+log(<span style="color: #ff4ea3;">"pd.DataFrame(s, index=['a', 'c', 'd'], columns=['A'])"</span>,
+    pd.DataFrame(s, index=[<span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'c'</span>, <span style="color: #ff4ea3;">'d'</span>], columns=[<span style="color: #ff4ea3;">'A'</span>]))
+</pre>
+</div>
+
+<pre class="example">
+=============================== pd.DataFrame(s) ================================
+          0
+a -1.923865
+b -0.225045
+c  0.065906
+d -0.409441
+e -0.484668
+==================== pd.DataFrame(s, index=['a', 'c', 'd']) ====================
+          0
+a -1.923865
+c  0.065906
+d -0.409441
+============ pd.DataFrame(s, index=['a', 'c', 'd'], columns=['A']) =============
+          A
+a -1.923865
+c  0.065906
+d -0.409441
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2-1-6" class="outline-5">
+<h5 id="sec-1-2-1-6"><span class="section-number-5">1.2.1.6</span> 指定行列索引创建</h5>
+<div class="outline-text-5" id="text-1-2-1-6">
 <div class="org-src-container">
 
 <pre class="src src-ipython"><span style="color: #ff8700;">dates</span> = pd.date_range(<span style="color: #ff4ea3;">'20160301'</span>, periods=6)
@@ -442,400 +1130,1130 @@ DatetimeIndex(['2016-03-01', '2016-03-02', '2016-03-03', '2016-03-04',
               dtype='datetime64[ns]', freq='D')
 ====================================== df ======================================
                    A         B         C         D
-2016-03-01  0.532636  0.356540 -1.411507 -0.688873
-2016-03-02  0.083138 -1.824050 -0.090720 -0.311539
-2016-03-03  0.745254  0.695164 -0.662537 -0.224461
-2016-03-04 -1.873410  0.109342  0.533539  0.259526
-2016-03-05 -0.035570 -0.782426 -0.448951  1.048616
-2016-03-06 -1.234143  0.208506  1.386050 -1.733326
+2016-03-01  0.245228  0.531611 -0.905433 -0.407112
+2016-03-02  0.832618  1.411373 -1.094851  1.677388
+2016-03-03  1.057017 -1.656864 -0.479863  0.365050
+2016-03-04  0.703737 -0.672549 -0.529225 -1.842786
+2016-03-05 -0.079853 -0.919528 -0.150218 -0.887124
+2016-03-06 -0.339975  0.545832  0.298648 -0.260201
 </pre>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-sec-2" class="outline-2">
-<h2 id="sec-2"><span class="section-number-2">2</span> 查看信息</h2>
-<div class="outline-text-2" id="text-2">
-</div><div id="outline-container-sec-2-1" class="outline-3">
-<h3 id="sec-2-1"><span class="section-number-3">2.1</span> 维度</h3>
-<div class="outline-text-3" id="text-2-1">
+<div id="outline-container-sec-1-2-2" class="outline-4">
+<h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> 数据操作</h4>
+<div class="outline-text-4" id="text-1-2-2">
 <div class="org-src-container">
 
-<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.shape"</span>, df.shape)
+<pre class="src src-ipython"><span style="color: #ff8700;">df</span> = pd.DataFrame(np.random.randn(6, 4),
+                  index=<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'ABCDEF'</span>),
+                  columns=[<span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'two'</span>, <span style="color: #ff4ea3;">'three'</span>, <span style="color: #ff4ea3;">'four'</span>])
+log(<span style="color: #ff4ea3;">"df"</span>, df)
 </pre>
 </div>
 
 <pre class="example">
-=================================== df.shape ===================================
-(6, 4)
+====================================== df ======================================
+        one       two     three      four
+A -0.883178 -1.569091 -0.998333 -0.585060
+B  0.563423  0.571258  1.515396 -0.683374
+C  0.290994 -0.407175 -0.747683 -1.545365
+D  1.171879  1.201897 -0.101424 -0.122624
+E -1.680215  0.274066 -0.285068 -0.510313
+F  0.278929 -0.255002 -0.404114 -1.040284
+</pre>
+</div>
+
+<div id="outline-container-sec-1-2-2-1" class="outline-5">
+<h5 id="sec-1-2-2-1"><span class="section-number-5">1.2.2.1</span> 列选择(Series)</h5>
+<div class="outline-text-5" id="text-1-2-2-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df['one']"</span>, df[<span style="color: #ff4ea3;">'one'</span>])
+log(<span style="color: #ff4ea3;">"df.one"</span>, df.one)
+</pre>
+</div>
+
+<pre class="example">
+================================== df['one'] ===================================
+A   -0.883178
+B    0.563423
+C    0.290994
+D    1.171879
+E   -1.680215
+F    0.278929
+Name: one, dtype: float64
+==================================== df.one ====================================
+A   -0.883178
+B    0.563423
+C    0.290994
+D    1.171879
+E   -1.680215
+F    0.278929
+Name: one, dtype: float64
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2-2-2" class="outline-5">
+<h5 id="sec-1-2-2-2"><span class="section-number-5">1.2.2.2</span> 列选择(DataFrame)</h5>
+<div class="outline-text-5" id="text-1-2-2-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.loc[:, ['one', 'two']]"</span>, df.loc[:, [<span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'two'</span>]])
+log(<span style="color: #ff4ea3;">"df.iloc[:, 0:1]"</span>, df.iloc[:, 0:1])
+</pre>
+</div>
+
+<pre class="example">
+========================== df.loc[:, ['one', 'two']] ===========================
+        one       two
+A -0.883178 -1.569091
+B  0.563423  0.571258
+C  0.290994 -0.407175
+D  1.171879  1.201897
+E -1.680215  0.274066
+F  0.278929 -0.255002
+=============================== df.iloc[:, 0:1] ================================
+        one
+A -0.883178
+B  0.563423
+C  0.290994
+D  1.171879
+E -1.680215
+F  0.278929
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2-2-3" class="outline-5">
+<h5 id="sec-1-2-2-3"><span class="section-number-5">1.2.2.3</span> 列赋值</h5>
+<div class="outline-text-5" id="text-1-2-2-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">df</span>[<span style="color: #ff4ea3;">'three'</span>] = df[<span style="color: #ff4ea3;">'one'</span>] + df[<span style="color: #ff4ea3;">'two'</span>]
+log(<span style="color: #ff4ea3;">"df"</span>, df)
+</pre>
+</div>
+
+<pre class="example">
+====================================== df ======================================
+        one       two     three      four
+A -0.883178 -1.569091 -2.452269 -0.585060
+B  0.563423  0.571258  1.134681 -0.683374
+C  0.290994 -0.407175 -0.116181 -1.545365
+D  1.171879  1.201897  2.373776 -0.122624
+E -1.680215  0.274066 -1.406149 -0.510313
+F  0.278929 -0.255002  0.023927 -1.040284
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2-2-4" class="outline-5">
+<h5 id="sec-1-2-2-4"><span class="section-number-5">1.2.2.4</span> 列删除</h5>
+<div class="outline-text-5" id="text-1-2-2-4">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">del</span> df[<span style="color: #ff4ea3;">'three'</span>]
+log(<span style="color: #ff4ea3;">"df"</span>, df)
+</pre>
+</div>
+
+<pre class="example">
+====================================== df ======================================
+        one       two      four
+A -0.883178 -1.569091 -0.585060
+B  0.563423  0.571258 -0.683374
+C  0.290994 -0.407175 -1.545365
+D  1.171879  1.201897 -0.122624
+E -1.680215  0.274066 -0.510313
+F  0.278929 -0.255002 -1.040284
 </pre>
 
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">s</span> = df.pop(<span style="color: #ff4ea3;">'four'</span>)
+log(<span style="color: #ff4ea3;">"s"</span>, s)
+log(<span style="color: #ff4ea3;">"df"</span>, df)
+</pre>
+</div>
+
+<pre class="example">
+====================================== s =======================================
+A   -0.585060
+B   -0.683374
+C   -1.545365
+D   -0.122624
+E   -0.510313
+F   -1.040284
+Name: four, dtype: float64
+====================================== df ======================================
+        one       two
+A -0.883178 -1.569091
+B  0.563423  0.571258
+C  0.290994 -0.407175
+D  1.171879  1.201897
+E -1.680215  0.274066
+F  0.278929 -0.255002
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">result</span> = df.drop([<span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'two'</span>], axis=1)  <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">df &#19981;&#21464;</span>
+log(<span style="color: #ff4ea3;">"result"</span>, result)
+</pre>
+</div>
+
+<pre class="example">
+==================================== result ====================================
+Empty DataFrame
+Columns: []
+Index: [A, B, C, D, E, F]
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2-2-5" class="outline-5">
+<h5 id="sec-1-2-2-5"><span class="section-number-5">1.2.2.5</span> 增加列</h5>
+<div class="outline-text-5" id="text-1-2-2-5">
+</div><div id="outline-container-sec-1-2-2-5-1" class="outline-6">
+<h6 id="sec-1-2-2-5-1"><span class="section-number-6">1.2.2.5.1</span> 添加到最后</h6>
+<div class="outline-text-6" id="text-1-2-2-5-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">df</span>[<span style="color: #ff4ea3;">'flag'</span>] = df[<span style="color: #ff4ea3;">'one'</span>] &gt; 0
+<span style="color: #ff8700;">df</span>[<span style="color: #ff4ea3;">'five'</span>] = 5
+<span style="color: #ff8700;">df</span>[<span style="color: #ff4ea3;">'one_trunc'</span>] = df[<span style="color: #ff4ea3;">'one'</span>][:2]
+log(<span style="color: #ff4ea3;">"df"</span>, df)
+</pre>
+</div>
+
+<pre class="example">
+====================================== df ======================================
+        one       two   flag  five  one_trunc
+A -0.883178 -1.569091  False     5  -0.883178
+B  0.563423  0.571258   True     5   0.563423
+C  0.290994 -0.407175   True     5        NaN
+D  1.171879  1.201897   True     5        NaN
+E -1.680215  0.274066  False     5        NaN
+F  0.278929 -0.255002   True     5        NaN
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-2-5-2" class="outline-6">
+<h6 id="sec-1-2-2-5-2"><span class="section-number-6">1.2.2.5.2</span> 指定位置添加</h6>
+<div class="outline-text-6" id="text-1-2-2-5-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython">df.insert(1, <span style="color: #ff4ea3;">'bar'</span>, df.one + df.two)
+log(<span style="color: #ff4ea3;">"df"</span>, df)
+</pre>
+</div>
+
+<pre class="example">
+====================================== df ======================================
+        one       bar       two   flag  five  one_trunc
+A -0.883178 -2.452269 -1.569091  False     5  -0.883178
+B  0.563423  1.134681  0.571258   True     5   0.563423
+C  0.290994 -0.116181 -0.407175   True     5        NaN
+D  1.171879  2.373776  1.201897   True     5        NaN
+E -1.680215 -1.406149  0.274066  False     5        NaN
+F  0.278929  0.023927 -0.255002   True     5        NaN
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2-2-5-3" class="outline-6">
+<h6 id="sec-1-2-2-5-3"><span class="section-number-6">1.2.2.5.3</span> assign()</h6>
+<div class="outline-text-6" id="text-1-2-2-5-3">
 <p>
-DataFrame 对象可以理解为二维数组
-</p>
-</div>
-</div>
-
-
-<div id="outline-container-sec-2-2" class="outline-3">
-<h3 id="sec-2-2"><span class="section-number-3">2.2</span> 行索引信息</h3>
-<div class="outline-text-3" id="text-2-2">
-<div class="org-src-container">
-
-<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.index"</span>, df.index)
-</pre>
-</div>
-
-<pre class="example">
-=================================== df.index ===================================
-DatetimeIndex(['2016-03-01', '2016-03-02', '2016-03-03', '2016-03-04',
-               '2016-03-05', '2016-03-06'],
-              dtype='datetime64[ns]', freq='D')
-</pre>
-</div>
-</div>
-
-
-<div id="outline-container-sec-2-3" class="outline-3">
-<h3 id="sec-2-3"><span class="section-number-3">2.3</span> 列索引信息</h3>
-<div class="outline-text-3" id="text-2-3">
-<div class="org-src-container">
-
-<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.columns"</span>, df.columns)
-</pre>
-</div>
-
-<pre class="example">
-================================== df.columns ==================================
-Index(['A', 'B', 'C', 'D'], dtype='object')
-</pre>
-</div>
-</div>
-
-
-<div id="outline-container-sec-2-4" class="outline-3">
-<h3 id="sec-2-4"><span class="section-number-3">2.4</span> 底层数据</h3>
-<div class="outline-text-3" id="text-2-4">
-<div class="org-src-container">
-
-<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.values"</span>, df.values)
-log(<span style="color: #ff4ea3;">"type(df.values)"</span>, <span style="color: #d18aff;">type</span>(df.values))
-</pre>
-</div>
-
-<pre class="example">
-================================== df.values ===================================
-[[ 0.5326356   0.3565399  -1.41150658 -0.68887286]
- [ 0.08313765 -1.82405045 -0.09071982 -0.31153915]
- [ 0.74525439  0.69516396 -0.66253664 -0.22446133]
- [-1.87340977  0.109342    0.53353921  0.25952619]
- [-0.03556995 -0.78242599 -0.44895054  1.04861554]
- [-1.23414285  0.20850611  1.38604989 -1.73332565]]
-=============================== type(df.values) ================================
-&lt;class 'numpy.ndarray'&gt;
-</pre>
-
-<p>
-<b>本质上 DataFrame 是对 Numpy array 的封装</b>
-</p>
-</div>
-</div>
-
-
-<div id="outline-container-sec-2-5" class="outline-3">
-<h3 id="sec-2-5"><span class="section-number-3">2.5</span> 列类型</h3>
-<div class="outline-text-3" id="text-2-5">
-<div class="org-src-container">
-
-<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.dtypes"</span>, df.dtypes)
-</pre>
-</div>
-
-<pre class="example">
-================================== df.dtypes ===================================
-A    float64
-B    float64
-C    float64
-D    float64
-dtype: object
-</pre>
-</div>
-</div>
-</div>
-
-
-
-
-
-<div id="outline-container-sec-3" class="outline-2">
-<h2 id="sec-3"><span class="section-number-2">3</span> 排序</h2>
-<div class="outline-text-2" id="text-3">
-</div><div id="outline-container-sec-3-1" class="outline-3">
-<h3 id="sec-3-1"><span class="section-number-3">3.1</span> 按列索引排序</h3>
-<div class="outline-text-3" id="text-3-1">
-<div class="org-src-container">
-
-<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.sort_index(axis=1, ascending=False)"</span>, df.sort_index(axis=1, ascending=<span style="color: #5fafd7;">False</span>))
-</pre>
-</div>
-
-<pre class="example">
-==================== df.sort_index(axis=1, ascending=False) ====================
-                   D         C         B         A
-2016-03-01 -0.688873 -1.411507  0.356540  0.532636
-2016-03-02 -0.311539 -0.090720 -1.824050  0.083138
-2016-03-03 -0.224461 -0.662537  0.695164  0.745254
-2016-03-04  0.259526  0.533539  0.109342 -1.873410
-2016-03-05  1.048616 -0.448951 -0.782426 -0.035570
-2016-03-06 -1.733326  1.386050  0.208506 -1.234143
-</pre>
-</div>
-</div>
-
-
-<div id="outline-container-sec-3-2" class="outline-3">
-<h3 id="sec-3-2"><span class="section-number-3">3.2</span> 按列数据排序</h3>
-<div class="outline-text-3" id="text-3-2">
-<div class="org-src-container">
-
-<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.sort_values(by='C')"</span>, df.sort_values(by=<span style="color: #ff4ea3;">'C'</span>))
-</pre>
-</div>
-
-<pre class="example">
-============================ df.sort_values(by='C') ============================
-                   A         B         C         D
-2016-03-01  0.532636  0.356540 -1.411507 -0.688873
-2016-03-03  0.745254  0.695164 -0.662537 -0.224461
-2016-03-05 -0.035570 -0.782426 -0.448951  1.048616
-2016-03-02  0.083138 -1.824050 -0.090720 -0.311539
-2016-03-04 -1.873410  0.109342  0.533539  0.259526
-2016-03-06 -1.234143  0.208506  1.386050 -1.733326
-</pre>
-</div>
-</div>
-</div>
-
-
-<div id="outline-container-sec-4" class="outline-2">
-<h2 id="sec-4"><span class="section-number-2">4</span> 数据选择</h2>
-<div class="outline-text-2" id="text-4">
-<p>
-使用基于标签的 <code>loc</code> 函数选择数据效率较高。
+assign 方法并不会 inplace 地改变原来的 dataframe ，
+该方法的 <b>优势</b> 在于可以对 dataframe 对象使用链式操作。
 </p>
 
-<p>
-<b>DataFrame 中每一行 / 列是由一个 Series 对象组成的</b> 。
-</p>
-</div>
-
-<div id="outline-container-sec-4-1" class="outline-3">
-<h3 id="sec-4-1"><span class="section-number-3">4.1</span> 列数据（Series 类型对象）</h3>
-<div class="outline-text-3" id="text-4-1">
 <div class="org-src-container">
 
-<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df['A']"</span>, df[<span style="color: #ff4ea3;">'A'</span>])         <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">&#31561;&#25928;&#20110; df.A</span>
-log(<span style="color: #ff4ea3;">"df.iloc[0]"</span>, df.iloc[0])
+<pre class="src src-ipython"><span style="color: #ff8700;">df1</span> = df.assign(Ratio=df.one/df.two)
+log(<span style="color: #ff4ea3;">"df1"</span>, df1)
+log(<span style="color: #ff4ea3;">"df"</span>, df)
 </pre>
 </div>
 
 <pre class="example">
-=================================== df['A'] ====================================
-2016-03-01    0.532636
-2016-03-02    0.083138
-2016-03-03    0.745254
-2016-03-04   -1.873410
-2016-03-05   -0.035570
-2016-03-06   -1.234143
-Freq: D, Name: A, dtype: float64
+===================================== df1 ======================================
+        one       bar       two   flag  five  one_trunc     Ratio
+A -0.883178 -2.452269 -1.569091  False     5  -0.883178  0.562860
+B  0.563423  1.134681  0.571258   True     5   0.563423  0.986284
+C  0.290994 -0.116181 -0.407175   True     5        NaN -0.714665
+D  1.171879  2.373776  1.201897   True     5        NaN  0.975025
+E -1.680215 -1.406149  0.274066  False     5        NaN -6.130697
+F  0.278929  0.023927 -0.255002   True     5        NaN -1.093829
+====================================== df ======================================
+        one       bar       two   flag  five  one_trunc
+A -0.883178 -2.452269 -1.569091  False     5  -0.883178
+B  0.563423  1.134681  0.571258   True     5   0.563423
+C  0.290994 -0.116181 -0.407175   True     5        NaN
+D  1.171879  2.373776  1.201897   True     5        NaN
+E -1.680215 -1.406149  0.274066  False     5        NaN
+F  0.278929  0.023927 -0.255002   True     5        NaN
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.assign(Ratio=lambda x: x.one - x.two)"</span>,
+    df.assign(Ratio=<span style="color: #a1db00;">lambda</span> x: x.one - x.two))
+
+log(<span style="color: #ff4ea3;">"df.assign(ABRatio=df.one/df.two).assign(BarValue=lambda x: x.ABRatio*x.bar)"</span>,
+    df.assign(ABRatio=df.one/df.two).assign(BarValue=<span style="color: #a1db00;">lambda</span> x: x.ABRatio*x.bar))
+</pre>
+</div>
+
+<pre class="example">
+=================== df.assign(Ratio=lambda x: x.one - x.two) ===================
+        one       bar       two   flag  five  one_trunc     Ratio
+A -0.883178 -2.452269 -1.569091  False     5  -0.883178  0.685913
+B  0.563423  1.134681  0.571258   True     5   0.563423 -0.007836
+C  0.290994 -0.116181 -0.407175   True     5        NaN  0.698169
+D  1.171879  2.373776  1.201897   True     5        NaN -0.030018
+E -1.680215 -1.406149  0.274066  False     5        NaN -1.954281
+F  0.278929  0.023927 -0.255002   True     5        NaN  0.533931
+= df.assign(ABRatio=df.one/df.two).assign(BarValue=lambda x: x.ABRatio*x.bar) ==
+        one       bar       two   flag  five  one_trunc   ABRatio  BarValue
+A -0.883178 -2.452269 -1.569091  False     5  -0.883178  0.562860 -1.380284
+B  0.563423  1.134681  0.571258   True     5   0.563423  0.986284  1.119118
+C  0.290994 -0.116181 -0.407175   True     5        NaN -0.714665  0.083031
+D  1.171879  2.373776  1.201897   True     5        NaN  0.975025  2.314490
+E -1.680215 -1.406149  0.274066  False     5        NaN -6.130697  8.620676
+F  0.278929  0.023927 -0.255002   True     5        NaN -1.093829 -0.026172
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2-2-6" class="outline-5">
+<h5 id="sec-1-2-2-6"><span class="section-number-5">1.2.2.6</span> 行选择(Series)</h5>
+<div class="outline-text-5" id="text-1-2-2-6">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.loc['A']"</span>, df.loc[<span style="color: #ff4ea3;">'A'</span>])  <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">&#34892;&#26631;&#31614;&#26041;&#24335;</span>
+log(<span style="color: #ff4ea3;">"df.iloc[0]"</span>, df.iloc[0])    <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">&#34892;&#20301;&#32622;&#26041;&#24335;</span>
+</pre>
+</div>
+
+<pre class="example">
+================================= df.loc['A'] ==================================
+one         -0.883178
+bar          -2.45227
+two          -1.56909
+flag            False
+five                5
+one_trunc   -0.883178
+Name: A, dtype: object
 ================================== df.iloc[0] ==================================
-A    0.532636
-B    0.356540
-C   -1.411507
-D   -0.688873
-Name: 2016-03-01 00:00:00, dtype: float64
-</pre>
-</div>
-</div>
-
-<div id="outline-container-sec-4-2" class="outline-3">
-<h3 id="sec-4-2"><span class="section-number-3">4.2</span> 列数据（DataFrame 类型对象）</h3>
-<div class="outline-text-3" id="text-4-2">
-<div class="org-src-container">
-
-<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.loc[:, ['A', 'B']]"</span>, df.loc[:, [<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'B'</span>]])
-log(<span style="color: #ff4ea3;">"df.iloc[:, 1:2]"</span>, df.iloc[:, 1:2])
-</pre>
-</div>
-
-<pre class="example">
-============================ df.loc[:, ['A', 'B']] =============================
-                   A         B
-2016-03-01  0.532636  0.356540
-2016-03-02  0.083138 -1.824050
-2016-03-03  0.745254  0.695164
-2016-03-04 -1.873410  0.109342
-2016-03-05 -0.035570 -0.782426
-2016-03-06 -1.234143  0.208506
-=============================== df.iloc[:, 1:2] ================================
-                   B
-2016-03-01  0.356540
-2016-03-02 -1.824050
-2016-03-03  0.695164
-2016-03-04  0.109342
-2016-03-05 -0.782426
-2016-03-06  0.208506
+one         -0.883178
+bar          -2.45227
+two          -1.56909
+flag            False
+five                5
+one_trunc   -0.883178
+Name: A, dtype: object
 </pre>
 </div>
 </div>
 
 
-<div id="outline-container-sec-4-3" class="outline-3">
-<h3 id="sec-4-3"><span class="section-number-3">4.3</span> 行数据（Series 类型对象）</h3>
-<div class="outline-text-3" id="text-4-3">
-<div class="org-src-container">
-
-<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.loc['20160301']"</span>, df.loc[<span style="color: #ff4ea3;">'20160301'</span>])
-log(<span style="color: #ff4ea3;">"df.iloc[0]"</span>, df.iloc[0])
-</pre>
-</div>
-
-<pre class="example">
-============================== df.loc['20160301'] ==============================
-A    0.532636
-B    0.356540
-C   -1.411507
-D   -0.688873
-Name: 2016-03-01 00:00:00, dtype: float64
-================================== df.iloc[0] ==================================
-A    0.532636
-B    0.356540
-C   -1.411507
-D   -0.688873
-Name: 2016-03-01 00:00:00, dtype: float64
-</pre>
-</div>
-</div>
-
-<div id="outline-container-sec-4-4" class="outline-3">
-<h3 id="sec-4-4"><span class="section-number-3">4.4</span> 行数据（DataFrame 类型对象）</h3>
-<div class="outline-text-3" id="text-4-4">
+<div id="outline-container-sec-1-2-2-7" class="outline-5">
+<h5 id="sec-1-2-2-7"><span class="section-number-5">1.2.2.7</span> 行选择(DataFrame)</h5>
+<div class="outline-text-5" id="text-1-2-2-7">
 <div class="org-src-container">
 
 <pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df[2:4]"</span>, df[2:4])
-log(<span style="color: #ff4ea3;">"df['20160302':'20160305']"</span>, df[<span style="color: #ff4ea3;">'20160302'</span>:<span style="color: #ff4ea3;">'20160305'</span>])
-log(<span style="color: #ff4ea3;">"df.iloc[1:3]"</span>, df.iloc[1:3])
+log(<span style="color: #ff4ea3;">"df['A':'C']"</span>, df[<span style="color: #ff4ea3;">'A'</span>:<span style="color: #ff4ea3;">'C'</span>])
+log(<span style="color: #ff4ea3;">"df.iloc[2:4]"</span>, df.iloc[2:4])         <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">&#25928;&#29575;&#39640;</span>
+log(<span style="color: #ff4ea3;">"df[df.one &gt; 0.5]"</span>, df[df.one &gt; 0.5])  <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">&#24067;&#23572;&#26041;&#24335;</span>
+log(<span style="color: #ff4ea3;">"df[df &gt; 0]"</span>, df[df &gt; 0])             <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">&#24067;&#23572;&#26041;&#24335;</span>
+log(<span style="color: #ff4ea3;">"df[[False, True, True, False, True, False]]"</span>,
+    df[[<span style="color: #5fafd7;">False</span>, <span style="color: #5fafd7;">True</span>, <span style="color: #5fafd7;">True</span>, <span style="color: #5fafd7;">False</span>, <span style="color: #5fafd7;">True</span>, <span style="color: #5fafd7;">False</span>]])  <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">&#24067;&#23572;&#26041;&#24335;</span>
 </pre>
 </div>
 
 <pre class="example">
 =================================== df[2:4] ====================================
-                   A         B         C         D
-2016-03-03  0.745254  0.695164 -0.662537 -0.224461
-2016-03-04 -1.873410  0.109342  0.533539  0.259526
-========================== df['20160302':'20160305'] ===========================
-                   A         B         C         D
-2016-03-02  0.083138 -1.824050 -0.090720 -0.311539
-2016-03-03  0.745254  0.695164 -0.662537 -0.224461
-2016-03-04 -1.873410  0.109342  0.533539  0.259526
-2016-03-05 -0.035570 -0.782426 -0.448951  1.048616
-================================= df.iloc[1:3] =================================
-                   A         B         C         D
-2016-03-02  0.083138 -1.824050 -0.090720 -0.311539
-2016-03-03  0.745254  0.695164 -0.662537 -0.224461
+        one       bar       two  flag  five  one_trunc
+C  0.290994 -0.116181 -0.407175  True     5        NaN
+D  1.171879  2.373776  1.201897  True     5        NaN
+================================= df['A':'C'] ==================================
+        one       bar       two   flag  five  one_trunc
+A -0.883178 -2.452269 -1.569091  False     5  -0.883178
+B  0.563423  1.134681  0.571258   True     5   0.563423
+C  0.290994 -0.116181 -0.407175   True     5        NaN
+================================= df.iloc[2:4] =================================
+        one       bar       two  flag  five  one_trunc
+C  0.290994 -0.116181 -0.407175  True     5        NaN
+D  1.171879  2.373776  1.201897  True     5        NaN
+=============================== df[df.one &gt; 0.5] ===============================
+        one       bar       two  flag  five  one_trunc
+B  0.563423  1.134681  0.571258  True     5   0.563423
+D  1.171879  2.373776  1.201897  True     5        NaN
+================================== df[df &gt; 0] ==================================
+        one       bar       two  flag  five  one_trunc
+A       NaN       NaN       NaN   NaN     5        NaN
+B  0.563423  1.134681  0.571258   1.0     5   0.563423
+C  0.290994       NaN       NaN   1.0     5        NaN
+D  1.171879  2.373776  1.201897   1.0     5        NaN
+E       NaN       NaN  0.274066   NaN     5        NaN
+F  0.278929  0.023927       NaN   1.0     5        NaN
+================= df[[False, True, True, False, True, False]] ==================
+        one       bar       two   flag  five  one_trunc
+B  0.563423  1.134681  0.571258   True     5   0.563423
+C  0.290994 -0.116181 -0.407175   True     5        NaN
+E -1.680215 -1.406149  0.274066  False     5        NaN
 </pre>
 </div>
 </div>
 
 
-<div id="outline-container-sec-4-5" class="outline-3">
-<h3 id="sec-4-5"><span class="section-number-3">4.5</span> 选择行与列</h3>
-<div class="outline-text-3" id="text-4-5">
+<div id="outline-container-sec-1-2-2-8" class="outline-5">
+<h5 id="sec-1-2-2-8"><span class="section-number-5">1.2.2.8</span> 行删除</h5>
+<div class="outline-text-5" id="text-1-2-2-8">
 <div class="org-src-container">
 
-<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.loc['20160301':'20160305', ['A', 'B']]"</span>, df.loc[<span style="color: #ff4ea3;">'20160301'</span>:<span style="color: #ff4ea3;">'20160305'</span>, [<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'B'</span>]])
-log(<span style="color: #ff4ea3;">"df.iloc[1:3, 2:4]"</span>, df.iloc[1:3, 2:4])
+<pre class="src src-ipython"><span style="color: #ff8700;">result</span> = df.drop(<span style="color: #ff4ea3;">'A'</span>)           <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">result &#26159;&#19968;&#20221;&#26032;&#30340;&#25968;&#25454;&#25335;&#36125;</span>
+log(<span style="color: #ff4ea3;">"result"</span>, result)
 </pre>
 </div>
 
 <pre class="example">
-================== df.loc['20160301':'20160305', ['A', 'B']] ===================
-                   A         B
-2016-03-01  0.532636  0.356540
-2016-03-02  0.083138 -1.824050
-2016-03-03  0.745254  0.695164
-2016-03-04 -1.873410  0.109342
-2016-03-05 -0.035570 -0.782426
-============================== df.iloc[1:3, 2:4] ===============================
-                   C         D
-2016-03-02 -0.090720 -0.311539
-2016-03-03 -0.662537 -0.224461
+==================================== result ====================================
+        one       bar       two   flag  five  one_trunc
+B  0.563423  1.134681  0.571258   True     5   0.563423
+C  0.290994 -0.116181 -0.407175   True     5        NaN
+D  1.171879  2.373776  1.201897   True     5        NaN
+E -1.680215 -1.406149  0.274066  False     5        NaN
+F  0.278929  0.023927 -0.255002   True     5        NaN
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-2-9" class="outline-5">
+<h5 id="sec-1-2-2-9"><span class="section-number-5">1.2.2.9</span> 行与列选择</h5>
+<div class="outline-text-5" id="text-1-2-2-9">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.loc['A':'B', ['one', 'two']]"</span>, df.loc[<span style="color: #ff4ea3;">'A'</span>:<span style="color: #ff4ea3;">'B'</span>, [<span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'two'</span>]])
+log(<span style="color: #ff4ea3;">"df.iloc[0:2, 0:3]"</span>, df.iloc[0:2, 0:3])
+</pre>
+</div>
+
+<pre class="example">
+======================= df.loc['A':'B', ['one', 'two']] ========================
+        one       two
+A -0.883178 -1.569091
+B  0.563423  0.571258
+============================== df.iloc[0:2, 0:3] ===============================
+        one       bar       two
+A -0.883178 -2.452269 -1.569091
+B  0.563423  1.134681  0.571258
 </pre>
 </div>
 </div>
 
 
-<div id="outline-container-sec-4-6" class="outline-3">
-<h3 id="sec-4-6"><span class="section-number-3">4.6</span> 选择指定坐标</h3>
-<div class="outline-text-3" id="text-4-6">
+<div id="outline-container-sec-1-2-2-10" class="outline-5">
+<h5 id="sec-1-2-2-10"><span class="section-number-5">1.2.2.10</span> 选择指定坐标</h5>
+<div class="outline-text-5" id="text-1-2-2-10">
 <div class="org-src-container">
 
-<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.loc['2016-03-01', 'A']"</span>, df.loc[<span style="color: #ff4ea3;">'2016-03-01'</span>, <span style="color: #ff4ea3;">'A'</span>])
-log(<span style="color: #ff4ea3;">"df.at[pd.Timestamp('2016-03-01'), 'A']"</span>, df.at[pd.Timestamp(<span style="color: #ff4ea3;">'2016-03-01'</span>), <span style="color: #ff4ea3;">'A'</span>])
-<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">df.at['2016-03-01', 'A'] will raise error</span>
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.loc['A', 'one']"</span>, df.loc[<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'one'</span>])
+log(<span style="color: #ff4ea3;">"df.at['A', 'one']"</span>, df.at[<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'one'</span>])
 log(<span style="color: #ff4ea3;">"df.iloc[1, 1]"</span>, df.iloc[1, 1])
 log(<span style="color: #ff4ea3;">"df.iat[1, 1]"</span>, df.iat[1, 1])
 </pre>
 </div>
 
 <pre class="example">
-========================== df.loc['2016-03-01', 'A'] ===========================
-0.5326355967336309
-==================== df.at[pd.Timestamp('2016-03-01'), 'A'] ====================
-0.5326355967336309
+============================== df.loc['A', 'one'] ==============================
+-0.8831783611304017
+============================== df.at['A', 'one'] ===============================
+-0.8831783611304017
 ================================ df.iloc[1, 1] =================================
--1.8240504511239488
+1.1346811805979917
 ================================= df.iat[1, 1] =================================
--1.8240504511239488
+1.1346811805979917
 </pre>
 </div>
 </div>
 
-<div id="outline-container-sec-4-7" class="outline-3">
-<h3 id="sec-4-7"><span class="section-number-3">4.7</span> 布尔选择</h3>
-<div class="outline-text-3" id="text-4-7">
+
+<div id="outline-container-sec-1-2-2-11" class="outline-5">
+<h5 id="sec-1-2-2-11"><span class="section-number-5">1.2.2.11</span> 数据对齐</h5>
+<div class="outline-text-5" id="text-1-2-2-11">
+<p>
+DataFrame 在进行数据计算时， <b>会自动按行和列进行数据对齐</b> 。
+最终的计算结果会合并两个 DataFrame 。
+</p>
+
 <div class="org-src-container">
 
-<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df[df.A &lt; 0]"</span>, df[df.A &lt; 0])
-log(<span style="color: #ff4ea3;">"df[df &gt; 0]"</span>, df[df &gt; 0])
+<pre class="src src-ipython"><span style="color: #ff8700;">df1</span> = pd.DataFrame(np.random.randn(10, 4),
+                   index=<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'abcdefghij'</span>),
+                   columns=[<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'B'</span>, <span style="color: #ff4ea3;">'C'</span>, <span style="color: #ff4ea3;">'D'</span>])
+
+<span style="color: #ff8700;">df2</span> = pd.DataFrame(np.random.randn(7, 3),
+                   index=<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'cdefghi'</span>),
+                   columns=[<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'B'</span>, <span style="color: #ff4ea3;">'C'</span>])
+
+log(<span style="color: #ff4ea3;">"df1"</span>, df1)
+log(<span style="color: #ff4ea3;">"df2"</span>, df2)
+
+log(<span style="color: #ff4ea3;">"df1 + df2"</span>, df1 + df2)
+log(<span style="color: #ff4ea3;">"df1 - df1.iloc[0]"</span>, df1 - df1.iloc[0])
 </pre>
 </div>
 
 <pre class="example">
-================================= df[df.A &lt; 0] =================================
-                   A         B         C         D
-2016-03-04 -1.873410  0.109342  0.533539  0.259526
-2016-03-05 -0.035570 -0.782426 -0.448951  1.048616
-2016-03-06 -1.234143  0.208506  1.386050 -1.733326
-================================== df[df &gt; 0] ==================================
-                   A         B         C         D
-2016-03-01  0.532636  0.356540       NaN       NaN
-2016-03-02  0.083138       NaN       NaN       NaN
-2016-03-03  0.745254  0.695164       NaN       NaN
-2016-03-04       NaN  0.109342  0.533539  0.259526
-2016-03-05       NaN       NaN       NaN  1.048616
-2016-03-06       NaN  0.208506  1.386050       NaN
+===================================== df1 ======================================
+          A         B         C         D
+a -0.019614  0.126821  0.665216  0.242191
+b -0.308662  1.282776 -0.873227  0.081559
+c  0.079214 -1.529597  0.677124 -0.094919
+d  1.004413  0.614462 -1.345038  0.197602
+e -1.211647 -0.721458 -0.693457 -1.806826
+f  1.150716 -1.431315 -1.093433  0.182556
+g -0.377977 -0.386689 -0.834157 -0.502327
+h -0.476828  0.357593  0.348420  0.789929
+i -1.453757  1.926284  1.710175  1.110698
+j -1.099740 -1.449751 -1.246440  0.748631
+===================================== df2 ======================================
+          A         B         C
+c  1.383904 -0.605348  1.039699
+d -0.046129  1.256273  1.093310
+e  0.134646  0.181091 -0.616410
+f  1.139431 -0.352482  0.456517
+g  1.344378  0.291439  1.269441
+h -0.299056  0.986296  0.717988
+i  0.678626  1.936283  1.033897
+================================== df1 + df2 ===================================
+          A         B         C   D
+a       NaN       NaN       NaN NaN
+b       NaN       NaN       NaN NaN
+c  1.463118 -2.134945  1.716823 NaN
+d  0.958284  1.870734 -0.251728 NaN
+e -1.077001 -0.540367 -1.309867 NaN
+f  2.290147 -1.783797 -0.636916 NaN
+g  0.966402 -0.095250  0.435284 NaN
+h -0.775884  1.343889  1.066408 NaN
+i -0.775132  3.862567  2.744072 NaN
+j       NaN       NaN       NaN NaN
+============================== df1 - df1.iloc[0] ===============================
+          A         B         C         D
+a  0.000000  0.000000  0.000000  0.000000
+b -0.289048  1.155955 -1.538443 -0.160632
+c  0.098828 -1.656418  0.011908 -0.337110
+d  1.024027  0.487641 -2.010254 -0.044589
+e -1.192034 -0.848279 -1.358673 -2.049017
+f  1.170330 -1.558136 -1.758648 -0.059635
+g -0.358363 -0.513510 -1.499373 -0.744518
+h -0.457214  0.230772 -0.316796  0.547738
+i -1.434144  1.799463  1.044960  0.868507
+j -1.080126 -1.576572 -1.911655  0.506440
+</pre>
+
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">df3</span> = df2.loc[:, [<span style="color: #ff4ea3;">'B'</span>, <span style="color: #ff4ea3;">'C'</span>]].copy()
+log(<span style="color: #ff4ea3;">"df3 (before)"</span>, df3)
+<span style="color: #ff8700;">df3</span>[df3 &gt; 0] = -df3
+log(<span style="color: #ff4ea3;">"df3 (after)"</span>, df3)
+</pre>
+</div>
+
+<pre class="example">
+================================= df3 (before) =================================
+          B         C
+c -0.605348  1.039699
+d  1.256273  1.093310
+e  0.181091 -0.616410
+f -0.352482  0.456517
+g  0.291439  1.269441
+h  0.986296  0.717988
+i  1.936283  1.033897
+================================= df3 (after) ==================================
+          B         C
+c -0.605348 -1.039699
+d -1.256273 -1.093310
+e -0.181091 -0.616410
+f -0.352482 -0.456517
+g -0.291439 -1.269441
+h -0.986296 -0.717988
+i -1.936283 -1.033897
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-2-12" class="outline-5">
+<h5 id="sec-1-2-2-12"><span class="section-number-5">1.2.2.12</span> 使用 numpy 函数</h5>
+<div class="outline-text-5" id="text-1-2-2-12">
+<p>
+因为从本质上讲，DataFrame 内部用的数据结构就是 numpy 的 ndarray 。
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">df</span> = pd.DataFrame(np.random.randn(10, 4), columns=[<span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'two'</span>, <span style="color: #ff4ea3;">'three'</span>, <span style="color: #ff4ea3;">'four'</span>])
+log(<span style="color: #ff4ea3;">"np.exp(df)"</span>, np.exp(df))
+log(<span style="color: #ff4ea3;">"np.sin(df)"</span>, np.sin(df))
+</pre>
+</div>
+
+<pre class="example">
+================================== np.exp(df) ==================================
+        one       two     three      four
+0  2.556802  0.929056  0.560815  1.366921
+1  1.720174  1.579260  9.579832  0.863667
+2  0.518708  7.984518  0.093743  0.637652
+3  1.076955  0.206827  0.981211  0.897555
+4  0.370664  0.293923  0.122741  1.598987
+5  2.736577  0.474548  0.522088  6.761482
+6  1.637848  1.535084  0.135364  0.192315
+7  4.484296  0.244593  2.711336  0.414157
+8  0.826744  6.181238  0.184613  0.396710
+9  2.162772  2.560361  0.286384  0.663309
+================================== np.sin(df) ==================================
+        one       two     three      four
+0  0.806825 -0.073519 -0.546655  0.307496
+1  0.516215  0.441219  0.771969 -0.146044
+2 -0.610281  0.874347 -0.699284 -0.434932
+3  0.074069 -0.999987 -0.018967 -0.107870
+4 -0.837373 -0.940616 -0.864381  0.452325
+5  0.845076 -0.678260 -0.605122  0.942606
+6  0.473608  0.415584 -0.909387 -0.996973
+7  0.997536 -0.986804  0.840086 -0.771700
+8 -0.189114  0.968733 -0.992964 -0.798349
+9  0.697133  0.807646 -0.949117 -0.399080
+</pre>
+</div>
+
+<div id="outline-container-sec-1-2-2-12-1" class="outline-6">
+<h6 id="sec-1-2-2-12-1"><span class="section-number-6">1.2.2.12.1</span> DataFrame 转换为 ndarray 对象</h6>
+<div class="outline-text-6" id="text-1-2-2-12-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">ary</span> = np.asarray(df)
+log(<span style="color: #ff4ea3;">"ary"</span>, ary)
+log(<span style="color: #ff4ea3;">"ary == df.values"</span>, ary == df.values)
+log(<span style="color: #ff4ea3;">"ary == df"</span>, ary == df)
+</pre>
+</div>
+
+<pre class="example">
+===================================== ary ======================================
+[[ 0.93875722 -0.07358588 -0.57836376  0.31256077]
+ [ 0.54242568  0.45695646  2.25966008 -0.14656796]
+ [-0.65641485  2.07750437 -2.36719686 -0.44996232]
+ [ 0.07413724 -1.57587055 -0.01896803 -0.10808033]
+ [-0.99246045 -1.22443913 -2.09767503  0.46937019]
+ [ 1.00670802 -0.74539147 -0.64991935  1.91124206]
+ [ 0.49338332  0.42858484 -1.99978558 -1.64861979]
+ [ 1.50058141 -1.40815987  0.99744151 -0.88150959]
+ [-0.1902601   1.82151865 -1.68949499 -0.92454915]
+ [ 0.7713908   0.94014842 -1.25042155 -0.41051361]]
+=============================== ary == df.values ===============================
+[[ True  True  True  True]
+ [ True  True  True  True]
+ [ True  True  True  True]
+ [ True  True  True  True]
+ [ True  True  True  True]
+ [ True  True  True  True]
+ [ True  True  True  True]
+ [ True  True  True  True]
+ [ True  True  True  True]
+ [ True  True  True  True]]
+================================== ary == df ===================================
+    one   two  three  four
+0  True  True   True  True
+1  True  True   True  True
+2  True  True   True  True
+3  True  True   True  True
+4  True  True   True  True
+5  True  True   True  True
+6  True  True   True  True
+7  True  True   True  True
+8  True  True   True  True
+9  True  True   True  True
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> Panel</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+Panel 是三维带标签的数组。
+</p>
+
+<p>
+Panel 由三个标签组成：
+</p>
+
+<dl class="org-dl">
+<dt> items </dt><dd>坐标轴 0 ，索引对应的元素是一个 DataFrame
+</dd>
+<dt> major_axis </dt><dd>坐标轴 1 , DataFrame 里的行标签
+</dd>
+<dt> minor_axis </dt><dd>坐标轴 2 , DataFrame 里的列标签
+</dd>
+</dl>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> 函数应用</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> 将数据按行或列进行计算(apply)</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">df</span> = pd.DataFrame(np.arange(12).reshape(4, 3),
+                  index=[<span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'two'</span>, <span style="color: #ff4ea3;">'three'</span>, <span style="color: #ff4ea3;">'four'</span>],
+                  columns=<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'ABC'</span>))
+
+log(<span style="color: #ff4ea3;">"df"</span>, df)
+</pre>
+</div>
+
+<pre class="example">
+====================================== df ======================================
+       A   B   C
+one    0   1   2
+two    3   4   5
+three  6   7   8
+four   9  10  11
+</pre>
+</div>
+
+<div id="outline-container-sec-2-1-0-1" class="outline-5">
+<h5 id="sec-2-1-0-1"><span class="section-number-5">2.1.0.1</span> 按列进行运算</h5>
+<div class="outline-text-5" id="text-2-1-0-1">
+<p>
+每一列作为一个 Series 作为参数传递给 lambda 函数
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">result</span> = df.<span style="color: #d18aff;">apply</span>(<span style="color: #a1db00;">lambda</span> x: x.<span style="color: #d18aff;">max</span>() - x.<span style="color: #d18aff;">min</span>())
+log(<span style="color: #ff4ea3;">"result"</span>, result)
+</pre>
+</div>
+
+<pre class="example">
+==================================== result ====================================
+A    9
+B    9
+C    9
+dtype: int64
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-2-1-0-2" class="outline-5">
+<h5 id="sec-2-1-0-2"><span class="section-number-5">2.1.0.2</span> 按行进行运算</h5>
+<div class="outline-text-5" id="text-2-1-0-2">
+<p>
+每一行作为一个 Series 作为参数传递给 lambda 函数
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">result</span> = df.<span style="color: #d18aff;">apply</span>(<span style="color: #a1db00;">lambda</span> x: x.<span style="color: #d18aff;">max</span>() - x.<span style="color: #d18aff;">min</span>(), axis=1)
+log(<span style="color: #ff4ea3;">"result"</span>, result)
+</pre>
+</div>
+
+<pre class="example">
+==================================== result ====================================
+one      2
+two      2
+three    2
+four     2
+dtype: int64
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-2-1-0-3" class="outline-5">
+<h5 id="sec-2-1-0-3"><span class="section-number-5">2.1.0.3</span> 返回多个值组成的 Series</h5>
+<div class="outline-text-5" id="text-2-1-0-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">def</span> <span style="color: #ffd700;">min_max</span>(x):
+    <span style="color: #a1db00;">return</span> pd.Series([x.<span style="color: #d18aff;">min</span>(), x.<span style="color: #d18aff;">max</span>()], index=[<span style="color: #ff4ea3;">'min'</span>, <span style="color: #ff4ea3;">'max'</span>])
+<span style="color: #ff8700;">result</span> = df.<span style="color: #d18aff;">apply</span>(min_max, axis=1)
+log(<span style="color: #ff4ea3;">"result"</span>, result)
+</pre>
+</div>
+
+<pre class="example">
+==================================== result ====================================
+       min  max
+one      0    2
+two      3    5
+three    6    8
+four     9   11
 </pre>
 </div>
 </div>
 </div>
 
 
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> 逐元素运算(applymap)</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
 
-<div id="outline-container-sec-5" class="outline-2">
-<h2 id="sec-5"><span class="section-number-2">5</span> 处理丢失数据</h2>
-<div class="outline-text-2" id="text-5">
+<pre class="src src-ipython"><span style="color: #ff8700;">df</span> = pd.DataFrame(np.random.randn(4, 3),
+                  index=[<span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'two'</span>, <span style="color: #ff4ea3;">'three'</span>, <span style="color: #ff4ea3;">'four'</span>],
+                  columns=<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'ABC'</span>))
+
+log(<span style="color: #ff4ea3;">"df"</span>, df)
+</pre>
+</div>
+
+<pre class="example">
+====================================== df ======================================
+              A         B         C
+one   -0.532705  0.733568  0.261089
+two   -0.841090 -1.850960  1.045689
+three -0.988623 -0.302227 -1.271004
+four   0.992151  0.990394  1.866412
+</pre>
+
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">x &#34920;&#31034; dataframe &#20013;&#30340;&#27599;&#20010;&#20803;&#32032;</span>
+<span style="color: #ff8700;">result</span> = df.applymap(<span style="color: #a1db00;">lambda</span> x: <span style="color: #ff4ea3;">'{0:.03f}'</span>.<span style="color: #d18aff;">format</span>(x))
+log(<span style="color: #ff4ea3;">"result"</span>, result)
+</pre>
+</div>
+
+<pre class="example">
+==================================== result ====================================
+            A       B       C
+one    -0.533   0.734   0.261
+two    -0.841  -1.851   1.046
+three  -0.989  -0.302  -1.271
+four    0.992   0.990   1.866
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> 排序(sort_values)</h3>
+<div class="outline-text-3" id="text-2-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">df</span> = pd.DataFrame(np.random.randint(1, 10, (4, 3)),
+                  index=<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'ABCD'</span>),
+                  columns=[<span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'two'</span>, <span style="color: #ff4ea3;">'three'</span>])
+
+log(<span style="color: #ff4ea3;">"df"</span>, df)
+</pre>
+</div>
+
+<pre class="example">
+====================================== df ======================================
+   one  two  three
+A    6    6      1
+B    7    4      4
+C    9    1      8
+D    7    8      2
+</pre>
+</div>
+
+
+<div id="outline-container-sec-2-3-1" class="outline-4">
+<h4 id="sec-2-3-1"><span class="section-number-4">2.3.1</span> 按列排序</h4>
+<div class="outline-text-4" id="text-2-3-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">result</span> = df.sort_values(by=<span style="color: #ff4ea3;">'two'</span>, ascending=<span style="color: #5fafd7;">False</span>)
+log(<span style="color: #ff4ea3;">"result"</span>, result)
+</pre>
+</div>
+
+<pre class="example">
+==================================== result ====================================
+   one  two  three
+D    7    8      2
+A    6    6      1
+B    7    4      4
+C    9    1      8
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-2-3-2" class="outline-4">
+<h4 id="sec-2-3-2"><span class="section-number-4">2.3.2</span> 按行排序</h4>
+<div class="outline-text-4" id="text-2-3-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">result</span> = df.sort_values(by=<span style="color: #ff4ea3;">'C'</span>, axis=1, ascending=<span style="color: #5fafd7;">False</span>)
+log(<span style="color: #ff4ea3;">"result"</span>, result)
+</pre>
+</div>
+
+<pre class="example">
+==================================== result ====================================
+   one  three  two
+A    6      1    6
+B    7      4    4
+C    9      8    1
+D    7      2    8
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> 索引排序(sort_index)</h3>
+<div class="outline-text-3" id="text-2-4">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">df</span> = pd.DataFrame(np.random.randint(1, 10, (4, 3)),
+                  index=<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'ABCD'</span>),
+                  columns=[<span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'two'</span>, <span style="color: #ff4ea3;">'three'</span>])
+
+log(<span style="color: #ff4ea3;">"df"</span>, df)
+</pre>
+</div>
+
+<pre class="example">
+====================================== df ======================================
+   one  two  three
+A    6    3      6
+B    3    8      3
+C    8    7      9
+D    8    4      9
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">col_sort</span> = df.sort_index(axis=1, ascending=<span style="color: #5fafd7;">False</span>)
+<span style="color: #ff8700;">row_sort</span> = df.sort_index(ascending=<span style="color: #5fafd7;">False</span>)
+
+log(<span style="color: #ff4ea3;">"col_sort"</span>, col_sort)
+log(<span style="color: #ff4ea3;">"row_sort"</span>, row_sort)
+</pre>
+</div>
+
+<pre class="example">
+=================================== col_sort ===================================
+   two  three  one
+A    3      6    6
+B    8      3    3
+C    7      9    8
+D    4      9    8
+=================================== row_sort ===================================
+   one  two  three
+D    8    4      9
+C    8    7      9
+B    3    8      3
+A    6    3      6
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-5" class="outline-3">
+<h3 id="sec-2-5"><span class="section-number-3">2.5</span> 排名(rank)</h3>
+<div class="outline-text-3" id="text-2-5">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">s</span> = pd.Series([3, 6, 2, 6, 4])
+<span style="color: #ff8700;">df</span> = pd.DataFrame(np.random.randint(1, 10, (4, 3)),
+                  index=<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'ABCD'</span>),
+                  columns=[<span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'two'</span>, <span style="color: #ff4ea3;">'three'</span>])
+
+log(<span style="color: #ff4ea3;">"s"</span>, s)
+log(<span style="color: #ff4ea3;">"df"</span>, df)
+</pre>
+</div>
+
+<pre class="example">
+====================================== s =======================================
+0    3
+1    6
+2    2
+3    6
+4    4
+dtype: int64
+====================================== df ======================================
+   one  two  three
+A    5    9      7
+B    3    5      3
+C    8    6      4
+D    9    6      5
+</pre>
+
+
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">s_result</span> = s.rank(method=<span style="color: #ff4ea3;">'first'</span>, ascending=<span style="color: #5fafd7;">False</span>)
+log(<span style="color: #ff4ea3;">"s_result"</span>, s_result)
+</pre>
+</div>
+
+<pre class="example">
+=================================== s_result ===================================
+0    4.0
+1    1.0
+2    5.0
+3    2.0
+4    3.0
+dtype: float64
+</pre>
+
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">df_result</span> = df.rank(method=<span style="color: #ff4ea3;">'first'</span>)
+log(<span style="color: #ff4ea3;">"df_result"</span>, df_result)
+</pre>
+</div>
+
+<pre class="example">
+================================== df_result ===================================
+   one  two  three
+A  2.0  4.0    4.0
+B  1.0  1.0    1.0
+C  3.0  2.0    2.0
+D  4.0  3.0    3.0
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-6" class="outline-3">
+<h3 id="sec-2-6"><span class="section-number-3">2.6</span> Series 元素统计</h3>
+<div class="outline-text-3" id="text-2-6">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">s</span> = pd.Series(<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'abbcdabacad'</span>))
+log(<span style="color: #ff4ea3;">"s"</span>, s)
+</pre>
+</div>
+
+<pre class="example">
+====================================== s =======================================
+0     a
+1     b
+2     b
+3     c
+4     d
+5     a
+6     b
+7     a
+8     c
+9     a
+10    d
+dtype: object
+</pre>
+</div>
+
+<div id="outline-container-sec-2-6-1" class="outline-4">
+<h4 id="sec-2-6-1"><span class="section-number-4">2.6.1</span> 个数统计(value_counts)</h4>
+<div class="outline-text-4" id="text-2-6-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"s.value_counts()"</span>, s.value_counts())
+</pre>
+</div>
+
+<pre class="example">
+=============================== s.value_counts() ===============================
+a    4
+b    3
+c    2
+d    2
+dtype: int64
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-2-6-2" class="outline-4">
+<h4 id="sec-2-6-2"><span class="section-number-4">2.6.2</span> 唯一性统计(uniq)</h4>
+<div class="outline-text-4" id="text-2-6-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"s.unique()"</span>, s.unique())
+</pre>
+</div>
+
+<pre class="example">
+================================== s.unique() ==================================
+['a' 'b' 'c' 'd']
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-6-3" class="outline-4">
+<h4 id="sec-2-6-3"><span class="section-number-4">2.6.3</span> 成员资格统计(isin)</h4>
+<div class="outline-text-4" id="text-2-6-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"s.isin(['a', 'b', 'c'])"</span>, s.isin([<span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'b'</span>, <span style="color: #ff4ea3;">'c'</span>]))
+</pre>
+</div>
+
+<pre class="example">
+=========================== s.isin(['a', 'b', 'c']) ============================
+0      True
+1      True
+2      True
+3      True
+4     False
+5      True
+6      True
+7      True
+8      True
+9      True
+10    False
+dtype: bool
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> 处理丢失数据</h2>
+<div class="outline-text-2" id="text-3">
 <div class="org-src-container">
 
 <pre class="src src-ipython"><span style="color: #ff8700;">dates</span> = pd.date_range(<span style="color: #ff4ea3;">'20160301'</span>, periods=6)
@@ -849,16 +2267,16 @@ log(<span style="color: #ff4ea3;">"df1"</span>, df1)
 <pre class="example">
 ===================================== df1 ======================================
                    A         B         C         D    E
-2016-03-01  1.020773  1.023099  0.105737 -0.111994  NaN
-2016-03-02 -0.778058  1.298551  0.449568  0.851687  1.0
-2016-03-03 -1.213934  0.908412  1.350923 -0.778425  1.0
-2016-03-04 -1.528374 -0.032039  0.433028  0.650533  NaN
+2016-03-01 -0.527115 -1.116024  1.506698  0.593771  NaN
+2016-03-02 -0.505900 -0.095077  0.369228 -0.409652  1.0
+2016-03-03 -0.378624 -0.028224  0.004317  0.576436  1.0
+2016-03-04 -0.687604 -0.932040 -0.063781 -1.173488  NaN
 </pre>
 </div>
 
-<div id="outline-container-sec-5-1" class="outline-3">
-<h3 id="sec-5-1"><span class="section-number-3">5.1</span> 丢弃 NaN 行</h3>
-<div class="outline-text-3" id="text-5-1">
+<div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> 丢弃 NaN 行</h3>
+<div class="outline-text-3" id="text-3-1">
 <div class="org-src-container">
 
 <pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df1.dropna(how='any')"</span>, df1.dropna(how=<span style="color: #ff4ea3;">'any'</span>))
@@ -868,15 +2286,15 @@ log(<span style="color: #ff4ea3;">"df1"</span>, df1)
 <pre class="example">
 ============================ df1.dropna(how='any') =============================
                    A         B         C         D    E
-2016-03-02 -0.778058  1.298551  0.449568  0.851687  1.0
-2016-03-03 -1.213934  0.908412  1.350923 -0.778425  1.0
+2016-03-02 -0.505900 -0.095077  0.369228 -0.409652  1.0
+2016-03-03 -0.378624 -0.028224  0.004317  0.576436  1.0
 </pre>
 </div>
 </div>
 
-<div id="outline-container-sec-5-2" class="outline-3">
-<h3 id="sec-5-2"><span class="section-number-3">5.2</span> 用默认值替换 NaN</h3>
-<div class="outline-text-3" id="text-5-2">
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> 用默认值替换 NaN</h3>
+<div class="outline-text-3" id="text-3-2">
 <div class="org-src-container">
 
 <pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df1.fillna(value=5)"</span>, df1.fillna(value=5))
@@ -886,17 +2304,17 @@ log(<span style="color: #ff4ea3;">"df1"</span>, df1)
 <pre class="example">
 ============================= df1.fillna(value=5) ==============================
                    A         B         C         D    E
-2016-03-01  1.020773  1.023099  0.105737 -0.111994  5.0
-2016-03-02 -0.778058  1.298551  0.449568  0.851687  1.0
-2016-03-03 -1.213934  0.908412  1.350923 -0.778425  1.0
-2016-03-04 -1.528374 -0.032039  0.433028  0.650533  5.0
+2016-03-01 -0.527115 -1.116024  1.506698  0.593771  5.0
+2016-03-02 -0.505900 -0.095077  0.369228 -0.409652  1.0
+2016-03-03 -0.378624 -0.028224  0.004317  0.576436  1.0
+2016-03-04 -0.687604 -0.932040 -0.063781 -1.173488  5.0
 </pre>
 </div>
 </div>
 
-<div id="outline-container-sec-5-3" class="outline-3">
-<h3 id="sec-5-3"><span class="section-number-3">5.3</span> 判断数据集是否包含 NaN</h3>
-<div class="outline-text-3" id="text-5-3">
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> 判断数据集是否包含 NaN</h3>
+<div class="outline-text-3" id="text-3-3">
 <div class="org-src-container">
 
 <pre class="src src-ipython">log(<span style="color: #ff4ea3;">"pd.isnull(df1)"</span>, pd.isnull(df1))
@@ -926,9 +2344,9 @@ True
 </div>
 
 
-<div id="outline-container-sec-5-4" class="outline-3">
-<h3 id="sec-5-4"><span class="section-number-3">5.4</span> NaN 不参与运算</h3>
-<div class="outline-text-3" id="text-5-4">
+<div id="outline-container-sec-3-4" class="outline-3">
+<h3 id="sec-3-4"><span class="section-number-3">3.4</span> NaN 不参与运算</h3>
+<div class="outline-text-3" id="text-3-4">
 <div class="org-src-container">
 
 <pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df1.mean()"</span>, df1.mean())
@@ -938,17 +2356,17 @@ log(<span style="color: #ff4ea3;">"df1.mean(axis=1)"</span>, df1.mean(axis=1))
 
 <pre class="example">
 ================================== df1.mean() ==================================
-A   -0.624898
-B    0.799506
-C    0.584814
-D    0.152950
+A   -0.524811
+B   -0.542841
+C    0.454115
+D   -0.103233
 E    1.000000
 dtype: float64
 =============================== df1.mean(axis=1) ===============================
-2016-03-01    0.509404
-2016-03-02    0.564350
-2016-03-03    0.253395
-2016-03-04   -0.119213
+2016-03-01    0.114333
+2016-03-02    0.071720
+2016-03-03    0.234781
+2016-03-04   -0.714228
 Freq: D, dtype: float64
 </pre>
 
@@ -961,17 +2379,17 @@ log(<span style="color: #ff4ea3;">"df1.sum(axis=1)"</span>, df1.<span style="col
 
 <pre class="example">
 ================================== df1.sum() ===================================
-A   -2.499592
-B    3.198023
-C    2.339256
-D    0.611801
+A   -2.099243
+B   -2.171365
+C    1.816462
+D   -0.412933
 E    2.000000
 dtype: float64
 =============================== df1.sum(axis=1) ================================
-2016-03-01    2.037616
-2016-03-02    2.821748
-2016-03-03    1.266977
-2016-03-04   -0.476853
+2016-03-01    0.457330
+2016-03-02    0.358599
+2016-03-03    1.173906
+2016-03-04   -2.856913
 Freq: D, dtype: float64
 </pre>
 
@@ -995,19 +2413,19 @@ log(<span style="color: #ff4ea3;">"df.sub(s, axis='index')"</span>, df.sub(s, ax
 Freq: D, dtype: float64
 ====================================== df ======================================
                    A         B         C         D
-2016-03-01  1.020773  1.023099  0.105737 -0.111994
-2016-03-02 -0.778058  1.298551  0.449568  0.851687
-2016-03-03 -1.213934  0.908412  1.350923 -0.778425
-2016-03-04 -1.528374 -0.032039  0.433028  0.650533
-2016-03-05  0.214027 -1.227334 -0.110959 -1.009341
-2016-03-06 -2.417962 -0.359982  0.670071 -0.560019
+2016-03-01 -0.527115 -1.116024  1.506698  0.593771
+2016-03-02 -0.505900 -0.095077  0.369228 -0.409652
+2016-03-03 -0.378624 -0.028224  0.004317  0.576436
+2016-03-04 -0.687604 -0.932040 -0.063781 -1.173488
+2016-03-05 -1.301733 -1.215259 -1.232233  0.099956
+2016-03-06  0.597856  0.181732 -0.188227 -0.774593
 =========================== df.sub(s, axis='index') ============================
                    A         B         C         D
 2016-03-01       NaN       NaN       NaN       NaN
 2016-03-02       NaN       NaN       NaN       NaN
-2016-03-03 -2.213934 -0.091588  0.350923 -1.778425
-2016-03-04 -4.528374 -3.032039 -2.566972 -2.349467
-2016-03-05 -4.785973 -6.227334 -5.110959 -6.009341
+2016-03-03 -1.378624 -1.028224 -0.995683 -0.423564
+2016-03-04 -3.687604 -3.932040 -3.063781 -4.173488
+2016-03-05 -6.301733 -6.215259 -6.232233 -4.900044
 2016-03-06       NaN       NaN       NaN       NaN
 </pre>
 </div>
@@ -1015,9 +2433,9 @@ Freq: D, dtype: float64
 </div>
 
 
-<div id="outline-container-sec-6" class="outline-2">
-<h2 id="sec-6"><span class="section-number-2">6</span> 数据操作</h2>
-<div class="outline-text-2" id="text-6">
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> 数据操作</h2>
+<div class="outline-text-2" id="text-4">
 <div class="org-src-container">
 
 <pre class="src src-ipython"><span style="color: #ff8700;">dates</span> = pd.date_range(<span style="color: #ff4ea3;">'20160301'</span>, periods=6)
@@ -1029,159 +2447,20 @@ log(<span style="color: #ff4ea3;">"df"</span>, df)
 <pre class="example">
 ====================================== df ======================================
                    A         B         C         D
-2016-03-01  0.697232  0.607249 -0.149952  0.399362
-2016-03-02  0.637409  0.102238  0.352435 -1.051465
-2016-03-03  1.502642  0.005583  0.698379 -2.819079
-2016-03-04 -0.401596 -0.164851 -1.621371 -1.051040
-2016-03-05 -0.320215 -0.322924  0.000743  0.445042
-2016-03-06  0.302772  1.201058 -1.055231 -0.507314
+2016-03-01  0.738720  0.241603  2.426864 -1.815852
+2016-03-02 -0.181157  0.609030  0.285647 -2.080525
+2016-03-03 -1.474873 -1.160844 -2.128148 -0.267674
+2016-03-04 -0.504567  0.425355  0.644578  0.963721
+2016-03-05  0.239487 -0.315634  2.465795  0.458451
+2016-03-06  0.554252 -1.138592  0.298728  0.290909
 </pre>
 </div>
 
 
-<div id="outline-container-sec-6-1" class="outline-3">
-<h3 id="sec-6-1"><span class="section-number-3">6.1</span> 增加列</h3>
-<div class="outline-text-3" id="text-6-1">
-<div class="org-src-container">
 
-<pre class="src src-ipython"><span style="color: #ff8700;">s</span> = pd.Series(np.arange(6), index=pd.date_range(<span style="color: #ff4ea3;">'20160301'</span>, periods=6))
-<span style="color: #ff8700;">df</span>[<span style="color: #ff4ea3;">'E'</span>] = s
-log(<span style="color: #ff4ea3;">"df"</span>, df)
-</pre>
-</div>
-
-<pre class="example">
-====================================== df ======================================
-                   A         B         C         D  E
-2016-03-01  0.697232  0.607249 -0.149952  0.399362  0
-2016-03-02  0.637409  0.102238  0.352435 -1.051465  1
-2016-03-03  1.502642  0.005583  0.698379 -2.819079  2
-2016-03-04 -0.401596 -0.164851 -1.621371 -1.051040  3
-2016-03-05 -0.320215 -0.322924  0.000743  0.445042  4
-2016-03-06  0.302772  1.201058 -1.055231 -0.507314  5
-</pre>
-</div>
-</div>
-
-
-<div id="outline-container-sec-6-2" class="outline-3">
-<h3 id="sec-6-2"><span class="section-number-3">6.2</span> 修改列</h3>
-<div class="outline-text-3" id="text-6-2">
-<div class="org-src-container">
-
-<pre class="src src-ipython"><span style="color: #ff8700;">df.loc</span>[:, <span style="color: #ff4ea3;">'A'</span>] = np.arange(10, 16)
-log(<span style="color: #ff4ea3;">"df"</span>, df)
-</pre>
-</div>
-
-<pre class="example">
-====================================== df ======================================
-             A         B         C         D  E
-2016-03-01  10  0.607249 -0.149952  0.399362  0
-2016-03-02  11  0.102238  0.352435 -1.051465  1
-2016-03-03  12  0.005583  0.698379 -2.819079  2
-2016-03-04  13 -0.164851 -1.621371 -1.051040  3
-2016-03-05  14 -0.322924  0.000743  0.445042  4
-2016-03-06  15  1.201058 -1.055231 -0.507314  5
-</pre>
-</div>
-</div>
-
-
-<div id="outline-container-sec-6-3" class="outline-3">
-<h3 id="sec-6-3"><span class="section-number-3">6.3</span> 修改指定坐标</h3>
-<div class="outline-text-3" id="text-6-3">
-<div class="org-src-container">
-
-<pre class="src src-ipython"><span style="color: #ff8700;">df.loc</span>[<span style="color: #ff4ea3;">'20160301'</span>, <span style="color: #ff4ea3;">'A'</span>] = 0.2
-<span style="color: #ff8700;">df.at</span>[pd.Timestamp(<span style="color: #ff4ea3;">'20160301'</span>), <span style="color: #ff4ea3;">'A'</span>] = 0.4
-<span style="color: #ff8700;">df.iat</span>[0, 0] = 0.6
-log(<span style="color: #ff4ea3;">"df"</span>, df)
-</pre>
-</div>
-
-<pre class="example">
-====================================== df ======================================
-               A         B         C         D  E
-2016-03-01   0.6  0.607249 -0.149952  0.399362  0
-2016-03-02  11.0  0.102238  0.352435 -1.051465  1
-2016-03-03  12.0  0.005583  0.698379 -2.819079  2
-2016-03-04  13.0 -0.164851 -1.621371 -1.051040  3
-2016-03-05  14.0 -0.322924  0.000743  0.445042  4
-2016-03-06  15.0  1.201058 -1.055231 -0.507314  5
-</pre>
-</div>
-</div>
-
-
-<div id="outline-container-sec-6-4" class="outline-3">
-<h3 id="sec-6-4"><span class="section-number-3">6.4</span> 整体赋值</h3>
-<div class="outline-text-3" id="text-6-4">
-<div class="org-src-container">
-
-<pre class="src src-ipython"><span style="color: #ff8700;">df2</span> = df.loc[:, [<span style="color: #ff4ea3;">'B'</span>, <span style="color: #ff4ea3;">'C'</span>]].copy()
-<span style="color: #ff8700;">df2</span>[df2 &gt; 0] = -df2
-log(<span style="color: #ff4ea3;">"df2"</span>, df2)
-</pre>
-</div>
-
-<pre class="example">
-===================================== df2 ======================================
-                   B         C
-2016-03-01 -0.607249 -0.149952
-2016-03-02 -0.102238 -0.352435
-2016-03-03 -0.005583 -0.698379
-2016-03-04 -0.164851 -1.621371
-2016-03-05 -0.322924 -0.000743
-2016-03-06 -1.201058 -1.055231
-</pre>
-</div>
-</div>
-
-
-
-<div id="outline-container-sec-6-5" class="outline-3">
-<h3 id="sec-6-5"><span class="section-number-3">6.5</span> apply</h3>
-<div class="outline-text-3" id="text-6-5">
-<div class="org-src-container">
-
-<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.apply(np.cumsum)"</span>, df.<span style="color: #d18aff;">apply</span>(np.cumsum))
-</pre>
-</div>
-
-<pre class="example">
-============================= df.apply(np.cumsum) ==============================
-               A         B         C         D   E
-2016-03-01   0.6  0.607249 -0.149952  0.399362   0
-2016-03-02  11.6  0.709487  0.202483 -0.652103   1
-2016-03-03  23.6  0.715069  0.900861 -3.471183   3
-2016-03-04  36.6  0.550218 -0.720509 -4.522223   6
-2016-03-05  50.6  0.227294 -0.719766 -4.077181  10
-2016-03-06  65.6  1.428352 -1.774998 -4.584495  15
-</pre>
-
-<div class="org-src-container">
-
-<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.apply(lambda x: x.max() - x.min())"</span>, df.<span style="color: #d18aff;">apply</span>(<span style="color: #a1db00;">lambda</span> x: x.<span style="color: #d18aff;">max</span>() - x.<span style="color: #d18aff;">min</span>()))
-</pre>
-</div>
-
-<pre class="example">
-==================== df.apply(lambda x: x.max() - x.min()) =====================
-A    14.400000
-B     1.523981
-C     2.319749
-D     3.264121
-E     5.000000
-dtype: float64
-</pre>
-</div>
-</div>
-
-
-<div id="outline-container-sec-6-6" class="outline-3">
-<h3 id="sec-6-6"><span class="section-number-3">6.6</span> concat</h3>
-<div class="outline-text-3" id="text-6-6">
+<div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> concat</h3>
+<div class="outline-text-3" id="text-4-1">
 <div class="org-src-container">
 
 <pre class="src src-ipython"><span style="color: #ff8700;">df</span> = pd.DataFrame(np.random.randn(10, 4), columns=<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'ABCD'</span>))
@@ -1192,16 +2471,16 @@ log(<span style="color: #ff4ea3;">"df"</span>, df)
 <pre class="example">
 ====================================== df ======================================
           A         B         C         D
-0  0.378066 -0.740079  1.127442  0.810306
-1  0.973077 -0.392192 -0.859464  1.744233
-2  0.289765 -0.416978 -0.069027  0.163929
-3 -0.708653 -0.700105 -0.296862 -1.265261
-4  0.943287  0.320653  0.821595 -2.354610
-5 -0.100405 -0.200439 -0.593389  1.149051
-6 -0.573298 -0.795423  0.112136 -0.207383
-7 -0.622403  0.910907 -0.437496 -0.374832
-8 -1.200341 -0.350762  0.755248  1.212612
-9 -2.503909 -0.244715 -1.970061 -0.112274
+0 -0.595553  0.187491 -1.276159 -0.840742
+1 -0.204689 -0.965893  0.549338  0.028937
+2 -2.043452  0.136887 -1.936706  1.271916
+3 -0.175120  0.417158  0.175173  1.578685
+4 -1.095380 -0.937828 -0.786879  0.204025
+5 -0.607174 -1.033643 -1.563467  0.043538
+6  2.541788  0.805271  0.259254  0.306688
+7  0.013212 -0.778118 -0.126098  0.330077
+8 -0.412940 -2.268200  0.278772 -1.188025
+9  1.012111 -0.321584  1.879789 -1.050260
 </pre>
 
 <div class="org-src-container">
@@ -1215,16 +2494,16 @@ log(<span style="color: #ff4ea3;">"(result == df).all().all()"</span>, (result =
 <pre class="example">
 ==================================== result ====================================
           A         B         C         D
-0  0.378066 -0.740079  1.127442  0.810306
-1  0.973077 -0.392192 -0.859464  1.744233
-2  0.289765 -0.416978 -0.069027  0.163929
-3 -0.708653 -0.700105 -0.296862 -1.265261
-4  0.943287  0.320653  0.821595 -2.354610
-5 -0.100405 -0.200439 -0.593389  1.149051
-6 -0.573298 -0.795423  0.112136 -0.207383
-7 -0.622403  0.910907 -0.437496 -0.374832
-8 -1.200341 -0.350762  0.755248  1.212612
-9 -2.503909 -0.244715 -1.970061 -0.112274
+0 -0.595553  0.187491 -1.276159 -0.840742
+1 -0.204689 -0.965893  0.549338  0.028937
+2 -2.043452  0.136887 -1.936706  1.271916
+3 -0.175120  0.417158  0.175173  1.578685
+4 -1.095380 -0.937828 -0.786879  0.204025
+5 -0.607174 -1.033643 -1.563467  0.043538
+6  2.541788  0.805271  0.259254  0.306688
+7  0.013212 -0.778118 -0.126098  0.330077
+8 -0.412940 -2.268200  0.278772 -1.188025
+9  1.012111 -0.321584  1.879789 -1.050260
 ========================== (result == df).all().all() ==========================
 True
 </pre>
@@ -1232,9 +2511,9 @@ True
 </div>
 
 
-<div id="outline-container-sec-6-7" class="outline-3">
-<h3 id="sec-6-7"><span class="section-number-3">6.7</span> merge</h3>
-<div class="outline-text-3" id="text-6-7">
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> merge</h3>
+<div class="outline-text-3" id="text-4-2">
 <div class="org-src-container">
 
 <pre class="src src-ipython"><span style="color: #ff8700;">left</span> = pd.DataFrame({<span style="color: #ff4ea3;">'key'</span>: [<span style="color: #ff4ea3;">'foo'</span>, <span style="color: #ff4ea3;">'foo'</span>], <span style="color: #ff4ea3;">'lval'</span>: [1, 2]})
@@ -1268,9 +2547,9 @@ log(<span style="color: #ff4ea3;">"result"</span>, result)
 </div>
 
 
-<div id="outline-container-sec-6-8" class="outline-3">
-<h3 id="sec-6-8"><span class="section-number-3">6.8</span> append</h3>
-<div class="outline-text-3" id="text-6-8">
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3"><span class="section-number-3">4.3</span> append</h3>
+<div class="outline-text-3" id="text-4-3">
 <div class="org-src-container">
 
 <pre class="src src-ipython"><span style="color: #ff8700;">s</span> = pd.Series(np.random.randint(1, 5, size=4), index=<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'ABCD'</span>))
@@ -1282,32 +2561,32 @@ log(<span style="color: #ff4ea3;">"result"</span>, result)
 
 <pre class="example">
 ====================================== s =======================================
-A    2
+A    3
 B    1
 C    1
 D    3
 dtype: int64
 ==================================== result ====================================
            A         B         C         D
-0   0.378066 -0.740079  1.127442  0.810306
-1   0.973077 -0.392192 -0.859464  1.744233
-2   0.289765 -0.416978 -0.069027  0.163929
-3  -0.708653 -0.700105 -0.296862 -1.265261
-4   0.943287  0.320653  0.821595 -2.354610
-5  -0.100405 -0.200439 -0.593389  1.149051
-6  -0.573298 -0.795423  0.112136 -0.207383
-7  -0.622403  0.910907 -0.437496 -0.374832
-8  -1.200341 -0.350762  0.755248  1.212612
-9  -2.503909 -0.244715 -1.970061 -0.112274
-10  2.000000  1.000000  1.000000  3.000000
+0  -0.595553  0.187491 -1.276159 -0.840742
+1  -0.204689 -0.965893  0.549338  0.028937
+2  -2.043452  0.136887 -1.936706  1.271916
+3  -0.175120  0.417158  0.175173  1.578685
+4  -1.095380 -0.937828 -0.786879  0.204025
+5  -0.607174 -1.033643 -1.563467  0.043538
+6   2.541788  0.805271  0.259254  0.306688
+7   0.013212 -0.778118 -0.126098  0.330077
+8  -0.412940 -2.268200  0.278772 -1.188025
+9   1.012111 -0.321584  1.879789 -1.050260
+10  3.000000  1.000000  1.000000  3.000000
 </pre>
 </div>
 </div>
 
 
-<div id="outline-container-sec-6-9" class="outline-3">
-<h3 id="sec-6-9"><span class="section-number-3">6.9</span> 数据整形</h3>
-<div class="outline-text-3" id="text-6-9">
+<div id="outline-container-sec-4-4" class="outline-3">
+<h3 id="sec-4-4"><span class="section-number-3">4.4</span> 数据整形</h3>
+<div class="outline-text-3" id="text-4-4">
 <div class="org-src-container">
 
 <pre class="src src-ipython"><span style="color: #ff8700;">tuples</span> = <span style="color: #d18aff;">list</span>(<span style="color: #d18aff;">zip</span>(*[[<span style="color: #ff4ea3;">'bar'</span>, <span style="color: #ff4ea3;">'bar'</span>, <span style="color: #ff4ea3;">'baz'</span>, <span style="color: #ff4ea3;">'baz'</span>,
@@ -1327,20 +2606,20 @@ log(<span style="color: #ff4ea3;">"df"</span>, df)
 ====================================== df ======================================
                      A         B
 first second
-bar   one    -0.673452 -0.901687
-      two    -1.751302 -0.722018
-baz   one     1.145836 -2.092757
-      two     1.892349 -1.695332
-foo   one     1.036723  0.896265
-      two     0.109888 -1.989356
-qux   one    -0.009183  1.433188
-      two     0.891392 -1.655394
+bar   one     1.511985  0.843907
+      two    -0.396385 -1.062010
+baz   one     0.730714  0.620409
+      two    -1.198375 -1.130645
+foo   one     1.832943 -0.288714
+      two     0.538879 -0.248672
+qux   one    -0.111035 -0.894406
+      two     1.111032 -0.925067
 </pre>
 </div>
 
-<div id="outline-container-sec-6-9-1" class="outline-4">
-<h4 id="sec-6-9-1"><span class="section-number-4">6.9.1</span> 将列索引变为行索引 (stack)</h4>
-<div class="outline-text-4" id="text-6-9-1">
+<div id="outline-container-sec-4-4-1" class="outline-4">
+<h4 id="sec-4-4-1"><span class="section-number-4">4.4.1</span> 将列索引变为行索引 (stack)</h4>
+<div class="outline-text-4" id="text-4-4-1">
 <div class="org-src-container">
 
 <pre class="src src-ipython"><span style="color: #ff8700;">stacked</span> = df.stack()
@@ -1353,22 +2632,22 @@ log(<span style="color: #ff4ea3;">"stacked.index"</span>, stacked.index)
 <pre class="example">
 =================================== stacked ====================================
 first  second
-bar    one     A   -0.673452
-               B   -0.901687
-       two     A   -1.751302
-               B   -0.722018
-baz    one     A    1.145836
-               B   -2.092757
-       two     A    1.892349
-               B   -1.695332
-foo    one     A    1.036723
-               B    0.896265
-       two     A    0.109888
-               B   -1.989356
-qux    one     A   -0.009183
-               B    1.433188
-       two     A    0.891392
-               B   -1.655394
+bar    one     A    1.511985
+               B    0.843907
+       two     A   -0.396385
+               B   -1.062010
+baz    one     A    0.730714
+               B    0.620409
+       two     A   -1.198375
+               B   -1.130645
+foo    one     A    1.832943
+               B   -0.288714
+       two     A    0.538879
+               B   -0.248672
+qux    one     A   -0.111035
+               B   -0.894406
+       two     A    1.111032
+               B   -0.925067
 dtype: float64
 ================================ type(stacked) =================================
 &lt;class 'pandas.core.series.Series'&gt;
@@ -1380,9 +2659,9 @@ MultiIndex(levels=[['bar', 'baz', 'foo', 'qux'], ['one', 'two'], ['A', 'B']],
 </div>
 </div>
 
-<div id="outline-container-sec-6-9-2" class="outline-4">
-<h4 id="sec-6-9-2"><span class="section-number-4">6.9.2</span> 将行索引变为列索引 (unstack)</h4>
-<div class="outline-text-4" id="text-6-9-2">
+<div id="outline-container-sec-4-4-2" class="outline-4">
+<h4 id="sec-4-4-2"><span class="section-number-4">4.4.2</span> 将行索引变为列索引 (unstack)</h4>
+<div class="outline-text-4" id="text-4-4-2">
 <div class="org-src-container">
 
 <pre class="src src-ipython">log(<span style="color: #ff4ea3;">"stacked.unstack()"</span>, stacked.unstack())
@@ -1393,21 +2672,21 @@ MultiIndex(levels=[['bar', 'baz', 'foo', 'qux'], ['one', 'two'], ['A', 'B']],
 ============================== stacked.unstack() ===============================
                      A         B
 first second
-bar   one    -0.673452 -0.901687
-      two    -1.751302 -0.722018
-baz   one     1.145836 -2.092757
-      two     1.892349 -1.695332
-foo   one     1.036723  0.896265
-      two     0.109888 -1.989356
-qux   one    -0.009183  1.433188
-      two     0.891392 -1.655394
+bar   one     1.511985  0.843907
+      two    -0.396385 -1.062010
+baz   one     0.730714  0.620409
+      two    -1.198375 -1.130645
+foo   one     1.832943 -0.288714
+      two     0.538879 -0.248672
+qux   one    -0.111035 -0.894406
+      two     1.111032 -0.925067
 </pre>
 </div>
 </div>
 
-<div id="outline-container-sec-6-9-3" class="outline-4">
-<h4 id="sec-6-9-3"><span class="section-number-4">6.9.3</span> 透视图（pivot_table）</h4>
-<div class="outline-text-4" id="text-6-9-3">
+<div id="outline-container-sec-4-4-3" class="outline-4">
+<h4 id="sec-4-4-3"><span class="section-number-4">4.4.3</span> 透视图（pivot_table）</h4>
+<div class="outline-text-4" id="text-4-4-3">
 <p>
 只观察 data frame 中一部分数据
 </p>
@@ -1427,18 +2706,18 @@ log(<span style="color: #ff4ea3;">"df"</span>, df)
 <pre class="example">
 ====================================== df ======================================
         A  B    C         D         E
-0     one  A  foo  1.134572  1.100447
-1     one  B  foo -0.880082  0.176647
-2     two  C  foo  0.076353  0.247115
-3   three  A  bar -0.097865 -1.955502
-4     one  B  bar  0.838803 -0.419073
-5     one  C  bar -1.165200  0.416583
-6     two  A  foo  1.163344 -1.086826
-7   three  B  foo  0.946516  0.711345
-8     one  C  foo  0.733041  0.260971
-9     one  A  bar -0.045652  0.267900
-10    two  B  bar  0.285165 -0.348909
-11  three  C  bar  0.570444 -1.750690
+0     one  A  foo  0.610748 -1.488635
+1     one  B  foo  2.562515  2.024654
+2     two  C  foo  0.189435  0.126219
+3   three  A  bar  0.016702 -0.244982
+4     one  B  bar  0.689116 -0.480311
+5     one  C  bar  0.591127 -1.588618
+6     two  A  foo -0.163090  0.440312
+7   three  B  foo -0.876609  0.609215
+8     one  C  foo -0.567691  0.110820
+9     one  A  bar  1.069680  0.755752
+10    two  B  bar  0.821980  0.179915
+11  three  C  bar  1.047503  0.401803
 </pre>
 
 <p>
@@ -1456,15 +2735,15 @@ log(<span style="color: #ff4ea3;">"result"</span>, result)
 ==================================== result ====================================
 C             bar       foo
 A     B
-one   A -0.045652  1.134572
-      B  0.838803 -0.880082
-      C -1.165200  0.733041
-three A -0.097865       NaN
-      B       NaN  0.946516
-      C  0.570444       NaN
-two   A       NaN  1.163344
-      B  0.285165       NaN
-      C       NaN  0.076353
+one   A  1.069680  0.610748
+      B  0.689116  2.562515
+      C  0.591127 -0.567691
+three A  0.016702       NaN
+      B       NaN -0.876609
+      C  1.047503       NaN
+two   A       NaN -0.163090
+      B  0.821980       NaN
+      C       NaN  0.189435
 </pre>
 
 <p>
@@ -1483,9 +2762,9 @@ log(<span style="color: #ff4ea3;">"result"</span>, result)
               E
 C           bar       foo
 A
-one    0.088470  0.512688
-three -1.853096  0.711345
-two   -0.348909 -0.419856
+one   -0.437726  0.215613
+three  0.078411  0.609215
+two    0.179915  0.283266
 </pre>
 
 <p>
@@ -1503,17 +2782,17 @@ log(<span style="color: #ff4ea3;">"result"</span>, result)
 ==================================== result ====================================
             D         E
 C
-bar -0.124016  0.088470
-foo  0.329177  0.512688
+bar  0.783307 -0.437726
+foo  0.868524  0.215613
 </pre>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-sec-6-10" class="outline-3">
-<h3 id="sec-6-10"><span class="section-number-3">6.10</span> Category</h3>
-<div class="outline-text-3" id="text-6-10">
+<div id="outline-container-sec-4-5" class="outline-3">
+<h3 id="sec-4-5"><span class="section-number-3">4.5</span> Category</h3>
+<div class="outline-text-3" id="text-4-5">
 <div class="org-src-container">
 
 <pre class="src src-ipython"><span style="color: #ff8700;">df</span> = pd.DataFrame({<span style="color: #ff4ea3;">"id"</span>:[1,2,3,4,5,6], <span style="color: #ff4ea3;">"raw_grade"</span>:[<span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'b'</span>, <span style="color: #ff4ea3;">'b'</span>, <span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'e'</span>]})
@@ -1579,12 +2858,12 @@ Index(['a', 'b', 'e'], dtype='object')
 </div>
 
 
-<div id="outline-container-sec-7" class="outline-2">
-<h2 id="sec-7"><span class="section-number-2">7</span> 信息统计</h2>
-<div class="outline-text-2" id="text-7">
-</div><div id="outline-container-sec-7-1" class="outline-3">
-<h3 id="sec-7-1"><span class="section-number-3">7.1</span> describe</h3>
-<div class="outline-text-3" id="text-7-1">
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> 信息统计</h2>
+<div class="outline-text-2" id="text-5">
+</div><div id="outline-container-sec-5-1" class="outline-3">
+<h3 id="sec-5-1"><span class="section-number-3">5.1</span> describe</h3>
+<div class="outline-text-3" id="text-5-1">
 <div class="org-src-container">
 
 <pre class="src src-ipython"><span style="color: #ff8700;">dates</span> = pd.date_range(<span style="color: #ff4ea3;">'20160301'</span>, periods=6)
@@ -1597,65 +2876,30 @@ log(<span style="color: #ff4ea3;">"df.describe()"</span>, df.describe())
 <pre class="example">
 ====================================== df ======================================
                    A         B         C         D
-2016-03-01 -0.890713  1.731549 -0.819759 -1.433703
-2016-03-02 -0.651259 -0.682624 -0.631661  0.032853
-2016-03-03 -1.167830 -0.637942  0.310298 -1.690597
-2016-03-04 -0.852791 -0.880532  0.056582 -0.511704
-2016-03-05  1.086752 -1.379618  0.089785  0.440358
-2016-03-06  0.568446 -0.232396  0.699720  1.474725
+2016-03-01  0.889227 -0.173516  2.652816 -1.376377
+2016-03-02 -1.378835  0.315804  0.676864  2.237995
+2016-03-03  0.628641 -1.281045  0.128095  0.636426
+2016-03-04  0.500661  0.082452  0.740659 -1.616577
+2016-03-05 -0.375707  0.270148  1.468322  1.202998
+2016-03-06 -0.565520  1.392180  1.612911 -0.114896
 ================================ df.describe() =================================
               A         B         C         D
 count  6.000000  6.000000  6.000000  6.000000
-mean  -0.317899 -0.346927 -0.049172 -0.281345
-std    0.917212  1.084596  0.575091  1.189146
-min   -1.167830 -1.379618 -0.819759 -1.690597
-25%   -0.881233 -0.831055 -0.459600 -1.203204
-50%   -0.752025 -0.660283  0.073184 -0.239426
-75%    0.263520 -0.333783  0.255169  0.338482
-max    1.086752  1.731549  0.699720  1.474725
+mean  -0.050256  0.101004  1.213278  0.161595
+std    0.869894  0.863441  0.892833  1.498341
+min   -1.378835 -1.281045  0.128095 -1.616577
+25%   -0.518067 -0.109524  0.692813 -1.061007
+50%    0.062477  0.176300  1.104490  0.260765
+75%    0.596646  0.304390  1.576764  1.061355
+max    0.889227  1.392180  2.652816  2.237995
 </pre>
 </div>
 </div>
 
-<div id="outline-container-sec-7-2" class="outline-3">
-<h3 id="sec-7-2"><span class="section-number-3">7.2</span> value_counts</h3>
-<div class="outline-text-3" id="text-7-2">
-<div class="org-src-container">
 
-<pre class="src src-ipython"><span style="color: #ff8700;">s</span> = pd.Series(np.random.randint(10, 20, size=10))
-log(<span style="color: #ff4ea3;">"s"</span>, s)
-log(<span style="color: #ff4ea3;">"s.value_counts()"</span>, s.value_counts())
-</pre>
-</div>
-
-<pre class="example">
-====================================== s =======================================
-0    18
-1    14
-2    18
-3    10
-4    15
-5    18
-6    17
-7    17
-8    16
-9    14
-dtype: int64
-=============================== s.value_counts() ===============================
-18    3
-14    2
-17    2
-15    1
-10    1
-16    1
-dtype: int64
-</pre>
-</div>
-</div>
-
-<div id="outline-container-sec-7-3" class="outline-3">
-<h3 id="sec-7-3"><span class="section-number-3">7.3</span> mode</h3>
-<div class="outline-text-3" id="text-7-3">
+<div id="outline-container-sec-5-2" class="outline-3">
+<h3 id="sec-5-2"><span class="section-number-3">5.2</span> mode</h3>
+<div class="outline-text-3" id="text-5-2">
 <div class="org-src-container">
 
 <pre class="src src-ipython">log(<span style="color: #ff4ea3;">"s.mode()"</span>, s.mode())
@@ -1664,7 +2908,8 @@ dtype: int64
 
 <pre class="example">
 =================================== s.mode() ===================================
-0    18
+0    1
+1    3
 dtype: int64
 </pre>
 </div>
@@ -1672,9 +2917,9 @@ dtype: int64
 </div>
 
 
-<div id="outline-container-sec-8" class="outline-2">
-<h2 id="sec-8"><span class="section-number-2">8</span> 分组统计</h2>
-<div class="outline-text-2" id="text-8">
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> 分组统计</h2>
+<div class="outline-text-2" id="text-6">
 <p>
 执行步骤：
 </p>
@@ -1703,20 +2948,20 @@ log(<span style="color: #ff4ea3;">"df"</span>, df)
 <pre class="example">
 ====================================== df ======================================
      A      B         C         D
-0  foo    one -1.045295 -1.136248
-1  bar    one -1.097611 -0.304475
-2  foo    two -0.425652  1.985694
-3  bar  three  0.169674  0.058648
-4  foo    two -0.814353  0.879171
-5  bar    two -1.837651 -0.023279
-6  foo    one -0.110396  1.438022
-7  foo  three -0.473942  0.045392
+0  foo    one -0.148597  0.356479
+1  bar    one -0.266165 -0.167831
+2  foo    two  1.122663 -0.954599
+3  bar  three  0.789232  1.054489
+4  foo    two -0.079362 -0.425494
+5  bar    two -1.624489 -1.137994
+6  foo    one  0.561873 -0.277972
+7  foo  three -1.660304 -0.269887
 </pre>
 </div>
 
-<div id="outline-container-sec-8-1" class="outline-3">
-<h3 id="sec-8-1"><span class="section-number-3">8.1</span> 对单列分组</h3>
-<div class="outline-text-3" id="text-8-1">
+<div id="outline-container-sec-6-1" class="outline-3">
+<h3 id="sec-6-1"><span class="section-number-3">6.1</span> 对单列分组</h3>
+<div class="outline-text-3" id="text-6-1">
 <div class="org-src-container">
 
 <pre class="src src-ipython"><span style="color: #ff8700;">result</span> = df.groupby(<span style="color: #ff4ea3;">'A'</span>).<span style="color: #d18aff;">sum</span>()
@@ -1728,16 +2973,16 @@ log(<span style="color: #ff4ea3;">"result"</span>, result)
 ==================================== result ====================================
             C         D
 A
-bar -2.765588 -0.269106
-foo -2.869638  3.212031
+bar -1.101422 -0.251337
+foo -0.203727 -1.571473
 </pre>
 </div>
 </div>
 
 
-<div id="outline-container-sec-8-2" class="outline-3">
-<h3 id="sec-8-2"><span class="section-number-3">8.2</span> 对多列分组</h3>
-<div class="outline-text-3" id="text-8-2">
+<div id="outline-container-sec-6-2" class="outline-3">
+<h3 id="sec-6-2"><span class="section-number-3">6.2</span> 对多列分组</h3>
+<div class="outline-text-3" id="text-6-2">
 <div class="org-src-container">
 
 <pre class="src src-ipython"><span style="color: #ff8700;">result</span> = df.groupby([<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'B'</span>]).<span style="color: #d18aff;">sum</span>()
@@ -1749,12 +2994,12 @@ log(<span style="color: #ff4ea3;">"result"</span>, result)
 ==================================== result ====================================
                   C         D
 A   B
-bar one   -1.097611 -0.304475
-    three  0.169674  0.058648
-    two   -1.837651 -0.023279
-foo one   -1.155691  0.301774
-    three -0.473942  0.045392
-    two   -1.240005  2.864865
+bar one   -0.266165 -0.167831
+    three  0.789232  1.054489
+    two   -1.624489 -1.137994
+foo one    0.413277  0.078507
+    three -1.660304 -0.269887
+    two    1.043300 -1.380093
 </pre>
 
 <div class="org-src-container">
@@ -1768,29 +3013,29 @@ log(<span style="color: #ff4ea3;">"result"</span>, result)
 ==================================== result ====================================
                   C         D
 B     A
-one   bar -1.097611 -0.304475
-      foo -1.155691  0.301774
-three bar  0.169674  0.058648
-      foo -0.473942  0.045392
-two   bar -1.837651 -0.023279
-      foo -1.240005  2.864865
+one   bar -0.266165 -0.167831
+      foo  0.413277  0.078507
+three bar  0.789232  1.054489
+      foo -1.660304 -0.269887
+two   bar -1.624489 -1.137994
+      foo  1.043300 -1.380093
 </pre>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-sec-9" class="outline-2">
-<h2 id="sec-9"><span class="section-number-2">9</span> 时间序列</h2>
-<div class="outline-text-2" id="text-9">
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> 时间序列</h2>
+<div class="outline-text-2" id="text-7">
 <p>
 pandas 提供了强大的时间序列功能，比如把秒级的股票数据转换为 5 分钟周期数据等。
 </p>
 </div>
 
-<div id="outline-container-sec-9-1" class="outline-3">
-<h3 id="sec-9-1"><span class="section-number-3">9.1</span> data_range</h3>
-<div class="outline-text-3" id="text-9-1">
+<div id="outline-container-sec-7-1" class="outline-3">
+<h3 id="sec-7-1"><span class="section-number-3">7.1</span> data_range</h3>
+<div class="outline-text-3" id="text-7-1">
 <div class="org-src-container">
 
 <pre class="src src-ipython"><span style="color: #ff8700;">rng</span> = pd.date_range(<span style="color: #ff4ea3;">'20160301'</span>, periods=600, freq=<span style="color: #ff4ea3;">'s'</span>)
@@ -1815,75 +3060,75 @@ DatetimeIndex(['2016-03-01 00:00:00', '2016-03-01 00:00:01',
                '2016-03-01 00:09:58', '2016-03-01 00:09:59'],
               dtype='datetime64[ns]', length=600, freq='S')
 ====================================== ts ======================================
-2016-03-01 00:00:00    252
-2016-03-01 00:00:01    261
-2016-03-01 00:00:02    168
-2016-03-01 00:00:03     79
-2016-03-01 00:00:04    463
-2016-03-01 00:00:05    244
-2016-03-01 00:00:06     86
-2016-03-01 00:00:07    463
-2016-03-01 00:00:08    145
-2016-03-01 00:00:09     13
-2016-03-01 00:00:10     53
-2016-03-01 00:00:11    246
-2016-03-01 00:00:12    430
-2016-03-01 00:00:13    115
-2016-03-01 00:00:14    354
-2016-03-01 00:00:15    248
-2016-03-01 00:00:16    396
-2016-03-01 00:00:17    418
-2016-03-01 00:00:18    367
-2016-03-01 00:00:19    490
-2016-03-01 00:00:20    266
-2016-03-01 00:00:21    239
-2016-03-01 00:00:22    216
-2016-03-01 00:00:23    402
-2016-03-01 00:00:24    463
-2016-03-01 00:00:25     23
-2016-03-01 00:00:26    456
-2016-03-01 00:00:27    237
-2016-03-01 00:00:28    179
-2016-03-01 00:00:29    214
+2016-03-01 00:00:00    241
+2016-03-01 00:00:01    206
+2016-03-01 00:00:02    360
+2016-03-01 00:00:03     72
+2016-03-01 00:00:04    163
+2016-03-01 00:00:05    459
+2016-03-01 00:00:06    120
+2016-03-01 00:00:07    143
+2016-03-01 00:00:08    311
+2016-03-01 00:00:09    482
+2016-03-01 00:00:10    377
+2016-03-01 00:00:11    426
+2016-03-01 00:00:12    116
+2016-03-01 00:00:13    222
+2016-03-01 00:00:14    334
+2016-03-01 00:00:15    101
+2016-03-01 00:00:16    119
+2016-03-01 00:00:17    413
+2016-03-01 00:00:18    202
+2016-03-01 00:00:19    466
+2016-03-01 00:00:20      5
+2016-03-01 00:00:21    248
+2016-03-01 00:00:22     62
+2016-03-01 00:00:23    404
+2016-03-01 00:00:24    186
+2016-03-01 00:00:25    326
+2016-03-01 00:00:26     95
+2016-03-01 00:00:27    178
+2016-03-01 00:00:28    118
+2016-03-01 00:00:29    161
                       ...
-2016-03-01 00:09:30    449
-2016-03-01 00:09:31    169
-2016-03-01 00:09:32     49
-2016-03-01 00:09:33    159
-2016-03-01 00:09:34    471
-2016-03-01 00:09:35    246
-2016-03-01 00:09:36    316
-2016-03-01 00:09:37    308
-2016-03-01 00:09:38    207
-2016-03-01 00:09:39    133
-2016-03-01 00:09:40     78
-2016-03-01 00:09:41     56
-2016-03-01 00:09:42    249
-2016-03-01 00:09:43    212
-2016-03-01 00:09:44    246
-2016-03-01 00:09:45    144
-2016-03-01 00:09:46    370
-2016-03-01 00:09:47    264
-2016-03-01 00:09:48    228
-2016-03-01 00:09:49    148
-2016-03-01 00:09:50    362
-2016-03-01 00:09:51    247
-2016-03-01 00:09:52    423
-2016-03-01 00:09:53     72
-2016-03-01 00:09:54    263
-2016-03-01 00:09:55      0
-2016-03-01 00:09:56     21
-2016-03-01 00:09:57    122
-2016-03-01 00:09:58     85
-2016-03-01 00:09:59     98
+2016-03-01 00:09:30    196
+2016-03-01 00:09:31    271
+2016-03-01 00:09:32    233
+2016-03-01 00:09:33    209
+2016-03-01 00:09:34    164
+2016-03-01 00:09:35      2
+2016-03-01 00:09:36    376
+2016-03-01 00:09:37     70
+2016-03-01 00:09:38    408
+2016-03-01 00:09:39    344
+2016-03-01 00:09:40    101
+2016-03-01 00:09:41    298
+2016-03-01 00:09:42    382
+2016-03-01 00:09:43     58
+2016-03-01 00:09:44    430
+2016-03-01 00:09:45    321
+2016-03-01 00:09:46    379
+2016-03-01 00:09:47    188
+2016-03-01 00:09:48    358
+2016-03-01 00:09:49     54
+2016-03-01 00:09:50    322
+2016-03-01 00:09:51    485
+2016-03-01 00:09:52     17
+2016-03-01 00:09:53    498
+2016-03-01 00:09:54    237
+2016-03-01 00:09:55    493
+2016-03-01 00:09:56     36
+2016-03-01 00:09:57    196
+2016-03-01 00:09:58    397
+2016-03-01 00:09:59    191
 Freq: S, Length: 600, dtype: int64
 </pre>
 </div>
 </div>
 
-<div id="outline-container-sec-9-2" class="outline-3">
-<h3 id="sec-9-2"><span class="section-number-3">9.2</span> 重采样</h3>
-<div class="outline-text-3" id="text-9-2">
+<div id="outline-container-sec-7-2" class="outline-3">
+<h3 id="sec-7-2"><span class="section-number-3">7.2</span> 重采样</h3>
+<div class="outline-text-3" id="text-7-2">
 <div class="org-src-container">
 
 <pre class="src src-ipython"><span style="color: #ff8700;">result_sum</span> = ts.resample(<span style="color: #ff4ea3;">'2Min'</span>, how=<span style="color: #ff4ea3;">'sum'</span>)
@@ -1895,18 +3140,18 @@ log(<span style="color: #ff4ea3;">"result_mean"</span>, result_mean)
 
 <pre class="example">
 ================================== result_sum ==================================
-2016-03-01 00:00:00    29406
-2016-03-01 00:02:00    29893
-2016-03-01 00:04:00    29336
-2016-03-01 00:06:00    26448
-2016-03-01 00:08:00    29775
+2016-03-01 00:00:00    29146
+2016-03-01 00:02:00    28174
+2016-03-01 00:04:00    33494
+2016-03-01 00:06:00    30633
+2016-03-01 00:08:00    31650
 Freq: 2T, dtype: int64
 ================================= result_mean ==================================
-2016-03-01 00:00:00    245.050000
-2016-03-01 00:02:00    249.108333
-2016-03-01 00:04:00    244.466667
-2016-03-01 00:06:00    220.400000
-2016-03-01 00:08:00    248.125000
+2016-03-01 00:00:00    242.883333
+2016-03-01 00:02:00    234.783333
+2016-03-01 00:04:00    279.116667
+2016-03-01 00:06:00    255.275000
+2016-03-01 00:08:00    263.750000
 Freq: 2T, dtype: float64
 /Users/haoruan/Desktop/workspace/py3.5.3_env/lib/python3.5/site-packages/ipykernel_launcher.py:1: FutureWarning: how in .resample() is deprecated
 the new syntax is .resample(...).sum()
@@ -1918,9 +3163,9 @@ the new syntax is .resample(...).mean()
 </div>
 </div>
 
-<div id="outline-container-sec-9-3" class="outline-3">
-<h3 id="sec-9-3"><span class="section-number-3">9.3</span> period_range</h3>
-<div class="outline-text-3" id="text-9-3">
+<div id="outline-container-sec-7-3" class="outline-3">
+<h3 id="sec-7-3"><span class="section-number-3">7.3</span> period_range</h3>
+<div class="outline-text-3" id="text-7-3">
 <div class="org-src-container">
 
 <pre class="src src-ipython"><span style="color: #ff8700;">rng</span> = pd.period_range(<span style="color: #ff4ea3;">'2000Q1'</span>, <span style="color: #ff4ea3;">'2016Q1'</span>, freq=<span style="color: #ff4ea3;">'Q'</span>)
@@ -1966,9 +3211,9 @@ DatetimeIndex(['2000-01-01', '2000-04-01', '2000-07-01', '2000-10-01',
 </div>
 </div>
 
-<div id="outline-container-sec-9-4" class="outline-3">
-<h3 id="sec-9-4"><span class="section-number-3">9.4</span> 时间计算</h3>
-<div class="outline-text-3" id="text-9-4">
+<div id="outline-container-sec-7-4" class="outline-3">
+<h3 id="sec-7-4"><span class="section-number-3">7.4</span> 时间计算</h3>
+<div class="outline-text-3" id="text-7-4">
 <div class="org-src-container">
 
 <pre class="src src-ipython">log(<span style="color: #ff4ea3;">"pd.Timestamp('20160301') - pd.Timestamp('20160201')"</span>, pd.Timestamp(<span style="color: #ff4ea3;">'20160301'</span>) - pd.Timestamp(<span style="color: #ff4ea3;">'20160201'</span>))
@@ -1987,12 +3232,12 @@ log(<span style="color: #ff4ea3;">"pd.Timestamp('20160301') + pd.Timedelta(days=
 </div>
 
 
-<div id="outline-container-sec-10" class="outline-2">
-<h2 id="sec-10"><span class="section-number-2">10</span> 可视化</h2>
-<div class="outline-text-2" id="text-10">
-</div><div id="outline-container-sec-10-1" class="outline-3">
-<h3 id="sec-10-1"><span class="section-number-3">10.1</span> Series</h3>
-<div class="outline-text-3" id="text-10-1">
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> 可视化</h2>
+<div class="outline-text-2" id="text-8">
+</div><div id="outline-container-sec-8-1" class="outline-3">
+<h3 id="sec-8-1"><span class="section-number-3">8.1</span> Series</h3>
+<div class="outline-text-3" id="text-8-1">
 <div class="org-src-container">
 
 <pre class="src src-ipython"><span style="color: #ff8700;">ts</span> = pd.Series(np.random.randn(1000), index=pd.date_range(<span style="color: #ff4ea3;">'20000101'</span>, periods=1000))
@@ -2011,12 +3256,12 @@ show_fig(ts)
 </div>
 
 
-<div id="outline-container-sec-11" class="outline-2">
-<h2 id="sec-11"><span class="section-number-2">11</span> 导入导出</h2>
-<div class="outline-text-2" id="text-11">
-</div><div id="outline-container-sec-11-1" class="outline-3">
-<h3 id="sec-11-1"><span class="section-number-3">11.1</span> 导出 csv</h3>
-<div class="outline-text-3" id="text-11-1">
+<div id="outline-container-sec-9" class="outline-2">
+<h2 id="sec-9"><span class="section-number-2">9</span> 导入导出</h2>
+<div class="outline-text-2" id="text-9">
+</div><div id="outline-container-sec-9-1" class="outline-3">
+<h3 id="sec-9-1"><span class="section-number-3">9.1</span> 导出 csv</h3>
+<div class="outline-text-3" id="text-9-1">
 <div class="org-src-container">
 
 <pre class="src src-ipython"><span style="color: #ff8700;">df</span> = pd.DataFrame(np.random.randn(100, 4), columns=<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'ABCD'</span>))
@@ -2026,9 +3271,9 @@ df.to_csv(<span style="color: #ff4ea3;">"/tmp/df.csv"</span>)
 </div>
 </div>
 
-<div id="outline-container-sec-11-2" class="outline-3">
-<h3 id="sec-11-2"><span class="section-number-3">11.2</span> 导入 csv</h3>
-<div class="outline-text-3" id="text-11-2">
+<div id="outline-container-sec-9-2" class="outline-3">
+<h3 id="sec-9-2"><span class="section-number-3">9.2</span> 导入 csv</h3>
+<div class="outline-text-3" id="text-9-2">
 <div class="org-src-container">
 
 <pre class="src src-ipython">pd.read_csv(<span style="color: #ff4ea3;">'/tmp/df.csv'</span>, index_col=0)
@@ -2039,15 +3284,15 @@ df.to_csv(<span style="color: #ff4ea3;">"/tmp/df.csv"</span>)
 </div>
 
 
-<div id="outline-container-sec-12" class="outline-2">
-<h2 id="sec-12"><span class="section-number-2">12</span> 示例工程</h2>
-<div class="outline-text-2" id="text-12">
-</div><div id="outline-container-sec-12-1" class="outline-3">
-<h3 id="sec-12-1"><span class="section-number-3">12.1</span> 电影数据分析</h3>
-<div class="outline-text-3" id="text-12-1">
-</div><div id="outline-container-sec-12-1-1" class="outline-4">
-<h4 id="sec-12-1-1"><span class="section-number-4">12.1.1</span> 数据读取</h4>
-<div class="outline-text-4" id="text-12-1-1">
+<div id="outline-container-sec-10" class="outline-2">
+<h2 id="sec-10"><span class="section-number-2">10</span> 示例工程</h2>
+<div class="outline-text-2" id="text-10">
+</div><div id="outline-container-sec-10-1" class="outline-3">
+<h3 id="sec-10-1"><span class="section-number-3">10.1</span> 电影数据分析</h3>
+<div class="outline-text-3" id="text-10-1">
+</div><div id="outline-container-sec-10-1-1" class="outline-4">
+<h4 id="sec-10-1-1"><span class="section-number-4">10.1.1</span> 数据读取</h4>
+<div class="outline-text-4" id="text-10-1-1">
 <div class="org-src-container">
 
 <pre class="src src-ipython"><span style="color: #ff8700;">user_names</span> = [<span style="color: #ff4ea3;">'user_id'</span>, <span style="color: #ff4ea3;">'gender'</span>, <span style="color: #ff4ea3;">'age'</span>, <span style="color: #ff4ea3;">'occupation'</span>, <span style="color: #ff4ea3;">'zip'</span>]
@@ -2091,9 +3336,9 @@ log(<span style="color: #ff4ea3;">"movies.head()"</span>, movies.head())
 </div>
 </div>
 
-<div id="outline-container-sec-12-1-2" class="outline-4">
-<h4 id="sec-12-1-2"><span class="section-number-4">12.1.2</span> 数据合并 (merge)</h4>
-<div class="outline-text-4" id="text-12-1-2">
+<div id="outline-container-sec-10-1-2" class="outline-4">
+<h4 id="sec-10-1-2"><span class="section-number-4">10.1.2</span> 数据合并 (merge)</h4>
+<div class="outline-text-4" id="text-10-1-2">
 <p>
 在 pandas 中，数据只有合并后才能进行分析
 </p>
@@ -2113,9 +3358,9 @@ show_dataframe(data.head())
 </div>
 </div>
 
-<div id="outline-container-sec-12-1-3" class="outline-4">
-<h4 id="sec-12-1-3"><span class="section-number-4">12.1.3</span> 按性别查看各个电影的平均评分 (pivot_table)</h4>
-<div class="outline-text-4" id="text-12-1-3">
+<div id="outline-container-sec-10-1-3" class="outline-4">
+<h4 id="sec-10-1-3"><span class="section-number-4">10.1.3</span> 按性别查看各个电影的平均评分 (pivot_table)</h4>
+<div class="outline-text-4" id="text-10-1-3">
 <p>
 <b>关心的值</b> 是 rating ，以 title 作为 <b>行索引</b> ，gender 作为 <b>列索引</b>
 </p>
@@ -2140,9 +3385,9 @@ $1,000,000 Duck (1971)         3.375000  2.761905
 </div>
 </div>
 
-<div id="outline-container-sec-12-1-4" class="outline-4">
-<h4 id="sec-12-1-4"><span class="section-number-4">12.1.4</span> 男女意见想差最大的电影 (sort_values)</h4>
-<div class="outline-text-4" id="text-12-1-4">
+<div id="outline-container-sec-10-1-4" class="outline-4">
+<h4 id="sec-10-1-4"><span class="section-number-4">10.1.4</span> 男女意见想差最大的电影 (sort_values)</h4>
+<div class="outline-text-4" id="text-10-1-4">
 <div class="org-src-container">
 
 <pre class="src src-ipython"><span style="color: #ff8700;">mean_ratings_gender</span>[<span style="color: #ff4ea3;">'diff'</span>] = mean_ratings_gender.F - mean_ratings_gender.M
@@ -2164,9 +3409,9 @@ Killer: A Journal of Murder (1995)          1.0  3.428571 -2.428571
 </div>
 </div>
 
-<div id="outline-container-sec-12-1-5" class="outline-4">
-<h4 id="sec-12-1-5"><span class="section-number-4">12.1.5</span> 参与评分人数最多 (group_by)</h4>
-<div class="outline-text-4" id="text-12-1-5">
+<div id="outline-container-sec-10-1-5" class="outline-4">
+<h4 id="sec-10-1-5"><span class="section-number-4">10.1.5</span> 参与评分人数最多 (group_by)</h4>
+<div class="outline-text-4" id="text-10-1-5">
 <div class="org-src-container">
 
 <pre class="src src-ipython"><span style="color: #ff8700;">ratings_by_movie_title</span> = data.groupby(<span style="color: #ff4ea3;">'title'</span>).size()
@@ -2190,9 +3435,9 @@ dtype: int64
 </div>
 
 
-<div id="outline-container-sec-12-1-6" class="outline-4">
-<h4 id="sec-12-1-6"><span class="section-number-4">12.1.6</span> 活跃度超过 1000 的高分电影</h4>
-<div class="outline-text-4" id="text-12-1-6">
+<div id="outline-container-sec-10-1-6" class="outline-4">
+<h4 id="sec-10-1-6"><span class="section-number-4">10.1.6</span> 活跃度超过 1000 的高分电影</h4>
+<div class="outline-text-4" id="text-10-1-6">
 <div class="org-src-container">
 
 <pre class="src src-ipython"><span style="color: #ff8700;">mean_ratings</span> = data.pivot_table(values=<span style="color: #ff4ea3;">'rating'</span>, index=<span style="color: #ff4ea3;">'title'</span>, aggfunc=<span style="color: #ff4ea3;">'mean'</span>)
@@ -2219,6 +3464,754 @@ Dr. Strangelove or: How I Learned to Stop Worry...  4.449890  1367
 Casablanca (1942)                                   4.412822  1669
 Sixth Sense, The (1999)                             4.406263  2459
 </pre>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+<div id="outline-container-sec-11" class="outline-2">
+<h2 id="sec-11"><span class="section-number-2">11</span> 重新索引</h2>
+<div class="outline-text-2" id="text-11">
+<p>
+即把索引值进行重新赋值， <b>以增加一些行的数据</b> 。
+</p>
+</div>
+
+<div id="outline-container-sec-11-1" class="outline-3">
+<h3 id="sec-11-1"><span class="section-number-3">11.1</span> Series</h3>
+<div class="outline-text-3" id="text-11-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">s</span> = pd.Series([1, 3, 5, 6, 8], index=<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'acefh'</span>))
+log(<span style="color: #ff4ea3;">"s"</span>, s)
+</pre>
+</div>
+
+<pre class="example">
+====================================== s =======================================
+a    1
+c    3
+e    5
+f    6
+h    8
+dtype: int64
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"s.reindex(list('abcdefgh'))"</span>,
+    s.reindex(<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'abcdefgh'</span>)))
+</pre>
+</div>
+
+<pre class="example">
+========================= s.reindex(list('abcdefgh')) ==========================
+a    1.0
+b    NaN
+c    3.0
+d    NaN
+e    5.0
+f    6.0
+g    NaN
+h    8.0
+dtype: float64
+</pre>
+</div>
+
+
+<div id="outline-container-sec-11-1-0-1" class="outline-5">
+<h5 id="sec-11-1-0-1"><span class="section-number-5">11.1.0.1</span> 填充默认值</h5>
+<div class="outline-text-5" id="text-11-1-0-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"s.reindex(list('abcdefgh'), fill_value=0)"</span>,
+    s.reindex(<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'abcdefgh'</span>), fill_value=0))
+</pre>
+</div>
+
+<pre class="example">
+================== s.reindex(list('abcdefgh'), fill_value=0) ===================
+a    1
+b    0
+c    3
+d    0
+e    5
+f    6
+g    0
+h    8
+dtype: int64
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-11-1-0-2" class="outline-5">
+<h5 id="sec-11-1-0-2"><span class="section-number-5">11.1.0.2</span> 往前填充</h5>
+<div class="outline-text-5" id="text-11-1-0-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"s.reindex(list('abcdefgh'), method='ffill')"</span>,
+    s.reindex(<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'abcdefgh'</span>), method=<span style="color: #ff4ea3;">'ffill'</span>))
+</pre>
+</div>
+
+<pre class="example">
+================= s.reindex(list('abcdefgh'), method='ffill') ==================
+a    1
+b    1
+c    3
+d    3
+e    5
+f    6
+g    6
+h    8
+dtype: int64
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-11-1-0-3" class="outline-5">
+<h5 id="sec-11-1-0-3"><span class="section-number-5">11.1.0.3</span> 往后填充</h5>
+<div class="outline-text-5" id="text-11-1-0-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"s.reindex(list('abcdefgh'), method='bfill')"</span>,
+    s.reindex(<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'abcdefgh'</span>), method=<span style="color: #ff4ea3;">'bfill'</span>))
+</pre>
+</div>
+
+<pre class="example">
+================= s.reindex(list('abcdefgh'), method='bfill') ==================
+a    1
+b    3
+c    3
+d    5
+e    5
+f    6
+g    8
+h    8
+dtype: int64
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-11-2" class="outline-3">
+<h3 id="sec-11-2"><span class="section-number-3">11.2</span> DataFrame</h3>
+<div class="outline-text-3" id="text-11-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">df</span> = pd.DataFrame(np.random.randn(4, 6),
+                  index=<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'ADFH'</span>),
+                  columns=[<span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'two'</span>, <span style="color: #ff4ea3;">'three'</span>, <span style="color: #ff4ea3;">'four'</span>, <span style="color: #ff4ea3;">'five'</span>, <span style="color: #ff4ea3;">'six'</span>])
+log(<span style="color: #ff4ea3;">"df"</span>, df)
+</pre>
+</div>
+
+<pre class="example">
+====================================== df ======================================
+        one       two     three      four      five       six
+A  0.241024 -0.525741 -0.377113 -0.960432 -0.656974 -1.483413
+D  0.000605  0.387765 -0.310961 -0.249962  0.840062 -0.880926
+F  0.190481  0.156906 -0.858753  1.563886  0.594967  0.054731
+H -1.021625 -0.408587  1.226361  1.710079 -0.684852  0.370876
+</pre>
+</div>
+
+<div id="outline-container-sec-11-2-0-1" class="outline-5">
+<h5 id="sec-11-2-0-1"><span class="section-number-5">11.2.0.1</span> 对行重新索引</h5>
+<div class="outline-text-5" id="text-11-2-0-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.reindex(index=list('ABCDEFGH'))"</span>,
+    df.reindex(index=<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'ABCDEFGH'</span>)))
+</pre>
+</div>
+
+<pre class="example">
+====================== df.reindex(index=list('ABCDEFGH')) ======================
+        one       two     three      four      five       six
+A  0.241024 -0.525741 -0.377113 -0.960432 -0.656974 -1.483413
+B       NaN       NaN       NaN       NaN       NaN       NaN
+C       NaN       NaN       NaN       NaN       NaN       NaN
+D  0.000605  0.387765 -0.310961 -0.249962  0.840062 -0.880926
+E       NaN       NaN       NaN       NaN       NaN       NaN
+F  0.190481  0.156906 -0.858753  1.563886  0.594967  0.054731
+G       NaN       NaN       NaN       NaN       NaN       NaN
+H -1.021625 -0.408587  1.226361  1.710079 -0.684852  0.370876
+</pre>
+</div>
+
+<div id="outline-container-sec-11-2-0-1-1" class="outline-6">
+<h6 id="sec-11-2-0-1-1"><span class="section-number-6">11.2.0.1.1</span> 向前填充</h6>
+<div class="outline-text-6" id="text-11-2-0-1-1">
+<p>
+<b>fill method 只对行重新索引有效，不适用列</b>
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.reindex(index=list('ABCDEFGH'), method='ffill')"</span>,
+    df.reindex(index=<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'ABCDEFGH'</span>), method=<span style="color: #ff4ea3;">'ffill'</span>))
+</pre>
+</div>
+
+<pre class="example">
+============== df.reindex(index=list('ABCDEFGH'), method='ffill') ==============
+        one       two     three      four      five       six
+A  0.241024 -0.525741 -0.377113 -0.960432 -0.656974 -1.483413
+B  0.241024 -0.525741 -0.377113 -0.960432 -0.656974 -1.483413
+C  0.241024 -0.525741 -0.377113 -0.960432 -0.656974 -1.483413
+D  0.000605  0.387765 -0.310961 -0.249962  0.840062 -0.880926
+E  0.000605  0.387765 -0.310961 -0.249962  0.840062 -0.880926
+F  0.190481  0.156906 -0.858753  1.563886  0.594967  0.054731
+G  0.190481  0.156906 -0.858753  1.563886  0.594967  0.054731
+H -1.021625 -0.408587  1.226361  1.710079 -0.684852  0.370876
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-11-2-0-2" class="outline-5">
+<h5 id="sec-11-2-0-2"><span class="section-number-5">11.2.0.2</span> 对列重新索引</h5>
+<div class="outline-text-5" id="text-11-2-0-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.reindex(columns=['one', 'three', 'five', 'seven'], fill_value=0)"</span>,
+    df.reindex(columns=[<span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'three'</span>, <span style="color: #ff4ea3;">'five'</span>, <span style="color: #ff4ea3;">'seven'</span>], fill_value=0))
+</pre>
+</div>
+
+<pre class="example">
+===== df.reindex(columns=['one', 'three', 'five', 'seven'], fill_value=0) ======
+        one     three      five  seven
+A  0.241024 -0.377113 -0.656974      0
+D  0.000605 -0.310961  0.840062      0
+F  0.190481 -0.858753  0.594967      0
+H -1.021625  1.226361 -0.684852      0
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+
+<div id="outline-container-sec-12" class="outline-2">
+<h2 id="sec-12"><span class="section-number-2">12</span> 索引</h2>
+<div class="outline-text-2" id="text-12">
+</div><div id="outline-container-sec-12-1" class="outline-3">
+<h3 id="sec-12-1"><span class="section-number-3">12.1</span> 索引命名</h3>
+<div class="outline-text-3" id="text-12-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">s</span> = pd.Series(np.random.rand(5), index=<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'abcde'</span>))
+<span style="color: #ff8700;">df</span> = pd.DataFrame(np.random.randn(4, 3), columns=[<span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'two'</span>, <span style="color: #ff4ea3;">'three'</span>])
+
+log(<span style="color: #ff4ea3;">"s"</span>, s)
+log(<span style="color: #ff4ea3;">"df"</span>, df)
+</pre>
+</div>
+
+<pre class="example">
+====================================== s =======================================
+a    0.572128
+b    0.892046
+c    0.915196
+d    0.598729
+e    0.258596
+dtype: float64
+====================================== df ======================================
+        one       two     three
+0 -0.366591 -1.164579 -0.363068
+1  0.421988 -0.249189  0.464786
+2 -0.943840 -0.170259  0.390708
+3  1.237370 -0.961639 -1.520108
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"s.index"</span>, s.index)
+<span style="color: #ff8700;">s.index.name</span> = <span style="color: #ff4ea3;">'alpha'</span>
+log(<span style="color: #ff4ea3;">"s"</span>, s)
+</pre>
+</div>
+
+<pre class="example">
+=================================== s.index ====================================
+Index(['a', 'b', 'c', 'd', 'e'], dtype='object')
+====================================== s =======================================
+alpha
+a    0.572128
+b    0.892046
+c    0.915196
+d    0.598729
+e    0.258596
+dtype: float64
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.index"</span>, df.index)
+log(<span style="color: #ff4ea3;">"df.columns"</span>, df.columns)
+
+<span style="color: #ff8700;">df.index.name</span> = <span style="color: #ff4ea3;">'row'</span>
+<span style="color: #ff8700;">df.columns.name</span> = <span style="color: #ff4ea3;">'col'</span>
+
+log(<span style="color: #ff4ea3;">"df"</span>, df)
+</pre>
+</div>
+
+<pre class="example">
+=================================== df.index ===================================
+RangeIndex(start=0, stop=4, step=1)
+================================== df.columns ==================================
+Index(['one', 'two', 'three'], dtype='object')
+====================================== df ======================================
+col       one       two     three
+row
+0   -0.366591 -1.164579 -0.363068
+1    0.421988 -0.249189  0.464786
+2   -0.943840 -0.170259  0.390708
+3    1.237370 -0.961639 -1.520108
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-12-2" class="outline-3">
+<h3 id="sec-12-2"><span class="section-number-3">12.2</span> 重复索引</h3>
+<div class="outline-text-3" id="text-12-2">
+<p>
+索引值有重复项的索引
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">s</span> = pd.Series(np.arange(6), index=<span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'abcbda'</span>))
+log(<span style="color: #ff4ea3;">"s"</span>, s)
+</pre>
+</div>
+
+<pre class="example">
+====================================== s =======================================
+a    0
+b    1
+c    2
+b    3
+d    4
+a    5
+dtype: int64
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"s['a']"</span>, s[<span style="color: #ff4ea3;">'a'</span>])
+log(<span style="color: #ff4ea3;">"s.index.is_unique"</span>, s.index.is_unique)
+</pre>
+</div>
+
+<pre class="example">
+==================================== s['a'] ====================================
+a    0
+a    5
+dtype: int64
+============================== s.index.is_unique ===============================
+False
+</pre>
+</div>
+
+
+<div id="outline-container-sec-12-2-1" class="outline-4">
+<h4 id="sec-12-2-1"><span class="section-number-4">12.2.1</span> 对重复索引的处理（清洗）</h4>
+<div class="outline-text-4" id="text-12-2-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">sum_result</span> = s.groupby(s.index).<span style="color: #d18aff;">sum</span>()  <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">&#23545;&#37325;&#22797;&#32034;&#24341;&#20869;&#23481;&#36827;&#34892;&#27714;&#21644;</span>
+log(<span style="color: #ff4ea3;">"sum_result"</span>, sum_result)
+
+<span style="color: #ff8700;">first_result</span> = s.groupby(s.index).first()  <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">&#23545;&#37325;&#22797;&#32034;&#24341;&#20869;&#23481;&#21482;&#21462;&#31532;&#19968;&#39033;</span>
+log(<span style="color: #ff4ea3;">"first_result"</span>, first_result)
+
+<span style="color: #ff8700;">avg_result</span> = s.groupby(s.index).mean()  <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">&#23545;&#37325;&#22797;&#32034;&#24341;&#20869;&#23481;&#21462;&#24179;&#22343;&#20540;</span>
+log(<span style="color: #ff4ea3;">"avg_result"</span>, avg_result)
+</pre>
+</div>
+
+<pre class="example">
+================================== sum_result ==================================
+a    5
+b    4
+c    2
+d    4
+dtype: int64
+================================= first_result =================================
+a    0
+b    1
+c    2
+d    4
+dtype: int64
+================================== avg_result ==================================
+a    2.5
+b    2.0
+c    2.0
+d    4.0
+dtype: float64
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-12-3" class="outline-3">
+<h3 id="sec-12-3"><span class="section-number-3">12.3</span> 多级索引</h3>
+<div class="outline-text-3" id="text-12-3">
+<p>
+<b>用二维的数据表达更高维度的数据</b> ，使数据组织方式更清晰，它使用 <code>pd.MultiIndex</code> 类来表示。
+</p>
+</div>
+
+<div id="outline-container-sec-12-3-1" class="outline-4">
+<h4 id="sec-12-3-1"><span class="section-number-4">12.3.1</span> 层次化索引的作用</h4>
+<div class="outline-text-4" id="text-12-3-1">
+<p>
+比如在分析股票数据：
+</p>
+<ul class="org-ul">
+<li>一级行索引可以是日期
+</li>
+<li>二级行索引可以是股票代码
+</li>
+<li>列索引可以是股票的交易量，开盘价，收盘价等等
+</li>
+</ul>
+
+<p>
+这样就可以把多个股票放在同一个时间维度下进行考察和分析。
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-sec-12-3-2" class="outline-4">
+<h4 id="sec-12-3-2"><span class="section-number-4">12.3.2</span> Series 多级索引</h4>
+<div class="outline-text-4" id="text-12-3-2">
+</div><div id="outline-container-sec-12-3-2-1" class="outline-5">
+<h5 id="sec-12-3-2-1"><span class="section-number-5">12.3.2.1</span> 创建</h5>
+<div class="outline-text-5" id="text-12-3-2-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">a</span> = [[<span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'b'</span>, <span style="color: #ff4ea3;">'b'</span>, <span style="color: #ff4ea3;">'c'</span>, <span style="color: #ff4ea3;">'c'</span>], [1, 2, 3, 1, 2, 2, 3]]
+<span style="color: #ff8700;">tuples</span> = <span style="color: #d18aff;">list</span>(<span style="color: #d18aff;">zip</span>(*a))
+log(<span style="color: #ff4ea3;">"tuples"</span>, tuples)
+<span style="color: #ff8700;">index</span> = pd.MultiIndex.from_tuples(tuples, names=[<span style="color: #ff4ea3;">'first'</span>, <span style="color: #ff4ea3;">'second'</span>])
+log(<span style="color: #ff4ea3;">"index"</span>, index)
+<span style="color: #ff8700;">s</span> = pd.Series(np.random.randn(7), index=index)
+log(<span style="color: #ff4ea3;">"s"</span>, s)
+log(<span style="color: #ff4ea3;">"s.index"</span>, s.index)
+log(<span style="color: #ff4ea3;">"s.index.levels[1]"</span>, s.index.levels[1])
+</pre>
+</div>
+
+<pre class="example">
+==================================== tuples ====================================
+[('a', 1), ('a', 2), ('a', 3), ('b', 1), ('b', 2), ('c', 2), ('c', 3)]
+==================================== index =====================================
+MultiIndex(levels=[['a', 'b', 'c'], [1, 2, 3]],
+           labels=[[0, 0, 0, 1, 1, 2, 2], [0, 1, 2, 0, 1, 1, 2]],
+           names=['first', 'second'])
+====================================== s =======================================
+first  second
+a      1         0.006824
+       2         0.158492
+       3        -1.695640
+b      1        -0.917198
+       2        -0.366629
+c      2        -1.680081
+       3         0.136124
+dtype: float64
+=================================== s.index ====================================
+MultiIndex(levels=[['a', 'b', 'c'], [1, 2, 3]],
+           labels=[[0, 0, 0, 1, 1, 2, 2], [0, 1, 2, 0, 1, 1, 2]],
+           names=['first', 'second'])
+============================== s.index.levels[1] ===============================
+Int64Index([1, 2, 3], dtype='int64', name='second')
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-12-3-2-2" class="outline-5">
+<h5 id="sec-12-3-2-2"><span class="section-number-5">12.3.2.2</span> 选取</h5>
+<div class="outline-text-5" id="text-12-3-2-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"s['b']"</span>, s[<span style="color: #ff4ea3;">'b'</span>])
+log(<span style="color: #ff4ea3;">"s['b':'c']"</span>, s[<span style="color: #ff4ea3;">'b'</span>:<span style="color: #ff4ea3;">'c'</span>])
+log(<span style="color: #ff4ea3;">"s[['b', 'a']]"</span>, s[[<span style="color: #ff4ea3;">'b'</span>, <span style="color: #ff4ea3;">'a'</span>]])
+log(<span style="color: #ff4ea3;">"s['b', 1]"</span>, s[<span style="color: #ff4ea3;">'b'</span>, 1])
+log(<span style="color: #ff4ea3;">"s[:, 2]"</span>, s[:, 2])
+</pre>
+</div>
+
+<pre class="example">
+==================================== s['b'] ====================================
+second
+1   -0.917198
+2   -0.366629
+dtype: float64
+================================== s['b':'c'] ==================================
+first  second
+b      1        -0.917198
+       2        -0.366629
+c      2        -1.680081
+       3         0.136124
+dtype: float64
+================================ s[['b', 'a']] =================================
+first  second
+a      1         0.006824
+       2         0.158492
+       3        -1.695640
+b      1        -0.917198
+       2        -0.366629
+dtype: float64
+================================== s['b', 1] ===================================
+-0.9171979950557985
+=================================== s[:, 2] ====================================
+first
+a    0.158492
+b   -0.366629
+c   -1.680081
+dtype: float64
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-12-3-3" class="outline-4">
+<h4 id="sec-12-3-3"><span class="section-number-4">12.3.3</span> DataFrame 多级索引</h4>
+<div class="outline-text-4" id="text-12-3-3">
+</div><div id="outline-container-sec-12-3-3-1" class="outline-5">
+<h5 id="sec-12-3-3-1"><span class="section-number-5">12.3.3.1</span> 创建</h5>
+<div class="outline-text-5" id="text-12-3-3-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">df</span> = pd.DataFrame(np.random.randint(1, 10, (4, 3)),  <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">1-10 &#20043;&#38388;&#30340;&#38543;&#26426;&#25968;&#65292;4 &#34892; 3 &#21015;</span>
+                  index=[[<span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'a'</span>, <span style="color: #ff4ea3;">'b'</span>, <span style="color: #ff4ea3;">'b'</span>], [1, 2, 1, 2]],
+                  columns=[[<span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'two'</span>], [<span style="color: #ff4ea3;">'blue'</span>, <span style="color: #ff4ea3;">'red'</span>, <span style="color: #ff4ea3;">'blue'</span>]])
+<span style="color: #ff8700;">df.index.names</span> = [<span style="color: #ff4ea3;">'row-1'</span>, <span style="color: #ff4ea3;">'row-2'</span>]
+<span style="color: #ff8700;">df.columns.names</span> = [<span style="color: #ff4ea3;">'col-1'</span>, <span style="color: #ff4ea3;">'col-2'</span>]
+show_dataframe(df)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig75428gsV.png" alt="fig75428gsV.png">
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-12-3-3-2" class="outline-5">
+<h5 id="sec-12-3-3-2"><span class="section-number-5">12.3.3.2</span> 选取</h5>
+<div class="outline-text-5" id="text-12-3-3-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython">show_dataframe(df.loc[<span style="color: #ff4ea3;">'a'</span>])
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig754286Ai.png" alt="fig754286Ai.png">
+</p>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"df.loc['a', 1]"</span>, df.loc[<span style="color: #ff4ea3;">'a'</span>, 1])
+</pre>
+</div>
+
+<pre class="example">
+================================ df.loc['a', 1] ================================
+col-1  col-2
+one    blue     7
+       red      6
+two    blue     7
+Name: (a, 1), dtype: int64
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-12-3-3-3" class="outline-5">
+<h5 id="sec-12-3-3-3"><span class="section-number-5">12.3.3.3</span> 多级索引交换</h5>
+<div class="outline-text-5" id="text-12-3-3-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">df2</span> = df.swaplevel(<span style="color: #ff4ea3;">'row-1'</span>, <span style="color: #ff4ea3;">'row-2'</span>)
+show_dataframe(df2)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig75428UVu.png" alt="fig75428UVu.png">
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-12-3-3-4" class="outline-5">
+<h5 id="sec-12-3-3-4"><span class="section-number-5">12.3.3.4</span> 多级索引排序</h5>
+<div class="outline-text-5" id="text-12-3-3-4">
+<div class="org-src-container">
+
+<pre class="src src-ipython">show_dataframe(df2.sortlevel(0))  <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">0 &#34920;&#31034;&#26681;&#25454;&#19968;&#32423;&#32034;&#24341;&#36827;&#34892;&#25490;&#24207;</span>
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig75428TpD.png" alt="fig75428TpD.png">
+</p>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython">show_dataframe(df2.sortlevel(1))  <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">&#26681;&#25454;&#20108;&#32423;&#32034;&#24341;&#36827;&#34892;&#25490;&#24207;</span>
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig75428t9P.png" alt="fig75428t9P.png">
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-12-3-3-5" class="outline-5">
+<h5 id="sec-12-3-3-5"><span class="section-number-5">12.3.3.5</span> 多级索引统计</h5>
+<div class="outline-text-5" id="text-12-3-3-5">
+<div class="org-src-container">
+
+<pre class="src src-ipython">show_dataframe(df.<span style="color: #d18aff;">sum</span>(level=0))
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig75428HSc.png" alt="fig75428HSc.png">
+</p>
+</div>
+
+
+<div class="org-src-container">
+
+<pre class="src src-ipython">show_dataframe(df.<span style="color: #d18aff;">sum</span>(level=1))
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig75428hmo.png" alt="fig75428hmo.png">
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-12-3-3-6" class="outline-5">
+<h5 id="sec-12-3-3-6"><span class="section-number-5">12.3.3.6</span> 列与索引的转换</h5>
+<div class="outline-text-5" id="text-12-3-3-6">
+<p>
+创建多级索引比较复杂，一般情况下会从文件中读取一个 DataFrame ，
+然后将其中某个列转换为多级索引，最终得到一个基于多级索引的 DataFrame 。
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">df</span> = pd.DataFrame({
+    <span style="color: #ff4ea3;">'a'</span>: <span style="color: #d18aff;">range</span>(7),
+    <span style="color: #ff4ea3;">'b'</span>: <span style="color: #d18aff;">range</span>(7, 0, -1),
+    <span style="color: #ff4ea3;">'c'</span>: [<span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'one'</span>, <span style="color: #ff4ea3;">'two'</span>, <span style="color: #ff4ea3;">'two'</span>, <span style="color: #ff4ea3;">'two'</span>, <span style="color: #ff4ea3;">'two'</span>],
+    <span style="color: #ff4ea3;">'d'</span>: [0, 1, 2, 0, 1, 2, 3]
+})
+show_dataframe(df)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig75428760.png" alt="fig75428760.png">
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-12-3-3-6-1" class="outline-6">
+<h6 id="sec-12-3-3-6-1"><span class="section-number-6">12.3.3.6.1</span> 列转换为索引</h6>
+<div class="outline-text-6" id="text-12-3-3-6-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython">show_dataframe(df.set_index(<span style="color: #ff4ea3;">'c'</span>))
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig754286OK.png" alt="fig754286OK.png">
+</p>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">df2</span> = df.set_index([<span style="color: #ff4ea3;">'c'</span>, <span style="color: #ff4ea3;">'d'</span>])
+show_dataframe(df2)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig75428UjW.png" alt="fig75428UjW.png">
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-12-3-3-6-2" class="outline-6">
+<h6 id="sec-12-3-3-6-2"><span class="section-number-6">12.3.3.6.2</span> 还原</h6>
+<div class="outline-text-6" id="text-12-3-3-6-2">
+<p>
+对由列转换成的多级索引 DataFrame 进行还原
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython">show_dataframe(df2.reset_index().sort_index(<span style="color: #ff4ea3;">'columns'</span>))
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/fig75428u3i.png" alt="fig75428u3i.png">
+</p>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
