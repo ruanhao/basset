@@ -68,6 +68,18 @@
 
 * 核心数据结构
 
+** Panel
+
+Panel 是三维带标签的数组。
+
+Panel 由三个标签组成：
+
+- items :: 坐标轴 0 ，索引对应的元素是一个 DataFrame
+- major_axis :: 坐标轴 1 , DataFrame 里的行标签
+- minor_axis :: 坐标轴 2 , DataFrame 里的列标签
+
+
+
 ** Series
 
 Series 是一维带标签的数组，数组里可以放任意的数据（整数，浮点数，字符串，Python Object）。
@@ -184,7 +196,8 @@ key 为 DataFrame 的列；value 为对应列下的值
 
   log("pd.DataFrame(d)", pd.DataFrame(d))
   log("pd.DataFrame(d, index=['d', 'b', 'a'])", pd.DataFrame(d, index=['d', 'b', 'a']))
-  log("pd.DataFrame(d, index=['d', 'b', 'a'], columns=['two', 'three'])", pd.DataFrame(d, index=['d', 'b', 'a'], columns=['two', 'three']))
+  log("pd.DataFrame(d, index=['d', 'b', 'a'], columns=['two', 'three'])",
+      pd.DataFrame(d, index=['d', 'b', 'a'], columns=['two', 'three']))
 #+END_SRC
 
 #+BEGIN_SRC ipython :session :exports both :results output
@@ -394,6 +407,20 @@ assign 方法并不会 inplace 地改变原来的 dataframe ，
   log("result", result)
 #+END_SRC
 
+
+**** 增加行
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020vuz.png"
+  s = pd.Series([7, 7, 7, True, 7, 7], index=list(df.columns))
+  appended = df.append(s, ignore_index=True)
+  show_dataframe(appended)
+#+END_SRC
+
+#+NAME: img/fig37020vuz.png
+#+CAPTION: append
+[[file:img/fig37020vuz.png]]
+
+
 **** 行与列选择
 
 #+BEGIN_SRC ipython :session :exports both :results output
@@ -441,6 +468,7 @@ DataFrame 在进行数据计算时， *会自动按行和列进行数据对齐* 
   log("df3 (after)", df3)
 #+END_SRC
 
+
 **** 使用 numpy 函数
 
 因为从本质上讲，DataFrame 内部用的数据结构就是 numpy 的 ndarray 。
@@ -460,16 +488,6 @@ DataFrame 在进行数据计算时， *会自动按行和列进行数据对齐* 
   log("ary == df", ary == df)
 #+END_SRC
 
-
-** Panel
-
-Panel 是三维带标签的数组。
-
-Panel 由三个标签组成：
-
-- items :: 坐标轴 0 ，索引对应的元素是一个 DataFrame
-- major_axis :: 坐标轴 1 , DataFrame 里的行标签
-- minor_axis :: 坐标轴 2 , DataFrame 里的列标签
 
 
 
@@ -617,6 +635,7 @@ Panel 由三个标签组成：
   log("s.value_counts()", s.value_counts())
 #+END_SRC
 
+
 *** 唯一性统计(uniq)
 
 #+BEGIN_SRC ipython :session :exports both :results output
@@ -632,6 +651,175 @@ Panel 由三个标签组成：
 
 
 
+
+
+
+** 出现最频繁值的统计(mode)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series([1, 1, 2, 3, 4, 5])
+  log("s.mode()", s.mode())
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020hxO.png"
+  df = pd.DataFrame({'data1': ['a', 'a', 'b', 'b', 'a'],
+                     'data2': ['one', 'one', 'one', 'two', 'two'],
+                     'data3': [1, 2, 3, 5, 5],
+                     'data4': [6, 7, 8, 8, 9]})
+  show_dataframe(df.mode())
+#+END_SRC
+
+#+NAME: img/fig37020hxO.png
+#+CAPTION: 频繁值统计
+[[file:img/fig37020hxO.png]]
+
+
+
+** 数据联结(concat)
+
+#+BEGIN_SRC ipython :session :var path="img/fig370207Fb.png"
+  df = pd.DataFrame(np.random.randn(10, 4), columns=list('ABCD'))
+  concatted = pd.concat([df.iloc[:3], df.iloc[3:7], df.iloc[7:]])
+  show_dataframe(concatted)  # (concatted == df).all().all(): True
+#+END_SRC
+
+#+NAME: img/fig370207Fb.png
+#+CAPTION: cat
+[[file:img/fig370207Fb.png]]
+
+
+** 数据合并(merge)
+
+*相当于数据库操作中的外连接*
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020Van.png"
+  left = pd.DataFrame({'key': ['foo', 'foo'], 'lval': [1, 2]})
+  right = pd.DataFrame({'key': ['foo', 'foo'], 'rval': [4, 5]})
+
+  # SELECT * FROM left INNER JOIN right ON left.key = right.key;
+  merged = pd.merge(left, right, on='key')
+  show_dataframe(merged)
+#+END_SRC
+
+#+NAME: img/fig37020Van.png
+#+CAPTION: merge
+[[file:img/fig37020Van.png]]
+
+
+** 行列索引转换
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020uCJ.png"
+  tuples = list(zip(*[['bar', 'bar', 'baz', 'baz',
+                       'foo', 'foo', 'qux', 'qux'],
+                      ['one', 'two', 'one', 'two',
+                       'one', 'two', 'one', 'two']]))
+  index = pd.MultiIndex.from_tuples(tuples, names=['first', 'second'])
+  df = pd.DataFrame(np.random.randn(8, 2), index=index, columns=['A', 'B'])
+  show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig37020uCJ.png
+#+CAPTION: 示例数据
+[[file:img/fig37020uCJ.png]]
+
+*** 将列索引变为行索引 (stack)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  stacked = df.stack()
+  log("stacked", stacked)
+  log("type(stacked)", type(stacked))
+  log("stacked.index", stacked.index)
+#+END_SRC
+
+
+*** 将行索引变为列索引 (unstack)
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020IXV.png"
+  show_dataframe(stacked.unstack())
+#+END_SRC
+
+#+NAME: img/fig37020IXV.png
+#+CAPTION: unstack
+[[file:img/fig37020IXV.png]]
+
+
+** 透视图（pivot_table）
+
+用于观察 data frame 中一部分数据
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020irh.png"
+  df = pd.DataFrame({'A' : ['one', 'one', 'two', 'three'] * 3,
+                     'B' : ['A', 'B', 'C'] * 4,
+                     'C' : ['foo', 'foo', 'foo', 'bar', 'bar', 'bar'] * 2,
+                     'D' : np.random.randn(12),
+                     'E' : np.random.randn(12)})
+
+  show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig37020irh.png
+#+CAPTION: 示例数据
+[[file:img/fig37020irh.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig370208_t.png"
+  result = pd.pivot_table(df, values='D', index=['A', 'B'], columns=['C'])
+  show_dataframe(result)
+#+END_SRC
+
+#+NAME: img/fig370208_t.png
+#+CAPTION: 以 A ，B 为行索引，以 C 为列索引的，针对 D 的数据
+[[file:img/fig370208_t.png]]
+
+
+*当透视表结果为多个值的时候，默认返回平均值* ：
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig370207TD.png"
+  result = pd.pivot_table(df, values=['E'], index=['A'], columns=['C'])
+  show_dataframe(result)
+#+END_SRC
+
+#+NAME: img/fig370207TD.png
+#+CAPTION: 默认计算平均值
+[[file:img/fig370207TD.png]]
+
+针对 A 为 one 的那行数据，其计算过程相当于：
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result = df[df.A=='one'].groupby('C')['E'].mean()
+  log("result", result)
+#+END_SRC
+
+
+** 数据分类(astype('category'))
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020v8b.png"
+  df = pd.DataFrame({"id":[1,2,3,4,5,6], "raw_grade":['a', 'b', 'b', 'a', 'a', 'e']})
+  df["grade"] = df["raw_grade"].astype("category")
+  show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig37020v8b.png
+#+CAPTION: 示例数据
+[[file:img/fig37020v8b.png]]
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.grade", df.grade)
+  log("df.grade.cat.categories", df.grade.cat.categories)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020JRo.png"
+  df.grade.cat.categories = ['very good', 'good', 'bad']
+  sort_result = df.sort_values(by='grade', ascending=False)
+  show_dataframe(sort_result)
+#+END_SRC
+
+#+NAME: img/fig37020JRo.png
+#+CAPTION: 以 raw_grade 列为排序标准
+[[file:img/fig37020JRo.png]]
 
 
 * 索引
@@ -949,6 +1137,7 @@ Panel 由三个标签组成：
 2. 应用：每个分组进行什么样的计算（每个组应用一个 *计算规则* ，输出一个结果）
 3. 聚合：把每个分组的计算结果合并起来，构成最终输出
 
+
 ** 分组
 
 *** 对 Series 进行分组
@@ -1111,11 +1300,8 @@ Panel 由三个标签组成：
 
 [[file:img/fig37020FNM.png]]
 
+
 ** 数据聚合
-
-
-
-
 
 
 #+BEGIN_SRC ipython :session :var path="img/fig37020fhY.png"
@@ -1189,6 +1375,7 @@ Panel 由三个标签组成：
 #+CAPTION: describe
 [[file:img/fig37020fvA.png]]
 
+
 *** 自定义聚合函数
 
 自定义聚合函数时，需使用 =agg()= 或 =aggregate()= 函数。
@@ -1210,6 +1397,7 @@ Panel 由三个标签组成：
 #+END_SRC
 
 [[file:img/fig3702051k.png]]
+
 
 *** 应用多个聚合函数
 
@@ -1280,6 +1468,167 @@ Panel 由三个标签组成：
 [[file:img/fig37020gpT.png]]
 
 
+
+
+
+*** transform
+
+transform_func 作用的是分组后每个列上的数据（Series）， *运算结果是 Series* ，不是标量。
+
+#+NAME: transform
+#+CAPTION: transform 原理
+[[file:img/pandas_transform.png]]
+
+**** 案例一（给每行都添加一个分组后的平均值）
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020USs.png"
+  df = pd.DataFrame({'key1': ['a', 'a', 'b', 'b', 'a'],
+                     'key2': ['one', 'two', 'one', 'two', 'one'],
+                     'data1': np.random.randint(1, 10, 5),
+                     'data2': np.random.randint(1, 10, 5)})
+  show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig37020USs.png
+#+CAPTION: 示例数据
+[[file:img/fig37020USs.png]]
+
+***** 使用 merge 实现
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020TmB.png"
+  k1_mean = df.groupby('key1').mean().add_prefix('mean_')
+  show_dataframe(k1_mean)
+#+END_SRC
+
+#+NAME: img/fig37020TmB.png
+#+CAPTION: 先求平均值
+[[file:img/fig37020TmB.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020t6N.png"
+  show_dataframe(pd.merge(df, k1_mean, left_on='key1', right_index=True))
+#+END_SRC
+
+#+NAME: img/fig37020t6N.png
+#+CAPTION: 使用 merge
+[[file:img/fig37020t6N.png]]
+
+
+***** 使用 transform 实现
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020HPa.png"
+  k1_mean = df.groupby('key1').transform(np.mean).add_prefix('mean_')
+  show_dataframe(k1_mean)
+#+END_SRC
+
+#+NAME: img/fig37020HPa.png
+#+CAPTION: 使用 transform 计算平均值
+[[file:img/fig37020HPa.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020hjm.png"
+  df[k1_mean.columns] = k1_mean
+  show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig37020hjm.png
+#+CAPTION: 将 k1_mean 附加到原 dataframe 中
+[[file:img/fig37020hjm.png]]
+
+
+**** 案例二（计算分组后每个值与平均值的差异）
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig3702073y.png"
+  df = pd.DataFrame(np.random.randint(1, 10, (5, 5)),
+                    columns=['a', 'b', 'c', 'd', 'e'],
+                    index=['Alice', 'Bob', 'Candy', 'Dark', 'Emily'])
+  show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig3702073y.png
+#+CAPTION: 示例数据
+[[file:img/fig3702073y.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig370206LI.png"
+  def demean(s):
+      return s - s.mean()
+
+  key = ['one', 'one', 'two', 'one', 'two']
+  demeaned = df.groupby(key).transform(demean)
+  show_dataframe(demeaned)
+#+END_SRC
+
+#+NAME: img/fig370206LI.png
+#+CAPTION: 均值差
+[[file:img/fig370206LI.png]]
+
+
+*** apply
+
+*DataFrame 的 apply 函数是逐行或逐列来处理数据。GroupBy 的 apply 函数对每个分组进行计算。*
+
+*apply_func 作用的是分组后每个 group 对象。*
+
+#+NAME: apply
+#+CAPTION: apply 原理
+file:img/pandas_apply.png
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020UgU.png"
+  df = pd.DataFrame({'key1': ['a', 'a', 'b', 'b', 'a', 'a', 'a', 'b', 'b', 'a'],
+                    'key2': ['one', 'two', 'one', 'two', 'one', 'one', 'two', 'one', 'two', 'one'],
+                    'data1': np.random.randint(1, 10, 10),
+                    'data2': np.random.randint(1, 10, 10)})
+  show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig37020UgU.png
+#+CAPTION: 示例数据
+[[file:img/fig37020UgU.png]]
+
+**** 案例一（根据 column 排序，输出其最大的 n 行数据）
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020u0g.png"
+  def top(df, n=2, column='data1'):
+      return df.sort_values(by=column, ascending=False)[:n]
+
+  show_dataframe(df.groupby('key1').apply(top))
+  # 可以传递参数：df.groupby('key1').apply(top, n=3, column='data2')
+#+END_SRC
+
+#+NAME: img/fig37020u0g.png
+#+CAPTION: 输出 n 行
+[[file:img/fig37020u0g.png]]
+
+
+禁用分组键：
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020IJt.png"
+  show_dataframe(df.groupby('key1', group_keys=False).apply(top))
+#+END_SRC
+
+#+NAME: img/fig37020IJt.png
+#+CAPTION: 禁用分组键
+[[file:img/fig37020IJt.png]]
+
+
+
+**** 案例二（用不同的分组平均值填充空缺数据）
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  states = ['Ohio', 'New York', 'Vermont', 'Florida',
+            'Oregon', 'Nevada', 'California', 'Idaho']
+  group_key = ['East'] * 4 + ['West'] * 4
+  data = pd.Series(np.random.randn(8), index=states)
+  data[['Vermont', 'Nevada', 'Idaho']] = np.nan
+  log("data", data)
+
+  fill_mean = lambda g: g.fillna(g.mean())
+  result = data.groupby(group_key).apply(fill_mean)
+  log("result", result)
+#+END_SRC
+
+
 * 处理丢失数据
 
 #+BEGIN_SRC ipython :session :exports both :results output
@@ -1330,181 +1679,6 @@ Panel 由三个标签组成：
   log("df.sub(s, axis='index')", df.sub(s, axis='index'))
 #+END_SRC
 
-
-* 数据操作
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  dates = pd.date_range('20160301', periods=6)
-  df = pd.DataFrame(data=np.random.randn(6, 4), index=dates, columns=list('ABCD'))
-  log("df", df)
-#+END_SRC
-
-
-
-** concat
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  df = pd.DataFrame(np.random.randn(10, 4), columns=list('ABCD'))
-  log("df", df)
-#+END_SRC
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  result = pd.concat([df.iloc[:3], df.iloc[3:7], df.iloc[7:]])
-  log("result", result)
-  log("(result == df).all().all()", (result == df).all().all())
-#+END_SRC
-
-
-** merge
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  left = pd.DataFrame({'key': ['foo', 'foo'], 'lval': [1, 2]})
-  right = pd.DataFrame({'key': ['foo', 'foo'], 'rval': [4, 5]})
-  log("left", left)
-  log("right", right)
-
-  # SELECT * FROM left INNER JOIN right ON left.key = right.key;
-  result = pd.merge(left, right, on='key')
-  log("result", result)
-#+END_SRC
-
-
-** append
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  s = pd.Series(np.random.randint(1, 5, size=4), index=list('ABCD'))
-  log("s", s)
-  result = df.append(s, ignore_index=True)
-  log("result", result)
-#+END_SRC
-
-
-** 数据整形
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  tuples = list(zip(*[['bar', 'bar', 'baz', 'baz',
-                       'foo', 'foo', 'qux', 'qux'],
-                      ['one', 'two', 'one', 'two',
-                       'one', 'two', 'one', 'two']]))
-  log("tuples", tuples)
-  index = pd.MultiIndex.from_tuples(tuples, names=['first', 'second'])
-  df = pd.DataFrame(np.random.randn(8, 2), index=index, columns=['A', 'B'])
-  log("df", df)
-#+END_SRC
-
-*** 将列索引变为行索引 (stack)
-
-#+BEGIN_SRC ipython :session :exports both :results output
-stacked = df.stack()
-log("stacked", stacked)
-log("type(stacked)", type(stacked))
-log("stacked.index", stacked.index)
-#+END_SRC
-
-*** 将行索引变为列索引 (unstack)
-
-#+BEGIN_SRC ipython :session :exports both :results output
-log("stacked.unstack()", stacked.unstack())
-#+END_SRC
-
-*** 透视图（pivot_table）
-
-只观察 data frame 中一部分数据
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  df = pd.DataFrame({'A' : ['one', 'one', 'two', 'three'] * 3,
-                     'B' : ['A', 'B', 'C'] * 4,
-                     'C' : ['foo', 'foo', 'foo', 'bar', 'bar', 'bar'] * 2,
-                     'D' : np.random.randn(12),
-                     'E' : np.random.randn(12)})
-
-  log("df", df)
-#+END_SRC
-
-以 A ，B 为行索引，以 C 为列索引的，针对 D 的数据：
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  result = pd.pivot_table(df, values='D', index=['A', 'B'], columns=['C'])
-  log("result", result)
-
-#+END_SRC
-
-*当透视表结果为多个值的时候，返回平均值* ，如：
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  result = pd.pivot_table(df, values=['E'], index=['A'], columns=['C'])
-  log("result", result)
-#+END_SRC
-
-针对 A 为 one 的那行数据，其计算过程相当于：
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  result = df[df.A=='one'].groupby('C').mean()
-  log("result", result)
-#+END_SRC
-
-
-** Category
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  df = pd.DataFrame({"id":[1,2,3,4,5,6], "raw_grade":['a', 'b', 'b', 'a', 'a', 'e']})
-  df["grade"] = df["raw_grade"].astype("category")
-  log("df", df)
-#+END_SRC
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  log("df.grade", df.grade)
-  log("df.grade.cat.categories", df.grade.cat.categories)
-  df.grade.cat.categories = ['very good', 'good', 'bad']
-  log("df", df)
-  # 以 raw_grade 列为排序标准
-  sort_result = df.sort_values(by='grade', ascending=False)
-  log("sort_result", sort_result)
-#+END_SRC
-
-
-* 信息统计
-
-
-** mode
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  log("s.mode()", s.mode())
-#+END_SRC
-
-
-* 分组统计
-
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  df = pd.DataFrame({'A' : ['foo', 'bar', 'foo', 'bar',
-                            'foo', 'bar', 'foo', 'foo'],
-                     'B' : ['one', 'one', 'two', 'three',
-                            'two', 'two', 'one', 'three'],
-                     'C' : np.random.randn(8),
-                     'D' : np.random.randn(8)})
-  log("df", df)
-#+END_SRC
-
-** 对单列分组
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  result = df.groupby('A').sum()
-  log("result", result)
-#+END_SRC
-
-
-** 对多列分组
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  result = df.groupby(['A', 'B']).sum()
-  log("result", result)
-#+END_SRC
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  result = df.groupby(['B', 'A']).sum()
-  log("result", result)
-#+END_SRC
 
 
 * 时间序列
@@ -1583,13 +1757,16 @@ pd.read_csv('/tmp/df.csv', index_col=0)
 
 #+BEGIN_SRC ipython :session :exports both :results output
   user_names = ['user_id', 'gender', 'age', 'occupation', 'zip']
-  users = pd.read_table('data/ml-1m/users.dat', sep='::', header=None, names=user_names, engine='python')
+  users = pd.read_table('data/ml-1m/users.dat', sep='::',
+                        header=None, names=user_names, engine='python')
 
   rating_names = ['user_id', 'movie_id', 'rating', 'timestamp']
-  ratings = pd.read_table('data/ml-1m/ratings.dat', sep='::', header=None, names=rating_names, engine='python')
+  ratings = pd.read_table('data/ml-1m/ratings.dat', sep='::',
+                          header=None, names=rating_names, engine='python')
 
   movie_names = ['movie_id', 'title', 'genres']
-  movies = pd.read_table('data/ml-1m/movies.dat', sep='::', header=None, names=movie_names, engine='python')
+  movies = pd.read_table('data/ml-1m/movies.dat', sep='::',
+                         header=None, names=movie_names, engine='python')
 
   log("users.head()", users.head())
   log("ratings.head()", ratings.head())
@@ -1612,7 +1789,8 @@ pd.read_csv('/tmp/df.csv', index_col=0)
 *关心的值* 是 rating ，以 title 作为 *行索引* ，gender 作为 *列索引*
 
 #+BEGIN_SRC ipython :session :exports both :results output
-  mean_ratings_gender = data.pivot_table(values='rating', index='title', columns='gender', aggfunc='mean')
+  mean_ratings_gender = data.pivot_table(values='rating', index='title',
+                                         columns='gender', aggfunc='mean')
   log("mean_ratings_gender.head()", mean_ratings_gender.head())
 
 #+END_SRC
@@ -1641,7 +1819,8 @@ pd.read_csv('/tmp/df.csv', index_col=0)
 
 #+BEGIN_SRC ipython :session :exports both :results output
   mean_ratings = data.pivot_table(values='rating', index='title', aggfunc='mean')
-  top_10_movies = mean_ratings.loc[top_ratings.index].sort_values(by='rating', ascending=False).head(10)
+  top_10_movies = mean_ratings.loc[top_ratings.index].sort_values(by='rating',
+                                                                  ascending=False).head(10)
   # 把平均评分和热度综合起来
   df_top_10_movies = pd.DataFrame(top_10_movies)
   df_top_10_movies['hot'] = top_ratings.loc[top_10_movies.index]
