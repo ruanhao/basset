@@ -2516,6 +2516,7 @@ file:img/pandas_apply.png
 
 #+END_SRC
 
+
 ** 股票数据分析
 
 *** 导入数据
@@ -2626,6 +2627,135 @@ file:img/pandas_apply.png
 #+NAME: img/fig92800kyk.png
 #+CAPTION: 增长率图
 [[file:img/fig92800kyk.png]]
+
+
+** 小市值策略分析
+
+*** 导入数据
+
+|----------+----------+--------+----------+----------------+------------+------------|
+| 交易日期 | 股票代码 | 总市值 | 是否交易 | 最后一天涨跌幅 | 交易天数   | 下月涨幅   |
+|----------+----------+--------+----------+----------------+------------+------------|
+| date     | code     | mktcap | tradable | ld_pchange     | trade_days | nm_pchange |
+|----------+----------+--------+----------+----------------+------------+------------|
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig73568kg2.png"
+  cols = ['date', 'code', 'mktcap', 'tradable', 'ld_pchange',
+          'trade_days', 'nm_pchange']
+  df = pd.read_csv('data/stock_data.csv',
+                   parse_dates=['交易日期'],
+                   encoding='gbk')
+  df.columns = cols
+  show_dataframe(df.head())
+#+END_SRC
+
+#+NAME: img/fig73568kg2.png
+#+CAPTION: 原始数据
+[[file:img/fig73568kg2.png]]
+
+*** 按照交易日期，股票代码排序
+
+#+BEGIN_SRC ipython :session :var path="img/fig73568j0L.png"
+  df = df.sort_values(by=['date', 'code'])
+  show_dataframe(df.head())
+#+END_SRC
+
+#+NAME: img/fig73568j0L.png
+#+CAPTION: 按交易日期，股票代码排序
+[[file:img/fig73568j0L.png]]
+
+
+*** 设定分析起始日期
+
+#+BEGIN_SRC ipython :session :var path="img/fig735689IY.png"
+  date_filter = df.date > pd.to_datetime('20060101')
+  df = df[date_filter]
+  show_dataframe(df.head())
+#+END_SRC
+
+#+NAME: img/fig735689IY.png
+#+CAPTION: 设定开始时间
+[[file:img/fig735689IY.png]]
+
+*** 过滤不符合分析要求的股票
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig73568Xdk.png"
+  # 过滤无法交易的股票
+  tradable_filter = df.tradable == 1
+  df = df[tradable_filter]
+
+  # 过滤交易时间过短的股票
+  trade_days_filter = df.trade_days > 10
+  df = df[trade_days_filter]
+
+  # 过滤涨停股
+  ld_pchange_filter = df.ld_pchange <= 0.097
+  df = df[ld_pchange_filter]
+
+  show_dataframe(df.head())
+#+END_SRC
+
+#+NAME: img/fig73568Xdk.png
+#+CAPTION: 过滤无用数据
+[[file:img/fig73568Xdk.png]]
+
+*** 计算所有股票平均涨幅
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  all_mean = df.groupby('date')['nm_pchange'].mean()
+  log("all_mean.head()", all_mean.head())
+#+END_SRC
+
+*** 选取低市值股票
+
+**** 计算每月市值排名
+
+#+BEGIN_SRC ipython :session :var path="img/fig73568xxw.png"
+  r = df.groupby('date')['mktcap'].rank()
+  df['m_rank'] = r
+  show_dataframe(df.head(10))
+#+END_SRC
+
+#+NAME: img/fig73568xxw.png
+#+CAPTION: 每月排名
+[[file:img/fig73568xxw.png]]
+
+**** 选取市值排名前十低的股票
+
+#+BEGIN_SRC ipython :session :var path="img/fig73568wFG.png"
+  df = df[df.m_rank <= 10]
+  show_dataframe(df.head(20))
+#+END_SRC
+
+#+NAME: img/fig73568wFG.png
+#+CAPTION: 市值前十低
+[[file:img/fig73568wFG.png]]
+
+*** 计算低市值股票平均涨幅
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  select_mean = df.groupby('date')['nm_pchange'].mean()
+  log("select_mean.head()", select_mean.head())
+#+END_SRC
+
+*** 统计绘图
+
+#+BEGIN_SRC ipython :session :var path="img/fig73568KaS.png"
+  all_cum = (all_mean + 1).cumprod()
+  select_cum = (select_mean + 1).cumprod()
+
+  result = pd.DataFrame()
+  result['overall'] = all_cum
+  result['selected'] = select_cum
+  result.plot()
+  plot()
+#+END_SRC
+
+#+NAME: img/fig73568KaS.png
+#+CAPTION: 对比
+[[file:img/fig73568KaS.png]]
 
 
 * 参考资料
