@@ -1,0 +1,2334 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>代码仓库</title>
+<!-- 2018-02-22 Thu 22:49 -->
+<meta  charset="utf-8">
+<meta  name="generator" content="Org-mode">
+<meta  name="author" content="Hao Ruan">
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+<link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">代码仓库</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 类</a>
+<ul>
+<li><a href="#sec-1-1">1.1. 不调用 <code>__init__</code> 方法来创建实例</a></li>
+<li><a href="#sec-1-2">1.2. 创建缓存对象</a></li>
+<li><a href="#sec-1-3">1.3. 抽象类</a></li>
+<li><a href="#sec-1-4">1.4. 动态定义类</a></li>
+<li><a href="#sec-1-5">1.5. 使用元类控制类的创建</a>
+<ul>
+<li><a href="#sec-1-5-1">1.5.1. 实例缓存</a></li>
+<li><a href="#sec-1-5-2">1.5.2. 单例</a></li>
+<li><a href="#sec-1-5-3">1.5.3. 禁用直接实例化</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. 进程与多线程</a>
+<ul>
+<li><a href="#sec-2-1">2.1. 创建子进程</a></li>
+<li><a href="#sec-2-2">2.2. 子进程的输入输出</a></li>
+<li><a href="#sec-2-3">2.3. 进程间通信</a></li>
+<li><a href="#sec-2-4">2.4. 创建线程</a></li>
+<li><a href="#sec-2-5">2.5. 线程加锁</a></li>
+<li><a href="#sec-2-6">2.6. thread local 变量</a></li>
+<li><a href="#sec-2-7">2.7. 线程池</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. 数据结构</a>
+<ul>
+<li><a href="#sec-3-1">3.1. 列表</a>
+<ul>
+<li><a href="#sec-3-1-1">3.1.1. 列表中出现频率最高</a></li>
+<li><a href="#sec-3-1-2">3.1.2. 列表中最大或最小的几项</a></li>
+<li><a href="#sec-3-1-3">3.1.3. 对列表中的数据分组</a></li>
+<li><a href="#sec-3-1-4">3.1.4. 消除序列中的重复数据，同时保持数据顺序</a></li>
+<li><a href="#sec-3-1-5">3.1.5. 序列解包 (unpack)</a></li>
+<li><a href="#sec-3-1-6">3.1.6. flatten 列表</a></li>
+</ul>
+</li>
+<li><a href="#sec-3-2">3.2. 字典</a>
+<ul>
+<li><a href="#sec-3-2-1">3.2.1. 对字典作集合运算</a></li>
+<li><a href="#sec-3-2-2">3.2.2. 组合多个字典当作一个字典使用</a></li>
+<li><a href="#sec-3-2-3">3.2.3. 字典栈</a></li>
+</ul>
+</li>
+<li><a href="#sec-3-3">3.3. 队列</a>
+<ul>
+<li><a href="#sec-3-3-1">3.3.1. 优先队列</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-4">4. IO</a>
+<ul>
+<li><a href="#sec-4-1">4.1. 文件</a>
+<ul>
+<li><a href="#sec-4-1-1">4.1.1. 将文件描述符包装成文件对象</a></li>
+<li><a href="#sec-4-1-2">4.1.2. 改变已打开文件的编码方式</a></li>
+</ul>
+</li>
+<li><a href="#sec-4-2">4.2. 内存 IO</a>
+<ul>
+<li><a href="#sec-4-2-1">4.2.1. 内存字符串</a></li>
+<li><a href="#sec-4-2-2">4.2.2. 内存比特流</a></li>
+</ul>
+</li>
+<li><a href="#sec-4-3">4.3. 读写 JSON</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. 模块</a>
+<ul>
+<li><a href="#sec-5-1">5.1. 猴子补丁</a></li>
+<li><a href="#sec-5-2">5.2. 将模块拆分出多个文件</a></li>
+</ul>
+</li>
+<li><a href="#sec-6">6. 数字，日期，时间</a>
+<ul>
+<li><a href="#sec-6-1">6.1. time 模块</a>
+<ul>
+<li><a href="#sec-6-1-1">6.1.1. 获取 Unix Timestamp</a></li>
+<li><a href="#sec-6-1-2">6.1.2. 获取具体时间值</a></li>
+</ul>
+</li>
+<li><a href="#sec-6-2">6.2. datetime 模块</a>
+<ul>
+<li><a href="#sec-6-2-1">6.2.1. 创建时间</a></li>
+<li><a href="#sec-6-2-2">6.2.2. 获取 UTC 时间</a></li>
+<li><a href="#sec-6-2-3">6.2.3. 获取当前时区时间</a></li>
+<li><a href="#sec-6-2-4">6.2.4. 日期运算</a></li>
+<li><a href="#sec-6-2-5">6.2.5. 日期转字符串</a></li>
+<li><a href="#sec-6-2-6">6.2.6. 字符串转日期</a></li>
+</ul>
+</li>
+<li><a href="#sec-6-3">6.3. 月份缩写</a></li>
+<li><a href="#sec-6-4">6.4. 数字精度格式化</a></li>
+</ul>
+</li>
+<li><a href="#sec-7">7. 字符串与文本</a>
+<ul>
+<li><a href="#sec-7-1">7.1. 格式化</a>
+<ul>
+<li><a href="#sec-7-1-1">7.1.1. 填充与对齐</a></li>
+<li><a href="#sec-7-1-2">7.1.2. 字符串截断</a></li>
+<li><a href="#sec-7-1-3">7.1.3. 占位符</a></li>
+<li><a href="#sec-7-1-4">7.1.4. 排版</a></li>
+</ul>
+</li>
+<li><a href="#sec-7-2">7.2. 字符串匹配</a>
+<ul>
+<li><a href="#sec-7-2-1">7.2.1. 使用 shell 风格的通配符匹配字符串</a></li>
+<li><a href="#sec-7-2-2">7.2.2. 贪婪和非贪婪匹配</a></li>
+</ul>
+</li>
+<li><a href="#sec-7-3">7.3. 密码输入</a></li>
+</ul>
+</li>
+<li><a href="#sec-8">8. 参考资料</a></li>
+</ul>
+</div>
+</div>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 类</a>
+<ul>
+<li><a href="#sec-1-1">1.1. 不调用 <code>__init__</code> 方法来创建实例</a></li>
+<li><a href="#sec-1-2">1.2. 创建缓存对象</a></li>
+<li><a href="#sec-1-3">1.3. 抽象类</a></li>
+<li><a href="#sec-1-4">1.4. 动态定义类</a></li>
+<li><a href="#sec-1-5">1.5. 使用元类控制类的创建</a>
+<ul>
+<li><a href="#sec-1-5-1">1.5.1. 实例缓存</a></li>
+<li><a href="#sec-1-5-2">1.5.2. 单例</a></li>
+<li><a href="#sec-1-5-3">1.5.3. 禁用直接实例化</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. 进程与多线程</a>
+<ul>
+<li><a href="#sec-2-1">2.1. 创建子进程</a></li>
+<li><a href="#sec-2-2">2.2. 子进程的输入输出</a></li>
+<li><a href="#sec-2-3">2.3. 进程间通信</a></li>
+<li><a href="#sec-2-4">2.4. 创建线程</a></li>
+<li><a href="#sec-2-5">2.5. 线程加锁</a></li>
+<li><a href="#sec-2-6">2.6. thread local 变量</a></li>
+<li><a href="#sec-2-7">2.7. 线程池</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. 数据结构</a>
+<ul>
+<li><a href="#sec-3-1">3.1. 列表</a>
+<ul>
+<li><a href="#sec-3-1-1">3.1.1. 列表中出现频率最高</a></li>
+<li><a href="#sec-3-1-2">3.1.2. 列表中最大或最小的几项</a></li>
+<li><a href="#sec-3-1-3">3.1.3. 对列表中的数据分组</a></li>
+<li><a href="#sec-3-1-4">3.1.4. 消除序列中的重复数据，同时保持数据顺序</a></li>
+<li><a href="#sec-3-1-5">3.1.5. 序列解包 (unpack)</a></li>
+<li><a href="#sec-3-1-6">3.1.6. flatten 列表</a></li>
+</ul>
+</li>
+<li><a href="#sec-3-2">3.2. 字典</a>
+<ul>
+<li><a href="#sec-3-2-1">3.2.1. 对字典作集合运算</a></li>
+<li><a href="#sec-3-2-2">3.2.2. 组合多个字典当作一个字典使用</a></li>
+<li><a href="#sec-3-2-3">3.2.3. 字典栈</a></li>
+</ul>
+</li>
+<li><a href="#sec-3-3">3.3. 队列</a>
+<ul>
+<li><a href="#sec-3-3-1">3.3.1. 优先队列</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-4">4. IO</a>
+<ul>
+<li><a href="#sec-4-1">4.1. 文件</a>
+<ul>
+<li><a href="#sec-4-1-1">4.1.1. 将文件描述符包装成文件对象</a></li>
+<li><a href="#sec-4-1-2">4.1.2. 改变已打开文件的编码方式</a></li>
+</ul>
+</li>
+<li><a href="#sec-4-2">4.2. 内存 IO</a>
+<ul>
+<li><a href="#sec-4-2-1">4.2.1. 内存字符串</a></li>
+<li><a href="#sec-4-2-2">4.2.2. 内存比特流</a></li>
+</ul>
+</li>
+<li><a href="#sec-4-3">4.3. 读写 JSON</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. 模块</a>
+<ul>
+<li><a href="#sec-5-1">5.1. 猴子补丁</a></li>
+<li><a href="#sec-5-2">5.2. 将模块拆分出多个文件</a></li>
+</ul>
+</li>
+<li><a href="#sec-6">6. 数字，日期，时间</a>
+<ul>
+<li><a href="#sec-6-1">6.1. time 模块</a>
+<ul>
+<li><a href="#sec-6-1-1">6.1.1. 获取 Unix Timestamp</a></li>
+<li><a href="#sec-6-1-2">6.1.2. 获取具体时间值</a></li>
+</ul>
+</li>
+<li><a href="#sec-6-2">6.2. datetime 模块</a>
+<ul>
+<li><a href="#sec-6-2-1">6.2.1. 创建时间</a></li>
+<li><a href="#sec-6-2-2">6.2.2. 获取 UTC 时间</a></li>
+<li><a href="#sec-6-2-3">6.2.3. 获取当前时区时间</a></li>
+<li><a href="#sec-6-2-4">6.2.4. 日期运算</a></li>
+<li><a href="#sec-6-2-5">6.2.5. 日期转字符串</a></li>
+<li><a href="#sec-6-2-6">6.2.6. 字符串转日期</a></li>
+</ul>
+</li>
+<li><a href="#sec-6-3">6.3. 月份缩写</a></li>
+<li><a href="#sec-6-4">6.4. 数字精度格式化</a></li>
+</ul>
+</li>
+<li><a href="#sec-7">7. 字符串与文本</a>
+<ul>
+<li><a href="#sec-7-1">7.1. 格式化</a>
+<ul>
+<li><a href="#sec-7-1-1">7.1.1. 填充与对齐</a></li>
+<li><a href="#sec-7-1-2">7.1.2. 字符串截断</a></li>
+<li><a href="#sec-7-1-3">7.1.3. 占位符</a></li>
+<li><a href="#sec-7-1-4">7.1.4. 排版</a></li>
+</ul>
+</li>
+<li><a href="#sec-7-2">7.2. 字符串匹配</a>
+<ul>
+<li><a href="#sec-7-2-1">7.2.1. 使用 shell 风格的通配符匹配字符串</a></li>
+<li><a href="#sec-7-2-2">7.2.2. 贪婪和非贪婪匹配</a></li>
+</ul>
+</li>
+<li><a href="#sec-7-3">7.3. 密码输入</a></li>
+</ul>
+</li>
+<li><a href="#sec-8">8. 参考资料</a></li>
+</ul>
+</div>
+</div>
+<div class="outline-2" id="meta">
+<table>
+
+
+<colgroup>
+<col  class="left">
+
+<col  class="left">
+</colgroup>
+<tbody>
+<tr>
+<td class="left">Author</td>
+<td class="left">Hao Ruan (haoru@cisco.com)</td>
+</tr>
+
+<tr>
+<td class="left">Date</td>
+<td class="left">2018-02-22 22:48:58</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> 类</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> 不调用 <code>__init__</code> 方法来创建实例</h3>
+<div class="outline-text-3" id="text-1-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">from</span> time <span style="color: #a1db00;">import</span> localtime
+
+<span style="color: #a1db00;">class</span> <span style="color: #00d7af;">Date</span>:
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__init__</span>(<span style="color: #a1db00;">self</span>, year, month, day):
+        <span style="color: #a1db00;">self</span>.year = year
+        <span style="color: #a1db00;">self</span>.month = month
+        <span style="color: #a1db00;">self</span>.day = day
+
+    <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Class method that bypasses __init__</span>
+    <span style="color: #00d7af;">@classmethod</span>
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">today</span>(cls):
+        <span style="color: #ff8700;">d</span> = cls.__new__(cls)
+        <span style="color: #ff8700;">t</span> = localtime()
+        <span style="color: #ff8700;">d.year</span> = t.tm_year
+        <span style="color: #ff8700;">d.month</span> = t.tm_mon
+        <span style="color: #ff8700;">d.day</span> = t.tm_mday
+        <span style="color: #a1db00;">return</span> d
+
+<span style="color: #ff8700;">d</span> = Date.__new__(Date)
+<span style="color: #a1db00;">print</span>(d)
+<span style="color: #a1db00;">print</span>(<span style="color: #d18aff;">hasattr</span>(d,<span style="color: #ff4ea3;">'year'</span>))
+
+<span style="color: #ff8700;">data</span> = {
+    <span style="color: #ff4ea3;">'year'</span> : 2012,
+    <span style="color: #ff4ea3;">'month'</span> : 8,
+    <span style="color: #ff4ea3;">'day'</span> : 29
+}
+
+d.__dict__.update(data)
+<span style="color: #a1db00;">print</span>(d.year)
+<span style="color: #a1db00;">print</span>(d.month)
+
+<span style="color: #ff8700;">d</span> = Date.today()
+<span style="color: #a1db00;">print</span>(d.year, d.month, d.day)
+</pre>
+</div>
+
+<pre class="example">
+&lt;__main__.Date object at 0x1046e9be0&gt;
+False
+2012
+8
+2018 2 22
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> 创建缓存对象</h3>
+<div class="outline-text-3" id="text-1-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">class</span> <span style="color: #00d7af;">Spam</span>:
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__init__</span>(<span style="color: #a1db00;">self</span>, name):
+        <span style="color: #a1db00;">self</span>.name = name
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Caching support</span>
+<span style="color: #a1db00;">import</span> weakref
+<span style="color: #ff8700;">_spam_cache</span> = weakref.WeakValueDictionary()
+
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">get_spam</span>(name):
+    <span style="color: #a1db00;">if</span> name <span style="color: #a1db00;">not</span> <span style="color: #a1db00;">in</span> _spam_cache:
+        <span style="color: #ff8700;">s</span> = Spam(name)
+        <span style="color: #ff8700;">_spam_cache</span>[name] = s
+    <span style="color: #a1db00;">else</span>:
+        <span style="color: #ff8700;">s</span> = _spam_cache[name]
+    <span style="color: #a1db00;">return</span> s
+
+<span style="color: #a1db00;">if</span> <span style="color: #d18aff;">__name__</span> == <span style="color: #ff4ea3;">'__main__'</span>:
+    <span style="color: #ff8700;">a</span> = get_spam(<span style="color: #ff4ea3;">'foo'</span>)
+    <span style="color: #ff8700;">b</span> = get_spam(<span style="color: #ff4ea3;">'bar'</span>)
+    <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'a is b:'</span>, a <span style="color: #a1db00;">is</span> b)
+    <span style="color: #ff8700;">c</span> = get_spam(<span style="color: #ff4ea3;">'foo'</span>)
+    <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'a is c:'</span>, a <span style="color: #a1db00;">is</span> c)
+</pre>
+</div>
+
+<pre class="example">
+a is b: False
+a is c: True
+</pre>
+
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">import</span> weakref
+
+<span style="color: #a1db00;">class</span> <span style="color: #00d7af;">CachedSpamManager</span>:
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__init__</span>(<span style="color: #a1db00;">self</span>):
+        <span style="color: #a1db00;">self</span>._cache = weakref.WeakValueDictionary()
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">get_spam</span>(<span style="color: #a1db00;">self</span>, name):
+        <span style="color: #a1db00;">if</span> name <span style="color: #a1db00;">not</span> <span style="color: #a1db00;">in</span> <span style="color: #a1db00;">self</span>._cache:
+            <span style="color: #ff8700;">s</span> = Spam(name)
+            <span style="color: #a1db00;">self</span>._cache[name] = s
+        <span style="color: #a1db00;">else</span>:
+            <span style="color: #ff8700;">s</span> = <span style="color: #a1db00;">self</span>._cache[name]
+        <span style="color: #a1db00;">return</span> s
+
+<span style="color: #a1db00;">class</span> <span style="color: #00d7af;">Spam</span>:
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__init__</span>(<span style="color: #a1db00;">self</span>, name):
+        <span style="color: #a1db00;">self</span>.name = name
+
+<span style="color: #ff8700;">Spam.manager</span> = CachedSpamManager()
+
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">get_spam</span>(name):
+    <span style="color: #a1db00;">return</span> Spam.manager.get_spam(name)
+
+<span style="color: #a1db00;">if</span> <span style="color: #d18aff;">__name__</span> == <span style="color: #ff4ea3;">'__main__'</span>:
+    <span style="color: #ff8700;">a</span> = get_spam(<span style="color: #ff4ea3;">'foo'</span>)
+    <span style="color: #ff8700;">b</span> = get_spam(<span style="color: #ff4ea3;">'bar'</span>)
+    <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'a is b:'</span>, a <span style="color: #a1db00;">is</span> b)
+    <span style="color: #ff8700;">c</span> = get_spam(<span style="color: #ff4ea3;">'foo'</span>)
+    <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'a is c:'</span>, a <span style="color: #a1db00;">is</span> c)
+</pre>
+</div>
+
+<pre class="example">
+a is b: False
+a is c: True
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Example involving new and some of its problems</span>
+
+<span style="color: #a1db00;">import</span> weakref
+
+<span style="color: #a1db00;">class</span> <span style="color: #00d7af;">Spam</span>:
+    <span style="color: #ff8700;">_spam_cache</span> = weakref.WeakValueDictionary()
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__new__</span>(cls, name):
+        <span style="color: #a1db00;">if</span> name <span style="color: #a1db00;">in</span> cls._spam_cache:
+            <span style="color: #a1db00;">return</span> cls._spam_cache[name]
+        <span style="color: #a1db00;">else</span>:
+            <span style="color: #a1db00;">self</span> = <span style="color: #d18aff;">super</span>().__new__(cls)
+            <span style="color: #ff8700;">cls._spam_cache</span>[name] = <span style="color: #a1db00;">self</span>
+            <span style="color: #a1db00;">return</span> <span style="color: #a1db00;">self</span>
+
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__init__</span>(<span style="color: #a1db00;">self</span>, name):
+        <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'Initializing Spam'</span>)
+        <span style="color: #a1db00;">self</span>.name = name
+
+<span style="color: #a1db00;">if</span> <span style="color: #d18aff;">__name__</span> == <span style="color: #ff4ea3;">'__main__'</span>:
+    <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">"This should print 'Initializing Spam' twice"</span>)
+    <span style="color: #ff8700;">s</span> = Spam(<span style="color: #ff4ea3;">'Dave'</span>)
+    <span style="color: #ff8700;">t</span> = Spam(<span style="color: #ff4ea3;">'Dave'</span>)
+    <span style="color: #a1db00;">print</span>(s <span style="color: #a1db00;">is</span> t)
+</pre>
+</div>
+
+<pre class="example">
+This should print 'Initializing Spam' twice
+Initializing Spam
+Initializing Spam
+True
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> 抽象类</h3>
+<div class="outline-text-3" id="text-1-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">from</span> abc <span style="color: #a1db00;">import</span> ABCMeta, abstractmethod
+
+<span style="color: #a1db00;">class</span> <span style="color: #00d7af;">A</span>(metaclass=ABCMeta):
+    <span style="color: #00d7af;">@property</span>
+    <span style="color: #00d7af;">@abstractmethod</span>
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">name</span>(<span style="color: #a1db00;">self</span>):
+        <span style="color: #a1db00;">pass</span>
+
+    <span style="color: #00d7af;">@name.setter</span>
+    <span style="color: #00d7af;">@abstractmethod</span>
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">name</span>(<span style="color: #a1db00;">self</span>, value):
+        <span style="color: #a1db00;">pass</span>
+
+    <span style="color: #00d7af;">@classmethod</span>
+    <span style="color: #00d7af;">@abstractmethod</span>
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">method1</span>(cls):
+        <span style="color: #a1db00;">pass</span>
+
+    <span style="color: #00d7af;">@staticmethod</span>
+    <span style="color: #00d7af;">@abstractmethod</span>
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">method2</span>():
+        <span style="color: #a1db00;">pass</span>
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-4" class="outline-3">
+<h3 id="sec-1-4"><span class="section-number-3">1.4</span> 动态定义类</h3>
+<div class="outline-text-3" id="text-1-4">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Example of making a class manually from parts</span>
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Methods</span>
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__init__</span>(<span style="color: #a1db00;">self</span>, name, shares, price):
+    <span style="color: #a1db00;">self</span>.name = name
+    <span style="color: #a1db00;">self</span>.shares = shares
+    <span style="color: #a1db00;">self</span>.price = price
+
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">cost</span>(<span style="color: #a1db00;">self</span>):
+    <span style="color: #a1db00;">return</span> <span style="color: #a1db00;">self</span>.shares * <span style="color: #a1db00;">self</span>.price
+
+<span style="color: #ff8700;">cls_dict</span> = {
+    <span style="color: #ff4ea3;">'__init__'</span> : __init__,
+    <span style="color: #ff4ea3;">'cost'</span> : cost,
+}
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Make a class</span>
+<span style="color: #a1db00;">import</span> types
+
+<span style="color: #ff8700;">Stock</span> = types.new_class(<span style="color: #ff4ea3;">'Stock'</span>, (), {}, <span style="color: #a1db00;">lambda</span> ns: ns.update(cls_dict))
+
+<span style="color: #a1db00;">if</span> <span style="color: #d18aff;">__name__</span> == <span style="color: #ff4ea3;">'__main__'</span>:
+    <span style="color: #ff8700;">s</span> = Stock(<span style="color: #ff4ea3;">'ACME'</span>, 50, 91.1)
+    <span style="color: #a1db00;">print</span>(s)
+    <span style="color: #a1db00;">print</span>(s.cost())
+</pre>
+</div>
+
+<pre class="example">
+&lt;types.Stock object at 0x1047214a8&gt;
+4555.0
+</pre>
+
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">An alternative formulation of namedtuples</span>
+
+<span style="color: #a1db00;">import</span> operator
+<span style="color: #a1db00;">import</span> types
+<span style="color: #a1db00;">import</span> sys
+
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">named_tuple</span>(classname, fieldnames):
+    <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Populate a dictionary of field property accessors</span>
+    <span style="color: #ff8700;">cls_dict</span> = { name: <span style="color: #d18aff;">property</span>(operator.itemgetter(n))
+                 <span style="color: #a1db00;">for</span> n, name <span style="color: #a1db00;">in</span> <span style="color: #d18aff;">enumerate</span>(fieldnames) }
+
+    <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Make a __new__ function and add to the class dict</span>
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__new__</span>(cls, *args):
+        <span style="color: #a1db00;">if</span> <span style="color: #d18aff;">len</span>(args) != <span style="color: #d18aff;">len</span>(fieldnames):
+            <span style="color: #a1db00;">raise</span> <span style="color: #00d7af;">TypeError</span>(<span style="color: #ff4ea3;">'Expected {} arguments'</span>.<span style="color: #d18aff;">format</span>(<span style="color: #d18aff;">len</span>(fieldnames)))
+        <span style="color: #a1db00;">return</span> <span style="color: #d18aff;">tuple</span>.__new__(cls, (args))
+
+    <span style="color: #ff8700;">cls_dict</span>[<span style="color: #ff4ea3;">'__new__'</span>] = __new__
+
+    <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Make the class</span>
+    <span style="color: #ff8700;">cls</span> = types.new_class(classname, (<span style="color: #d18aff;">tuple</span>,), {},
+                           <span style="color: #a1db00;">lambda</span> ns: ns.update(cls_dict))
+    <span style="color: #ff8700;">cls.__module__</span> = sys._getframe(1).f_globals[<span style="color: #ff4ea3;">'__name__'</span>]
+    <span style="color: #a1db00;">return</span> cls
+
+<span style="color: #a1db00;">if</span> <span style="color: #d18aff;">__name__</span> == <span style="color: #ff4ea3;">'__main__'</span>:
+    <span style="color: #ff8700;">Point</span> = named_tuple(<span style="color: #ff4ea3;">'Point'</span>, [<span style="color: #ff4ea3;">'x'</span>, <span style="color: #ff4ea3;">'y'</span>])
+    <span style="color: #a1db00;">print</span>(Point)
+    <span style="color: #ff8700;">p</span> = Point(4, 5)
+    <span style="color: #a1db00;">print</span>(<span style="color: #d18aff;">len</span>(p))
+    <span style="color: #a1db00;">print</span>(p.x, p[0])
+    <span style="color: #a1db00;">print</span>(p.y, p[1])
+    <span style="color: #a1db00;">try</span>:
+        <span style="color: #ff8700;">p.x</span> = 2
+    <span style="color: #a1db00;">except</span> <span style="color: #00d7af;">AttributeError</span> <span style="color: #a1db00;">as</span> e:
+        <span style="color: #a1db00;">print</span>(e)
+    <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'%s %s'</span> % p)
+</pre>
+</div>
+
+<pre class="example">
+&lt;class '__main__.Point'&gt;
+2
+4 4
+5 5
+can't set attribute
+4 5
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-5" class="outline-3">
+<h3 id="sec-1-5"><span class="section-number-3">1.5</span> 使用元类控制类的创建</h3>
+<div class="outline-text-3" id="text-1-5">
+</div><div id="outline-container-sec-1-5-1" class="outline-4">
+<h4 id="sec-1-5-1"><span class="section-number-4">1.5.1</span> 实例缓存</h4>
+<div class="outline-text-4" id="text-1-5-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Cached instances</span>
+
+<span style="color: #a1db00;">import</span> weakref
+
+<span style="color: #a1db00;">class</span> <span style="color: #00d7af;">Cached</span>(<span style="color: #d18aff;">type</span>):
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__init__</span>(<span style="color: #a1db00;">self</span>, *args, **kwargs):
+        <span style="color: #d18aff;">super</span>().__init__(*args, **kwargs)
+        <span style="color: #a1db00;">self</span>.__cache = weakref.WeakValueDictionary()
+
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__call__</span>(<span style="color: #a1db00;">self</span>, *args):
+        <span style="color: #a1db00;">if</span> args <span style="color: #a1db00;">in</span> <span style="color: #a1db00;">self</span>.__cache:
+            <span style="color: #a1db00;">return</span> <span style="color: #a1db00;">self</span>.__cache[args]
+        <span style="color: #a1db00;">else</span>:
+            <span style="color: #ff8700;">obj</span> = <span style="color: #d18aff;">super</span>().__call__(*args)
+            <span style="color: #a1db00;">self</span>.__cache[args] = obj
+            <span style="color: #a1db00;">return</span> obj
+
+<span style="color: #a1db00;">class</span> <span style="color: #00d7af;">Spam</span>(metaclass=Cached):
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__init__</span>(<span style="color: #a1db00;">self</span>, name):
+        <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'Creating Spam({!r})'</span>.<span style="color: #d18aff;">format</span>(name))
+        <span style="color: #a1db00;">self</span>.name = name
+
+<span style="color: #a1db00;">if</span> <span style="color: #d18aff;">__name__</span> == <span style="color: #ff4ea3;">'__main__'</span>:
+    <span style="color: #ff8700;">a</span> = Spam(<span style="color: #ff4ea3;">'foo'</span>)
+    <span style="color: #ff8700;">b</span> = Spam(<span style="color: #ff4ea3;">'bar'</span>)
+    <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'a is b:'</span>, a <span style="color: #a1db00;">is</span> b)
+    <span style="color: #ff8700;">c</span> = Spam(<span style="color: #ff4ea3;">'foo'</span>)
+    <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'a is c:'</span>, a <span style="color: #a1db00;">is</span> c)
+</pre>
+</div>
+
+<pre class="example">
+Creating Spam('foo')
+Creating Spam('bar')
+a is b: False
+a is c: True
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-5-2" class="outline-4">
+<h4 id="sec-1-5-2"><span class="section-number-4">1.5.2</span> 单例</h4>
+<div class="outline-text-4" id="text-1-5-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Singleton</span>
+
+<span style="color: #a1db00;">class</span> <span style="color: #00d7af;">Singleton</span>(<span style="color: #d18aff;">type</span>):
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__init__</span>(<span style="color: #a1db00;">self</span>, *args, **kwargs):
+        <span style="color: #a1db00;">self</span>.__instance = <span style="color: #5fafd7;">None</span>
+        <span style="color: #d18aff;">super</span>().__init__(*args, **kwargs)
+
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__call__</span>(<span style="color: #a1db00;">self</span>, *args, **kwargs):
+        <span style="color: #a1db00;">if</span> <span style="color: #a1db00;">self</span>.__instance <span style="color: #a1db00;">is</span> <span style="color: #5fafd7;">None</span>:
+            <span style="color: #a1db00;">self</span>.__instance = <span style="color: #d18aff;">super</span>().__call__(*args, **kwargs)
+            <span style="color: #a1db00;">return</span> <span style="color: #a1db00;">self</span>.__instance
+        <span style="color: #a1db00;">else</span>:
+            <span style="color: #a1db00;">return</span> <span style="color: #a1db00;">self</span>.__instance
+
+<span style="color: #a1db00;">class</span> <span style="color: #00d7af;">Spam</span>(metaclass=Singleton):
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__init__</span>(<span style="color: #a1db00;">self</span>):
+        <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'Creating Spam'</span>)
+
+<span style="color: #a1db00;">if</span> <span style="color: #d18aff;">__name__</span> == <span style="color: #ff4ea3;">'__main__'</span>:
+    <span style="color: #ff8700;">a</span> = Spam()
+    <span style="color: #ff8700;">b</span> = Spam()
+    <span style="color: #a1db00;">print</span>(a <span style="color: #a1db00;">is</span> b)
+</pre>
+</div>
+
+<pre class="example">
+Creating Spam
+True
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-5-3" class="outline-4">
+<h4 id="sec-1-5-3"><span class="section-number-4">1.5.3</span> 禁用直接实例化</h4>
+<div class="outline-text-4" id="text-1-5-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Not allowing direct instantiation</span>
+
+<span style="color: #a1db00;">class</span> <span style="color: #00d7af;">NoInstances</span>(<span style="color: #d18aff;">type</span>):
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__call__</span>(<span style="color: #a1db00;">self</span>, *args, **kwargs):
+        <span style="color: #a1db00;">raise</span> <span style="color: #00d7af;">TypeError</span>(<span style="color: #ff4ea3;">"Can't instantiate directly"</span>)
+
+<span style="color: #a1db00;">class</span> <span style="color: #00d7af;">Spam</span>(metaclass=NoInstances):
+    <span style="color: #00d7af;">@staticmethod</span>
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">grok</span>(x):
+        <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'Spam.grok'</span>)
+
+<span style="color: #a1db00;">if</span> <span style="color: #d18aff;">__name__</span> == <span style="color: #ff4ea3;">'__main__'</span>:
+    <span style="color: #a1db00;">try</span>:
+        <span style="color: #ff8700;">s</span> = Spam()
+    <span style="color: #a1db00;">except</span> <span style="color: #00d7af;">TypeError</span> <span style="color: #a1db00;">as</span> e:
+        <span style="color: #a1db00;">print</span>(e)
+
+    Spam.grok(42)
+</pre>
+</div>
+
+<pre class="example">
+Can't instantiate directly
+Spam.grok
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> 进程与多线程</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> 创建子进程</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">from</span> multiprocessing <span style="color: #a1db00;">import</span> Process
+<span style="color: #a1db00;">import</span> os
+
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">run_proc</span>(name):
+    <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'Run child process %s (%s)...'</span> % (name, os.getpid()))
+
+<span style="color: #a1db00;">if</span> <span style="color: #d18aff;">__name__</span>==<span style="color: #ff4ea3;">'__main__'</span>:
+    <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'Parent process %s.'</span> % os.getpid())
+    <span style="color: #ff8700;">p</span> = Process(target=run_proc, args=(<span style="color: #ff4ea3;">'test'</span>,))
+    <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'Child process will start.'</span>)
+    p.start()
+    p.join()  <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">&#31561;&#24453;&#23376;&#36827;&#31243;&#32467;&#26463;&#21518;&#20877;&#32487;&#32493;&#24448;&#19979;&#36816;&#34892;</span>
+    <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'Child process end.'</span>)
+</pre>
+</div>
+
+<pre class="example">
+Parent process 96615.
+Child process will start.
+Run child process test (12144)...
+Child process end.
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> 子进程的输入输出</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">import</span> subprocess
+
+<span style="color: #ff8700;">r</span> = subprocess.call([<span style="color: #ff4ea3;">'nslookup'</span>, <span style="color: #ff4ea3;">'www.python.org'</span>])
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'r: {}'</span>.<span style="color: #d18aff;">format</span>(r))
+
+<span style="color: #ff8700;">p</span> = subprocess.Popen([<span style="color: #ff4ea3;">'nslookup'</span>], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+<span style="color: #ff8700;">output</span>, <span style="color: #ff8700;">err</span> = p.communicate(b<span style="color: #ff4ea3;">'set q=mx\npython.org\nexit\n'</span>)
+<span style="color: #a1db00;">print</span>(output.decode(<span style="color: #ff4ea3;">'utf-8'</span>))
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'Exit code:'</span>, p.returncode)
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">&#30456;&#24403;&#20110;&#22312;&#21629;&#20196;&#34892;&#25191;&#34892;&#21629;&#20196;nslookup&#65292;&#28982;&#21518;&#25163;&#21160;&#36755;&#20837;&#65306;</span>
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">set q=mx</span>
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">python.org</span>
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">exit</span>
+</pre>
+</div>
+
+<pre class="example">
+r: 0
+Server:		64.104.123.245
+Address:	64.104.123.245#53
+
+Non-authoritative answer:
+python.org	mail exchanger = 50 mail.python.org.
+
+Authoritative answers can be found from:
+org	nameserver = c0.org.afilias-nst.info.
+org	nameserver = d0.org.afilias-nst.org.
+org	nameserver = b2.org.afilias-nst.org.
+org	nameserver = a2.org.afilias-nst.info.
+org	nameserver = b0.org.afilias-nst.org.
+org	nameserver = a0.org.afilias-nst.info.
+a0.org.afilias-nst.info	internet address = 199.19.56.1
+a2.org.afilias-nst.info	internet address = 199.249.112.1
+b0.org.afilias-nst.org	internet address = 199.19.54.1
+b2.org.afilias-nst.org	internet address = 199.249.120.1
+c0.org.afilias-nst.info	internet address = 199.19.53.1
+d0.org.afilias-nst.org	internet address = 199.19.57.1
+a0.org.afilias-nst.info	has AAAA address 2001:500:e::1
+a2.org.afilias-nst.info	has AAAA address 2001:500:40::1
+b0.org.afilias-nst.org	has AAAA address 2001:500:c::1
+b2.org.afilias-nst.org	has AAAA address 2001:500:48::1
+c0.org.afilias-nst.info	has AAAA address 2001:500:b::1
+d0.org.afilias-nst.org	has AAAA address 2001:500:f::1
+
+
+Exit code: 0
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> 进程间通信</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+父进程中创建两个子进程，一个往 Queue 里写数据，一个从 Queue 里读数据：
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">from</span> multiprocessing <span style="color: #a1db00;">import</span> Process, Queue
+<span style="color: #a1db00;">import</span> os, time, random
+
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">write</span>(q):
+    <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'Process to write: %s'</span> % os.getpid())
+    <span style="color: #a1db00;">for</span> value <span style="color: #a1db00;">in</span> [<span style="color: #ff4ea3;">'A'</span>, <span style="color: #ff4ea3;">'B'</span>, <span style="color: #ff4ea3;">'C'</span>]:
+        <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'Put %s to queue...'</span> % value)
+        q.put(value)
+        time.sleep(random.random())
+
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">read</span>(q):
+    <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'Process to read: %s'</span> % os.getpid())
+    <span style="color: #a1db00;">while</span> <span style="color: #5fafd7;">True</span>:
+        <span style="color: #ff8700;">value</span> = q.get(<span style="color: #5fafd7;">True</span>)
+        <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'Get %s from queue.'</span> % value)
+
+<span style="color: #ff8700;">q</span> = Queue()
+<span style="color: #ff8700;">pw</span> = Process(target=write, args=(q,))
+<span style="color: #ff8700;">pr</span> = Process(target=read, args=(q,))
+pw.start()
+pr.start()
+pw.join()
+pr.terminate()  <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">pr &#36827;&#31243;&#37324;&#26159;&#27515;&#24490;&#29615;&#65292;&#26080;&#27861;&#31561;&#24453;&#20854;&#32467;&#26463;&#65292;&#21482;&#33021;&#24378;&#34892;&#32456;&#27490;:</span>
+</pre>
+</div>
+
+<pre class="example">
+Process to write: 12157
+Put A to queue...
+Process to read: 12158
+Get A from queue.
+Put B to queue...
+Get B from queue.
+Put C to queue...
+Get C from queue.
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> 创建线程</h3>
+<div class="outline-text-3" id="text-2-4">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">import</span> time, threading
+
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">worker</span>():
+    <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'thread %s is running...'</span> % threading.current_thread().name)
+    time.sleep(1)
+    <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'thread %s ended.'</span> % threading.current_thread().name)
+
+<span style="color: #ff8700;">t</span> = threading.Thread(target=worker, name=<span style="color: #ff4ea3;">'WorkerThread'</span>)
+t.start()
+t.join()
+</pre>
+</div>
+
+<pre class="example">
+thread WorkerThread is running...
+thread WorkerThread ended.
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-5" class="outline-3">
+<h3 id="sec-2-5"><span class="section-number-3">2.5</span> 线程加锁</h3>
+<div class="outline-text-3" id="text-2-5">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">import</span> threading
+<span style="color: #a1db00;">from</span> concurrent.futures <span style="color: #a1db00;">import</span> ThreadPoolExecutor
+
+<span style="color: #ff8700;">lock</span> = threading.Lock()
+<span style="color: #ff8700;">count</span> = 0
+
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">run_thread_without_lock</span>():
+    <span style="color: #a1db00;">global</span> count
+    <span style="color: #a1db00;">while</span> count &lt; 10:
+        <span style="color: #ff8700;">count</span> += 1
+        <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">"\x1b[31m%s\x1b[0m, "</span> % count, end=<span style="color: #ff4ea3;">''</span>)
+
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">run_thread_with_lock</span>():
+    <span style="color: #a1db00;">global</span> count
+    <span style="color: #a1db00;">with</span> lock:
+        <span style="color: #a1db00;">while</span> count &lt; 10:
+            <span style="color: #ff8700;">count</span> += 1
+            <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">"%s, "</span> % count, end=<span style="color: #ff4ea3;">''</span>)
+
+<span style="color: #a1db00;">with</span> ThreadPoolExecutor(max_workers=4) <span style="color: #a1db00;">as</span> executor:
+    <span style="color: #a1db00;">for</span> i <span style="color: #a1db00;">in</span> <span style="color: #d18aff;">range</span>(5):
+        executor.submit(run_thread_without_lock)
+
+<span style="color: #ff8700;">count</span> = 0
+
+<span style="color: #a1db00;">with</span> ThreadPoolExecutor(max_workers=4) <span style="color: #a1db00;">as</span> executor:
+    <span style="color: #a1db00;">for</span> i <span style="color: #a1db00;">in</span> <span style="color: #d18aff;">range</span>(5):
+        executor.submit(run_thread_with_lock)
+</pre>
+</div>
+
+<pre class="example">
+[31m1[0m, [31m2[0m, [31m3[0m, [31m4[0m, [31m5[0m, [31m6[0m, [31m7[0m, [31m8[0m, [31m9[0m, [31m10[0m, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-6" class="outline-3">
+<h3 id="sec-2-6"><span class="section-number-3">2.6</span> thread local 变量</h3>
+<div class="outline-text-3" id="text-2-6">
+<p>
+一个线程使用自己的局部变量比使用全局变量好，因为局部变量只有线程自己能看见，不会影响其他线程，而全局变量的修改必须加锁。
+</p>
+
+<p>
+最常用的地方就是为每个线程绑定一个数据库连接，HTTP 请求，用户身份信息等，这样一个线程的所有调用到的处理函数都可以非常方便地访问这些资源。
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">import</span> threading, time
+
+<span style="color: #ff8700;">tl</span> = threading.local()
+
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">worker</span>(name):
+    <span style="color: #ff8700;">tl.name</span> = name
+    time.sleep(3)
+    <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">"in thread:"</span>, tl.name)
+
+<span style="color: #ff8700;">t</span> = threading.Thread(target=worker, args=(<span style="color: #ff4ea3;">"hello"</span>,), name=<span style="color: #ff4ea3;">'Thread-A'</span>)
+t.start()
+<span style="color: #ff8700;">tl.name</span> = <span style="color: #ff4ea3;">'world'</span>
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">"in main:"</span>, tl.name)
+</pre>
+</div>
+
+<pre class="example">
+in main: world
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-7" class="outline-3">
+<h3 id="sec-2-7"><span class="section-number-3">2.7</span> 线程池</h3>
+<div class="outline-text-3" id="text-2-7">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">from</span> concurrent.futures <span style="color: #a1db00;">import</span> ThreadPoolExecutor
+<span style="color: #a1db00;">import</span> urllib.request
+
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">fetch_url</span>(url):
+    <span style="color: #ff8700;">u</span> = urllib.request.urlopen(url)
+    <span style="color: #ff8700;">data</span> = u.read()
+    <span style="color: #a1db00;">return</span> data
+
+<span style="color: #ff8700;">pool</span> = ThreadPoolExecutor(10)
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Submit work to the pool</span>
+<span style="color: #ff8700;">a</span> = pool.submit(fetch_url, <span style="color: #ff4ea3;">'http://www.python.org'</span>)
+<span style="color: #ff8700;">b</span> = pool.submit(fetch_url, <span style="color: #ff4ea3;">'http://www.pypy.org'</span>)
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Get the results back</span>
+<span style="color: #ff8700;">x</span> = a.result()
+<span style="color: #ff8700;">y</span> = b.result()
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> 数据结构</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> 列表</h3>
+<div class="outline-text-3" id="text-3-1">
+</div><div id="outline-container-sec-3-1-1" class="outline-4">
+<h4 id="sec-3-1-1"><span class="section-number-4">3.1.1</span> 列表中出现频率最高</h4>
+<div class="outline-text-4" id="text-3-1-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">words</span> = [
+   <span style="color: #ff4ea3;">'look'</span>, <span style="color: #ff4ea3;">'into'</span>, <span style="color: #ff4ea3;">'my'</span>, <span style="color: #ff4ea3;">'eyes'</span>, <span style="color: #ff4ea3;">'look'</span>, <span style="color: #ff4ea3;">'into'</span>, <span style="color: #ff4ea3;">'my'</span>, <span style="color: #ff4ea3;">'eyes'</span>,
+   <span style="color: #ff4ea3;">'the'</span>, <span style="color: #ff4ea3;">'eyes'</span>, <span style="color: #ff4ea3;">'the'</span>, <span style="color: #ff4ea3;">'eyes'</span>, <span style="color: #ff4ea3;">'the'</span>, <span style="color: #ff4ea3;">'eyes'</span>, <span style="color: #ff4ea3;">'not'</span>, <span style="color: #ff4ea3;">'around'</span>, <span style="color: #ff4ea3;">'the'</span>,
+   <span style="color: #ff4ea3;">'eyes'</span>, <span style="color: #ff4ea3;">"don't"</span>, <span style="color: #ff4ea3;">'look'</span>, <span style="color: #ff4ea3;">'around'</span>, <span style="color: #ff4ea3;">'the'</span>, <span style="color: #ff4ea3;">'eyes'</span>, <span style="color: #ff4ea3;">'look'</span>, <span style="color: #ff4ea3;">'into'</span>,
+   <span style="color: #ff4ea3;">'my'</span>, <span style="color: #ff4ea3;">'eyes'</span>, <span style="color: #ff4ea3;">"you're"</span>, <span style="color: #ff4ea3;">'under'</span>
+]
+
+<span style="color: #a1db00;">from</span> collections <span style="color: #a1db00;">import</span> Counter
+<span style="color: #ff8700;">word_counts</span> = Counter(words)
+<span style="color: #ff8700;">top_three</span> = word_counts.most_common(3)
+<span style="color: #a1db00;">print</span>(top_three)
+</pre>
+</div>
+
+<pre class="example">
+[('eyes', 8), ('the', 5), ('look', 4)]
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3-1-2" class="outline-4">
+<h4 id="sec-3-1-2"><span class="section-number-4">3.1.2</span> 列表中最大或最小的几项</h4>
+<div class="outline-text-4" id="text-3-1-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">import</span> heapq
+
+<span style="color: #ff8700;">portfolio</span> = [
+   {<span style="color: #ff4ea3;">'name'</span>: <span style="color: #ff4ea3;">'IBM'</span>, <span style="color: #ff4ea3;">'shares'</span>: 100, <span style="color: #ff4ea3;">'price'</span>: 91.1},
+   {<span style="color: #ff4ea3;">'name'</span>: <span style="color: #ff4ea3;">'AAPL'</span>, <span style="color: #ff4ea3;">'shares'</span>: 50, <span style="color: #ff4ea3;">'price'</span>: 543.22},
+   {<span style="color: #ff4ea3;">'name'</span>: <span style="color: #ff4ea3;">'FB'</span>, <span style="color: #ff4ea3;">'shares'</span>: 200, <span style="color: #ff4ea3;">'price'</span>: 21.09},
+   {<span style="color: #ff4ea3;">'name'</span>: <span style="color: #ff4ea3;">'HPQ'</span>, <span style="color: #ff4ea3;">'shares'</span>: 35, <span style="color: #ff4ea3;">'price'</span>: 31.75},
+   {<span style="color: #ff4ea3;">'name'</span>: <span style="color: #ff4ea3;">'YHOO'</span>, <span style="color: #ff4ea3;">'shares'</span>: 45, <span style="color: #ff4ea3;">'price'</span>: 16.35},
+   {<span style="color: #ff4ea3;">'name'</span>: <span style="color: #ff4ea3;">'ACME'</span>, <span style="color: #ff4ea3;">'shares'</span>: 75, <span style="color: #ff4ea3;">'price'</span>: 115.65}
+]
+
+<span style="color: #ff8700;">cheap</span> = heapq.nsmallest(3, portfolio, key=<span style="color: #a1db00;">lambda</span> s: s[<span style="color: #ff4ea3;">'price'</span>])
+<span style="color: #ff8700;">expensive</span> = heapq.nlargest(3, portfolio, key=<span style="color: #a1db00;">lambda</span> s: s[<span style="color: #ff4ea3;">'price'</span>])
+<span style="color: #ff8700;">r</span> = {<span style="color: #ff4ea3;">'cheap'</span>: cheap, <span style="color: #ff4ea3;">'expensive'</span>: expensive}
+<span style="color: #a1db00;">print</span>(r)
+</pre>
+</div>
+
+<pre class="example">
+{'expensive': [{'name': 'AAPL', 'shares': 50, 'price': 543.22}, {'name': 'ACME', 'shares': 75, 'price': 115.65}, {'name': 'IBM', 'shares': 100, 'price': 91.1}], 'cheap': [{'name': 'YHOO', 'shares': 45, 'price': 16.35}, {'name': 'FB', 'shares': 200, 'price': 21.09}, {'name': 'HPQ', 'shares': 35, 'price': 31.75}]}
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3-1-3" class="outline-4">
+<h4 id="sec-3-1-3"><span class="section-number-4">3.1.3</span> 对列表中的数据分组</h4>
+<div class="outline-text-4" id="text-3-1-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">rows</span> = [
+    {<span style="color: #ff4ea3;">'address'</span>: <span style="color: #ff4ea3;">'5412 N CLARK'</span>, <span style="color: #ff4ea3;">'date'</span>: <span style="color: #ff4ea3;">'07/01/2012'</span>},
+    {<span style="color: #ff4ea3;">'address'</span>: <span style="color: #ff4ea3;">'5148 N CLARK'</span>, <span style="color: #ff4ea3;">'date'</span>: <span style="color: #ff4ea3;">'07/04/2012'</span>},
+    {<span style="color: #ff4ea3;">'address'</span>: <span style="color: #ff4ea3;">'5800 E 58TH'</span>, <span style="color: #ff4ea3;">'date'</span>: <span style="color: #ff4ea3;">'07/02/2012'</span>},
+    {<span style="color: #ff4ea3;">'address'</span>: <span style="color: #ff4ea3;">'2122 N CLARK'</span>, <span style="color: #ff4ea3;">'date'</span>: <span style="color: #ff4ea3;">'07/03/2012'</span>},
+    {<span style="color: #ff4ea3;">'address'</span>: <span style="color: #ff4ea3;">'5645 N RAVENSWOOD'</span>, <span style="color: #ff4ea3;">'date'</span>: <span style="color: #ff4ea3;">'07/02/2012'</span>},
+    {<span style="color: #ff4ea3;">'address'</span>: <span style="color: #ff4ea3;">'1060 W ADDISON'</span>, <span style="color: #ff4ea3;">'date'</span>: <span style="color: #ff4ea3;">'07/02/2012'</span>},
+    {<span style="color: #ff4ea3;">'address'</span>: <span style="color: #ff4ea3;">'4801 N BROADWAY'</span>, <span style="color: #ff4ea3;">'date'</span>: <span style="color: #ff4ea3;">'07/01/2012'</span>},
+    {<span style="color: #ff4ea3;">'address'</span>: <span style="color: #ff4ea3;">'1039 W GRANVILLE'</span>, <span style="color: #ff4ea3;">'date'</span>: <span style="color: #ff4ea3;">'07/04/2012'</span>},
+]
+
+<span style="color: #a1db00;">from</span> itertools <span style="color: #a1db00;">import</span> groupby
+
+rows.sort(key=<span style="color: #a1db00;">lambda</span> r: r[<span style="color: #ff4ea3;">'date'</span>])
+<span style="color: #a1db00;">for</span> date, items <span style="color: #a1db00;">in</span> groupby(rows, key=<span style="color: #a1db00;">lambda</span> r: r[<span style="color: #ff4ea3;">'date'</span>]):
+    <span style="color: #a1db00;">print</span>(date)
+    <span style="color: #a1db00;">for</span> i <span style="color: #a1db00;">in</span> items:
+        <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'    '</span>, i)
+</pre>
+</div>
+
+<pre class="example">
+07/01/2012
+     {'date': '07/01/2012', 'address': '5412 N CLARK'}
+     {'date': '07/01/2012', 'address': '4801 N BROADWAY'}
+07/02/2012
+     {'date': '07/02/2012', 'address': '5800 E 58TH'}
+     {'date': '07/02/2012', 'address': '5645 N RAVENSWOOD'}
+     {'date': '07/02/2012', 'address': '1060 W ADDISON'}
+07/03/2012
+     {'date': '07/03/2012', 'address': '2122 N CLARK'}
+07/04/2012
+     {'date': '07/04/2012', 'address': '5148 N CLARK'}
+     {'date': '07/04/2012', 'address': '1039 W GRANVILLE'}
+</pre>
+
+<p>
+或者使用 defaultdict 来实现：
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">from</span> collections <span style="color: #a1db00;">import</span> defaultdict
+<span style="color: #ff8700;">rows_by_date</span> = defaultdict(<span style="color: #d18aff;">list</span>)
+<span style="color: #a1db00;">for</span> row <span style="color: #a1db00;">in</span> rows:
+    rows_by_date[row[<span style="color: #ff4ea3;">'date'</span>]].append(row)
+<span style="color: #a1db00;">print</span>(rows_by_date)
+</pre>
+</div>
+
+<pre class="example">
+defaultdict(&lt;class 'list'&gt;, {'07/04/2012': [{'date': '07/04/2012', 'address': '5148 N CLARK'}, {'date': '07/04/2012', 'address': '1039 W GRANVILLE'}], '07/01/2012': [{'date': '07/01/2012', 'address': '5412 N CLARK'}, {'date': '07/01/2012', 'address': '4801 N BROADWAY'}], '07/03/2012': [{'date': '07/03/2012', 'address': '2122 N CLARK'}], '07/02/2012': [{'date': '07/02/2012', 'address': '5800 E 58TH'}, {'date': '07/02/2012', 'address': '5645 N RAVENSWOOD'}, {'date': '07/02/2012', 'address': '1060 W ADDISON'}]})
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3-1-4" class="outline-4">
+<h4 id="sec-3-1-4"><span class="section-number-4">3.1.4</span> 消除序列中的重复数据，同时保持数据顺序</h4>
+<div class="outline-text-4" id="text-3-1-4">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">def</span> <span style="color: #ffd700;">dedupe</span>(items, key=<span style="color: #5fafd7;">None</span>):
+    <span style="color: #ff8700;">seen</span> = <span style="color: #d18aff;">set</span>()
+    <span style="color: #a1db00;">for</span> item <span style="color: #a1db00;">in</span> items:
+        <span style="color: #ff8700;">val</span> = item <span style="color: #a1db00;">if</span> key <span style="color: #a1db00;">is</span> <span style="color: #5fafd7;">None</span> <span style="color: #a1db00;">else</span> key(item)
+        <span style="color: #a1db00;">if</span> val <span style="color: #a1db00;">not</span> <span style="color: #a1db00;">in</span> seen:
+            <span style="color: #a1db00;">yield</span> item
+            seen.add(val)
+
+
+<span style="color: #ff8700;">a</span> = [
+        {<span style="color: #ff4ea3;">'x'</span>: 2, <span style="color: #ff4ea3;">'y'</span>: 3},
+        {<span style="color: #ff4ea3;">'x'</span>: 1, <span style="color: #ff4ea3;">'y'</span>: 4},
+        {<span style="color: #ff4ea3;">'x'</span>: 2, <span style="color: #ff4ea3;">'y'</span>: 3},
+        {<span style="color: #ff4ea3;">'x'</span>: 2, <span style="color: #ff4ea3;">'y'</span>: 3},
+        {<span style="color: #ff4ea3;">'x'</span>: 10, <span style="color: #ff4ea3;">'y'</span>: 15}
+    ]
+<span style="color: #a1db00;">print</span>(<span style="color: #d18aff;">list</span>(dedupe(a, key=<span style="color: #a1db00;">lambda</span> a: (a[<span style="color: #ff4ea3;">'x'</span>],a[<span style="color: #ff4ea3;">'y'</span>]))))
+</pre>
+</div>
+
+<pre class="example">
+[{'y': 3, 'x': 2}, {'y': 4, 'x': 1}, {'y': 15, 'x': 10}]
+</pre>
+
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">def</span> <span style="color: #ffd700;">dedupe</span>(items):
+    <span style="color: #ff8700;">seen</span> = <span style="color: #d18aff;">set</span>()
+    <span style="color: #a1db00;">for</span> item <span style="color: #a1db00;">in</span> items:
+        <span style="color: #a1db00;">if</span> item <span style="color: #a1db00;">not</span> <span style="color: #a1db00;">in</span> seen:
+            <span style="color: #a1db00;">yield</span> item
+            seen.add(item)
+
+<span style="color: #ff8700;">a</span> = [1, 5, 2, 1, 9, 1, 5, 10]
+<span style="color: #a1db00;">print</span>(<span style="color: #d18aff;">list</span>(dedupe(a)))
+</pre>
+</div>
+
+<pre class="example">
+[1, 5, 2, 9, 10]
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3-1-5" class="outline-4">
+<h4 id="sec-3-1-5"><span class="section-number-4">3.1.5</span> 序列解包 (unpack)</h4>
+<div class="outline-text-4" id="text-3-1-5">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">records</span> = [
+     (<span style="color: #ff4ea3;">'foo'</span>, 1, 2),
+     (<span style="color: #ff4ea3;">'bar'</span>, <span style="color: #ff4ea3;">'hello'</span>),
+     (<span style="color: #ff4ea3;">'foo'</span>, 3, 4),
+]
+
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">do_foo</span>(x,y):
+    <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'foo'</span>, x, y)
+
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">do_bar</span>(s):
+    <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'bar'</span>, s)
+
+<span style="color: #a1db00;">for</span> tag, *args <span style="color: #a1db00;">in</span> records:
+    <span style="color: #a1db00;">if</span> tag == <span style="color: #ff4ea3;">'foo'</span>:
+        do_foo(*args)
+    <span style="color: #a1db00;">elif</span> tag == <span style="color: #ff4ea3;">'bar'</span>:
+        do_bar(*args)
+</pre>
+</div>
+
+<pre class="example">
+foo 1 2
+bar hello
+foo 3 4
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3-1-6" class="outline-4">
+<h4 id="sec-3-1-6"><span class="section-number-4">3.1.6</span> flatten 列表</h4>
+<div class="outline-text-4" id="text-3-1-6">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">from</span> collections <span style="color: #a1db00;">import</span> Iterable
+
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">flatten</span>(items, ignore_types=(<span style="color: #d18aff;">str</span>, <span style="color: #d18aff;">bytes</span>)):
+    <span style="color: #a1db00;">for</span> x <span style="color: #a1db00;">in</span> items:
+        <span style="color: #a1db00;">if</span> <span style="color: #d18aff;">isinstance</span>(x, Iterable) <span style="color: #a1db00;">and</span> <span style="color: #a1db00;">not</span> <span style="color: #d18aff;">isinstance</span>(x, ignore_types):
+            <span style="color: #a1db00;">yield</span> <span style="color: #a1db00;">from</span> flatten(x)
+        <span style="color: #a1db00;">else</span>:
+            <span style="color: #a1db00;">yield</span> x
+
+<span style="color: #ff8700;">items</span> = [1, 2, [3, 4, [5, 6], 7], 8]
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Produces 1 2 3 4 5 6 7 8</span>
+<span style="color: #a1db00;">for</span> x <span style="color: #a1db00;">in</span> flatten(items):
+    <span style="color: #a1db00;">print</span>(x)
+
+<span style="color: #ff8700;">items</span> = [<span style="color: #ff4ea3;">'Dave'</span>, <span style="color: #ff4ea3;">'Paula'</span>, [<span style="color: #ff4ea3;">'Thomas'</span>, <span style="color: #ff4ea3;">'Lewis'</span>]]
+<span style="color: #a1db00;">for</span> x <span style="color: #a1db00;">in</span> flatten(items):
+    <span style="color: #a1db00;">print</span>(x)
+</pre>
+</div>
+
+<pre class="example">
+1
+2
+3
+4
+5
+6
+7
+8
+Dave
+Paula
+Thomas
+Lewis
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> 字典</h3>
+<div class="outline-text-3" id="text-3-2">
+</div><div id="outline-container-sec-3-2-1" class="outline-4">
+<h4 id="sec-3-2-1"><span class="section-number-4">3.2.1</span> 对字典作集合运算</h4>
+<div class="outline-text-4" id="text-3-2-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">a</span> = {
+   <span style="color: #ff4ea3;">'x'</span> : 1,
+   <span style="color: #ff4ea3;">'y'</span> : 2,
+   <span style="color: #ff4ea3;">'z'</span> : 3
+}
+
+<span style="color: #ff8700;">b</span> = {
+   <span style="color: #ff4ea3;">'w'</span> : 10,
+   <span style="color: #ff4ea3;">'x'</span> : 11,
+   <span style="color: #ff4ea3;">'y'</span> : 2
+}
+
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'Common keys:'</span>, a.keys() &amp; b.keys())
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'Keys in a not in b:'</span>, a.keys() - b.keys())
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'(key,value) pairs in common:'</span>, a.items() &amp; b.items())
+</pre>
+</div>
+
+<pre class="example">
+Common keys: {'y', 'x'}
+Keys in a not in b: {'z'}
+(key,value) pairs in common: {('y', 2)}
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3-2-2" class="outline-4">
+<h4 id="sec-3-2-2"><span class="section-number-4">3.2.2</span> 组合多个字典当作一个字典使用</h4>
+<div class="outline-text-4" id="text-3-2-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">a</span> = {<span style="color: #ff4ea3;">'x'</span>: 1, <span style="color: #ff4ea3;">'z'</span>: 3 }
+<span style="color: #ff8700;">b</span> = {<span style="color: #ff4ea3;">'y'</span>: 2, <span style="color: #ff4ea3;">'z'</span>: 4 }
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">(a) Simple example of combining</span>
+<span style="color: #a1db00;">from</span> collections <span style="color: #a1db00;">import</span> ChainMap
+<span style="color: #ff8700;">c</span> = ChainMap(a,b)
+
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">"c:"</span>, c)
+
+<span style="color: #a1db00;">print</span>(c[<span style="color: #ff4ea3;">'x'</span>])      <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Outputs 1  (from a)</span>
+<span style="color: #a1db00;">print</span>(c[<span style="color: #ff4ea3;">'y'</span>])      <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Outputs 2  (from b)</span>
+<span style="color: #a1db00;">print</span>(c[<span style="color: #ff4ea3;">'z'</span>])      <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Outputs 3  (from a)</span>
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Output some common values</span>
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'len(c):'</span>, <span style="color: #d18aff;">len</span>(c))
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'c.keys():'</span>, <span style="color: #d18aff;">list</span>(c.keys()))
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'c.values():'</span>, <span style="color: #d18aff;">list</span>(c.values()))
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Modify some values</span>
+<span style="color: #ff8700;">c</span>[<span style="color: #ff4ea3;">'z'</span>] = 10
+<span style="color: #ff8700;">c</span>[<span style="color: #ff4ea3;">'w'</span>] = 40
+<span style="color: #a1db00;">del</span> c[<span style="color: #ff4ea3;">'x'</span>]
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">"a:"</span>, a)
+</pre>
+</div>
+
+<pre class="example">
+c: ChainMap({'x': 1, 'z': 3}, {'y': 2, 'z': 4})
+1
+2
+3
+len(c): 3
+c.keys(): ['y', 'x', 'z']
+c.values(): [2, 1, 3]
+a: {'z': 10, 'w': 40}
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3-2-3" class="outline-4">
+<h4 id="sec-3-2-3"><span class="section-number-4">3.2.3</span> 字典栈</h4>
+<div class="outline-text-4" id="text-3-2-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Example of stacking mappings (like scopes)</span>
+<span style="color: #ff8700;">values</span> = ChainMap()
+<span style="color: #ff8700;">values</span>[<span style="color: #ff4ea3;">'x'</span>] = 1
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Add a new mapping</span>
+<span style="color: #ff8700;">values</span> = values.new_child()
+<span style="color: #ff8700;">values</span>[<span style="color: #ff4ea3;">'x'</span>] = 2
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Add a new mapping</span>
+<span style="color: #ff8700;">values</span> = values.new_child()
+<span style="color: #ff8700;">values</span>[<span style="color: #ff4ea3;">'x'</span>] = 3
+
+<span style="color: #a1db00;">print</span>(values)
+<span style="color: #a1db00;">print</span>(values[<span style="color: #ff4ea3;">'x'</span>])
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Discard last mapping</span>
+<span style="color: #ff8700;">values</span> = values.parents
+<span style="color: #a1db00;">print</span>(values)
+<span style="color: #a1db00;">print</span>(values[<span style="color: #ff4ea3;">'x'</span>])
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Discard last mapping</span>
+<span style="color: #ff8700;">values</span> = values.parents
+<span style="color: #a1db00;">print</span>(values)
+<span style="color: #a1db00;">print</span>(values[<span style="color: #ff4ea3;">'x'</span>])
+</pre>
+</div>
+
+<pre class="example">
+ChainMap({'x': 3}, {'x': 2}, {'x': 1})
+3
+ChainMap({'x': 2}, {'x': 1})
+2
+ChainMap({'x': 1})
+1
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> 队列</h3>
+<div class="outline-text-3" id="text-3-3">
+</div><div id="outline-container-sec-3-3-1" class="outline-4">
+<h4 id="sec-3-3-1"><span class="section-number-4">3.3.1</span> 优先队列</h4>
+<div class="outline-text-4" id="text-3-3-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">import</span> heapq
+
+<span style="color: #a1db00;">class</span> <span style="color: #00d7af;">PriorityQueue</span>:
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__init__</span>(<span style="color: #a1db00;">self</span>):
+        <span style="color: #a1db00;">self</span>._queue = []
+        <span style="color: #a1db00;">self</span>._index = 0
+
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">push</span>(<span style="color: #a1db00;">self</span>, item, priority):
+        heapq.heappush(<span style="color: #a1db00;">self</span>._queue, (-priority, <span style="color: #a1db00;">self</span>._index, item))
+        <span style="color: #a1db00;">self</span>._index += 1
+
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">pop</span>(<span style="color: #a1db00;">self</span>):
+        <span style="color: #a1db00;">return</span> heapq.heappop(<span style="color: #a1db00;">self</span>._queue)[-1]
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Example use</span>
+<span style="color: #a1db00;">class</span> <span style="color: #00d7af;">Item</span>:
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__init__</span>(<span style="color: #a1db00;">self</span>, name):
+        <span style="color: #a1db00;">self</span>.name = name
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__repr__</span>(<span style="color: #a1db00;">self</span>):
+        <span style="color: #a1db00;">return</span> <span style="color: #ff4ea3;">'Item({!r})'</span>.<span style="color: #d18aff;">format</span>(<span style="color: #a1db00;">self</span>.name)
+
+<span style="color: #ff8700;">q</span> = PriorityQueue()
+q.push(Item(<span style="color: #ff4ea3;">'foo'</span>), 1)
+q.push(Item(<span style="color: #ff4ea3;">'bar'</span>), 5)
+q.push(Item(<span style="color: #ff4ea3;">'spam'</span>), 4)
+q.push(Item(<span style="color: #ff4ea3;">'grok'</span>), 1)
+
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">"Should be bar:"</span>, q.pop())
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">"Should be spam:"</span>, q.pop())
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">"Should be foo:"</span>, q.pop())
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">"Should be grok:"</span>, q.pop())
+</pre>
+</div>
+
+<pre class="example">
+Should be bar: Item('bar')
+Should be spam: Item('spam')
+Should be foo: Item('foo')
+Should be grok: Item('grok')
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> IO</h2>
+<div class="outline-text-2" id="text-4">
+</div><div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> 文件</h3>
+<div class="outline-text-3" id="text-4-1">
+</div><div id="outline-container-sec-4-1-1" class="outline-4">
+<h4 id="sec-4-1-1"><span class="section-number-4">4.1.1</span> 将文件描述符包装成文件对象</h4>
+<div class="outline-text-4" id="text-4-1-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">from</span> socket <span style="color: #a1db00;">import</span> socket, AF_INET, SOCK_STREAM
+
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">echo_client</span>(client_sock, addr):
+    <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">"Got connection from"</span>, addr)
+
+    <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Make text-mode file wrappers for socket reading/writing</span>
+    <span style="color: #ff8700;">client_in</span> = <span style="color: #d18aff;">open</span>(client_sock.fileno(), <span style="color: #ff4ea3;">'rt'</span>, encoding=<span style="color: #ff4ea3;">'latin-1'</span>, closefd=<span style="color: #5fafd7;">False</span>)
+    <span style="color: #ff8700;">client_out</span> = <span style="color: #d18aff;">open</span>(client_sock.fileno(), <span style="color: #ff4ea3;">'wt'</span>, encoding=<span style="color: #ff4ea3;">'latin-1'</span>, closefd=<span style="color: #5fafd7;">False</span>)
+
+    <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Echo lines back to the client using file I/O</span>
+    <span style="color: #a1db00;">for</span> line <span style="color: #a1db00;">in</span> client_in:
+        client_out.write(line)
+        client_out.flush()
+    client_sock.close()
+
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">echo_server</span>(address):
+    <span style="color: #ff8700;">sock</span> = socket(AF_INET, SOCK_STREAM)
+    sock.bind(address)
+    sock.listen(1)
+    <span style="color: #a1db00;">while</span> <span style="color: #5fafd7;">True</span>:
+        <span style="color: #ff8700;">client</span>, <span style="color: #ff8700;">addr</span> = sock.accept()
+        echo_client(client, addr)
+
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'Echo serving running on localhost:25000'</span>)
+echo_server((<span style="color: #ff4ea3;">''</span>, 25000))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-1-2" class="outline-4">
+<h4 id="sec-4-1-2"><span class="section-number-4">4.1.2</span> 改变已打开文件的编码方式</h4>
+<div class="outline-text-4" id="text-4-1-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Example of adding a text encoding to existing file-like object</span>
+
+<span style="color: #a1db00;">import</span> urllib.request
+<span style="color: #a1db00;">import</span> io
+
+<span style="color: #ff8700;">u</span> = urllib.request.urlopen(<span style="color: #ff4ea3;">'http://www.python.org'</span>)
+<span style="color: #ff8700;">f</span> = io.TextIOWrapper(u, encoding=<span style="color: #ff4ea3;">'utf-8'</span>)
+<span style="color: #ff8700;">text</span> = f.read()
+
+<span style="color: #a1db00;">print</span>(text)
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> 内存 IO</h3>
+<div class="outline-text-3" id="text-4-2">
+</div><div id="outline-container-sec-4-2-1" class="outline-4">
+<h4 id="sec-4-2-1"><span class="section-number-4">4.2.1</span> 内存字符串</h4>
+<div class="outline-text-4" id="text-4-2-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">from</span> io <span style="color: #a1db00;">import</span> StringIO
+<span style="color: #ff8700;">f</span> = StringIO()
+f.write(<span style="color: #ff4ea3;">'hello'</span>)
+f.write(<span style="color: #ff4ea3;">' '</span>)
+f.write(<span style="color: #ff4ea3;">'world!'</span>)
+<span style="color: #a1db00;">print</span>(f.getvalue())
+</pre>
+</div>
+
+<pre class="example">
+hello world!
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">f</span> = StringIO(<span style="color: #ff4ea3;">'Hello!\nHi!\nGoodbye!'</span>)
+<span style="color: #a1db00;">while</span> <span style="color: #5fafd7;">True</span>:
+    <span style="color: #ff8700;">s</span> = f.readline()
+    <span style="color: #a1db00;">if</span> s == <span style="color: #ff4ea3;">''</span>:  <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">eof</span>
+        <span style="color: #a1db00;">break</span>
+    <span style="color: #a1db00;">print</span>(s, end=<span style="color: #ff4ea3;">''</span>)
+</pre>
+</div>
+
+<pre class="example">
+Hello!
+Hi!
+Goodbye!
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-4-2-2" class="outline-4">
+<h4 id="sec-4-2-2"><span class="section-number-4">4.2.2</span> 内存比特流</h4>
+<div class="outline-text-4" id="text-4-2-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">from</span> io <span style="color: #a1db00;">import</span> BytesIO
+<span style="color: #ff8700;">f</span> = BytesIO()
+f.write(<span style="color: #ff4ea3;">'&#20013;&#25991;'</span>.encode(<span style="color: #ff4ea3;">'utf-8'</span>))
+<span style="color: #a1db00;">print</span>(f.getvalue())
+</pre>
+</div>
+
+<pre class="example">
+b'\xe4\xb8\xad\xe6\x96\x87'
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">f</span> = BytesIO(b<span style="color: #ff4ea3;">'\xe4\xb8\xad\xe6\x96\x87'</span>)
+<span style="color: #ff8700;">r</span> = f.read().decode(<span style="color: #ff4ea3;">'utf-8'</span>)
+<span style="color: #a1db00;">print</span>(r)
+</pre>
+</div>
+
+<pre class="example">
+中文
+</pre>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3"><span class="section-number-3">4.3</span> 读写 JSON</h3>
+<div class="outline-text-3" id="text-4-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Some advanced JSON examples involving ordered dicts and classes</span>
+<span style="color: #a1db00;">import</span> json
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Some JSON encoded text</span>
+<span style="color: #ff8700;">s</span> = <span style="color: #ff4ea3;">'{"name": "ACME", "shares": 50, "price": 490.1}'</span>
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">(a) Turning JSON into an OrderedDict</span>
+
+<span style="color: #a1db00;">from</span> collections <span style="color: #a1db00;">import</span> OrderedDict
+<span style="color: #ff8700;">data</span> = json.loads(s, object_pairs_hook=OrderedDict)
+<span style="color: #a1db00;">print</span>(data)
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">(b) Using JSON to populate an instance</span>
+
+<span style="color: #a1db00;">class</span> <span style="color: #00d7af;">JSONObject</span>:
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__init__</span>(<span style="color: #a1db00;">self</span>, d):
+        <span style="color: #a1db00;">self</span>.__dict__ = d
+
+<span style="color: #ff8700;">data</span> = json.loads(s, object_hook=JSONObject)
+<span style="color: #a1db00;">print</span>(data.name)
+<span style="color: #a1db00;">print</span>(data.shares)
+<span style="color: #a1db00;">print</span>(data.price)
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">(c) Encoding instances</span>
+
+<span style="color: #a1db00;">class</span> <span style="color: #00d7af;">Point</span>:
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__init__</span>(<span style="color: #a1db00;">self</span>, x, y):
+        <span style="color: #a1db00;">self</span>.x = x
+        <span style="color: #a1db00;">self</span>.y = y
+
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">serialize_instance</span>(obj):
+    <span style="color: #ff8700;">d</span> = { <span style="color: #ff4ea3;">'__classname__'</span> : <span style="color: #d18aff;">type</span>(obj).<span style="color: #d18aff;">__name__</span> }
+    d.update(<span style="color: #d18aff;">vars</span>(obj))
+    <span style="color: #a1db00;">return</span> d
+
+<span style="color: #ff8700;">p</span> = Point(3,4)
+<span style="color: #ff8700;">s</span> = json.dumps(p, default=serialize_instance)
+<span style="color: #a1db00;">print</span>(s)
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">(d) Decoding instances</span>
+<span style="color: #ff8700;">classes</span> = {
+    <span style="color: #ff4ea3;">'Point'</span> : Point
+}
+
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">unserialize_object</span>(d):
+    <span style="color: #ff8700;">clsname</span> = d.pop(<span style="color: #ff4ea3;">'__classname__'</span>, <span style="color: #5fafd7;">None</span>)
+    <span style="color: #a1db00;">if</span> clsname:
+        <span style="color: #ff8700;">cls</span> = classes[clsname]
+        <span style="color: #ff8700;">obj</span> = cls.__new__(cls)
+        <span style="color: #a1db00;">for</span> key, value <span style="color: #a1db00;">in</span> d.items():
+            <span style="color: #d18aff;">setattr</span>(obj, key, value)
+        <span style="color: #a1db00;">return</span> obj
+    <span style="color: #a1db00;">else</span>:
+        <span style="color: #a1db00;">return</span> d
+
+<span style="color: #ff8700;">a</span> = json.loads(s, object_hook=unserialize_object)
+<span style="color: #a1db00;">print</span>(a)
+<span style="color: #a1db00;">print</span>(a.x)
+<span style="color: #a1db00;">print</span>(a.y)
+</pre>
+</div>
+
+<pre class="example">
+OrderedDict([('name', 'ACME'), ('shares', 50), ('price', 490.1)])
+ACME
+50
+490.1
+{"y": 4, "x": 3, "__classname__": "Point"}
+&lt;__main__.Point object at 0x10475a208&gt;
+3
+4
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> 模块</h2>
+<div class="outline-text-2" id="text-5">
+</div><div id="outline-container-sec-5-1" class="outline-3">
+<h3 id="sec-5-1"><span class="section-number-3">5.1</span> 猴子补丁</h3>
+<div class="outline-text-3" id="text-5-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">import</span> importlib
+<span style="color: #a1db00;">import</span> sys
+<span style="color: #a1db00;">from</span> collections <span style="color: #a1db00;">import</span> defaultdict
+
+<span style="color: #ff8700;">_post_import_hooks</span> = defaultdict(<span style="color: #d18aff;">list</span>)
+
+<span style="color: #a1db00;">class</span> <span style="color: #00d7af;">PostImportFinder</span>:
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__init__</span>(<span style="color: #a1db00;">self</span>):
+        <span style="color: #a1db00;">self</span>._skip = <span style="color: #d18aff;">set</span>()
+
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">find_module</span>(<span style="color: #a1db00;">self</span>, fullname, path=<span style="color: #5fafd7;">None</span>):
+        <span style="color: #a1db00;">if</span> fullname <span style="color: #a1db00;">in</span> <span style="color: #a1db00;">self</span>._skip:
+            <span style="color: #a1db00;">return</span> <span style="color: #5fafd7;">None</span>
+        <span style="color: #a1db00;">self</span>._skip.add(fullname)
+        <span style="color: #a1db00;">return</span> PostImportLoader(<span style="color: #a1db00;">self</span>)
+
+<span style="color: #a1db00;">class</span> <span style="color: #00d7af;">PostImportLoader</span>:
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">__init__</span>(<span style="color: #a1db00;">self</span>, finder):
+        <span style="color: #a1db00;">self</span>._finder = finder
+
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">load_module</span>(<span style="color: #a1db00;">self</span>, fullname):
+        importlib.import_module(fullname)
+        <span style="color: #ff8700;">module</span> = sys.modules[fullname]
+        <span style="color: #a1db00;">for</span> func <span style="color: #a1db00;">in</span> _post_import_hooks[fullname]:
+            func(module)
+        <span style="color: #a1db00;">self</span>._finder._skip.remove(fullname)
+        <span style="color: #a1db00;">return</span> module
+
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">when_imported</span>(fullname):
+    <span style="color: #a1db00;">def</span> <span style="color: #ffd700;">decorate</span>(func):
+        <span style="color: #a1db00;">if</span> fullname <span style="color: #a1db00;">in</span> sys.modules:
+            func(sys.modules[fullname])
+        <span style="color: #a1db00;">else</span>:
+            _post_import_hooks[fullname].append(func)
+        <span style="color: #a1db00;">return</span> func
+    <span style="color: #a1db00;">return</span> decorate
+
+sys.meta_path.insert(0, PostImportFinder())
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #00d7af;">@when_imported</span>(<span style="color: #ff4ea3;">'threading'</span>)
+<span style="color: #a1db00;">def</span> <span style="color: #ffd700;">warn_threads</span>(mod):
+    <span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'Threads? Are you crazy?'</span>)
+
+<span style="color: #a1db00;">import</span> threading
+</pre>
+</div>
+
+<pre class="example">
+Threads? Are you crazy?
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-5-2" class="outline-3">
+<h3 id="sec-5-2"><span class="section-number-3">5.2</span> 将模块拆分出多个文件</h3>
+<div class="outline-text-3" id="text-5-2">
+<p>
+模块 mymodule 目录结构：
+</p>
+
+<pre class="example">
+mymodule
+├── __init__.py
+├── a.py
+└── b.py
+</pre>
+
+<p>
+<code>__init__.py</code> 文件内容:
+</p>
+
+<pre class="example">
+from .a import A
+from .b import B
+</pre>
+
+<p>
+<code>a.py</code> 文件内容：
+</p>
+
+<pre class="example">
+class A:
+    def spam(self):
+        print('A.spam')
+</pre>
+
+<p>
+<code>b.py</code> 文件内容：
+</p>
+
+<pre class="example">
+from .a import A
+
+class B(A):
+    def bar(self):
+        print('B.bar')
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">import</span> mymodule
+<span style="color: #ff8700;">a</span> = mymodule.A()
+a.spam()
+
+<span style="color: #ff8700;">b</span> = mymodule.B()
+b.bar()
+</pre>
+</div>
+
+<pre class="example">
+A.spam
+B.bar
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> 数字，日期，时间</h2>
+<div class="outline-text-2" id="text-6">
+</div><div id="outline-container-sec-6-1" class="outline-3">
+<h3 id="sec-6-1"><span class="section-number-3">6.1</span> time 模块</h3>
+<div class="outline-text-3" id="text-6-1">
+<p>
+time 模块始终返回 UTC 时间。
+</p>
+</div>
+
+<div id="outline-container-sec-6-1-1" class="outline-4">
+<h4 id="sec-6-1-1"><span class="section-number-4">6.1.1</span> 获取 Unix Timestamp</h4>
+<div class="outline-text-4" id="text-6-1-1">
+<p>
+即从 Epoch (1970年1月1日00:00:00 UTC) 开始所经过的秒数。
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">import</span> time
+<span style="color: #a1db00;">print</span>(time.time())
+</pre>
+</div>
+
+<pre class="example">
+1519310956.79615
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-6-1-2" class="outline-4">
+<h4 id="sec-6-1-2"><span class="section-number-4">6.1.2</span> 获取具体时间值</h4>
+<div class="outline-text-4" id="text-6-1-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">current_time</span> = time.time()
+<span style="color: #ff8700;">current_struct_time</span> = time.gmtime(current_time)
+<span style="color: #a1db00;">print</span>(current_struct_time)
+</pre>
+</div>
+
+<pre class="example">
+time.struct_time(tm_year=2018, tm_mon=2, tm_mday=22, tm_hour=14, tm_min=49, tm_sec=17, tm_wday=3, tm_yday=53, tm_isdst=0)
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">current_year</span> = current_struct_time.tm_year
+<span style="color: #ff8700;">current_mon</span>  = current_struct_time.tm_mon
+<span style="color: #ff8700;">current_mday</span> = current_struct_time.tm_mday
+<span style="color: #ff8700;">current_hour</span> = current_struct_time.tm_hour
+<span style="color: #ff8700;">current_min</span>  = current_struct_time.tm_min
+<span style="color: #ff8700;">r</span> = (current_year, current_mon, current_mday, current_hour, current_min)
+<span style="color: #a1db00;">print</span>(r)
+</pre>
+</div>
+
+<pre class="example">
+(2018, 2, 22, 14, 49)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-6-2" class="outline-3">
+<h3 id="sec-6-2"><span class="section-number-3">6.2</span> datetime 模块</h3>
+<div class="outline-text-3" id="text-6-2">
+<p>
+datetime 模块简化了日期操作，如增加天数，设置时区等。
+</p>
+</div>
+
+<div id="outline-container-sec-6-2-1" class="outline-4">
+<h4 id="sec-6-2-1"><span class="section-number-4">6.2.1</span> 创建时间</h4>
+<div class="outline-text-4" id="text-6-2-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">import</span> datetime
+<span style="color: #ff8700;">d</span> = datetime.datetime(year=2017, month=12, day=31, hour=12, minute=59, second=59)
+<span style="color: #ff8700;">r</span> = (d.year, d.month, d.day, d.hour, d.minute, d.second, d.microsecond)
+<span style="color: #a1db00;">print</span>(r)
+</pre>
+</div>
+
+<pre class="example">
+(2017, 12, 31, 12, 59, 59, 0)
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-6-2-2" class="outline-4">
+<h4 id="sec-6-2-2"><span class="section-number-4">6.2.2</span> 获取 UTC 时间</h4>
+<div class="outline-text-4" id="text-6-2-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">print</span>(datetime.datetime.utcnow())
+</pre>
+</div>
+
+<pre class="example">
+2018-02-22 14:49:18.220324
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-6-2-3" class="outline-4">
+<h4 id="sec-6-2-3"><span class="section-number-4">6.2.3</span> 获取当前时区时间</h4>
+<div class="outline-text-4" id="text-6-2-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">print</span>(datetime.datetime.now())
+</pre>
+</div>
+
+<pre class="example">
+2018-02-22 22:49:18.564539
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-6-2-4" class="outline-4">
+<h4 id="sec-6-2-4"><span class="section-number-4">6.2.4</span> 日期运算</h4>
+<div class="outline-text-4" id="text-6-2-4">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">today</span> = datetime.datetime.now()
+<span style="color: #ff8700;">diff</span> = datetime.timedelta(weeks=3, days=2)
+<span style="color: #ff8700;">future</span> = today + diff
+<span style="color: #ff8700;">past</span> = today - diff
+<span style="color: #a1db00;">print</span>((future, past))
+</pre>
+</div>
+
+<pre class="example">
+(datetime.datetime(2018, 3, 17, 22, 49, 18, 915723), datetime.datetime(2018, 1, 30, 22, 49, 18, 915723))
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-6-2-5" class="outline-4">
+<h4 id="sec-6-2-5"><span class="section-number-4">6.2.5</span> 日期转字符串</h4>
+<div class="outline-text-4" id="text-6-2-5">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">r</span> = <span style="color: #ff4ea3;">'{:%Y-%m-%d %H:%M}'</span>.<span style="color: #d18aff;">format</span>(datetime.datetime(2001, 2, 3, 4, 5))
+<span style="color: #a1db00;">print</span>(r)
+</pre>
+</div>
+
+<pre class="example">
+2001-02-03 04:05
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-6-2-6" class="outline-4">
+<h4 id="sec-6-2-6"><span class="section-number-4">6.2.6</span> 字符串转日期</h4>
+<div class="outline-text-4" id="text-6-2-6">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">r</span> = datetime.datetime.strptime(<span style="color: #ff4ea3;">"Mar 03, 2010"</span>, <span style="color: #ff4ea3;">"%b %d, %Y"</span>)
+<span style="color: #a1db00;">print</span>(r)
+</pre>
+</div>
+
+<pre class="example">
+2010-03-03 00:00:00
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-6-3" class="outline-3">
+<h3 id="sec-6-3"><span class="section-number-3">6.3</span> 月份缩写</h3>
+<div class="outline-text-3" id="text-6-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">from</span> calendar <span style="color: #a1db00;">import</span> month_abbr
+<span style="color: #a1db00;">print</span>(<span style="color: #d18aff;">list</span>(month_abbr))
+</pre>
+</div>
+
+<pre class="example">
+['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-6-4" class="outline-3">
+<h3 id="sec-6-4"><span class="section-number-3">6.4</span> 数字精度格式化</h3>
+<div class="outline-text-3" id="text-6-4">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'{:06.2f}'</span>.<span style="color: #d18aff;">format</span>(3.141592653589793))
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'{:04d}'</span>.<span style="color: #d18aff;">format</span>(42))
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'{:+d}'</span>.<span style="color: #d18aff;">format</span>(42))
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'{: d}'</span>.<span style="color: #d18aff;">format</span>(42))
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'{: d}'</span>.<span style="color: #d18aff;">format</span>(-42))
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'{:=5d}'</span>.<span style="color: #d18aff;">format</span>((- 23)))
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'{:=+5d}'</span>.<span style="color: #d18aff;">format</span>((23)))
+</pre>
+</div>
+
+<pre class="example">
+003.14
+0042
++42
+ 42
+-42
+-  23
++  23
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> 字符串与文本</h2>
+<div class="outline-text-2" id="text-7">
+</div><div id="outline-container-sec-7-1" class="outline-3">
+<h3 id="sec-7-1"><span class="section-number-3">7.1</span> 格式化</h3>
+<div class="outline-text-3" id="text-7-1">
+</div><div id="outline-container-sec-7-1-1" class="outline-4">
+<h4 id="sec-7-1-1"><span class="section-number-4">7.1.1</span> 填充与对齐</h4>
+<div class="outline-text-4" id="text-7-1-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'{:&gt;10}'</span>.<span style="color: #d18aff;">format</span>(<span style="color: #ff4ea3;">'test'</span>))
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'{:10}'</span>.<span style="color: #d18aff;">format</span>(<span style="color: #ff4ea3;">'test'</span>))
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'{:^10}'</span>.<span style="color: #d18aff;">format</span>(<span style="color: #ff4ea3;">'test'</span>))
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'{:_&lt;10}'</span>.<span style="color: #d18aff;">format</span>(<span style="color: #ff4ea3;">'test'</span>))
+</pre>
+</div>
+
+<pre class="example">
+      test
+test
+   test
+test______
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-7-1-2" class="outline-4">
+<h4 id="sec-7-1-2"><span class="section-number-4">7.1.2</span> 字符串截断</h4>
+<div class="outline-text-4" id="text-7-1-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'{:.5}'</span>.<span style="color: #d18aff;">format</span>(<span style="color: #ff4ea3;">'xylophone'</span>))
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'{:10.5}'</span>.<span style="color: #d18aff;">format</span>(<span style="color: #ff4ea3;">'xylophone'</span>))
+</pre>
+</div>
+
+<pre class="example">
+xylop
+xylop
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-7-1-3" class="outline-4">
+<h4 id="sec-7-1-3"><span class="section-number-4">7.1.3</span> 占位符</h4>
+<div class="outline-text-4" id="text-7-1-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">data</span> = {<span style="color: #ff4ea3;">'first'</span>: <span style="color: #ff4ea3;">'Hodor'</span>, <span style="color: #ff4ea3;">'last'</span>: <span style="color: #ff4ea3;">'Hodor!'</span>}
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'{first} {last}'</span>.<span style="color: #d18aff;">format</span>(**data))
+
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'{first} {last}'</span>.<span style="color: #d18aff;">format</span>(first=<span style="color: #ff4ea3;">'Hodor'</span>, last=<span style="color: #ff4ea3;">'Hodor!'</span>))
+</pre>
+</div>
+
+<pre class="example">
+Hodor Hodor!
+Hodor Hodor!
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">person</span> = {<span style="color: #ff4ea3;">'first'</span>: <span style="color: #ff4ea3;">'Jean-Luc'</span>, <span style="color: #ff4ea3;">'last'</span>: <span style="color: #ff4ea3;">'Picard'</span>}
+<span style="color: #ff8700;">data</span> = [4, 8, 15, 16, 23, 42]
+<span style="color: #a1db00;">class</span> <span style="color: #00d7af;">Plant</span>(<span style="color: #d18aff;">object</span>):
+    <span style="color: #ff8700;">category</span> = <span style="color: #ff4ea3;">'tree'</span>
+    <span style="color: #ff8700;">kinds</span> = [{<span style="color: #ff4ea3;">'name'</span>: <span style="color: #ff4ea3;">'oak'</span>}, {<span style="color: #ff4ea3;">'name'</span>: <span style="color: #ff4ea3;">'maple'</span>}]
+
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'{p[first]} {p[last]}'</span>.<span style="color: #d18aff;">format</span>(p=person))
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'{d[4]} {d[5]}'</span>.<span style="color: #d18aff;">format</span>(d=data))
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'{p.category}: {p.kinds[0][name]}'</span>.<span style="color: #d18aff;">format</span>(p=Plant()))
+</pre>
+</div>
+
+<pre class="example">
+Jean-Luc Picard
+23 42
+tree: oak
+</pre>
+</div>
+</div>
+
+
+
+<div id="outline-container-sec-7-1-4" class="outline-4">
+<h4 id="sec-7-1-4"><span class="section-number-4">7.1.4</span> 排版</h4>
+<div class="outline-text-4" id="text-7-1-4">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">import</span> textwrap
+
+<span style="color: #ff8700;">s</span> = <span style="color: #ff4ea3;">"Look into my eyes, look into my eyes, the eyes, the eyes, \</span>
+<span style="color: #ff4ea3;">the eyes, not around the eyes, don't look around the eyes, \</span>
+<span style="color: #ff4ea3;">look into my eyes, you're under."</span>
+
+<span style="color: #a1db00;">print</span>(textwrap.fill(s, 70))
+<span style="color: #a1db00;">print</span>()
+
+<span style="color: #a1db00;">print</span>(textwrap.fill(s, 40))
+<span style="color: #a1db00;">print</span>()
+
+<span style="color: #a1db00;">print</span>(textwrap.fill(s, 40, initial_indent=<span style="color: #ff4ea3;">'    '</span>))
+<span style="color: #a1db00;">print</span>()
+
+<span style="color: #a1db00;">print</span>(textwrap.fill(s, 40, subsequent_indent=<span style="color: #ff4ea3;">'    '</span>))
+<span style="color: #a1db00;">print</span>()
+</pre>
+</div>
+
+<pre class="example">
+Look into my eyes, look into my eyes, the eyes, the eyes, the eyes,
+not around the eyes, don't look around the eyes, look into my eyes,
+you're under.
+
+Look into my eyes, look into my eyes,
+the eyes, the eyes, the eyes, not around
+the eyes, don't look around the eyes,
+look into my eyes, you're under.
+
+    Look into my eyes, look into my
+eyes, the eyes, the eyes, the eyes, not
+around the eyes, don't look around the
+eyes, look into my eyes, you're under.
+
+Look into my eyes, look into my eyes,
+    the eyes, the eyes, the eyes, not
+    around the eyes, don't look around
+    the eyes, look into my eyes, you're
+    under.
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-2" class="outline-3">
+<h3 id="sec-7-2"><span class="section-number-3">7.2</span> 字符串匹配</h3>
+<div class="outline-text-3" id="text-7-2">
+</div><div id="outline-container-sec-7-2-1" class="outline-4">
+<h4 id="sec-7-2-1"><span class="section-number-4">7.2.1</span> 使用 shell 风格的通配符匹配字符串</h4>
+<div class="outline-text-4" id="text-7-2-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">from</span> fnmatch <span style="color: #a1db00;">import</span> fnmatchcase <span style="color: #a1db00;">as</span> match
+
+<span style="color: #ff8700;">addresses</span> = [
+    <span style="color: #ff4ea3;">'5412 N CLARK ST'</span>,
+    <span style="color: #ff4ea3;">'1060 W ADDISON ST'</span>,
+    <span style="color: #ff4ea3;">'1039 W GRANVILLE AVE'</span>,
+    <span style="color: #ff4ea3;">'2122 N CLARK ST'</span>,
+    <span style="color: #ff4ea3;">'4802 N BROADWAY'</span>,
+]
+
+<span style="color: #ff8700;">a</span> = [addr <span style="color: #a1db00;">for</span> addr <span style="color: #a1db00;">in</span> addresses <span style="color: #a1db00;">if</span> match(addr, <span style="color: #ff4ea3;">'* ST'</span>)]
+<span style="color: #a1db00;">print</span>(a)
+
+<span style="color: #ff8700;">b</span> = [addr <span style="color: #a1db00;">for</span> addr <span style="color: #a1db00;">in</span> addresses <span style="color: #a1db00;">if</span> match(addr, <span style="color: #ff4ea3;">'54[0-9][0-9] *CLARK*'</span>)]
+<span style="color: #a1db00;">print</span>(b)
+</pre>
+</div>
+
+<pre class="example">
+['5412 N CLARK ST', '1060 W ADDISON ST', '2122 N CLARK ST']
+['5412 N CLARK ST']
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-7-2-2" class="outline-4">
+<h4 id="sec-7-2-2"><span class="section-number-4">7.2.2</span> 贪婪和非贪婪匹配</h4>
+<div class="outline-text-4" id="text-7-2-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">import</span> re
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">Sample text</span>
+<span style="color: #ff8700;">text</span> = <span style="color: #ff4ea3;">'Computer says "no." Phone says "yes."'</span>
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">(a) Regex that finds quoted strings - longest match</span>
+<span style="color: #ff8700;">str_pat</span> = re.<span style="color: #d18aff;">compile</span>(r<span style="color: #ff4ea3;">'\"(.*)\"'</span>)
+<span style="color: #a1db00;">print</span>(str_pat.findall(text))
+
+<span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">(b) Regex that finds quoted strings - shortest match</span>
+<span style="color: #ff8700;">str_pat</span> = re.<span style="color: #d18aff;">compile</span>(r<span style="color: #ff4ea3;">'\"(.*?)\"'</span>)
+<span style="color: #a1db00;">print</span>(str_pat.findall(text))
+</pre>
+</div>
+
+<pre class="example">
+['no." Phone says "yes.']
+['no.', 'yes.']
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-7-3" class="outline-3">
+<h3 id="sec-7-3"><span class="section-number-3">7.3</span> 密码输入</h3>
+<div class="outline-text-3" id="text-7-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">import</span> getpass
+
+<span style="color: #ff8700;">user</span> = getpass.getuser()
+<span style="color: #ff8700;">passwd</span> = getpass.getpass()
+
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'User:'</span>, user)
+<span style="color: #a1db00;">print</span>(<span style="color: #ff4ea3;">'Passwd:'</span>, passwd)
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> 参考资料</h2>
+</div>
+</div>
+</body>
+</html>
