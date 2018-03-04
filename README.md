@@ -5,6 +5,7 @@
 - [语法](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/grammar.html)
 - [Numpy](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/numpy.html)
 - [Pandas](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/pandas.html)
+- [Openpyxl](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/openpyxl.html)
 
 ## Java
 

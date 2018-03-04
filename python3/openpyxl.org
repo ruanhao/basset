@@ -1,0 +1,244 @@
+#+TITLE:     OPENPYXL
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS:   h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+STARTUP:   showall
+#+TOC:       headlines 3
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
+ #+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+
+
+#+BEGIN_SRC ipython :session :exports none
+  #! /usr/bin/env python3
+  # -*- coding: utf-8 -*-
+
+
+  import pandas as pd
+  import numpy as np
+  import matplotlib.pyplot as plt
+  import subprocess
+  from PIL import Image
+
+  def run_script(script):
+      """Returns (stdout, stderr), raises error on non-zero return code"""
+      proc = subprocess.Popen(['bash', '-c', script],
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                              stdin=subprocess.PIPE)
+      stdout, stderr = proc.communicate()
+      if proc.returncode:
+          raise Exception('exit code %s' % proc.returncode)
+      return stdout, stderr
+
+  def show_dataframe(df):
+      global path
+      df.to_html("/tmp/df.html")
+      run_script('webkit2png -F --transparent /tmp/df.html -D /tmp -o df')
+      # try:
+      #     subprocess.call('webkit2png -F --transparent /tmp/df.html -D /tmp -o df', shell=True, timeout=5)
+      # except:
+      #     pass
+      image = Image.open('/tmp/df-full.png')
+      box = image.getbbox()
+      cropped = image.crop(box)
+      image.close()
+      w = cropped.size[0]
+      h = cropped.size[1]
+      ratio = 0.618
+      cropped.thumbnail((int(w*ratio), int(h*ratio)), Image.ANTIALIAS)
+      cropped.save(path)
+      cropped.close()
+
+  def plot():
+      global path
+      plt.savefig(path)
+      plt.clf()
+
+  def show_fig(o):
+      global path
+      plt.clf()
+      o.plot()
+      plt.savefig(path)
+
+
+  def log(title0, value):
+      title1 = ' ' + title0 + ' '
+      print("{}\n{}".format(title1.center(30, '='), value))
+#+END_SRC
+
+* 读取 Excel 文档
+
+** 示例文件
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df = pd.read_excel('data/example.xlsx', header=None)
+  df.columns = list('ABC')
+  df.index = df.index + 1
+  log("df", df)
+#+END_SRC
+
+
+** 打开文档
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  import openpyxl
+  wb = openpyxl.load_workbook('data/example.xlsx')
+  log("type(wb)", type(wb))
+#+END_SRC
+
+
+** 获取工作表
+
+*** 所有工作表名
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("wb.get_sheet_names()", wb.sheetnames)
+#+END_SRC
+
+
+*** 指定工作表
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  sheet = wb['Sheet3']
+  log("type(sheet)", type(sheet))
+  log("sheet.title", sheet.title)
+#+END_SRC
+
+
+*** 活动工作表
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  active_sheet = wb.active
+  log("active_sheet", active_sheet)
+#+END_SRC
+
+
+*** 确定表的大小
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("active_sheet.max_row", active_sheet.max_row)
+  log("active_sheet.max_column", active_sheet.max_column)
+
+#+END_SRC
+
+
+** 获取单元格
+
+*** 使用字符串坐标
+
+根据名字访问 *Cell* 对象：
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  cell_a1 = active_sheet['A1']
+  log("cell_a1", cell_a1)
+  log("cell_a1.value", cell_a1.value)
+  log("cell_a1.row", cell_a1.row)
+  log("cell_a1.column", cell_a1.column)
+  log("cell_a1.coordinate", cell_a1.coordinate)
+#+END_SRC
+
+
+*** 使用整数坐标
+
+*第一行或第一列索引是 1 不是 0*
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  c = active_sheet.cell(row=1, column=1)
+  log("c.value", c.value)
+#+END_SRC
+
+
+*** 列字母和数字之间的转换
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  from openpyxl.utils import get_column_letter, column_index_from_string
+  from openpyxl.utils import coordinate_from_string, column_index_from_string
+
+  log("get_column_letter(1)", get_column_letter(1))
+
+  xy = coordinate_from_string('A4') # returns ('A',4)
+  row = xy[1]
+  col = column_index_from_string(xy[0]) # returns 1
+  log("xy", xy)
+  log("row", row)
+  log("col", col)
+#+END_SRC
+
+
+** 获取行和列
+
+*** 获取列
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  col1 = tuple(active_sheet.columns)[1]
+  log("col1", col1)
+#+END_SRC
+
+
+
+*** 获取行
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  row1 = tuple(active_sheet.rows)[1]
+  log("row1", row1)
+#+END_SRC
+
+
+
+
+*** 获取矩形区域
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result = tuple(active_sheet['A1':'C3'])
+  log("result", result)
+#+END_SRC
+
+
+
+* 写入 Excel 文档
+
+** 创建并保存
+
+当修改 Workbook 对象或它的工作表和单元格时，电子表格文件不会保存，需要调用 =save()= 方法。
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  sheet = wb.active
+  sheet.title = 'Spam'
+  wb.save('/tmp/example_copy.xlsx')
+#+END_SRC
+
+
+** 创建和删除工作表
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  wb.create_sheet()
+  wb.create_sheet(index=0, title='First')
+  wb.create_sheet(index=2, title='Last')
+  log("wb.sheetnames", wb.sheetnames)
+  wb.remove(wb['Last'])
+  wb.save('/tmp/example_create_delete_sheet.xlsx')
+#+END_SRC
+
+
+** 写入单元格
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  sheet['A1'] = 'Hello world'
+  log("sheet['A1'].value", sheet['A1'].value)
+#+END_SRC
+
+
+** 公式
+
+公式以一个等号开始。
+
+#+BEGIN_SRC ipython
+  sheet['B9'] = '=SUM(B1:B8)'
+#+END_SRC

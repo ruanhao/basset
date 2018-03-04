@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>OPENPYXL</title>
+<!-- 2018-03-04 Sun 21:11 -->
+<meta  charset="utf-8">
+<meta  name="generator" content="Org-mode">
+<meta  name="author" content="Hao Ruan">
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+<link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">OPENPYXL</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 读取 Excel 文档</a>
+<ul>
+<li><a href="#sec-1-1">1.1. 示例文件</a></li>
+<li><a href="#sec-1-2">1.2. 打开文档</a></li>
+<li><a href="#sec-1-3">1.3. 获取工作表</a>
+<ul>
+<li><a href="#sec-1-3-1">1.3.1. 所有工作表名</a></li>
+<li><a href="#sec-1-3-2">1.3.2. 指定工作表</a></li>
+<li><a href="#sec-1-3-3">1.3.3. 活动工作表</a></li>
+<li><a href="#sec-1-3-4">1.3.4. 确定表的大小</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-4">1.4. 获取单元格</a>
+<ul>
+<li><a href="#sec-1-4-1">1.4.1. 使用字符串坐标</a></li>
+<li><a href="#sec-1-4-2">1.4.2. 使用整数坐标</a></li>
+<li><a href="#sec-1-4-3">1.4.3. 列字母和数字之间的转换</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-5">1.5. 获取行和列</a>
+<ul>
+<li><a href="#sec-1-5-1">1.5.1. 获取列</a></li>
+<li><a href="#sec-1-5-2">1.5.2. 获取行</a></li>
+<li><a href="#sec-1-5-3">1.5.3. 获取矩形区域</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. 写入 Excel 文档</a>
+<ul>
+<li><a href="#sec-2-1">2.1. 创建并保存</a></li>
+<li><a href="#sec-2-2">2.2. 创建和删除工作表</a></li>
+<li><a href="#sec-2-3">2.3. 写入单元格</a></li>
+<li><a href="#sec-2-4">2.4. 公式</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 读取 Excel 文档</a>
+<ul>
+<li><a href="#sec-1-1">1.1. 示例文件</a></li>
+<li><a href="#sec-1-2">1.2. 打开文档</a></li>
+<li><a href="#sec-1-3">1.3. 获取工作表</a>
+<ul>
+<li><a href="#sec-1-3-1">1.3.1. 所有工作表名</a></li>
+<li><a href="#sec-1-3-2">1.3.2. 指定工作表</a></li>
+<li><a href="#sec-1-3-3">1.3.3. 活动工作表</a></li>
+<li><a href="#sec-1-3-4">1.3.4. 确定表的大小</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-4">1.4. 获取单元格</a>
+<ul>
+<li><a href="#sec-1-4-1">1.4.1. 使用字符串坐标</a></li>
+<li><a href="#sec-1-4-2">1.4.2. 使用整数坐标</a></li>
+<li><a href="#sec-1-4-3">1.4.3. 列字母和数字之间的转换</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-5">1.5. 获取行和列</a>
+<ul>
+<li><a href="#sec-1-5-1">1.5.1. 获取列</a></li>
+<li><a href="#sec-1-5-2">1.5.2. 获取行</a></li>
+<li><a href="#sec-1-5-3">1.5.3. 获取矩形区域</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. 写入 Excel 文档</a>
+<ul>
+<li><a href="#sec-2-1">2.1. 创建并保存</a></li>
+<li><a href="#sec-2-2">2.2. 创建和删除工作表</a></li>
+<li><a href="#sec-2-3">2.3. 写入单元格</a></li>
+<li><a href="#sec-2-4">2.4. 公式</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="outline-2" id="meta">
+<table>
+
+
+<colgroup>
+<col  class="left">
+
+<col  class="left">
+</colgroup>
+<tbody>
+<tr>
+<td class="left">Author</td>
+<td class="left">Hao Ruan (haoru@cisco.com)</td>
+</tr>
+
+<tr>
+<td class="left">Date</td>
+<td class="left">2018-03-04 21:11:17</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> 读取 Excel 文档</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> 示例文件</h3>
+<div class="outline-text-3" id="text-1-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">df</span> = pd.read_excel(<span style="color: #ff4ea3;">'data/example.xlsx'</span>, header=<span style="color: #5fafd7;">None</span>)
+<span style="color: #ff8700;">df.columns</span> = <span style="color: #d18aff;">list</span>(<span style="color: #ff4ea3;">'ABC'</span>)
+<span style="color: #ff8700;">df.index</span> = df.index + 1
+log(<span style="color: #ff4ea3;">"df"</span>, df)
+</pre>
+</div>
+
+<pre class="example">
+============= df =============
+                    A             B    C
+1 2015-04-05 13:34:02        Apples   73
+2 2015-04-05 03:41:23      Cherries   85
+3 2015-04-06 12:46:51         Pears   14
+4 2015-04-08 08:59:43       Oranges   52
+5 2015-04-10 02:07:00        Apples  152
+6 2015-04-10 18:10:37       Bananas   23
+7 2015-04-10 02:40:46  Strawberries   98
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> 打开文档</h3>
+<div class="outline-text-3" id="text-1-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">import</span> openpyxl
+<span style="color: #ff8700;">wb</span> = openpyxl.load_workbook(<span style="color: #ff4ea3;">'data/example.xlsx'</span>)
+log(<span style="color: #ff4ea3;">"type(wb)"</span>, <span style="color: #d18aff;">type</span>(wb))
+</pre>
+</div>
+
+<pre class="example">
+========== type(wb) ==========
+&lt;class 'openpyxl.workbook.workbook.Workbook'&gt;
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> 获取工作表</h3>
+<div class="outline-text-3" id="text-1-3">
+</div><div id="outline-container-sec-1-3-1" class="outline-4">
+<h4 id="sec-1-3-1"><span class="section-number-4">1.3.1</span> 所有工作表名</h4>
+<div class="outline-text-4" id="text-1-3-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"wb.get_sheet_names()"</span>, wb.sheetnames)
+</pre>
+</div>
+
+<pre class="example">
+==== wb.get_sheet_names() ====
+['Sheet1', 'Sheet2', 'Sheet3']
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-3-2" class="outline-4">
+<h4 id="sec-1-3-2"><span class="section-number-4">1.3.2</span> 指定工作表</h4>
+<div class="outline-text-4" id="text-1-3-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">sheet</span> = wb[<span style="color: #ff4ea3;">'Sheet3'</span>]
+log(<span style="color: #ff4ea3;">"type(sheet)"</span>, <span style="color: #d18aff;">type</span>(sheet))
+log(<span style="color: #ff4ea3;">"sheet.title"</span>, sheet.title)
+</pre>
+</div>
+
+<pre class="example">
+======== type(sheet) =========
+&lt;class 'openpyxl.worksheet.worksheet.Worksheet'&gt;
+======== sheet.title =========
+Sheet3
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-3-3" class="outline-4">
+<h4 id="sec-1-3-3"><span class="section-number-4">1.3.3</span> 活动工作表</h4>
+<div class="outline-text-4" id="text-1-3-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">active_sheet</span> = wb.active
+log(<span style="color: #ff4ea3;">"active_sheet"</span>, active_sheet)
+</pre>
+</div>
+
+<pre class="example">
+======== active_sheet ========
+&lt;Worksheet "Sheet1"&gt;
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-3-4" class="outline-4">
+<h4 id="sec-1-3-4"><span class="section-number-4">1.3.4</span> 确定表的大小</h4>
+<div class="outline-text-4" id="text-1-3-4">
+<div class="org-src-container">
+
+<pre class="src src-ipython">log(<span style="color: #ff4ea3;">"active_sheet.max_row"</span>, active_sheet.max_row)
+log(<span style="color: #ff4ea3;">"active_sheet.max_column"</span>, active_sheet.max_column)
+</pre>
+</div>
+
+<pre class="example">
+==== active_sheet.max_row ====
+7
+== active_sheet.max_column ===
+3
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-4" class="outline-3">
+<h3 id="sec-1-4"><span class="section-number-3">1.4</span> 获取单元格</h3>
+<div class="outline-text-3" id="text-1-4">
+</div><div id="outline-container-sec-1-4-1" class="outline-4">
+<h4 id="sec-1-4-1"><span class="section-number-4">1.4.1</span> 使用字符串坐标</h4>
+<div class="outline-text-4" id="text-1-4-1">
+<p>
+根据名字访问 <b>Cell</b> 对象：
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">cell_a1</span> = active_sheet[<span style="color: #ff4ea3;">'A1'</span>]
+log(<span style="color: #ff4ea3;">"cell_a1"</span>, cell_a1)
+log(<span style="color: #ff4ea3;">"cell_a1.value"</span>, cell_a1.value)
+log(<span style="color: #ff4ea3;">"cell_a1.row"</span>, cell_a1.row)
+log(<span style="color: #ff4ea3;">"cell_a1.column"</span>, cell_a1.column)
+log(<span style="color: #ff4ea3;">"cell_a1.coordinate"</span>, cell_a1.coordinate)
+</pre>
+</div>
+
+<pre class="example">
+========== cell_a1 ===========
+&lt;Cell 'Sheet1'.A1&gt;
+======= cell_a1.value ========
+2015-04-05 13:34:02
+======== cell_a1.row =========
+1
+======= cell_a1.column =======
+A
+===== cell_a1.coordinate =====
+A1
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-4-2" class="outline-4">
+<h4 id="sec-1-4-2"><span class="section-number-4">1.4.2</span> 使用整数坐标</h4>
+<div class="outline-text-4" id="text-1-4-2">
+<p>
+<b>第一行或第一列索引是 1 不是 0</b>
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">c</span> = active_sheet.cell(row=1, column=1)
+log(<span style="color: #ff4ea3;">"c.value"</span>, c.value)
+</pre>
+</div>
+
+<pre class="example">
+========== c.value ===========
+2015-04-05 13:34:02
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-4-3" class="outline-4">
+<h4 id="sec-1-4-3"><span class="section-number-4">1.4.3</span> 列字母和数字之间的转换</h4>
+<div class="outline-text-4" id="text-1-4-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #a1db00;">from</span> openpyxl.utils <span style="color: #a1db00;">import</span> get_column_letter, column_index_from_string
+<span style="color: #a1db00;">from</span> openpyxl.utils <span style="color: #a1db00;">import</span> coordinate_from_string, column_index_from_string
+
+log(<span style="color: #ff4ea3;">"get_column_letter(1)"</span>, get_column_letter(1))
+
+<span style="color: #ff8700;">xy</span> = coordinate_from_string(<span style="color: #ff4ea3;">'A4'</span>) <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">returns ('A',4)</span>
+<span style="color: #ff8700;">row</span> = xy[1]
+<span style="color: #ff8700;">col</span> = column_index_from_string(xy[0]) <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">returns 1</span>
+log(<span style="color: #ff4ea3;">"xy"</span>, xy)
+log(<span style="color: #ff4ea3;">"row"</span>, row)
+log(<span style="color: #ff4ea3;">"col"</span>, col)
+</pre>
+</div>
+
+<pre class="example">
+==== get_column_letter(1) ====
+A
+============= xy =============
+('A', 4)
+============ row =============
+4
+============ col =============
+1
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-5" class="outline-3">
+<h3 id="sec-1-5"><span class="section-number-3">1.5</span> 获取行和列</h3>
+<div class="outline-text-3" id="text-1-5">
+</div><div id="outline-container-sec-1-5-1" class="outline-4">
+<h4 id="sec-1-5-1"><span class="section-number-4">1.5.1</span> 获取列</h4>
+<div class="outline-text-4" id="text-1-5-1">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">col1</span> = <span style="color: #d18aff;">tuple</span>(active_sheet.columns)[1]
+log(<span style="color: #ff4ea3;">"col1"</span>, col1)
+</pre>
+</div>
+
+<pre class="example">
+============ col1 ============
+(&lt;Cell 'Sheet1'.B1&gt;, &lt;Cell 'Sheet1'.B2&gt;, &lt;Cell 'Sheet1'.B3&gt;, &lt;Cell 'Sheet1'.B4&gt;, &lt;Cell 'Sheet1'.B5&gt;, &lt;Cell 'Sheet1'.B6&gt;, &lt;Cell 'Sheet1'.B7&gt;)
+</pre>
+</div>
+</div>
+
+
+
+<div id="outline-container-sec-1-5-2" class="outline-4">
+<h4 id="sec-1-5-2"><span class="section-number-4">1.5.2</span> 获取行</h4>
+<div class="outline-text-4" id="text-1-5-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">row1</span> = <span style="color: #d18aff;">tuple</span>(active_sheet.rows)[1]
+log(<span style="color: #ff4ea3;">"row1"</span>, row1)
+</pre>
+</div>
+
+<pre class="example">
+============ row1 ============
+(&lt;Cell 'Sheet1'.A2&gt;, &lt;Cell 'Sheet1'.B2&gt;, &lt;Cell 'Sheet1'.C2&gt;)
+</pre>
+</div>
+</div>
+
+
+
+
+<div id="outline-container-sec-1-5-3" class="outline-4">
+<h4 id="sec-1-5-3"><span class="section-number-4">1.5.3</span> 获取矩形区域</h4>
+<div class="outline-text-4" id="text-1-5-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">result</span> = <span style="color: #d18aff;">tuple</span>(active_sheet[<span style="color: #ff4ea3;">'A1'</span>:<span style="color: #ff4ea3;">'C3'</span>])
+log(<span style="color: #ff4ea3;">"result"</span>, result)
+</pre>
+</div>
+
+<pre class="example">
+=========== result ===========
+((&lt;Cell 'Sheet1'.A1&gt;, &lt;Cell 'Sheet1'.B1&gt;, &lt;Cell 'Sheet1'.C1&gt;), (&lt;Cell 'Sheet1'.A2&gt;, &lt;Cell 'Sheet1'.B2&gt;, &lt;Cell 'Sheet1'.C2&gt;), (&lt;Cell 'Sheet1'.A3&gt;, &lt;Cell 'Sheet1'.B3&gt;, &lt;Cell 'Sheet1'.C3&gt;))
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> 写入 Excel 文档</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> 创建并保存</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+当修改 Workbook 对象或它的工作表和单元格时，电子表格文件不会保存，需要调用 <code>save()</code> 方法。
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">sheet</span> = wb.active
+<span style="color: #ff8700;">sheet.title</span> = <span style="color: #ff4ea3;">'Spam'</span>
+wb.save(<span style="color: #ff4ea3;">'/tmp/example_copy.xlsx'</span>)
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> 创建和删除工作表</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+
+<pre class="src src-ipython">wb.create_sheet()
+wb.create_sheet(index=0, title=<span style="color: #ff4ea3;">'First'</span>)
+wb.create_sheet(index=2, title=<span style="color: #ff4ea3;">'Last'</span>)
+log(<span style="color: #ff4ea3;">"wb.sheetnames"</span>, wb.sheetnames)
+wb.remove(wb[<span style="color: #ff4ea3;">'Last'</span>])
+wb.save(<span style="color: #ff4ea3;">'/tmp/example_create_delete_sheet.xlsx'</span>)
+</pre>
+</div>
+
+<pre class="example">
+======= wb.sheetnames ========
+['First', 'Spam', 'Last', 'Sheet2', 'Sheet3', 'Sheet']
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> 写入单元格</h3>
+<div class="outline-text-3" id="text-2-3">
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">sheet</span>[<span style="color: #ff4ea3;">'A1'</span>] = <span style="color: #ff4ea3;">'Hello world'</span>
+log(<span style="color: #ff4ea3;">"sheet['A1'].value"</span>, sheet[<span style="color: #ff4ea3;">'A1'</span>].value)
+</pre>
+</div>
+
+<pre class="example">
+===== sheet['A1'].value ======
+Hello world
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> 公式</h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
+公式以一个等号开始。
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ipython"><span style="color: #ff8700;">sheet</span>[<span style="color: #ff4ea3;">'B9'</span>] = <span style="color: #ff4ea3;">'=SUM(B1:B8)'</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
