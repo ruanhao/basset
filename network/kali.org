@@ -1,0 +1,172 @@
+#+TITLE:     KALI
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS:   h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+STARTUP:   showall
+#+TOC:       headlines 3
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
+ #+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+
+
+* Cracking WiFi
+
+** 无线网卡模式切换
+
+无线网卡默认为 =Managed= 模式，需要切换到 =Monitor= 模式
+
+*** 方式一 (airmon-ng)
+
+
+#+BEGIN_SRC sh
+  airmon-ng check kill
+  airmon-ng                       # 列出接口
+  airmon-ng start wlan0
+
+  airmon-ng stop wlan0mon         # 切换回 Managed 模式
+#+END_SRC
+
+*** 方式二 (ifconfig)
+
+#+BEGIN_SRC sh
+  ifconfig wlan0 down
+  ifconfig wlan0 mode monitor
+  ifconfig wlan0 up
+#+END_SRC
+
+
+
+
+
+** 抓包
+
+*** 查看所有信道信息
+
+#+BEGIN_SRC sh
+  airodump-ng wlan0mon
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  BSSID              PWR  Beacons    #Data, #/s  CH  MB   ENC  CIPHER AUTH ESSID
+  28:2C:B2:0C:DE:98  -60      568      763    0   1  54e. WPA2 CCMP   PSK  ChinaNationalSpyAgency(Chonggu)
+  A0:91:C8:B9:72:10  -64      570       19    0   5  54e  WPA2 CCMP   PSK  CMCC-d6PS
+  B8:F8:83:EA:3F:41  -67      433       18    0   1  54e  WPA2 CCMP   PSK  didi
+  C8:94:BB:3F:F6:A0  -74      331       41    0   6  54e  WPA2 CCMP   PSK  ljp
+  BC:D1:77:D4:E0:04  -81      169      134    0   1  54e. WPA2 CCMP   PSK  TP-LINK_702
+  1C:FA:68:0E:01:F6  -82      206      415    0  11  54e. WPA2 CCMP   PSK  huanghui
+  A0:A3:3B:DB:5F:24  -83      201        0    0   7  54e  WPA2 CCMP   PSK  CU_Q69E
+  04:EC:BB:67:82:77  -83      184        0    0  12  54e  WPA2 CCMP   PSK  CMCC-urjS
+  5C:63:BF:A7:92:9E  -86      148       15    0   1  54e. WPA2 CCMP   PSK  DUSCHY
+#+END_EXAMPLE
+
+
+*** 查看指定信道信息
+
+#+BEGIN_SRC sh
+  airodump-ng --channel [channel] --bssid [bssid] [interface]
+#+END_SRC
+
+
+*** 保存数据包
+
+#+BEGIN_SRC sh
+  airodump-ng --channel [channel] --bssid [bssid] --write [file-name] [interface]
+#+END_SRC
+
+
+** DEAUTHENTICATION
+
+*** 针对 AP 下的所有客户端
+
+#+BEGIN_SRC sh
+   aireplay-ng --deauth [number of packets] -a [AP] [INTERFACE]
+#+END_SRC
+
+
+*** 针对 AP 下的某个客户端
+
+#+BEGIN_SRC sh
+   aireplay-ng --deauth [number of deauth packets] -a [AP] -c [target] [interface]
+#+END_SRC
+
+
+
+
+** 字典文件获取
+
+*** crunch
+
+#+BEGIN_SRC sh
+  crunch <min-length> <max-length> [characters] [-t <pattern>] -o <file>
+#+END_SRC
+
+
+*** 字典下载链接
+
+- [[ftp://ftp.openwall.com/pub/wordlists/]]
+- [[http://www.openwall.com/mirrors/]]
+- [[http://gdataonline.com/downloads/GDict/]]
+- [[http://www.outpost9.com/files/WordLists.html]]
+- [[http://www.vulnerabilityassessment.co.uk/passwords.htm]]
+- [[http://packetstormsecurity.org/Crackers/wordlists/]]
+- [[http://www.ai.uga.edu/ftplib/natural-language/moby/]]
+- [[http://www.cotse.com/tools/wordlists1.htm]]
+- [[http://www.cotse.com/tools/wordlists2.htm]]
+- [[http://wordlist.sourceforge.net/]]
+
+
+** 计算
+
+*** 原理
+
+使用 =pbkdf2= 算法将字典中每一个密码与 AP 名字 (essid) 进行计算得到 =Pairwise Master Key= (PMK) ，
+并将该 PMK 与握手文件中的值进行比较。
+
+*** 直接计算
+
+#+BEGIN_SRC sh
+  aircrack <handshake-file> -w <wordlist>
+#+END_SRC
+
+
+*** 使用 airolib-ng 计算
+
+**** 创建数据库并导入字典
+
+#+BEGIN_SRC sh
+  airolib-ng <db-name> --import passwd <wordlist>
+#+END_SRC
+
+**** 导入 ESSID
+
+#+BEGIN_SRC sh
+  airolib-ng <db-name> --import essid <essid-file>
+#+END_SRC
+
+
+**** 计算 PMK
+
+#+BEGIN_SRC sh
+  airolib-ng <db-name> --batch
+#+END_SRC
+
+
+**** 使用数据库中的数据进行破解
+
+#+BEGIN_SRC sh
+  aircrack-ng -r <db-name> <handshake-file>
+#+END_SRC
+
+
+
+* 常用链接
+
+  - [[https://www.offensive-security.com/kali-linux-vm-vmware-virtualbox-hyperv-image-download/][Kali 虚拟镜像下载]]
+
+  - [[https://www.virtualbox.org/wiki/Downloads][VirtualBox 扩展包下载]]

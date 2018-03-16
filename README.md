@@ -2,14 +2,14 @@
 
 ## Python
 
-- [语法](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/grammar.html)
+- [知识点](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/grammar.html)
 - [Numpy](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/numpy.html)
 - [Pandas](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/pandas.html)
 - [Openpyxl](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/openpyxl.html)
 
 ## Java
 
-- [语法](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/java/grammar.html)
+- [知识点](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/java/grammar.html)
 - [SpringBoot](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/java/springboot.html)
 
 ## 中间件
@@ -48,3 +48,8 @@
 - [tshark](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/tshark.html)
 - [uniq](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/uniq.html)
 - [xargs](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/cli/xargs.html)
+
+
+## 网络
+
+- [KALI](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/network/kali.html)

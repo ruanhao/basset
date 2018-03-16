@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>KALI</title>
+<!-- 2018-03-16 Fri 10:44 -->
+<meta  charset="utf-8">
+<meta  name="generator" content="Org-mode">
+<meta  name="author" content="Hao Ruan">
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+<link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">KALI</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Cracking WiFi</a>
+<ul>
+<li><a href="#sec-1-1">1.1. 无线网卡模式切换</a>
+<ul>
+<li><a href="#sec-1-1-1">1.1.1. 方式一 (airmon-ng)</a></li>
+<li><a href="#sec-1-1-2">1.1.2. 方式二 (ifconfig)</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2">1.2. 抓包</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. 查看所有信道信息</a></li>
+<li><a href="#sec-1-2-2">1.2.2. 查看指定信道信息</a></li>
+<li><a href="#sec-1-2-3">1.2.3. 保存数据包</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-3">1.3. DEAUTHENTICATION</a>
+<ul>
+<li><a href="#sec-1-3-1">1.3.1. 针对 AP 下的所有客户端</a></li>
+<li><a href="#sec-1-3-2">1.3.2. 针对 AP 下的某个客户端</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-4">1.4. 字典文件获取</a>
+<ul>
+<li><a href="#sec-1-4-1">1.4.1. crunch</a></li>
+<li><a href="#sec-1-4-2">1.4.2. 字典下载链接</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-5">1.5. 计算</a>
+<ul>
+<li><a href="#sec-1-5-1">1.5.1. 原理</a></li>
+<li><a href="#sec-1-5-2">1.5.2. 直接计算</a></li>
+<li><a href="#sec-1-5-3">1.5.3. 使用 airolib-ng 计算</a>
+<ul>
+<li><a href="#sec-1-5-3-1">1.5.3.1. 创建数据库并导入字典</a></li>
+<li><a href="#sec-1-5-3-2">1.5.3.2. 导入 ESSID</a></li>
+<li><a href="#sec-1-5-3-3">1.5.3.3. 计算 PMK</a></li>
+<li><a href="#sec-1-5-3-4">1.5.3.4. 使用数据库中的数据进行破解</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. 常用链接</a></li>
+</ul>
+</div>
+</div>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Cracking WiFi</a>
+<ul>
+<li><a href="#sec-1-1">1.1. 无线网卡模式切换</a>
+<ul>
+<li><a href="#sec-1-1-1">1.1.1. 方式一 (airmon-ng)</a></li>
+<li><a href="#sec-1-1-2">1.1.2. 方式二 (ifconfig)</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2">1.2. 抓包</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. 查看所有信道信息</a></li>
+<li><a href="#sec-1-2-2">1.2.2. 查看指定信道信息</a></li>
+<li><a href="#sec-1-2-3">1.2.3. 保存数据包</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-3">1.3. DEAUTHENTICATION</a>
+<ul>
+<li><a href="#sec-1-3-1">1.3.1. 针对 AP 下的所有客户端</a></li>
+<li><a href="#sec-1-3-2">1.3.2. 针对 AP 下的某个客户端</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-4">1.4. 字典文件获取</a>
+<ul>
+<li><a href="#sec-1-4-1">1.4.1. crunch</a></li>
+<li><a href="#sec-1-4-2">1.4.2. 字典下载链接</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-5">1.5. 计算</a>
+<ul>
+<li><a href="#sec-1-5-1">1.5.1. 原理</a></li>
+<li><a href="#sec-1-5-2">1.5.2. 直接计算</a></li>
+<li><a href="#sec-1-5-3">1.5.3. 使用 airolib-ng 计算</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. 常用链接</a></li>
+</ul>
+</div>
+</div>
+<div class="outline-2" id="meta">
+<table>
+
+
+<colgroup>
+<col  class="left">
+
+<col  class="left">
+</colgroup>
+<tbody>
+<tr>
+<td class="left">Author</td>
+<td class="left">Hao Ruan (haoru@cisco.com)</td>
+</tr>
+
+<tr>
+<td class="left">Date</td>
+<td class="left">2018-03-16 10:44:02</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Cracking WiFi</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> 无线网卡模式切换</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+无线网卡默认为 <code>Managed</code> 模式，需要切换到 <code>Monitor</code> 模式
+</p>
+</div>
+
+<div id="outline-container-sec-1-1-1" class="outline-4">
+<h4 id="sec-1-1-1"><span class="section-number-4">1.1.1</span> 方式一 (airmon-ng)</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">airmon-ng check kill
+airmon-ng                       <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">&#21015;&#20986;&#25509;&#21475;</span>
+airmon-ng start wlan0
+
+airmon-ng stop wlan0mon         <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">&#20999;&#25442;&#22238; Managed &#27169;&#24335;</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1-2" class="outline-4">
+<h4 id="sec-1-1-2"><span class="section-number-4">1.1.2</span> 方式二 (ifconfig)</h4>
+<div class="outline-text-4" id="text-1-1-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">ifconfig wlan0 down
+ifconfig wlan0 mode monitor
+ifconfig wlan0 up
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> 抓包</h3>
+<div class="outline-text-3" id="text-1-2">
+</div><div id="outline-container-sec-1-2-1" class="outline-4">
+<h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> 查看所有信道信息</h4>
+<div class="outline-text-4" id="text-1-2-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">airodump-ng wlan0mon
+</pre>
+</div>
+
+<pre class="example">
+BSSID              PWR  Beacons    #Data, #/s  CH  MB   ENC  CIPHER AUTH ESSID
+28:2C:B2:0C:DE:98  -60      568      763    0   1  54e. WPA2 CCMP   PSK  ChinaNationalSpyAgency(Chonggu)
+A0:91:C8:B9:72:10  -64      570       19    0   5  54e  WPA2 CCMP   PSK  CMCC-d6PS
+B8:F8:83:EA:3F:41  -67      433       18    0   1  54e  WPA2 CCMP   PSK  didi
+C8:94:BB:3F:F6:A0  -74      331       41    0   6  54e  WPA2 CCMP   PSK  ljp
+BC:D1:77:D4:E0:04  -81      169      134    0   1  54e. WPA2 CCMP   PSK  TP-LINK_702
+1C:FA:68:0E:01:F6  -82      206      415    0  11  54e. WPA2 CCMP   PSK  huanghui
+A0:A3:3B:DB:5F:24  -83      201        0    0   7  54e  WPA2 CCMP   PSK  CU_Q69E
+04:EC:BB:67:82:77  -83      184        0    0  12  54e  WPA2 CCMP   PSK  CMCC-urjS
+5C:63:BF:A7:92:9E  -86      148       15    0   1  54e. WPA2 CCMP   PSK  DUSCHY
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2-2" class="outline-4">
+<h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> 查看指定信道信息</h4>
+<div class="outline-text-4" id="text-1-2-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">airodump-ng --channel [channel] --bssid [bssid] [interface]
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2-3" class="outline-4">
+<h4 id="sec-1-2-3"><span class="section-number-4">1.2.3</span> 保存数据包</h4>
+<div class="outline-text-4" id="text-1-2-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">airodump-ng --channel [channel] --bssid [bssid] --write [file-name] [interface]
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> DEAUTHENTICATION</h3>
+<div class="outline-text-3" id="text-1-3">
+</div><div id="outline-container-sec-1-3-1" class="outline-4">
+<h4 id="sec-1-3-1"><span class="section-number-4">1.3.1</span> 针对 AP 下的所有客户端</h4>
+<div class="outline-text-4" id="text-1-3-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">aireplay-ng --deauth [number of packets] -a [AP] [INTERFACE]
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-3-2" class="outline-4">
+<h4 id="sec-1-3-2"><span class="section-number-4">1.3.2</span> 针对 AP 下的某个客户端</h4>
+<div class="outline-text-4" id="text-1-3-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">aireplay-ng --deauth [number of deauth packets] -a [AP] -c [target] [interface]
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+<div id="outline-container-sec-1-4" class="outline-3">
+<h3 id="sec-1-4"><span class="section-number-3">1.4</span> 字典文件获取</h3>
+<div class="outline-text-3" id="text-1-4">
+</div><div id="outline-container-sec-1-4-1" class="outline-4">
+<h4 id="sec-1-4-1"><span class="section-number-4">1.4.1</span> crunch</h4>
+<div class="outline-text-4" id="text-1-4-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">crunch &lt;min-length&gt; &lt;max-length&gt; [characters] [-t &lt;pattern&gt;] -o &lt;file&gt;
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-4-2" class="outline-4">
+<h4 id="sec-1-4-2"><span class="section-number-4">1.4.2</span> 字典下载链接</h4>
+<div class="outline-text-4" id="text-1-4-2">
+<ul class="org-ul">
+<li><a href="ftp://ftp.openwall.com/pub/wordlists/">ftp://ftp.openwall.com/pub/wordlists/</a>
+</li>
+<li><a href="http://www.openwall.com/mirrors/">http://www.openwall.com/mirrors/</a>
+</li>
+<li><a href="http://gdataonline.com/downloads/GDict/">http://gdataonline.com/downloads/GDict/</a>
+</li>
+<li><a href="http://www.outpost9.com/files/WordLists.html">http://www.outpost9.com/files/WordLists.html</a>
+</li>
+<li><a href="http://www.vulnerabilityassessment.co.uk/passwords.htm">http://www.vulnerabilityassessment.co.uk/passwords.htm</a>
+</li>
+<li><a href="http://packetstormsecurity.org/Crackers/wordlists/">http://packetstormsecurity.org/Crackers/wordlists/</a>
+</li>
+<li><a href="http://www.ai.uga.edu/ftplib/natural-language/moby/">http://www.ai.uga.edu/ftplib/natural-language/moby/</a>
+</li>
+<li><a href="http://www.cotse.com/tools/wordlists1.htm">http://www.cotse.com/tools/wordlists1.htm</a>
+</li>
+<li><a href="http://www.cotse.com/tools/wordlists2.htm">http://www.cotse.com/tools/wordlists2.htm</a>
+</li>
+<li><a href="http://wordlist.sourceforge.net/">http://wordlist.sourceforge.net/</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-5" class="outline-3">
+<h3 id="sec-1-5"><span class="section-number-3">1.5</span> 计算</h3>
+<div class="outline-text-3" id="text-1-5">
+</div><div id="outline-container-sec-1-5-1" class="outline-4">
+<h4 id="sec-1-5-1"><span class="section-number-4">1.5.1</span> 原理</h4>
+<div class="outline-text-4" id="text-1-5-1">
+<p>
+使用 <code>pbkdf2</code> 算法将字典中每一个密码与 AP 名字 (essid) 进行计算得到 <code>Pairwise Master Key</code> (PMK) ，
+并将该 PMK 与握手文件中的值进行比较。
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-5-2" class="outline-4">
+<h4 id="sec-1-5-2"><span class="section-number-4">1.5.2</span> 直接计算</h4>
+<div class="outline-text-4" id="text-1-5-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">aircrack &lt;handshake-file&gt; -w &lt;wordlist&gt;
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-5-3" class="outline-4">
+<h4 id="sec-1-5-3"><span class="section-number-4">1.5.3</span> 使用 airolib-ng 计算</h4>
+<div class="outline-text-4" id="text-1-5-3">
+</div><div id="outline-container-sec-1-5-3-1" class="outline-5">
+<h5 id="sec-1-5-3-1"><span class="section-number-5">1.5.3.1</span> 创建数据库并导入字典</h5>
+<div class="outline-text-5" id="text-1-5-3-1">
+<div class="org-src-container">
+
+<pre class="src src-sh">airolib-ng &lt;db-name&gt; --import passwd &lt;wordlist&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-5-3-2" class="outline-5">
+<h5 id="sec-1-5-3-2"><span class="section-number-5">1.5.3.2</span> 导入 ESSID</h5>
+<div class="outline-text-5" id="text-1-5-3-2">
+<div class="org-src-container">
+
+<pre class="src src-sh">airolib-ng &lt;db-name&gt; --import essid &lt;essid-file&gt;
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-5-3-3" class="outline-5">
+<h5 id="sec-1-5-3-3"><span class="section-number-5">1.5.3.3</span> 计算 PMK</h5>
+<div class="outline-text-5" id="text-1-5-3-3">
+<div class="org-src-container">
+
+<pre class="src src-sh">airolib-ng &lt;db-name&gt; --batch
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-5-3-4" class="outline-5">
+<h5 id="sec-1-5-3-4"><span class="section-number-5">1.5.3.4</span> 使用数据库中的数据进行破解</h5>
+<div class="outline-text-5" id="text-1-5-3-4">
+<div class="org-src-container">
+
+<pre class="src src-sh">aircrack-ng -r &lt;db-name&gt; &lt;handshake-file&gt;
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> 常用链接</h2>
+<div class="outline-text-2" id="text-2">
+<ul class="org-ul">
+<li><a href="https://www.offensive-security.com/kali-linux-vm-vmware-virtualbox-hyperv-image-download/">Kali 虚拟镜像下载</a>
+</li>
+
+<li><a href="https://www.virtualbox.org/wiki/Downloads">VirtualBox 扩展包下载</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</body>
+</html>
