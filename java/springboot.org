@@ -7,15 +7,170 @@
 #+TOC:       headlines 4
 #+HTML_DOCTYPE: <!DOCTYPE html>
 #+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
-#+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
 #+HTML: <div class="outline-2" id="meta">
 | Author   | {{{author}}} ({{{email}}})    |
 | Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
 #+HTML: </div>
 
-* 原理概念
+* 工具
 
-* 常用实践
+** JacksonXML
+
+*** 示例数据
+
+#+BEGIN_SRC xml
+  <root k6="6">
+      <k1>str</k1>
+      <k-2>2</k-2>
+      <k3>
+          <ki>1</ki>
+          <ki>2</ki>
+      </k3>
+      <k5>5-1</k5>
+      <k5>5-2</k5>
+      <k9><![CDATA[中<a>文]]></k9>
+  </root>
+#+END_SRC
+
+
+*** pom 配置
+
+#+BEGIN_SRC xml
+  <dependency>
+    <groupId>com.fasterxml.jackson.dataformat</groupId>
+    <artifactId>jackson-dataformat-xml</artifactId>
+  </dependency>
+#+END_SRC
+
+
+*** DTO
+
+#+BEGIN_SRC java
+  import java.util.*;
+  import com.fasterxml.jackson.dataformat.xml.annotation.*;
+  import lombok.Data;
+
+
+  @Data
+  @JacksonXmlRootElement(localName="root")
+  public class RootXml {
+
+      private String k1;
+
+      @JacksonXmlProperty(localName="k-2")
+      private Integer k2;
+
+      @JacksonXmlProperty(localName="k3")
+      @JacksonXmlElementWrapper(useWrapping=true)
+      private Collection<String> kis;
+
+      @JacksonXmlElementWrapper(useWrapping=false)
+      private Collection<String> k5;
+
+      @JacksonXmlProperty(isAttribute=true)
+      private Integer k6;
+
+      @JacksonXmlCData(value=true) // 序列化时是否总是使用 CDATA 块
+      private String k9;
+  }
+#+END_SRC
+
+*** Controller
+
+#+BEGIN_SRC java
+  @PostMapping(path="/xml", consumes=MediaType.APPLICATION_XML_VALUE)
+  public void test(@RequestBody RootXml xml) {
+
+  }
+#+END_SRC
+
+
+
+
+** MapStruct
+
+*** pom 配置
+
+**** properties
+
+#+BEGIN_SRC xml
+  <properties>
+    <org.mapstruct.version>1.2.0.Final</org.mapstruct.version>
+  </properties>
+#+END_SRC
+
+**** dependency
+
+#+BEGIN_SRC xml
+  <!-- 针对 swagger 的 workaround -->
+  <dependency>
+    <groupId>io.springfox</groupId>
+    <artifactId>springfox-swagger2</artifactId>
+    <exclusions>
+      <exclusion>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct</artifactId>
+      </exclusion>
+    </exclusions>
+  </dependency>
+
+  <dependency>
+    <groupId>org.mapstruct</groupId>
+    <artifactId>mapstruct-jdk8</artifactId> <!-- use mapstruct-jdk8 for Java 8 or higher -->
+    <version>${org.mapstruct.version}</version>
+  </dependency>
+
+  <dependency>
+    <groupId>org.mapstruct</groupId>
+    <artifactId>mapstruct-processor</artifactId>
+    <version>${org.mapstruct.version}</version>
+    <scope>provided</scope>
+  </dependency>
+#+END_SRC
+
+**** plugin
+
+#+BEGIN_SRC xml
+  <!-- 兼容 lombok -->
+  <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-compiler-plugin</artifactId>
+  </plugin>
+#+END_SRC
+
+
+*** Mapper 接口
+
+#+BEGIN_SRC java
+  @Mapper(unmappedTargetPolicy=ReportingPolicy.IGNORE)
+  public interface ClassAMapper {
+
+      ClassAMapper MAPPER = Mappers.getMapper( ClassAMapper.class );
+
+      @Mappings({
+              @Mapping(source="id", target="ID"),
+              @Mapping(source="name", target="NAME")
+      })
+      ClassA from(ClassB obj);
+
+      default ClassA from(ClassC obj) {
+          // Custmization
+      }
+  }
+#+END_SRC
+
+*** 调用
+
+#+BEGIN_SRC java
+  ClassB objB = new ClassB();
+  ClassC objC = new ClassC();
+  ClassA.MAPPER.from(objB);
+  ClassA.MAPPER.from(objC);
+#+END_SRC
+
+
+* 实践
 
 ** [[https://github.com/ruanhao/show-me-the-code/tree/springboot-restful-service][Restful Service (MVC)]]
 

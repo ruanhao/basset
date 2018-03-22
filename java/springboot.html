@@ -2,7 +2,7 @@
 <html>
 <head>
 <title>SpingBoot</title>
-<!-- 2018-02-16 Fri 10:31 -->
+<!-- 2018-03-22 Thu 18:59 -->
 <meta  charset="utf-8">
 <meta  name="generator" content="Org-mode">
 <meta  name="author" content="Hao Ruan">
@@ -87,7 +87,7 @@
   /*]]>*/-->
 </style>
 <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
-<link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+<link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -142,8 +142,32 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. 原理概念</a></li>
-<li><a href="#sec-2">2. 常用实践</a>
+<li><a href="#sec-1">1. 工具</a>
+<ul>
+<li><a href="#sec-1-1">1.1. JacksonXML</a>
+<ul>
+<li><a href="#sec-1-1-1">1.1.1. 示例数据</a></li>
+<li><a href="#sec-1-1-2">1.1.2. pom 配置</a></li>
+<li><a href="#sec-1-1-3">1.1.3. DTO</a></li>
+<li><a href="#sec-1-1-4">1.1.4. Controller</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2">1.2. MapStruct</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. pom 配置</a>
+<ul>
+<li><a href="#sec-1-2-1-1">1.2.1.1. properties</a></li>
+<li><a href="#sec-1-2-1-2">1.2.1.2. dependency</a></li>
+<li><a href="#sec-1-2-1-3">1.2.1.3. plugin</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2-2">1.2.2. Mapper 接口</a></li>
+<li><a href="#sec-1-2-3">1.2.3. 调用</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. 实践</a>
 <ul>
 <li><a href="#sec-2-1">2.1. Restful Service (MVC)</a>
 <ul>
@@ -215,8 +239,32 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. 原理概念</a></li>
-<li><a href="#sec-2">2. 常用实践</a>
+<li><a href="#sec-1">1. 工具</a>
+<ul>
+<li><a href="#sec-1-1">1.1. JacksonXML</a>
+<ul>
+<li><a href="#sec-1-1-1">1.1.1. 示例数据</a></li>
+<li><a href="#sec-1-1-2">1.1.2. pom 配置</a></li>
+<li><a href="#sec-1-1-3">1.1.3. DTO</a></li>
+<li><a href="#sec-1-1-4">1.1.4. Controller</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2">1.2. MapStruct</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. pom 配置</a>
+<ul>
+<li><a href="#sec-1-2-1-1">1.2.1.1. properties</a></li>
+<li><a href="#sec-1-2-1-2">1.2.1.2. dependency</a></li>
+<li><a href="#sec-1-2-1-3">1.2.1.3. plugin</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2-2">1.2.2. Mapper 接口</a></li>
+<li><a href="#sec-1-2-3">1.2.3. 调用</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. 实践</a>
 <ul>
 <li><a href="#sec-2-1">2.1. Restful Service (MVC)</a>
 <ul>
@@ -297,18 +345,224 @@ for the JavaScript code in this tag.
 
 <tr>
 <td class="left">Date</td>
-<td class="left">2018-02-16 10:31:47</td>
+<td class="left">2018-03-22 18:59:05</td>
 </tr>
 </tbody>
 </table>
 </div>
 
 <div id="outline-container-sec-1" class="outline-2">
-<h2 id="sec-1"><span class="section-number-2">1</span> 原理概念</h2>
+<h2 id="sec-1"><span class="section-number-2">1</span> 工具</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> JacksonXML</h3>
+<div class="outline-text-3" id="text-1-1">
+</div><div id="outline-container-sec-1-1-1" class="outline-4">
+<h4 id="sec-1-1-1"><span class="section-number-4">1.1.1</span> 示例数据</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<div class="org-src-container">
+
+<pre class="src src-xml">&lt;<span style="color: #f8fff9;">root</span> <span style="color: #dddd66;">k6</span>=<span style="color: #ffa042;">"</span><span style="color: #ffa042;">6</span><span style="color: #ffa042;">"</span>&gt;
+    &lt;<span style="color: #f8fff9;">k1</span>&gt;str&lt;/<span style="color: #f8fff9;">k1</span>&gt;
+    &lt;<span style="color: #f8fff9;">k-2</span>&gt;2&lt;/<span style="color: #f8fff9;">k-2</span>&gt;
+    &lt;<span style="color: #f8fff9;">k3</span>&gt;
+        &lt;<span style="color: #f8fff9;">ki</span>&gt;1&lt;/<span style="color: #f8fff9;">ki</span>&gt;
+        &lt;<span style="color: #f8fff9;">ki</span>&gt;2&lt;/<span style="color: #f8fff9;">ki</span>&gt;
+    &lt;/<span style="color: #f8fff9;">k3</span>&gt;
+    &lt;<span style="color: #f8fff9;">k5</span>&gt;5-1&lt;/<span style="color: #f8fff9;">k5</span>&gt;
+    &lt;<span style="color: #f8fff9;">k5</span>&gt;5-2&lt;/<span style="color: #f8fff9;">k5</span>&gt;
+    &lt;<span style="color: #f8fff9;">k9</span>&gt;&lt;![<span style="color: #f8fff9;">CDATA</span>[&#20013;&lt;a&gt;&#25991;]]&gt;&lt;/<span style="color: #f8fff9;">k9</span>&gt;
+&lt;/<span style="color: #f8fff9;">root</span>&gt;
+</pre>
+</div>
+</div>
 </div>
 
+
+<div id="outline-container-sec-1-1-2" class="outline-4">
+<h4 id="sec-1-1-2"><span class="section-number-4">1.1.2</span> pom 配置</h4>
+<div class="outline-text-4" id="text-1-1-2">
+<div class="org-src-container">
+
+<pre class="src src-xml">&lt;<span style="color: #f8fff9;">dependency</span>&gt;
+  &lt;<span style="color: #f8fff9;">groupId</span>&gt;com.fasterxml.jackson.dataformat&lt;/<span style="color: #f8fff9;">groupId</span>&gt;
+  &lt;<span style="color: #f8fff9;">artifactId</span>&gt;jackson-dataformat-xml&lt;/<span style="color: #f8fff9;">artifactId</span>&gt;
+&lt;/<span style="color: #f8fff9;">dependency</span>&gt;
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-1-3" class="outline-4">
+<h4 id="sec-1-1-3"><span class="section-number-4">1.1.3</span> DTO</h4>
+<div class="outline-text-4" id="text-1-1-3">
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #ff358b; font-weight: bold;">import</span> <span style="color: #b994ff;">java</span>.<span style="color: #b994ff;">util</span>.*;
+<span style="color: #ff358b; font-weight: bold;">import</span> <span style="color: #b994ff;">com</span>.<span style="color: #b994ff;">fasterxml</span>.<span style="color: #b994ff;">jackson</span>.<span style="color: #b994ff;">dataformat</span>.<span style="color: #b994ff;">xml</span>.<span style="color: #b994ff;">annotation</span>.*;
+<span style="color: #ff358b; font-weight: bold;">import</span> <span style="color: #b994ff;">lombok</span>.<span style="color: #01b0f0; font-weight: bold;">Data</span>;
+
+
+<span style="color: #b994ff;">@Data</span>
+<span style="color: #b994ff;">@JacksonXmlRootElement</span>(localName=<span style="color: #ffa042;">"root"</span>)
+<span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #ff358b; font-weight: bold;">class</span> <span style="color: #01b0f0; font-weight: bold;">RootXml</span> {
+
+    <span style="color: #ff358b; font-weight: bold;">private</span> <span style="color: #01b0f0; font-weight: bold;">String</span> <span style="color: #dddd66;">k1</span>;
+
+    <span style="color: #b994ff;">@JacksonXmlProperty</span>(localName=<span style="color: #ffa042;">"k-2"</span>)
+    <span style="color: #ff358b; font-weight: bold;">private</span> <span style="color: #01b0f0; font-weight: bold;">Integer</span> <span style="color: #dddd66;">k2</span>;
+
+    <span style="color: #b994ff;">@JacksonXmlProperty</span>(localName=<span style="color: #ffa042;">"k3"</span>)
+    <span style="color: #b994ff;">@JacksonXmlElementWrapper</span>(useWrapping=<span style="color: #b994ff;">true</span>)
+    <span style="color: #ff358b; font-weight: bold;">private</span> <span style="color: #01b0f0; font-weight: bold;">Collection</span>&lt;<span style="color: #01b0f0; font-weight: bold;">String</span>&gt; <span style="color: #dddd66;">kis</span>;
+
+    <span style="color: #b994ff;">@JacksonXmlElementWrapper</span>(useWrapping=<span style="color: #b994ff;">false</span>)
+    <span style="color: #ff358b; font-weight: bold;">private</span> <span style="color: #01b0f0; font-weight: bold;">Collection</span>&lt;<span style="color: #01b0f0; font-weight: bold;">String</span>&gt; <span style="color: #dddd66;">k5</span>;
+
+    <span style="color: #b994ff;">@JacksonXmlProperty</span>(isAttribute=<span style="color: #b994ff;">true</span>)
+    <span style="color: #ff358b; font-weight: bold;">private</span> <span style="color: #01b0f0; font-weight: bold;">Integer</span> <span style="color: #dddd66;">k6</span>;
+
+    <span style="color: #b994ff;">@JacksonXmlCData</span>(value=<span style="color: #b994ff;">true</span>) <span style="color: #465457;">// </span><span style="color: #465457;">&#24207;&#21015;&#21270;&#26102;&#26159;&#21542;&#24635;&#26159;&#20351;&#29992; CDATA &#22359;</span>
+    <span style="color: #ff358b; font-weight: bold;">private</span> <span style="color: #01b0f0; font-weight: bold;">String</span> <span style="color: #dddd66;">k9</span>;
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1-4" class="outline-4">
+<h4 id="sec-1-1-4"><span class="section-number-4">1.1.4</span> Controller</h4>
+<div class="outline-text-4" id="text-1-1-4">
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #b994ff;">@PostMapping</span>(path=<span style="color: #ffa042;">"/xml"</span>, consumes=<span style="color: #b994ff;">MediaType</span>.APPLICATION_XML_VALUE)
+<span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #01b0f0; font-weight: bold;">void</span> <span style="color: #f8fff9;">test</span>(<span style="color: #b994ff;">@RequestBody</span> <span style="color: #01b0f0; font-weight: bold;">RootXml</span> <span style="color: #dddd66;">xml</span>) {
+
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> MapStruct</h3>
+<div class="outline-text-3" id="text-1-2">
+</div><div id="outline-container-sec-1-2-1" class="outline-4">
+<h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> pom 配置</h4>
+<div class="outline-text-4" id="text-1-2-1">
+</div><div id="outline-container-sec-1-2-1-1" class="outline-5">
+<h5 id="sec-1-2-1-1"><span class="section-number-5">1.2.1.1</span> properties</h5>
+<div class="outline-text-5" id="text-1-2-1-1">
+<div class="org-src-container">
+
+<pre class="src src-xml">&lt;<span style="color: #f8fff9;">properties</span>&gt;
+  &lt;<span style="color: #f8fff9;">org.mapstruct.version</span>&gt;1.2.0.Final&lt;/<span style="color: #f8fff9;">org.mapstruct.version</span>&gt;
+&lt;/<span style="color: #f8fff9;">properties</span>&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-1-2" class="outline-5">
+<h5 id="sec-1-2-1-2"><span class="section-number-5">1.2.1.2</span> dependency</h5>
+<div class="outline-text-5" id="text-1-2-1-2">
+<div class="org-src-container">
+
+<pre class="src src-xml"><span style="color: #465457;">&lt;!--</span><span style="color: #465457;"> &#38024;&#23545; swagger &#30340; workaround </span><span style="color: #465457;">--&gt;</span>
+&lt;<span style="color: #f8fff9;">dependency</span>&gt;
+  &lt;<span style="color: #f8fff9;">groupId</span>&gt;io.springfox&lt;/<span style="color: #f8fff9;">groupId</span>&gt;
+  &lt;<span style="color: #f8fff9;">artifactId</span>&gt;springfox-swagger2&lt;/<span style="color: #f8fff9;">artifactId</span>&gt;
+  &lt;<span style="color: #f8fff9;">exclusions</span>&gt;
+    &lt;<span style="color: #f8fff9;">exclusion</span>&gt;
+      &lt;<span style="color: #f8fff9;">groupId</span>&gt;org.mapstruct&lt;/<span style="color: #f8fff9;">groupId</span>&gt;
+      &lt;<span style="color: #f8fff9;">artifactId</span>&gt;mapstruct&lt;/<span style="color: #f8fff9;">artifactId</span>&gt;
+    &lt;/<span style="color: #f8fff9;">exclusion</span>&gt;
+  &lt;/<span style="color: #f8fff9;">exclusions</span>&gt;
+&lt;/<span style="color: #f8fff9;">dependency</span>&gt;
+
+&lt;<span style="color: #f8fff9;">dependency</span>&gt;
+  &lt;<span style="color: #f8fff9;">groupId</span>&gt;org.mapstruct&lt;/<span style="color: #f8fff9;">groupId</span>&gt;
+  &lt;<span style="color: #f8fff9;">artifactId</span>&gt;mapstruct-jdk8&lt;/<span style="color: #f8fff9;">artifactId</span>&gt; <span style="color: #465457;">&lt;!--</span><span style="color: #465457;"> use mapstruct-jdk8 for Java 8 or higher </span><span style="color: #465457;">--&gt;</span>
+  &lt;<span style="color: #f8fff9;">version</span>&gt;${org.mapstruct.version}&lt;/<span style="color: #f8fff9;">version</span>&gt;
+&lt;/<span style="color: #f8fff9;">dependency</span>&gt;
+
+&lt;<span style="color: #f8fff9;">dependency</span>&gt;
+  &lt;<span style="color: #f8fff9;">groupId</span>&gt;org.mapstruct&lt;/<span style="color: #f8fff9;">groupId</span>&gt;
+  &lt;<span style="color: #f8fff9;">artifactId</span>&gt;mapstruct-processor&lt;/<span style="color: #f8fff9;">artifactId</span>&gt;
+  &lt;<span style="color: #f8fff9;">version</span>&gt;${org.mapstruct.version}&lt;/<span style="color: #f8fff9;">version</span>&gt;
+  &lt;<span style="color: #f8fff9;">scope</span>&gt;provided&lt;/<span style="color: #f8fff9;">scope</span>&gt;
+&lt;/<span style="color: #f8fff9;">dependency</span>&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-1-3" class="outline-5">
+<h5 id="sec-1-2-1-3"><span class="section-number-5">1.2.1.3</span> plugin</h5>
+<div class="outline-text-5" id="text-1-2-1-3">
+<div class="org-src-container">
+
+<pre class="src src-xml"><span style="color: #465457;">&lt;!--</span><span style="color: #465457;"> &#20860;&#23481; lombok </span><span style="color: #465457;">--&gt;</span>
+&lt;<span style="color: #f8fff9;">plugin</span>&gt;
+  &lt;<span style="color: #f8fff9;">groupId</span>&gt;org.apache.maven.plugins&lt;/<span style="color: #f8fff9;">groupId</span>&gt;
+  &lt;<span style="color: #f8fff9;">artifactId</span>&gt;maven-compiler-plugin&lt;/<span style="color: #f8fff9;">artifactId</span>&gt;
+&lt;/<span style="color: #f8fff9;">plugin</span>&gt;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2-2" class="outline-4">
+<h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> Mapper 接口</h4>
+<div class="outline-text-4" id="text-1-2-2">
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #b994ff;">@Mapper</span>(unmappedTargetPolicy=<span style="color: #b994ff;">ReportingPolicy</span>.IGNORE)
+<span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #ff358b; font-weight: bold;">interface</span> <span style="color: #01b0f0; font-weight: bold;">ClassAMapper</span> {
+
+    <span style="color: #01b0f0; font-weight: bold;">ClassAMapper</span> <span style="color: #dddd66;">MAPPER</span> = Mappers.getMapper( ClassAMapper.<span style="color: #ff358b; font-weight: bold;">class</span> );
+
+    <span style="color: #b994ff;">@Mappings</span>({
+            <span style="color: #b994ff;">@Mapping</span>(source=<span style="color: #ffa042;">"id"</span>, target=<span style="color: #ffa042;">"ID"</span>),
+            <span style="color: #f8fff9;">@Mapping</span>(source=<span style="color: #ffa042;">"name"</span>, target=<span style="color: #ffa042;">"NAME"</span>)
+    })
+    <span style="color: #01b0f0; font-weight: bold;">ClassA</span> <span style="color: #f8fff9;">from</span>(<span style="color: #01b0f0; font-weight: bold;">ClassB</span> <span style="color: #dddd66;">obj</span>);
+
+    <span style="color: #ff358b; font-weight: bold;">default</span> <span style="color: #01b0f0; font-weight: bold;">ClassA</span> <span style="color: #f8fff9;">from</span>(<span style="color: #01b0f0; font-weight: bold;">ClassC</span> <span style="color: #dddd66;">obj</span>) {
+        <span style="color: #465457;">// </span><span style="color: #465457;">Custmization</span>
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-3" class="outline-4">
+<h4 id="sec-1-2-3"><span class="section-number-4">1.2.3</span> 调用</h4>
+<div class="outline-text-4" id="text-1-2-3">
+<div class="org-src-container">
+
+<pre class="src src-java"><span style="color: #01b0f0; font-weight: bold;">ClassB</span> <span style="color: #dddd66;">objB</span> = <span style="color: #ff358b; font-weight: bold;">new</span> <span style="color: #01b0f0; font-weight: bold;">ClassB</span>();
+<span style="color: #01b0f0; font-weight: bold;">ClassC</span> <span style="color: #dddd66;">objC</span> = <span style="color: #ff358b; font-weight: bold;">new</span> <span style="color: #01b0f0; font-weight: bold;">ClassC</span>();
+<span style="color: #b994ff;">ClassA</span>.MAPPER.from(objB);
+<span style="color: #b994ff;">ClassA</span>.MAPPER.from(objC);
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
 <div id="outline-container-sec-2" class="outline-2">
-<h2 id="sec-2"><span class="section-number-2">2</span> 常用实践</h2>
+<h2 id="sec-2"><span class="section-number-2">2</span> 实践</h2>
 <div class="outline-text-2" id="text-2">
 </div><div id="outline-container-sec-2-1" class="outline-3">
 <h3 id="sec-2-1"><span class="section-number-3">2.1</span> <a href="https://github.com/ruanhao/show-me-the-code/tree/springboot-restful-service">Restful Service (MVC)</a></h3>
@@ -327,13 +581,13 @@ for the JavaScript code in this tag.
 <div class="outline-text-4" id="text-2-1-2">
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #5fafd7;">@RestController</span>
-<span style="color: #5fafd7;">@RequestMapping</span>(<span style="color: #ff4ea3;">"/{userId}/bookmarks"</span>)
-<span style="color: #a1db00;">class</span> <span style="color: #00d7af;">BookmarkRestController</span> {
+<pre class="src src-java"><span style="color: #b994ff;">@RestController</span>
+<span style="color: #b994ff;">@RequestMapping</span>(<span style="color: #ffa042;">"/{userId}/bookmarks"</span>)
+<span style="color: #ff358b; font-weight: bold;">class</span> <span style="color: #01b0f0; font-weight: bold;">BookmarkRestController</span> {
 
-    <span style="color: #5fafd7;">@PostMapping</span>
-    <span style="color: #00d7af;">ResponseEntity</span>&lt;?&gt; <span style="color: #ffd700;">add</span>(<span style="color: #5fafd7;">@PathVariable</span> <span style="color: #00d7af;">String</span> <span style="color: #ff8700;">userId</span>, <span style="color: #5fafd7;">@RequestBody</span> <span style="color: #00d7af;">Bookmark</span> <span style="color: #ff8700;">input</span>) {
-        <span style="color: #a1db00;">return</span> ResponseEntity.noContent().build();
+    <span style="color: #b994ff;">@PostMapping</span>
+    <span style="color: #01b0f0; font-weight: bold;">ResponseEntity</span>&lt;?&gt; <span style="color: #f8fff9;">add</span>(<span style="color: #b994ff;">@PathVariable</span> <span style="color: #01b0f0; font-weight: bold;">String</span> <span style="color: #dddd66;">userId</span>, <span style="color: #b994ff;">@RequestBody</span> <span style="color: #01b0f0; font-weight: bold;">Bookmark</span> <span style="color: #dddd66;">input</span>) {
+        <span style="color: #ff358b; font-weight: bold;">return</span> ResponseEntity.noContent().build();
     }
 }
 </pre>
@@ -380,23 +634,23 @@ HttpMessageConverter 工作于两个方向：
 
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #5fafd7;">@ResponseStatus</span>(value=<span style="color: #5fafd7;">HttpStatus</span>.NOT_FOUND, reason=<span style="color: #ff4ea3;">"No such Order"</span>)  <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">404</span>
-<span style="color: #a1db00;">public</span> <span style="color: #a1db00;">class</span> <span style="color: #00d7af;">OrderNotFoundException</span> <span style="color: #a1db00;">extends</span> <span style="color: #00d7af;">RuntimeException</span> {
-    <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">TODO</span>
+<pre class="src src-java"><span style="color: #b994ff;">@ResponseStatus</span>(value=<span style="color: #b994ff;">HttpStatus</span>.NOT_FOUND, reason=<span style="color: #ffa042;">"No such Order"</span>)  <span style="color: #465457;">// </span><span style="color: #465457;">404</span>
+<span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #ff358b; font-weight: bold;">class</span> <span style="color: #01b0f0; font-weight: bold;">OrderNotFoundException</span> <span style="color: #ff358b; font-weight: bold;">extends</span> <span style="color: #01b0f0; font-weight: bold;">RuntimeException</span> {
+    <span style="color: #465457;">// </span><span style="color: #465457;">TODO</span>
 }
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #5fafd7;">@RequestMapping</span>(value=<span style="color: #ff4ea3;">"/orders/{id}"</span>, method=GET)
-<span style="color: #a1db00;">public</span> <span style="color: #00d7af;">String</span> <span style="color: #ffd700;">showOrder</span>(<span style="color: #5fafd7;">@PathVariable</span>(<span style="color: #ff4ea3;">"id"</span>) <span style="color: #00d7af;">long</span> <span style="color: #ff8700;">id</span>, <span style="color: #00d7af;">Model</span> <span style="color: #ff8700;">model</span>) {
-    <span style="color: #00d7af;">Order</span> <span style="color: #ff8700;">order</span> = orderRepository.findOrderById(id);
+<pre class="src src-java"><span style="color: #b994ff;">@RequestMapping</span>(value=<span style="color: #ffa042;">"/orders/{id}"</span>, method=GET)
+<span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #01b0f0; font-weight: bold;">String</span> <span style="color: #f8fff9;">showOrder</span>(<span style="color: #b994ff;">@PathVariable</span>(<span style="color: #ffa042;">"id"</span>) <span style="color: #01b0f0; font-weight: bold;">long</span> <span style="color: #dddd66;">id</span>, <span style="color: #01b0f0; font-weight: bold;">Model</span> <span style="color: #dddd66;">model</span>) {
+    <span style="color: #01b0f0; font-weight: bold;">Order</span> <span style="color: #dddd66;">order</span> = orderRepository.findOrderById(id);
 
-    <span style="color: #a1db00;">if</span> (order == <span style="color: #5fafd7;">null</span>) <span style="color: #a1db00;">throw</span> <span style="color: #a1db00;">new</span> <span style="color: #00d7af;">OrderNotFoundException</span>(id);
+    <span style="color: #ff358b; font-weight: bold;">if</span> (order == <span style="color: #b994ff;">null</span>) <span style="color: #ff358b; font-weight: bold;">throw</span> <span style="color: #ff358b; font-weight: bold;">new</span> <span style="color: #01b0f0; font-weight: bold;">OrderNotFoundException</span>(id);
 
     model.addAttribute(order);
-    <span style="color: #a1db00;">return</span> <span style="color: #ff4ea3;">"orderDetail"</span>;
+    <span style="color: #ff358b; font-weight: bold;">return</span> <span style="color: #ffa042;">"orderDetail"</span>;
 }
 </pre>
 </div>
@@ -423,41 +677,41 @@ HttpMessageConverter 工作于两个方向：
 
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #5fafd7;">@Controller</span>
-<span style="color: #a1db00;">public</span> <span style="color: #a1db00;">class</span> <span style="color: #00d7af;">ExceptionHandlingController</span> {
+<pre class="src src-java"><span style="color: #b994ff;">@Controller</span>
+<span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #ff358b; font-weight: bold;">class</span> <span style="color: #01b0f0; font-weight: bold;">ExceptionHandlingController</span> {
 
-    <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">@RequestHandler methods that maybe throw exception</span>
+    <span style="color: #465457;">// </span><span style="color: #465457;">@RequestHandler methods that maybe throw exception</span>
     ...
 
 
-    <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">Exception handling methods:</span>
+    <span style="color: #465457;">// </span><span style="color: #465457;">Exception handling methods:</span>
 
-    <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">Convert a predefined exception to an HTTP Status code</span>
-    <span style="color: #5fafd7;">@ResponseStatus</span>(value=<span style="color: #5fafd7;">HttpStatus</span>.CONFLICT, reason=<span style="color: #ff4ea3;">"Data integrity violation"</span>)  <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">409</span>
-    <span style="color: #5fafd7;">@ExceptionHandler</span>(DataIntegrityViolationException.<span style="color: #a1db00;">class</span>)
-    <span style="color: #a1db00;">public</span> <span style="color: #00d7af;">void</span> conflict() {
-        <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">TODO</span>
+    <span style="color: #465457;">// </span><span style="color: #465457;">Convert a predefined exception to an HTTP Status code</span>
+    <span style="color: #b994ff;">@ResponseStatus</span>(value=<span style="color: #b994ff;">HttpStatus</span>.CONFLICT, reason=<span style="color: #ffa042;">"Data integrity violation"</span>)  <span style="color: #465457;">// </span><span style="color: #465457;">409</span>
+    <span style="color: #b994ff;">@ExceptionHandler</span>(DataIntegrityViolationException.<span style="color: #ff358b; font-weight: bold;">class</span>)
+    <span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #01b0f0; font-weight: bold;">void</span> conflict() {
+        <span style="color: #465457;">// </span><span style="color: #465457;">TODO</span>
     }
 
-    <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">Specify name of a specific view that will be used to display the error:</span>
-    <span style="color: #5fafd7;">@ExceptionHandler</span>({SQLException.<span style="color: #a1db00;">class</span>, DataAccessException.<span style="color: #a1db00;">class</span>})
-    <span style="color: #a1db00;">public</span> <span style="color: #00d7af;">String</span> <span style="color: #ffd700;">databaseError</span>() {
-        <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">Nothing to do.  Returns the logical view name of an error page, passed</span>
-        <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">to the view-resolver(s) in usual way.</span>
-        <span style="color: #a1db00;">return</span> <span style="color: #ff4ea3;">"databaseError"</span>;
+    <span style="color: #465457;">// </span><span style="color: #465457;">Specify name of a specific view that will be used to display the error:</span>
+    <span style="color: #b994ff;">@ExceptionHandler</span>({SQLException.<span style="color: #ff358b; font-weight: bold;">class</span>, DataAccessException.<span style="color: #ff358b; font-weight: bold;">class</span>})
+    <span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #01b0f0; font-weight: bold;">String</span> <span style="color: #f8fff9;">databaseError</span>() {
+        <span style="color: #465457;">// </span><span style="color: #465457;">Nothing to do.  Returns the logical view name of an error page, passed</span>
+        <span style="color: #465457;">// </span><span style="color: #465457;">to the view-resolver(s) in usual way.</span>
+        <span style="color: #ff358b; font-weight: bold;">return</span> <span style="color: #ffa042;">"databaseError"</span>;
     }
 
-    <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">Total control - setup a model and return the view name yourself. Or</span>
-    <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">consider subclassing ExceptionHandlerExceptionResolver.</span>
-    <span style="color: #5fafd7;">@ExceptionHandler</span>(Exception.<span style="color: #a1db00;">class</span>)
-    <span style="color: #a1db00;">public</span> <span style="color: #00d7af;">ModelAndView</span> <span style="color: #ffd700;">handleError</span>(<span style="color: #00d7af;">HttpServletRequest</span> <span style="color: #ff8700;">req</span>, <span style="color: #00d7af;">Exception</span> <span style="color: #ff8700;">ex</span>) {
-        logger.error(<span style="color: #ff4ea3;">"Request: "</span> + req.getRequestURL() + <span style="color: #ff4ea3;">" raised "</span> + ex);
+    <span style="color: #465457;">// </span><span style="color: #465457;">Total control - setup a model and return the view name yourself. Or</span>
+    <span style="color: #465457;">// </span><span style="color: #465457;">consider subclassing ExceptionHandlerExceptionResolver.</span>
+    <span style="color: #b994ff;">@ExceptionHandler</span>(Exception.<span style="color: #ff358b; font-weight: bold;">class</span>)
+    <span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #01b0f0; font-weight: bold;">ModelAndView</span> <span style="color: #f8fff9;">handleError</span>(<span style="color: #01b0f0; font-weight: bold;">HttpServletRequest</span> <span style="color: #dddd66;">req</span>, <span style="color: #01b0f0; font-weight: bold;">Exception</span> <span style="color: #dddd66;">ex</span>) {
+        logger.error(<span style="color: #ffa042;">"Request: "</span> + req.getRequestURL() + <span style="color: #ffa042;">" raised "</span> + ex);
 
-        <span style="color: #00d7af;">ModelAndView</span> <span style="color: #ff8700;">mav</span> = <span style="color: #a1db00;">new</span> <span style="color: #00d7af;">ModelAndView</span>();
-        mav.addObject(<span style="color: #ff4ea3;">"exception"</span>, ex);
-        mav.addObject(<span style="color: #ff4ea3;">"url"</span>, req.getRequestURL());
-        mav.setViewName(<span style="color: #ff4ea3;">"error"</span>);
-        <span style="color: #a1db00;">return</span> mav;
+        <span style="color: #01b0f0; font-weight: bold;">ModelAndView</span> <span style="color: #dddd66;">mav</span> = <span style="color: #ff358b; font-weight: bold;">new</span> <span style="color: #01b0f0; font-weight: bold;">ModelAndView</span>();
+        mav.addObject(<span style="color: #ffa042;">"exception"</span>, ex);
+        mav.addObject(<span style="color: #ffa042;">"url"</span>, req.getRequestURL());
+        mav.setViewName(<span style="color: #ffa042;">"error"</span>);
+        <span style="color: #ff358b; font-weight: bold;">return</span> mav;
     }
 }
 </pre>
@@ -484,12 +738,12 @@ HttpMessageConverter 工作于两个方向：
 
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #5fafd7;">@ControllerAdvice</span>
-<span style="color: #a1db00;">class</span> <span style="color: #00d7af;">GlobalControllerExceptionHandler</span> {
-    <span style="color: #5fafd7;">@ResponseStatus</span>(<span style="color: #5fafd7;">HttpStatus</span>.<span style="color: #00d7af;">CONFLICT</span>)  <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">409</span>
-    <span style="color: #5fafd7;">@ExceptionHandler</span>(DataIntegrityViolationException.<span style="color: #a1db00;">class</span>)
-    <span style="color: #a1db00;">public</span> <span style="color: #00d7af;">void</span> <span style="color: #ffd700;">handleConflict</span>() {
-        <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">Nothing to do</span>
+<pre class="src src-java"><span style="color: #b994ff;">@ControllerAdvice</span>
+<span style="color: #ff358b; font-weight: bold;">class</span> <span style="color: #01b0f0; font-weight: bold;">GlobalControllerExceptionHandler</span> {
+    <span style="color: #b994ff;">@ResponseStatus</span>(<span style="color: #b994ff;">HttpStatus</span>.<span style="color: #01b0f0; font-weight: bold;">CONFLICT</span>)  <span style="color: #465457;">// </span><span style="color: #465457;">409</span>
+    <span style="color: #b994ff;">@ExceptionHandler</span>(DataIntegrityViolationException.<span style="color: #ff358b; font-weight: bold;">class</span>)
+    <span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #01b0f0; font-weight: bold;">void</span> <span style="color: #f8fff9;">handleConflict</span>() {
+        <span style="color: #465457;">// </span><span style="color: #465457;">Nothing to do</span>
     }
 }
 </pre>
@@ -501,25 +755,25 @@ HttpMessageConverter 工作于两个方向：
 <div class="outline-text-6" id="text-2-1-4-3-1">
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #5fafd7;">@ControllerAdvice</span>
-<span style="color: #a1db00;">class</span> <span style="color: #00d7af;">GlobalDefaultExceptionHandler</span> {
-  <span style="color: #a1db00;">public</span> <span style="color: #a1db00;">static</span> <span style="color: #a1db00;">final</span> <span style="color: #00d7af;">String</span> <span style="color: #ff8700;">DEFAULT_ERROR_VIEW</span> = <span style="color: #ff4ea3;">"error"</span>;
+<pre class="src src-java"><span style="color: #b994ff;">@ControllerAdvice</span>
+<span style="color: #ff358b; font-weight: bold;">class</span> <span style="color: #01b0f0; font-weight: bold;">GlobalDefaultExceptionHandler</span> {
+  <span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #ff358b; font-weight: bold;">static</span> <span style="color: #ff358b; font-weight: bold;">final</span> <span style="color: #01b0f0; font-weight: bold;">String</span> <span style="color: #dddd66;">DEFAULT_ERROR_VIEW</span> = <span style="color: #ffa042;">"error"</span>;
 
-  <span style="color: #5fafd7;">@ExceptionHandler</span>(value = Exception.<span style="color: #a1db00;">class</span>)
-  <span style="color: #a1db00;">public</span> <span style="color: #00d7af;">ModelAndView</span> <span style="color: #ffd700;">defaultErrorHandler</span>(<span style="color: #00d7af;">HttpServletRequest</span> <span style="color: #ff8700;">req</span>, <span style="color: #00d7af;">Exception</span> <span style="color: #ff8700;">e</span>) <span style="color: #a1db00;">throws</span> <span style="color: #00d7af;">Exception</span> {
-    <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">If the exception is annotated with @ResponseStatus rethrow it and let</span>
-    <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">the framework handle it - like the OrderNotFoundException example</span>
-    <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">at the start of this post.</span>
-    <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">AnnotationUtils is a Spring Framework utility class.</span>
-    <span style="color: #a1db00;">if</span> (AnnotationUtils.findAnnotation(e.getClass(), ResponseStatus.<span style="color: #a1db00;">class</span>) != <span style="color: #5fafd7;">null</span>)
-      <span style="color: #a1db00;">throw</span> e;
+  <span style="color: #b994ff;">@ExceptionHandler</span>(value = Exception.<span style="color: #ff358b; font-weight: bold;">class</span>)
+  <span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #01b0f0; font-weight: bold;">ModelAndView</span> <span style="color: #f8fff9;">defaultErrorHandler</span>(<span style="color: #01b0f0; font-weight: bold;">HttpServletRequest</span> <span style="color: #dddd66;">req</span>, <span style="color: #01b0f0; font-weight: bold;">Exception</span> <span style="color: #dddd66;">e</span>) <span style="color: #ff358b; font-weight: bold;">throws</span> <span style="color: #01b0f0; font-weight: bold;">Exception</span> {
+    <span style="color: #465457;">// </span><span style="color: #465457;">If the exception is annotated with @ResponseStatus rethrow it and let</span>
+    <span style="color: #465457;">// </span><span style="color: #465457;">the framework handle it - like the OrderNotFoundException example</span>
+    <span style="color: #465457;">// </span><span style="color: #465457;">at the start of this post.</span>
+    <span style="color: #465457;">// </span><span style="color: #465457;">AnnotationUtils is a Spring Framework utility class.</span>
+    <span style="color: #ff358b; font-weight: bold;">if</span> (AnnotationUtils.findAnnotation(e.getClass(), ResponseStatus.<span style="color: #ff358b; font-weight: bold;">class</span>) != <span style="color: #b994ff;">null</span>)
+      <span style="color: #ff358b; font-weight: bold;">throw</span> e;
 
-    <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">Otherwise setup and send the user to a default error-view.</span>
-    <span style="color: #00d7af;">ModelAndView</span> <span style="color: #ff8700;">mav</span> = <span style="color: #a1db00;">new</span> <span style="color: #00d7af;">ModelAndView</span>();
-    mav.addObject(<span style="color: #ff4ea3;">"exception"</span>, e);
-    mav.addObject(<span style="color: #ff4ea3;">"url"</span>, req.getRequestURL());
+    <span style="color: #465457;">// </span><span style="color: #465457;">Otherwise setup and send the user to a default error-view.</span>
+    <span style="color: #01b0f0; font-weight: bold;">ModelAndView</span> <span style="color: #dddd66;">mav</span> = <span style="color: #ff358b; font-weight: bold;">new</span> <span style="color: #01b0f0; font-weight: bold;">ModelAndView</span>();
+    mav.addObject(<span style="color: #ffa042;">"exception"</span>, e);
+    mav.addObject(<span style="color: #ffa042;">"url"</span>, req.getRequestURL());
     mav.setViewName(DEFAULT_ERROR_VIEW);
-    <span style="color: #a1db00;">return</span> mav;
+    <span style="color: #ff358b; font-weight: bold;">return</span> mav;
   }
 }
 </pre>
@@ -540,17 +794,17 @@ HttpMessageConverter 工作于两个方向：
 <div class="outline-text-4" id="text-2-2-1">
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #5fafd7;">@ToString</span>
-<span style="color: #a1db00;">public</span> <span style="color: #a1db00;">class</span> <span style="color: #00d7af;">Event</span> <span style="color: #a1db00;">extends</span> <span style="color: #00d7af;">ApplicationEvent</span> {
+<pre class="src src-java"><span style="color: #b994ff;">@ToString</span>
+<span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #ff358b; font-weight: bold;">class</span> <span style="color: #01b0f0; font-weight: bold;">Event</span> <span style="color: #ff358b; font-weight: bold;">extends</span> <span style="color: #01b0f0; font-weight: bold;">ApplicationEvent</span> {
 
-    <span style="color: #a1db00;">private</span> <span style="color: #a1db00;">static</span> <span style="color: #a1db00;">final</span> <span style="color: #00d7af;">long</span> <span style="color: #ff8700;">serialVersionUID</span> = 1L;
+    <span style="color: #ff358b; font-weight: bold;">private</span> <span style="color: #ff358b; font-weight: bold;">static</span> <span style="color: #ff358b; font-weight: bold;">final</span> <span style="color: #01b0f0; font-weight: bold;">long</span> <span style="color: #dddd66;">serialVersionUID</span> = 1L;
 
-    <span style="color: #5fafd7;">@Getter</span>
-    <span style="color: #a1db00;">private</span> <span style="color: #00d7af;">String</span> <span style="color: #ff8700;">message</span>;
+    <span style="color: #b994ff;">@Getter</span>
+    <span style="color: #ff358b; font-weight: bold;">private</span> <span style="color: #01b0f0; font-weight: bold;">String</span> <span style="color: #dddd66;">message</span>;
 
-    <span style="color: #a1db00;">public</span> <span style="color: #ffd700;">Event</span>(<span style="color: #00d7af;">Object</span> <span style="color: #ff8700;">source</span>, <span style="color: #00d7af;">String</span> <span style="color: #ff8700;">message</span>) {
-        <span style="color: #a1db00;">super</span>(source);
-        <span style="color: #a1db00;">this</span>.message = message;
+    <span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #f8fff9;">Event</span>(<span style="color: #01b0f0; font-weight: bold;">Object</span> <span style="color: #dddd66;">source</span>, <span style="color: #01b0f0; font-weight: bold;">String</span> <span style="color: #dddd66;">message</span>) {
+        <span style="color: #ff358b; font-weight: bold;">super</span>(source);
+        <span style="color: #ff358b; font-weight: bold;">this</span>.message = message;
     }
 
 }
@@ -565,13 +819,13 @@ HttpMessageConverter 工作于两个方向：
 <div class="outline-text-4" id="text-2-2-2">
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #5fafd7;">@Component</span>
-<span style="color: #5fafd7;">@Slf4j</span>
-<span style="color: #a1db00;">public</span> <span style="color: #a1db00;">class</span> <span style="color: #00d7af;">Listener</span> {
+<pre class="src src-java"><span style="color: #b994ff;">@Component</span>
+<span style="color: #b994ff;">@Slf4j</span>
+<span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #ff358b; font-weight: bold;">class</span> <span style="color: #01b0f0; font-weight: bold;">Listener</span> {
 
-    <span style="color: #5fafd7;">@EventListener</span>
-    <span style="color: #a1db00;">public</span> <span style="color: #00d7af;">void</span> <span style="color: #ffd700;">handlerEvent</span>(<span style="color: #00d7af;">Event</span> <span style="color: #ff8700;">event</span>) {
-        log.info(<span style="color: #ff4ea3;">"Receive event: {}"</span>, event);
+    <span style="color: #b994ff;">@EventListener</span>
+    <span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #01b0f0; font-weight: bold;">void</span> <span style="color: #f8fff9;">handlerEvent</span>(<span style="color: #01b0f0; font-weight: bold;">Event</span> <span style="color: #dddd66;">event</span>) {
+        log.info(<span style="color: #ffa042;">"Receive event: {}"</span>, event);
     }
 
 }
@@ -586,16 +840,16 @@ HttpMessageConverter 工作于两个方向：
 <div class="outline-text-4" id="text-2-2-3">
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #5fafd7;">@Service</span>
-<span style="color: #5fafd7;">@Slf4j</span>
-<span style="color: #a1db00;">public</span> <span style="color: #a1db00;">class</span> <span style="color: #00d7af;">Publisher</span> {
+<pre class="src src-java"><span style="color: #b994ff;">@Service</span>
+<span style="color: #b994ff;">@Slf4j</span>
+<span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #ff358b; font-weight: bold;">class</span> <span style="color: #01b0f0; font-weight: bold;">Publisher</span> {
 
-    <span style="color: #5fafd7;">@Autowired</span>
-    <span style="color: #a1db00;">private</span> <span style="color: #00d7af;">ApplicationContext</span> <span style="color: #ff8700;">applicationContext</span>;
+    <span style="color: #b994ff;">@Autowired</span>
+    <span style="color: #ff358b; font-weight: bold;">private</span> <span style="color: #01b0f0; font-weight: bold;">ApplicationContext</span> <span style="color: #dddd66;">applicationContext</span>;
 
-    <span style="color: #a1db00;">public</span> <span style="color: #00d7af;">void</span> <span style="color: #ffd700;">publish</span>(<span style="color: #00d7af;">String</span> <span style="color: #ff8700;">message</span>) {
-        log.info(<span style="color: #ff4ea3;">"Sending message: {}"</span>, message);
-        applicationContext.publishEvent(<span style="color: #a1db00;">new</span> <span style="color: #00d7af;">Event</span>(<span style="color: #a1db00;">this</span>, message));
+    <span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #01b0f0; font-weight: bold;">void</span> <span style="color: #f8fff9;">publish</span>(<span style="color: #01b0f0; font-weight: bold;">String</span> <span style="color: #dddd66;">message</span>) {
+        log.info(<span style="color: #ffa042;">"Sending message: {}"</span>, message);
+        applicationContext.publishEvent(<span style="color: #ff358b; font-weight: bold;">new</span> <span style="color: #01b0f0; font-weight: bold;">Event</span>(<span style="color: #ff358b; font-weight: bold;">this</span>, message));
     }
 
 }
@@ -610,12 +864,12 @@ HttpMessageConverter 工作于两个方向：
 <div class="outline-text-4" id="text-2-2-4">
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #5fafd7;">@Bean</span>(name=<span style="color: #ff4ea3;">"applicationEventMulticaster"</span>)
-<span style="color: #a1db00;">public</span> <span style="color: #00d7af;">ApplicationEventMulticaster</span> <span style="color: #ffd700;">simpleApplicationEventMulticaster</span>() {
-    <span style="color: #00d7af;">SimpleApplicationEventMulticaster</span> <span style="color: #ff8700;">eventMulticaster</span>
-        = <span style="color: #a1db00;">new</span> <span style="color: #00d7af;">SimpleApplicationEventMulticaster</span>();
-    eventMulticaster.setTaskExecutor(<span style="color: #a1db00;">new</span> <span style="color: #00d7af;">SimpleAsyncTaskExecutor</span>());
-    <span style="color: #a1db00;">return</span> eventMulticaster;
+<pre class="src src-java"><span style="color: #b994ff;">@Bean</span>(name=<span style="color: #ffa042;">"applicationEventMulticaster"</span>)
+<span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #01b0f0; font-weight: bold;">ApplicationEventMulticaster</span> <span style="color: #f8fff9;">simpleApplicationEventMulticaster</span>() {
+    <span style="color: #01b0f0; font-weight: bold;">SimpleApplicationEventMulticaster</span> <span style="color: #dddd66;">eventMulticaster</span>
+        = <span style="color: #ff358b; font-weight: bold;">new</span> <span style="color: #01b0f0; font-weight: bold;">SimpleApplicationEventMulticaster</span>();
+    eventMulticaster.setTaskExecutor(<span style="color: #ff358b; font-weight: bold;">new</span> <span style="color: #01b0f0; font-weight: bold;">SimpleAsyncTaskExecutor</span>());
+    <span style="color: #ff358b; font-weight: bold;">return</span> eventMulticaster;
 }
 </pre>
 </div>
@@ -659,23 +913,23 @@ HttpMessageConverter 工作于两个方向：
 
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #5fafd7;">@EnableAsync</span>
-<span style="color: #5fafd7;">@Configuration</span>
-<span style="color: #a1db00;">public</span> <span style="color: #a1db00;">class</span> <span style="color: #00d7af;">AsyncConfiguration</span> <span style="color: #a1db00;">implements</span> <span style="color: #00d7af;">AsyncConfigurer</span> {
+<pre class="src src-java"><span style="color: #b994ff;">@EnableAsync</span>
+<span style="color: #b994ff;">@Configuration</span>
+<span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #ff358b; font-weight: bold;">class</span> <span style="color: #01b0f0; font-weight: bold;">AsyncConfiguration</span> <span style="color: #ff358b; font-weight: bold;">implements</span> <span style="color: #01b0f0; font-weight: bold;">AsyncConfigurer</span> {
 
-    <span style="color: #5fafd7;">@Override</span>
-    <span style="color: #a1db00;">public</span> <span style="color: #00d7af;">Executor</span> <span style="color: #ffd700;">getAsyncExecutor</span>() {
-        <span style="color: #00d7af;">ThreadPoolTaskExecutor</span> <span style="color: #ff8700;">taskExecutor</span> = <span style="color: #a1db00;">new</span> <span style="color: #00d7af;">ThreadPoolTaskExecutor</span>();
+    <span style="color: #b994ff;">@Override</span>
+    <span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #01b0f0; font-weight: bold;">Executor</span> <span style="color: #f8fff9;">getAsyncExecutor</span>() {
+        <span style="color: #01b0f0; font-weight: bold;">ThreadPoolTaskExecutor</span> <span style="color: #dddd66;">taskExecutor</span> = <span style="color: #ff358b; font-weight: bold;">new</span> <span style="color: #01b0f0; font-weight: bold;">ThreadPoolTaskExecutor</span>();
         taskExecutor.setCorePoolSize(4);
         taskExecutor.setMaxPoolSize(8);
         taskExecutor.setQueueCapacity(32);
         taskExecutor.initialize();
-        <span style="color: #a1db00;">return</span> taskExecutor;
+        <span style="color: #ff358b; font-weight: bold;">return</span> taskExecutor;
     }
 
-    <span style="color: #5fafd7;">@Override</span>
-    <span style="color: #a1db00;">public</span> <span style="color: #00d7af;">AsyncUncaughtExceptionHandler</span> <span style="color: #ffd700;">getAsyncUncaughtExceptionHandler</span>() {
-        <span style="color: #a1db00;">return</span> <span style="color: #a1db00;">new</span> <span style="color: #00d7af;">SimpleAsyncUncaughtExceptionHandler</span>();
+    <span style="color: #b994ff;">@Override</span>
+    <span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #01b0f0; font-weight: bold;">AsyncUncaughtExceptionHandler</span> <span style="color: #f8fff9;">getAsyncUncaughtExceptionHandler</span>() {
+        <span style="color: #ff358b; font-weight: bold;">return</span> <span style="color: #ff358b; font-weight: bold;">new</span> <span style="color: #01b0f0; font-weight: bold;">SimpleAsyncUncaughtExceptionHandler</span>();
     }
 
 }
@@ -707,7 +961,7 @@ HttpMessageConverter 工作于两个方向：
 <div class="outline-text-5" id="text-2-4-2-1">
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #5fafd7;">@Scheduled</span>(fixedRate=5000)
+<pre class="src src-java"><span style="color: #b994ff;">@Scheduled</span>(fixedRate=5000)
 </pre>
 </div>
 </div>
@@ -718,9 +972,9 @@ HttpMessageConverter 工作于两个方向：
 <div class="outline-text-5" id="text-2-4-2-2">
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">specify the interval between invocations measured</span>
-<span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">from the completion of the task</span>
-<span style="color: #5fafd7;">@Scheduled</span>(fixedDelay=5000)
+<pre class="src src-java"><span style="color: #465457;">// </span><span style="color: #465457;">specify the interval between invocations measured</span>
+<span style="color: #465457;">// </span><span style="color: #465457;">from the completion of the task</span>
+<span style="color: #b994ff;">@Scheduled</span>(fixedDelay=5000)
 </pre>
 </div>
 </div>
@@ -731,7 +985,7 @@ HttpMessageConverter 工作于两个方向：
 <div class="outline-text-5" id="text-2-4-2-3">
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #5fafd7;">@Scheduled</span>(cron=<span style="color: #ff4ea3;">"0 28 11 ? * *"</span>) <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">&#27599;&#22825; 11 &#28857; 28 &#20998; &#25191;&#34892;</span>
+<pre class="src src-java"><span style="color: #b994ff;">@Scheduled</span>(cron=<span style="color: #ffa042;">"0 28 11 ? * *"</span>) <span style="color: #465457;">// </span><span style="color: #465457;">&#27599;&#22825; 11 &#28857; 28 &#20998; &#25191;&#34892;</span>
 </pre>
 </div>
 </div>
@@ -748,20 +1002,20 @@ HttpMessageConverter 工作于两个方向：
 <div class="outline-text-4" id="text-2-5-1">
 <div class="org-src-container">
 
-<pre class="src src-sh"><span style="color: #6c6c6c; font-style: italic;">#</span><span style="color: #6c6c6c; font-style: italic;">Simple properties</span>
+<pre class="src src-sh"><span style="color: #465457;">#</span><span style="color: #465457;">Simple properties</span>
 mail.host=mailer@mail.com
 mail.port=9000
 mail.from=mailer@mail.com
 
-<span style="color: #6c6c6c; font-style: italic;">#</span><span style="color: #6c6c6c; font-style: italic;">List properties</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">List properties</span>
 mail.defaultRecipients[0]=admin@mail.com
 mail.defaultRecipients[1]=owner@mail.com
 
-<span style="color: #6c6c6c; font-style: italic;">#</span><span style="color: #6c6c6c; font-style: italic;">Map Properties</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">Map Properties</span>
 mail.additionalHeaders.redelivery=true
 mail.additionalHeaders.secure=true
 
-<span style="color: #6c6c6c; font-style: italic;">#</span><span style="color: #6c6c6c; font-style: italic;">Object properties</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">Object properties</span>
 mail.credentials.username=john
 mail.credentials.password=password
 mail.credentials.authMethod=SHA1
@@ -776,39 +1030,39 @@ mail.credentials.authMethod=SHA1
 <div class="outline-text-4" id="text-2-5-2">
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #5fafd7;">@Getter</span>
-<span style="color: #5fafd7;">@Setter</span>
-<span style="color: #5fafd7;">@ToString</span>
-<span style="color: #5fafd7;">@Configuration</span>
-<span style="color: #5fafd7;">@Validated</span>
-<span style="color: #5fafd7;">@PropertySource</span>(<span style="color: #ff4ea3;">"classpath:configprops.properties"</span>)
-<span style="color: #5fafd7;">@ConfigurationProperties</span>(prefix=<span style="color: #ff4ea3;">"mail"</span>)
-<span style="color: #a1db00;">public</span> <span style="color: #a1db00;">class</span> <span style="color: #00d7af;">ConfigProperties</span> {
+<pre class="src src-java"><span style="color: #b994ff;">@Getter</span>
+<span style="color: #b994ff;">@Setter</span>
+<span style="color: #b994ff;">@ToString</span>
+<span style="color: #b994ff;">@Configuration</span>
+<span style="color: #b994ff;">@Validated</span>
+<span style="color: #b994ff;">@PropertySource</span>(<span style="color: #ffa042;">"classpath:configprops.properties"</span>)
+<span style="color: #b994ff;">@ConfigurationProperties</span>(prefix=<span style="color: #ffa042;">"mail"</span>)
+<span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #ff358b; font-weight: bold;">class</span> <span style="color: #01b0f0; font-weight: bold;">ConfigProperties</span> {
 
-    <span style="color: #5fafd7;">@Getter</span>
-    <span style="color: #5fafd7;">@Setter</span>
-    <span style="color: #5fafd7;">@ToString</span>
-    <span style="color: #a1db00;">public</span> <span style="color: #a1db00;">static</span> <span style="color: #a1db00;">class</span> <span style="color: #00d7af;">Credentials</span> {
-        <span style="color: #5fafd7;">@Length</span>(max=4, min=1)
-        <span style="color: #a1db00;">private</span> <span style="color: #00d7af;">String</span> <span style="color: #ff8700;">authMethod</span>;
-        <span style="color: #a1db00;">private</span> <span style="color: #00d7af;">String</span> <span style="color: #ff8700;">username</span>;
-        <span style="color: #a1db00;">private</span> <span style="color: #00d7af;">String</span> <span style="color: #ff8700;">password</span>;
+    <span style="color: #b994ff;">@Getter</span>
+    <span style="color: #b994ff;">@Setter</span>
+    <span style="color: #b994ff;">@ToString</span>
+    <span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #ff358b; font-weight: bold;">static</span> <span style="color: #ff358b; font-weight: bold;">class</span> <span style="color: #01b0f0; font-weight: bold;">Credentials</span> {
+        <span style="color: #b994ff;">@Length</span>(max=4, min=1)
+        <span style="color: #ff358b; font-weight: bold;">private</span> <span style="color: #01b0f0; font-weight: bold;">String</span> <span style="color: #dddd66;">authMethod</span>;
+        <span style="color: #ff358b; font-weight: bold;">private</span> <span style="color: #01b0f0; font-weight: bold;">String</span> <span style="color: #dddd66;">username</span>;
+        <span style="color: #ff358b; font-weight: bold;">private</span> <span style="color: #01b0f0; font-weight: bold;">String</span> <span style="color: #dddd66;">password</span>;
     }
 
-    <span style="color: #5fafd7;">@NotBlank</span>
-    <span style="color: #a1db00;">private</span> <span style="color: #00d7af;">String</span> <span style="color: #ff8700;">host</span>;
-    <span style="color: #5fafd7;">@Min</span>(1025)
-    <span style="color: #5fafd7;">@Max</span>(65536)
-    <span style="color: #a1db00;">private</span> <span style="color: #00d7af;">int</span> <span style="color: #ff8700;">port</span>;
-    <span style="color: #5fafd7;">@Pattern</span>(regexp=<span style="color: #ff4ea3;">"^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,6}$"</span>)
-    <span style="color: #a1db00;">private</span> <span style="color: #00d7af;">String</span> <span style="color: #ff8700;">from</span>;
+    <span style="color: #b994ff;">@NotBlank</span>
+    <span style="color: #ff358b; font-weight: bold;">private</span> <span style="color: #01b0f0; font-weight: bold;">String</span> <span style="color: #dddd66;">host</span>;
+    <span style="color: #b994ff;">@Min</span>(1025)
+    <span style="color: #b994ff;">@Max</span>(65536)
+    <span style="color: #ff358b; font-weight: bold;">private</span> <span style="color: #01b0f0; font-weight: bold;">int</span> <span style="color: #dddd66;">port</span>;
+    <span style="color: #b994ff;">@Pattern</span>(regexp=<span style="color: #ffa042;">"^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,6}$"</span>)
+    <span style="color: #ff358b; font-weight: bold;">private</span> <span style="color: #01b0f0; font-weight: bold;">String</span> <span style="color: #dddd66;">from</span>;
 
-    <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">In order to validate values of nested properties,</span>
-    <span style="color: #6c6c6c; font-style: italic;">// </span><span style="color: #6c6c6c; font-style: italic;">you must annotate the associated field as @Valid to trigger its validation.</span>
-    <span style="color: #5fafd7;">@Valid</span>
-    <span style="color: #a1db00;">private</span> <span style="color: #00d7af;">Credentials</span> <span style="color: #ff8700;">credentials</span>;
-    <span style="color: #a1db00;">private</span> <span style="color: #00d7af;">List</span>&lt;<span style="color: #00d7af;">String</span>&gt; <span style="color: #ff8700;">defaultRecipients</span>;
-    <span style="color: #a1db00;">private</span> <span style="color: #00d7af;">Map</span>&lt;<span style="color: #00d7af;">String</span>, <span style="color: #00d7af;">String</span>&gt; <span style="color: #ff8700;">additionalHeaders</span>;
+    <span style="color: #465457;">// </span><span style="color: #465457;">In order to validate values of nested properties,</span>
+    <span style="color: #465457;">// </span><span style="color: #465457;">you must annotate the associated field as @Valid to trigger its validation.</span>
+    <span style="color: #b994ff;">@Valid</span>
+    <span style="color: #ff358b; font-weight: bold;">private</span> <span style="color: #01b0f0; font-weight: bold;">Credentials</span> <span style="color: #dddd66;">credentials</span>;
+    <span style="color: #ff358b; font-weight: bold;">private</span> <span style="color: #01b0f0; font-weight: bold;">List</span>&lt;<span style="color: #01b0f0; font-weight: bold;">String</span>&gt; <span style="color: #dddd66;">defaultRecipients</span>;
+    <span style="color: #ff358b; font-weight: bold;">private</span> <span style="color: #01b0f0; font-weight: bold;">Map</span>&lt;<span style="color: #01b0f0; font-weight: bold;">String</span>, <span style="color: #01b0f0; font-weight: bold;">String</span>&gt; <span style="color: #dddd66;">additionalHeaders</span>;
 
 }
 </pre>
@@ -826,8 +1080,8 @@ mail.credentials.authMethod=SHA1
 <div class="outline-text-4" id="text-2-6-1">
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #5fafd7;">@Value</span>(<span style="color: #ff4ea3;">"I love you"</span>)
-<span style="color: #00d7af;">String</span> <span style="color: #ff8700;">normal</span>;
+<pre class="src src-java"><span style="color: #b994ff;">@Value</span>(<span style="color: #ffa042;">"I love you"</span>)
+<span style="color: #01b0f0; font-weight: bold;">String</span> <span style="color: #dddd66;">normal</span>;
 </pre>
 </div>
 </div>
@@ -839,8 +1093,8 @@ mail.credentials.authMethod=SHA1
 <div class="outline-text-4" id="text-2-6-2">
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #5fafd7;">@Value</span>(<span style="color: #ff4ea3;">"#{systemProperties['os.name']}"</span>)
-<span style="color: #00d7af;">String</span> <span style="color: #ff8700;">osName</span>
+<pre class="src src-java"><span style="color: #b994ff;">@Value</span>(<span style="color: #ffa042;">"#{systemProperties['os.name']}"</span>)
+<span style="color: #01b0f0; font-weight: bold;">String</span> <span style="color: #dddd66;">osName</span>
 </pre>
 </div>
 </div>
@@ -852,8 +1106,8 @@ mail.credentials.authMethod=SHA1
 <div class="outline-text-4" id="text-2-6-3">
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #5fafd7;">@Value</span>(<span style="color: #ff4ea3;">"#{ T(java.lang.Math).random() * 100.0 }"</span>)
-<span style="color: #00d7af;">double</span> <span style="color: #ff8700;">randomNumber</span>;
+<pre class="src src-java"><span style="color: #b994ff;">@Value</span>(<span style="color: #ffa042;">"#{ T(java.lang.Math).random() * 100.0 }"</span>)
+<span style="color: #01b0f0; font-weight: bold;">double</span> <span style="color: #dddd66;">randomNumber</span>;
 </pre>
 </div>
 </div>
@@ -865,8 +1119,8 @@ mail.credentials.authMethod=SHA1
 <div class="outline-text-4" id="text-2-6-4">
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #5fafd7;">@Value</span>(<span style="color: #ff4ea3;">"#{anotherBean.value}"</span>)
-<span style="color: #00d7af;">String</span> <span style="color: #ff8700;">another</span>;
+<pre class="src src-java"><span style="color: #b994ff;">@Value</span>(<span style="color: #ffa042;">"#{anotherBean.value}"</span>)
+<span style="color: #01b0f0; font-weight: bold;">String</span> <span style="color: #dddd66;">another</span>;
 </pre>
 </div>
 </div>
@@ -878,8 +1132,8 @@ mail.credentials.authMethod=SHA1
 <div class="outline-text-4" id="text-2-6-5">
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #5fafd7;">@Value</span>(<span style="color: #ff4ea3;">"classpath:test.txt"</span>)
-<span style="color: #00d7af;">Resource</span> <span style="color: #ff8700;">testFile</span>;
+<pre class="src src-java"><span style="color: #b994ff;">@Value</span>(<span style="color: #ffa042;">"classpath:test.txt"</span>)
+<span style="color: #01b0f0; font-weight: bold;">Resource</span> <span style="color: #dddd66;">testFile</span>;
 </pre>
 </div>
 </div>
@@ -891,8 +1145,8 @@ mail.credentials.authMethod=SHA1
 <div class="outline-text-4" id="text-2-6-6">
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #5fafd7;">@Value</span>(<span style="color: #ff4ea3;">"http://www.baidu.com"</span>)
-<span style="color: #00d7af;">Resource</span> <span style="color: #ff8700;">testUrl</span>;
+<pre class="src src-java"><span style="color: #b994ff;">@Value</span>(<span style="color: #ffa042;">"http://www.baidu.com"</span>)
+<span style="color: #01b0f0; font-weight: bold;">Resource</span> <span style="color: #dddd66;">testUrl</span>;
 </pre>
 </div>
 </div>
@@ -904,11 +1158,11 @@ mail.credentials.authMethod=SHA1
 <div class="outline-text-4" id="text-2-6-7">
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #5fafd7;">@Configuration</span>
-<span style="color: #5fafd7;">@PropertySource</span>(<span style="color: #ff4ea3;">"classpath:jdbc.properties"</span>)
-<span style="color: #a1db00;">public</span> <span style="color: #a1db00;">class</span> <span style="color: #00d7af;">MyConfig</span> {
-    <span style="color: #5fafd7;">@Value</span>(<span style="color: #ff4ea3;">"${jdbc.url}"</span>)
-    <span style="color: #a1db00;">private</span> <span style="color: #00d7af;">String</span> <span style="color: #ff8700;">jdbcUrl</span>;
+<pre class="src src-java"><span style="color: #b994ff;">@Configuration</span>
+<span style="color: #b994ff;">@PropertySource</span>(<span style="color: #ffa042;">"classpath:jdbc.properties"</span>)
+<span style="color: #ff358b; font-weight: bold;">public</span> <span style="color: #ff358b; font-weight: bold;">class</span> <span style="color: #01b0f0; font-weight: bold;">MyConfig</span> {
+    <span style="color: #b994ff;">@Value</span>(<span style="color: #ffa042;">"${jdbc.url}"</span>)
+    <span style="color: #ff358b; font-weight: bold;">private</span> <span style="color: #01b0f0; font-weight: bold;">String</span> <span style="color: #dddd66;">jdbcUrl</span>;
 }
 </pre>
 </div>
