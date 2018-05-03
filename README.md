@@ -3,8 +3,9 @@
 ## Python
 
 - [知识点](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/grammar.html)
-- [Numpy](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/numpy.html)
+- [工具命令](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/utils.html)
 - [Pandas](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/pandas.html)
+- [Numpy](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/numpy.html)
 - [Openpyxl](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/openpyxl.html)
 
 ## Java
