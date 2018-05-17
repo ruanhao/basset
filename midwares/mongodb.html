@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- 2018-05-17 Thu 14:52 -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MongoDB</title>
+<meta name="generator" content="Org mode">
+<meta name="author" content="Hao Ruan">
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="https://www.pirilampo.org/styles/readtheorg/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="../org-html-themes/readtheorg/readtheorg.css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://www.pirilampo.org/styles/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="https://www.pirilampo.org/styles/readtheorg/js/readtheorg.js"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">MongoDB</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orga2658b1">1. Emacs 设置</a></li>
+<li><a href="#org572f8f5">2. 查询</a>
+<ul>
+<li><a href="#org31725b4">2.1. 基本查询</a>
+<ul>
+<li><a href="#org5e985e1">2.1.1. 查询所有</a></li>
+<li><a href="#org6b5844d">2.1.2. 指定相等条件</a></li>
+<li><a href="#org5c96d6f">2.1.3. 查询操作符</a></li>
+<li><a href="#orga04e49a">2.1.4. 与或条件</a></li>
+<li><a href="#org3069394">2.1.5. 查询内嵌文档</a></li>
+</ul>
+</li>
+<li><a href="#orgb0b62f8">2.2. 查询数组</a>
+<ul>
+<li><a href="#orge13ef37">2.2.1. 查询数组中的元素</a></li>
+<li><a href="#orge50d19c">2.2.2. 为元素指定多个条件</a></li>
+<li><a href="#orgb4deb3c">2.2.3. 通过数组下标进行查询</a></li>
+<li><a href="#org9f2a44d">2.2.4. 通过数组长度查询</a></li>
+</ul>
+</li>
+<li><a href="#org3a40eba">2.3. 查询内嵌文档数组</a>
+<ul>
+<li><a href="#org1fa90b4">2.3.1. 对字段查询</a></li>
+<li><a href="#org60fc285">2.3.2. 使用索引查询</a></li>
+<li><a href="#org923fb8a">2.3.3. 指定多个条件</a></li>
+</ul>
+</li>
+<li><a href="#orge6cc247">2.4. 对查询结果投影</a>
+<ul>
+<li><a href="#org011e374">2.4.1. 包含某些字段</a></li>
+<li><a href="#org2a13ace">2.4.2. 排除某些字段</a></li>
+<li><a href="#orgadff587">2.4.3. 对内嵌文档字段投影</a></li>
+<li><a href="#orge47284e">2.4.4. 对内嵌文档数组字段投影</a></li>
+<li><a href="#org1caeb90">2.4.5. 对返回结果中数组投影</a></li>
+</ul>
+</li>
+<li><a href="#orgaa9f050">2.5. 查询 Null 或 Missing 字段</a>
+<ul>
+<li><a href="#orgabb7936">2.5.1. 空值检查</a></li>
+<li><a href="#org9db13e8">2.5.2. 类型检查</a></li>
+<li><a href="#orgd60f234">2.5.3. 字段存在检查</a></li>
+</ul>
+</li>
+<li><a href="#org29ce770">2.6. 在 shell 中使用游标</a></li>
+</ul>
+</li>
+<li><a href="#orgc520d90">3. 聚合</a>
+<ul>
+<li><a href="#org65871ba">3.1. $project</a>
+<ul>
+<li><a href="#org5380074">3.1.1. 重命名字段</a></li>
+</ul>
+</li>
+<li><a href="#orgfc5418b">3.2. $unwind</a>
+<ul>
+<li><a href="#orgb050f84">3.2.1. 将数组中每一个元素拆分为单独的文档</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orga2658b1">1. Emacs 设置</a></li>
+<li><a href="#org572f8f5">2. 查询</a>
+<ul>
+<li><a href="#org31725b4">2.1. 基本查询</a>
+<ul>
+<li><a href="#org5e985e1">2.1.1. 查询所有</a></li>
+<li><a href="#org6b5844d">2.1.2. 指定相等条件</a></li>
+<li><a href="#org5c96d6f">2.1.3. 查询操作符</a></li>
+<li><a href="#orga04e49a">2.1.4. 与或条件</a></li>
+<li><a href="#org3069394">2.1.5. 查询内嵌文档</a></li>
+</ul>
+</li>
+<li><a href="#orgb0b62f8">2.2. 查询数组</a>
+<ul>
+<li><a href="#orge13ef37">2.2.1. 查询数组中的元素</a></li>
+<li><a href="#orge50d19c">2.2.2. 为元素指定多个条件</a></li>
+<li><a href="#orgb4deb3c">2.2.3. 通过数组下标进行查询</a></li>
+<li><a href="#org9f2a44d">2.2.4. 通过数组长度查询</a></li>
+</ul>
+</li>
+<li><a href="#org3a40eba">2.3. 查询内嵌文档数组</a>
+<ul>
+<li><a href="#org1fa90b4">2.3.1. 对字段查询</a></li>
+<li><a href="#org60fc285">2.3.2. 使用索引查询</a></li>
+<li><a href="#org923fb8a">2.3.3. 指定多个条件</a></li>
+</ul>
+</li>
+<li><a href="#orge6cc247">2.4. 对查询结果投影</a>
+<ul>
+<li><a href="#org011e374">2.4.1. 包含某些字段</a></li>
+<li><a href="#org2a13ace">2.4.2. 排除某些字段</a></li>
+<li><a href="#orgadff587">2.4.3. 对内嵌文档字段投影</a></li>
+<li><a href="#orge47284e">2.4.4. 对内嵌文档数组字段投影</a></li>
+<li><a href="#org1caeb90">2.4.5. 对返回结果中数组投影</a></li>
+</ul>
+</li>
+<li><a href="#orgaa9f050">2.5. 查询 Null 或 Missing 字段</a>
+<ul>
+<li><a href="#orgabb7936">2.5.1. 空值检查</a></li>
+<li><a href="#org9db13e8">2.5.2. 类型检查</a></li>
+<li><a href="#orgd60f234">2.5.3. 字段存在检查</a></li>
+</ul>
+</li>
+<li><a href="#org29ce770">2.6. 在 shell 中使用游标</a></li>
+</ul>
+</li>
+<li><a href="#orgc520d90">3. 聚合</a>
+<ul>
+<li><a href="#org65871ba">3.1. $project</a>
+<ul>
+<li><a href="#org5380074">3.1.1. 重命名字段</a></li>
+</ul>
+</li>
+<li><a href="#orgfc5418b">3.2. $unwind</a>
+<ul>
+<li><a href="#orgb050f84">3.2.1. 将数组中每一个元素拆分为单独的文档</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="outline-2" id="meta">
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Author</td>
+<td class="org-left">Hao Ruan (haoru@cisco.com)</td>
+</tr>
+
+<tr>
+<td class="org-left">Date</td>
+<td class="org-left">2018-05-17 14:52:12</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div id="outline-container-orga2658b1" class="outline-2">
+<h2 id="orga2658b1"><span class="section-number-2">1</span> Emacs 设置</h2>
+<div class="outline-text-2" id="text-1">
+<ol class="org-ol">
+<li>安装 <a href="https://github.com/krisajenkins/ob-mongo">ob-mongo</a></li>
+<li><code>rm -rf ~/.emacs.d/elpa/org-xxxxxxx/*.elc</code></li>
+</ol>
+</div>
+</div>
+
+
+
+<div id="outline-container-org572f8f5" class="outline-2">
+<h2 id="org572f8f5"><span class="section-number-2">2</span> 查询</h2>
+<div class="outline-text-2" id="text-2">
+<img src="img/crud-annotated-mongodb-find.bakedsvg.svg"/>
+</div>
+
+<div id="outline-container-org31725b4" class="outline-3">
+<h3 id="org31725b4"><span class="section-number-3">2.1</span> 基本查询</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.insertMany([
+    { item: <span style="color: #ff1f8b;">"journal"</span>,  qty: 25,  size: { h: 14,    w: 21,    uom: <span style="color: #ff1f8b;">"cm"</span> }, status: <span style="color: #ff1f8b;">"A"</span> },
+    { item: <span style="color: #ff1f8b;">"notebook"</span>, qty: 50,  size: { h: 8.5,   w: 11,    uom: <span style="color: #ff1f8b;">"in"</span> }, status: <span style="color: #ff1f8b;">"A"</span> },
+    { item: <span style="color: #ff1f8b;">"paper"</span>,    qty: 100, size: { h: 8.5,   w: 11,    uom: <span style="color: #ff1f8b;">"in"</span> }, status: <span style="color: #ff1f8b;">"D"</span> },
+    { item: <span style="color: #ff1f8b;">"planner"</span>,  qty: 75,  size: { h: 22.85, w: 30,    uom: <span style="color: #ff1f8b;">"cm"</span> }, status: <span style="color: #ff1f8b;">"D"</span> },
+    { item: <span style="color: #ff1f8b;">"postcard"</span>, qty: 45,  size: { h: 10,    w: 15.25, uom: <span style="color: #ff1f8b;">"cm"</span> }, status: <span style="color: #ff1f8b;">"A"</span> }
+]);
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org5e985e1" class="outline-4">
+<h4 id="org5e985e1"><span class="section-number-4">2.1.1</span> 查询所有</h4>
+<div class="outline-text-4" id="text-2-1-1">
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find({})
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6b5844d" class="outline-4">
+<h4 id="org6b5844d"><span class="section-number-4">2.1.2</span> 指定相等条件</h4>
+<div class="outline-text-4" id="text-2-1-2">
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { status: <span style="color: #ff1f8b;">"D"</span> } )
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org5c96d6f" class="outline-4">
+<h4 id="org5c96d6f"><span class="section-number-4">2.1.3</span> 查询操作符</h4>
+<div class="outline-text-4" id="text-2-1-3">
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { status: { $in: [ <span style="color: #ff1f8b;">"A"</span>, <span style="color: #ff1f8b;">"D"</span> ] } } )
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga04e49a" class="outline-4">
+<h4 id="orga04e49a"><span class="section-number-4">2.1.4</span> 与或条件</h4>
+<div class="outline-text-4" id="text-2-1-4">
+<ul class="org-ul">
+<li>AND</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { status: <span style="color: #ff1f8b;">"A"</span>, qty: { $lt: 30 } } )
+</pre>
+</div>
+
+<ul class="org-ul">
+<li>OR</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { $or: [ { status: <span style="color: #ff1f8b;">"A"</span> }, { qty: { $lt: 30 } } ] } )
+</pre>
+</div>
+
+
+<ul class="org-ul">
+<li>AND/OR</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( {
+    status: <span style="color: #ff1f8b;">"A"</span>,
+    $or: [ { qty: { $lt: 30 } }, { item: <span style="color: #ff1f8b;">/^p/</span> } ]
+} )
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3069394" class="outline-4">
+<h4 id="org3069394"><span class="section-number-4">2.1.5</span> 查询内嵌文档</h4>
+<div class="outline-text-4" id="text-2-1-5">
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { <span style="color: #ff1f8b;">"size.h"</span>: { $lt: 15 }, <span style="color: #ff1f8b;">"size.uom"</span>: <span style="color: #ff1f8b;">"in"</span>, status: <span style="color: #ff1f8b;">"D"</span> } )
+</pre>
+</div>
+
+<pre class="example">
+Mongo-Hacker 0.0.14
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a52"),
+  "item": "paper",
+  "status": "D",
+  "size": {
+    "h": 8.5,
+    "w": 11,
+    "uom": "in"
+  },
+  "instock": [
+    {
+      "warehouse": "A",
+      "qty": 60
+    }
+  ]
+}
+Fetched 1 record(s) in 1ms
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgb0b62f8" class="outline-3">
+<h3 id="orgb0b62f8"><span class="section-number-3">2.2</span> 查询数组</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.insertMany([
+    { item: <span style="color: #ff1f8b;">"journal"</span>,  qty: 25,  tags: [<span style="color: #ff1f8b;">"blank"</span>, <span style="color: #ff1f8b;">"red"</span>],          dim_cm: [ 14, 21 ] },
+    { item: <span style="color: #ff1f8b;">"notebook"</span>, qty: 50,  tags: [<span style="color: #ff1f8b;">"red"</span>, <span style="color: #ff1f8b;">"blank"</span>],          dim_cm: [ 14, 21 ] },
+    { item: <span style="color: #ff1f8b;">"paper"</span>,    qty: 100, tags: [<span style="color: #ff1f8b;">"red"</span>, <span style="color: #ff1f8b;">"blank"</span>, <span style="color: #ff1f8b;">"plain"</span>], dim_cm: [ 14, 21 ] },
+    { item: <span style="color: #ff1f8b;">"planner"</span>,  qty: 75,  tags: [<span style="color: #ff1f8b;">"blank"</span>, <span style="color: #ff1f8b;">"red"</span>],          dim_cm: [ 22.85, 30 ] },
+    { item: <span style="color: #ff1f8b;">"postcard"</span>, qty: 45,  tags: [<span style="color: #ff1f8b;">"blue"</span>],                  dim_cm: [ 10, 15.25 ] }
+]);
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orge13ef37" class="outline-4">
+<h4 id="orge13ef37"><span class="section-number-4">2.2.1</span> 查询数组中的元素</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<p>
+下述语法都是表示 <b>数组中是否有一个元素满足条件</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { tags: <span style="color: #ff1f8b;">"red"</span> } ).limit(1)
+</pre>
+</div>
+
+<pre class="example">
+Mongo-Hacker 0.0.14
+Fetched 0 record(s) in 0ms
+
+</pre>
+
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { dim_cm: { $gt: 25 } } )
+</pre>
+</div>
+
+<pre class="example">
+Mongo-Hacker 0.0.14
+Fetched 0 record(s) in 2ms
+
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orge50d19c" class="outline-4">
+<h4 id="orge50d19c"><span class="section-number-4">2.2.2</span> 为元素指定多个条件</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<p>
+下述例子不是针对某个元素，而是指 <b>是否有一个大于15，有另一个小于20</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { dim_cm: { $gt: 15, $lt: 20 } } ).limit(1)
+</pre>
+</div>
+
+<pre class="example">
+Mongo-Hacker 0.0.14
+Fetched 0 record(s) in 1ms
+
+</pre>
+
+<p>
+使用 <b>$elemMatch</b> 针对某个元素进行查询
+</p>
+
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { dim_cm: { $elemMatch: { $gt: 22, $lt: 30 } } } )
+</pre>
+</div>
+
+<pre class="example">
+Mongo-Hacker 0.0.14
+Fetched 0 record(s) in 1ms
+
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgb4deb3c" class="outline-4">
+<h4 id="orgb4deb3c"><span class="section-number-4">2.2.3</span> 通过数组下标进行查询</h4>
+<div class="outline-text-4" id="text-2-2-3">
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { <span style="color: #ff1f8b;">"dim_cm.1"</span>: { $gt: 25 } } )
+</pre>
+</div>
+
+<pre class="example">
+Mongo-Hacker 0.0.14
+Fetched 0 record(s) in 1ms
+
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org9f2a44d" class="outline-4">
+<h4 id="org9f2a44d"><span class="section-number-4">2.2.4</span> 通过数组长度查询</h4>
+<div class="outline-text-4" id="text-2-2-4">
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { <span style="color: #ff1f8b;">"tags"</span>: { $size: 3 } } )
+</pre>
+</div>
+
+<pre class="example">
+Mongo-Hacker 0.0.14
+Fetched 0 record(s) in 1ms
+
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org3a40eba" class="outline-3">
+<h3 id="org3a40eba"><span class="section-number-3">2.3</span> 查询内嵌文档数组</h3>
+<div class="outline-text-3" id="text-2-3">
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.insertMany( [
+    { item: <span style="color: #ff1f8b;">"journal"</span>,  instock: [ { warehouse: <span style="color: #ff1f8b;">"A"</span>, qty: 5 }, { warehouse: <span style="color: #ff1f8b;">"C"</span>, qty: 15 } ] },
+    { item: <span style="color: #ff1f8b;">"notebook"</span>, instock: [ { warehouse: <span style="color: #ff1f8b;">"C"</span>, qty: 5 } ] },
+    { item: <span style="color: #ff1f8b;">"paper"</span>,    instock: [ { warehouse: <span style="color: #ff1f8b;">"A"</span>, qty: 60 }, { warehouse: <span style="color: #ff1f8b;">"B"</span>, qty: 15 } ] },
+    { item: <span style="color: #ff1f8b;">"planner"</span>,  instock: [ { warehouse: <span style="color: #ff1f8b;">"A"</span>, qty: 40 }, { warehouse: <span style="color: #ff1f8b;">"B"</span>, qty: 5 } ] },
+    { item: <span style="color: #ff1f8b;">"postcard"</span>, instock: [ { warehouse: <span style="color: #ff1f8b;">"B"</span>, qty: 15 }, { warehouse: <span style="color: #ff1f8b;">"C"</span>, qty: 35 } ] }
+]);
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org1fa90b4" class="outline-4">
+<h4 id="org1fa90b4"><span class="section-number-4">2.3.1</span> 对字段查询</h4>
+<div class="outline-text-4" id="text-2-3-1">
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { <span style="color: #ff1f8b;">'instock.qty'</span>: { $lte: 20 } } )
+</pre>
+</div>
+
+<pre class="example">
+Mongo-Hacker 0.0.14
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a50"),
+  "item": "journal",
+  "status": "A",
+  "size": {
+    "h": 14,
+    "w": 21,
+    "uom": "cm"
+  },
+  "instock": [
+    {
+      "warehouse": "A",
+      "qty": 5
+    }
+  ]
+}
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a51"),
+  "item": "notebook",
+  "status": "A",
+  "size": {
+    "h": 8.5,
+    "w": 11,
+    "uom": "in"
+  },
+  "instock": [
+    {
+      "warehouse": "C",
+      "qty": 5
+    }
+  ]
+}
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a54"),
+  "item": "postcard",
+  "status": "A",
+  "size": {
+    "h": 10,
+    "w": 15.25,
+    "uom": "cm"
+  },
+  "instock": [
+    {
+      "warehouse": "B",
+      "qty": 15
+    },
+    {
+      "warehouse": "C",
+      "qty": 35
+    }
+  ]
+}
+Fetched 3 record(s) in 2ms
+</pre>
+</div>
+</div>
+
+
+
+<div id="outline-container-org60fc285" class="outline-4">
+<h4 id="org60fc285"><span class="section-number-4">2.3.2</span> 使用索引查询</h4>
+<div class="outline-text-4" id="text-2-3-2">
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { <span style="color: #ff1f8b;">'instock.0.qty'</span>: { $lte: 20 } } )
+</pre>
+</div>
+
+<pre class="example">
+Mongo-Hacker 0.0.14
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a50"),
+  "item": "journal",
+  "status": "A",
+  "size": {
+    "h": 14,
+    "w": 21,
+    "uom": "cm"
+  },
+  "instock": [
+    {
+      "warehouse": "A",
+      "qty": 5
+    }
+  ]
+}
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a51"),
+  "item": "notebook",
+  "status": "A",
+  "size": {
+    "h": 8.5,
+    "w": 11,
+    "uom": "in"
+  },
+  "instock": [
+    {
+      "warehouse": "C",
+      "qty": 5
+    }
+  ]
+}
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a54"),
+  "item": "postcard",
+  "status": "A",
+  "size": {
+    "h": 10,
+    "w": 15.25,
+    "uom": "cm"
+  },
+  "instock": [
+    {
+      "warehouse": "B",
+      "qty": 15
+    },
+    {
+      "warehouse": "C",
+      "qty": 35
+    }
+  ]
+}
+Fetched 3 record(s) in 2ms
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org923fb8a" class="outline-4">
+<h4 id="org923fb8a"><span class="section-number-4">2.3.3</span> 指定多个条件</h4>
+<div class="outline-text-4" id="text-2-3-3">
+<ul class="org-ul">
+<li>针对单个文档</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { <span style="color: #ff1f8b;">"instock"</span>: { $elemMatch: { qty: 5, warehouse: <span style="color: #ff1f8b;">"A"</span> } } } )
+</pre>
+</div>
+
+<pre class="example">
+Mongo-Hacker 0.0.14
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a50"),
+  "item": "journal",
+  "status": "A",
+  "size": {
+    "h": 14,
+    "w": 21,
+    "uom": "cm"
+  },
+  "instock": [
+    {
+      "warehouse": "A",
+      "qty": 5
+    }
+  ]
+}
+Fetched 1 record(s) in 1ms
+</pre>
+
+
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { <span style="color: #ff1f8b;">"instock"</span>: { $elemMatch: { qty: { $gt: 10, $lte: 20 } } } } )
+</pre>
+</div>
+
+<pre class="example">
+Mongo-Hacker 0.0.14
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a54"),
+  "item": "postcard",
+  "status": "A",
+  "size": {
+    "h": 10,
+    "w": 15.25,
+    "uom": "cm"
+  },
+  "instock": [
+    {
+      "warehouse": "B",
+      "qty": 15
+    },
+    {
+      "warehouse": "C",
+      "qty": 35
+    }
+  ]
+}
+Fetched 1 record(s) in 2ms
+</pre>
+
+<ul class="org-ul">
+<li>不针对单个文档</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { <span style="color: #ff1f8b;">"instock.qty"</span>: { $gt: 10,  $lte: 20 } } )
+</pre>
+</div>
+
+<pre class="example">
+Mongo-Hacker 0.0.14
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a54"),
+  "item": "postcard",
+  "status": "A",
+  "size": {
+    "h": 10,
+    "w": 15.25,
+    "uom": "cm"
+  },
+  "instock": [
+    {
+      "warehouse": "B",
+      "qty": 15
+    },
+    {
+      "warehouse": "C",
+      "qty": 35
+    }
+  ]
+}
+Fetched 1 record(s) in 2ms
+</pre>
+
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { <span style="color: #ff1f8b;">"instock.qty"</span>: 5, <span style="color: #ff1f8b;">"instock.warehouse"</span>: <span style="color: #ff1f8b;">"A"</span> } )
+</pre>
+</div>
+
+<pre class="example">
+Mongo-Hacker 0.0.14
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a50"),
+  "item": "journal",
+  "status": "A",
+  "size": {
+    "h": 14,
+    "w": 21,
+    "uom": "cm"
+  },
+  "instock": [
+    {
+      "warehouse": "A",
+      "qty": 5
+    }
+  ]
+}
+Fetched 1 record(s) in 2ms
+</pre>
+</div>
+</div>
+</div>
+
+
+
+
+
+
+<div id="outline-container-orge6cc247" class="outline-3">
+<h3 id="orge6cc247"><span class="section-number-3">2.4</span> 对查询结果投影</h3>
+<div class="outline-text-3" id="text-2-4">
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.insertMany( [
+    { item: <span style="color: #ff1f8b;">"journal"</span>,
+      status: <span style="color: #ff1f8b;">"A"</span>,
+      size: { h: 14, w: 21, uom: <span style="color: #ff1f8b;">"cm"</span> },
+      instock: [ { warehouse: <span style="color: #ff1f8b;">"A"</span>, qty: 5 } ] },
+    { item: <span style="color: #ff1f8b;">"notebook"</span>,
+      status: <span style="color: #ff1f8b;">"A"</span>,
+      size: { h: 8.5, w: 11, uom: <span style="color: #ff1f8b;">"in"</span> },
+      instock: [ { warehouse: <span style="color: #ff1f8b;">"C"</span>, qty: 5 } ] },
+    { item: <span style="color: #ff1f8b;">"paper"</span>,
+      status: <span style="color: #ff1f8b;">"D"</span>,
+      size: { h: 8.5, w: 11, uom: <span style="color: #ff1f8b;">"in"</span> },
+      instock: [ { warehouse: <span style="color: #ff1f8b;">"A"</span>, qty: 60 } ] },
+    { item: <span style="color: #ff1f8b;">"planner"</span>,
+      status: <span style="color: #ff1f8b;">"D"</span>,
+      size: { h: 22.85, w: 30, uom: <span style="color: #ff1f8b;">"cm"</span> },
+      instock: [ { warehouse: <span style="color: #ff1f8b;">"A"</span>, qty: 40 } ] },
+    { item: <span style="color: #ff1f8b;">"postcard"</span>,
+      status: <span style="color: #ff1f8b;">"A"</span>,
+      size: { h: 10, w: 15.25, uom: <span style="color: #ff1f8b;">"cm"</span> },
+      instock: [ { warehouse: <span style="color: #ff1f8b;">"B"</span>, qty: 15 }, { warehouse: <span style="color: #ff1f8b;">"C"</span>, qty: 35 } ] }
+]);
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org011e374" class="outline-4">
+<h4 id="org011e374"><span class="section-number-4">2.4.1</span> 包含某些字段</h4>
+<div class="outline-text-4" id="text-2-4-1">
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { status: <span style="color: #ff1f8b;">"A"</span> }, { item: 1, status: 1, _id: 0 } ).limit(3)
+</pre>
+</div>
+
+<pre class="example">
+Mongo-Hacker 0.0.14
+{
+  "item": "journal",
+  "status": "A"
+}
+{
+  "item": "notebook",
+  "status": "A"
+}
+{
+  "item": "postcard",
+  "status": "A"
+}
+Fetched 3 record(s) in 1ms
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org2a13ace" class="outline-4">
+<h4 id="org2a13ace"><span class="section-number-4">2.4.2</span> 排除某些字段</h4>
+<div class="outline-text-4" id="text-2-4-2">
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { status: <span style="color: #ff1f8b;">"A"</span> }, { status: 0, instock: 0 } ).limit(3)
+</pre>
+</div>
+
+<pre class="example">
+Mongo-Hacker 0.0.14
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a50"),
+  "item": "journal",
+  "size": {
+    "h": 14,
+    "w": 21,
+    "uom": "cm"
+  }
+}
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a51"),
+  "item": "notebook",
+  "size": {
+    "h": 8.5,
+    "w": 11,
+    "uom": "in"
+  }
+}
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a54"),
+  "item": "postcard",
+  "size": {
+    "h": 10,
+    "w": 15.25,
+    "uom": "cm"
+  }
+}
+Fetched 3 record(s) in 1ms
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgadff587" class="outline-4">
+<h4 id="orgadff587"><span class="section-number-4">2.4.3</span> 对内嵌文档字段投影</h4>
+<div class="outline-text-4" id="text-2-4-3">
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find(
+   { status: <span style="color: #ff1f8b;">"A"</span> },
+   { item: 1, status: 1, <span style="color: #ff1f8b;">"size.uom"</span>: 1 }
+).limit(3)
+</pre>
+</div>
+
+<pre class="example">
+Mongo-Hacker 0.0.14
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a50"),
+  "item": "journal",
+  "status": "A",
+  "size": {
+    "uom": "cm"
+  }
+}
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a51"),
+  "item": "notebook",
+  "status": "A",
+  "size": {
+    "uom": "in"
+  }
+}
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a54"),
+  "item": "postcard",
+  "status": "A",
+  "size": {
+    "uom": "cm"
+  }
+}
+Fetched 3 record(s) in 1ms
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orge47284e" class="outline-4">
+<h4 id="orge47284e"><span class="section-number-4">2.4.4</span> 对内嵌文档数组字段投影</h4>
+<div class="outline-text-4" id="text-2-4-4">
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { status: <span style="color: #ff1f8b;">"A"</span> }, { item: 1, status: 1, <span style="color: #ff1f8b;">"instock.qty"</span>: 1 } ).limit(3)
+</pre>
+</div>
+
+<pre class="example">
+Mongo-Hacker 0.0.14
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a50"),
+  "item": "journal",
+  "status": "A",
+  "instock": [
+    {
+      "qty": 5
+    }
+  ]
+}
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a51"),
+  "item": "notebook",
+  "status": "A",
+  "instock": [
+    {
+      "qty": 5
+    }
+  ]
+}
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a54"),
+  "item": "postcard",
+  "status": "A",
+  "instock": [
+    {
+      "qty": 15
+    },
+    {
+      "qty": 35
+    }
+  ]
+}
+Fetched 3 record(s) in 2ms
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org1caeb90" class="outline-4">
+<h4 id="org1caeb90"><span class="section-number-4">2.4.5</span> 对返回结果中数组投影</h4>
+<div class="outline-text-4" id="text-2-4-5">
+<p>
+只能使用 <a href="https://docs.mongodb.com/manual/reference/operator/projection/elemMatch/#proj._S_elemMatch">$elemMatch</a>, <a href="https://docs.mongodb.com/manual/reference/operator/projection/slice/#proj._S_slice">$slice</a>, <a href="https://docs.mongodb.com/manual/reference/operator/projection/positional/#proj._S_">$</a> 对返回结果中的数组进行投影
+</p>
+
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { status: <span style="color: #ff1f8b;">"A"</span> }, { item: 1, status: 1, instock: { $slice: -1 } } ).limit(3)
+</pre>
+</div>
+
+<pre class="example">
+Mongo-Hacker 0.0.14
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a50"),
+  "item": "journal",
+  "status": "A",
+  "instock": [
+    {
+      "warehouse": "A",
+      "qty": 5
+    }
+  ]
+}
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a51"),
+  "item": "notebook",
+  "status": "A",
+  "instock": [
+    {
+      "warehouse": "C",
+      "qty": 5
+    }
+  ]
+}
+{
+  "_id": ObjectId("5afd219310a81f112bcd9a54"),
+  "item": "postcard",
+  "status": "A",
+  "instock": [
+    {
+      "warehouse": "C",
+      "qty": 35
+    }
+  ]
+}
+Fetched 3 record(s) in 2ms
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgaa9f050" class="outline-3">
+<h3 id="orgaa9f050"><span class="section-number-3">2.5</span> 查询 Null 或 Missing 字段</h3>
+<div class="outline-text-3" id="text-2-5">
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.insertMany([
+   { _id: 1, item: <span style="color: #1f5bff; font-weight: bold;">null</span> },
+   { _id: 2 }
+])
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgabb7936" class="outline-4">
+<h4 id="orgabb7936"><span class="section-number-4">2.5.1</span> 空值检查</h4>
+<div class="outline-text-4" id="text-2-5-1">
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { item: <span style="color: #1f5bff; font-weight: bold;">null</span> } )
+</pre>
+</div>
+
+<pre class="example">
+Mongo-Hacker 0.0.14
+{
+  "_id": 1,
+  "item": null
+}
+{
+  "_id": 2
+}
+Fetched 2 record(s) in 1ms
+
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org9db13e8" class="outline-4">
+<h4 id="org9db13e8"><span class="section-number-4">2.5.2</span> 类型检查</h4>
+<div class="outline-text-4" id="text-2-5-2">
+<p>
+<a href="https://docs.mongodb.com/manual/reference/bson-types/">BSON Type</a>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { item : { $type: 10 } } )
+</pre>
+</div>
+
+<pre class="example">
+Mongo-Hacker 0.0.14
+{
+  "_id": 1,
+  "item": null
+}
+Fetched 1 record(s) in 1ms
+
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgd60f234" class="outline-4">
+<h4 id="orgd60f234"><span class="section-number-4">2.5.3</span> 字段存在检查</h4>
+<div class="outline-text-4" id="text-2-5-3">
+<div class="org-src-container">
+<pre class="src src-mongo">db.inventory.find( { item : { $exists: <span style="color: #1f5bff; font-weight: bold;">false</span> } } )
+</pre>
+</div>
+
+<pre class="example">
+Mongo-Hacker 0.0.14
+{
+  "_id": 2
+}
+Fetched 1 record(s) in 1ms
+
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org29ce770" class="outline-3">
+<h3 id="org29ce770"><span class="section-number-3">2.6</span> <a href="https://docs.mongodb.com/manual/tutorial/iterate-a-cursor/">在 shell 中使用游标</a></h3>
+<div class="outline-text-3" id="text-2-6">
+<p>
+The <code>db.collection.find()</code> method returns a cursor. To access the documents, you need to iterate the cursor.
+</p>
+
+<p>
+However, in the mongo shell, if the returned cursor is not assigned to a variable using the var keyword,
+then the cursor is automatically <b>iterated up to 20 times</b> to print up to the first 20 documents in the results.
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgc520d90" class="outline-2">
+<h2 id="orgc520d90"><span class="section-number-2">3</span> 聚合</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org65871ba" class="outline-3">
+<h3 id="org65871ba"><span class="section-number-3">3.1</span> $project</h3>
+<div class="outline-text-3" id="text-3-1">
+</div>
+<div id="outline-container-org5380074" class="outline-4">
+<h4 id="org5380074"><span class="section-number-4">3.1.1</span> 重命名字段</h4>
+<div class="outline-text-4" id="text-3-1-1">
+<ul class="org-ul">
+<li>数据</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-js">{ <span style="color: #ff1f8b;">"_id"</span>: ObjectId(<span style="color: #ff1f8b;">"56cea763d43e3500f6768482"</span>),
+  <span style="color: #ff1f8b;">"name"</span>: <span style="color: #ff1f8b;">"aaa"</span>,
+  <span style="color: #ff1f8b;">"model"</span>: { <span style="color: #ff1f8b;">"lang"</span>: <span style="color: #ff1f8b;">"en"</span>,
+             <span style="color: #ff1f8b;">"title"</span>: <span style="color: #ff1f8b;">"b"</span>,
+             <span style="color: #ff1f8b;">"date"</span>: ISODate(<span style="color: #ff1f8b;">"2016-02-25T07:04:03.414Z"</span>)
+           },
+}
+</pre>
+</div>
+
+<ul class="org-ul">
+<li>表达式</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-js">db.articles.aggregate([
+    {$match: {<span style="color: #ff1f8b;">'model.lang'</span>: <span style="color: #ff1f8b;">'en'</span>}},
+    {$project: {
+        _id: 0,
+        <span style="color: #ff1f8b;">'title'</span>: <span style="color: #ff1f8b;">'$model.title'</span>,
+        <span style="color: #ff1f8b;">'date'</span>: {$dateToString: {format: <span style="color: #ff1f8b;">'%Y-%m-%d'</span>,
+                                 date: <span style="color: #ff1f8b;">'$model.date'</span>}}}}])
+</pre>
+</div>
+
+
+<ul class="org-ul">
+<li>结果</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-js">{ <span style="color: #ff1f8b;">"date"</span> : <span style="color: #ff1f8b;">"2016-02-25"</span>, <span style="color: #ff1f8b;">"title"</span> : <span style="color: #ff1f8b;">"b"</span> }
+{ <span style="color: #ff1f8b;">"date"</span> : <span style="color: #ff1f8b;">"2016-02-25"</span>, <span style="color: #ff1f8b;">"title"</span> : <span style="color: #ff1f8b;">"c"</span> }
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgfc5418b" class="outline-3">
+<h3 id="orgfc5418b"><span class="section-number-3">3.2</span> $unwind</h3>
+<div class="outline-text-3" id="text-3-2">
+</div>
+<div id="outline-container-orgb050f84" class="outline-4">
+<h4 id="orgb050f84"><span class="section-number-4">3.2.1</span> 将数组中每一个元素拆分为单独的文档</h4>
+<div class="outline-text-4" id="text-3-2-1">
+<ul class="org-ul">
+<li><p>
+数据
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js">{
+    <span style="color: #ff1f8b;">"_id"</span> : ObjectId(<span style="color: #ff1f8b;">"50eeffc4c82a5271290530be"</span>),
+    <span style="color: #ff1f8b;">"author"</span> : <span style="color: #ff1f8b;">"k"</span>,
+    <span style="color: #ff1f8b;">"post"</span> : <span style="color: #ff1f8b;">"Hello, world!"</span>,
+    <span style="color: #ff1f8b;">"comments"</span> : [
+        {
+            <span style="color: #ff1f8b;">"author"</span> : <span style="color: #ff1f8b;">"mark"</span>,
+            <span style="color: #ff1f8b;">"date"</span> : ISODate(<span style="color: #ff1f8b;">"2013-01-10T17:52:04.148Z"</span>),
+            <span style="color: #ff1f8b;">"text"</span> : <span style="color: #ff1f8b;">"Nice post"</span>
+        },
+        {
+            <span style="color: #ff1f8b;">"author"</span> : <span style="color: #ff1f8b;">"bill"</span>,
+            <span style="color: #ff1f8b;">"date"</span> : ISODate(<span style="color: #ff1f8b;">"2013-01-10T17:52:04.148Z"</span>),
+            <span style="color: #ff1f8b;">"text"</span> : <span style="color: #ff1f8b;">"I agree"</span>
+        }
+    ]
+}
+</pre>
+</div></li>
+</ul>
+
+
+<ul class="org-ul">
+<li><p>
+表达式
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js">db.blog.aggregate({<span style="color: #ff1f8b;">"$unwind"</span> : <span style="color: #ff1f8b;">"$comments"</span>})
+</pre>
+</div></li>
+</ul>
+
+
+<ul class="org-ul">
+<li><p>
+结果
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js">{
+    <span style="color: #ff1f8b;">"results"</span> : [
+        {
+            <span style="color: #ff1f8b;">"_id"</span> : ObjectId(<span style="color: #ff1f8b;">"50eeffc4c82a5271290530be"</span>),
+            <span style="color: #ff1f8b;">"author"</span> : <span style="color: #ff1f8b;">"k"</span>,
+            <span style="color: #ff1f8b;">"post"</span> : <span style="color: #ff1f8b;">"Hello, world!"</span>,
+            <span style="color: #ff1f8b;">"comments"</span> : {
+                <span style="color: #ff1f8b;">"author"</span> : <span style="color: #ff1f8b;">"mark"</span>,
+                <span style="color: #ff1f8b;">"date"</span> : ISODate(<span style="color: #ff1f8b;">"2013-01-10T17:52:04.148Z"</span>),
+                <span style="color: #ff1f8b;">"text"</span> : <span style="color: #ff1f8b;">"Nice post"</span>
+            }
+        },
+        {
+            <span style="color: #ff1f8b;">"_id"</span> : ObjectId(<span style="color: #ff1f8b;">"50eeffc4c82a5271290530be"</span>),
+            <span style="color: #ff1f8b;">"author"</span> : <span style="color: #ff1f8b;">"k"</span>,
+            <span style="color: #ff1f8b;">"post"</span> : <span style="color: #ff1f8b;">"Hello, world!"</span>,
+            <span style="color: #ff1f8b;">"comments"</span> : {
+                <span style="color: #ff1f8b;">"author"</span> : <span style="color: #ff1f8b;">"bill"</span>,
+                <span style="color: #ff1f8b;">"date"</span> : ISODate(<span style="color: #ff1f8b;">"2013-01-10T17:52:04.148Z"</span>),
+                <span style="color: #ff1f8b;">"text"</span> : <span style="color: #ff1f8b;">"I agree"</span>
+            }
+        }
+    ],
+    <span style="color: #ff1f8b;">"ok"</span> : 1
+}
+</pre>
+</div></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
