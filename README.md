@@ -17,6 +17,7 @@
 
 - [RabbitMQ](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/midwares/rabbitmq.html)
 - [Nginx](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/midwares/nginx.html)
+- [MongoDB](https://htmlpreview.github.io/?https://github.com/ruanhao/basset/blob/master/midwares/mongodb.html)
 
 
 ## 运维
