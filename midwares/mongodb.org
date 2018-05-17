@@ -963,105 +963,14 @@ However, in the mongo shell, if the returned cursor is not assigned to a variabl
 then the cursor is automatically *iterated up to 20 times* to print up to the first 20 documents in the results.
 
 
+
 * 聚合
 
-** $project
+** Pipeline
 
-*** 重命名字段
+The aggregation pipeline is a framework for data aggregation modeled on the concept of data processing pipelines.
+Documents enter a *multi-stage pipeline* that transforms the documents into aggregated results.
 
-- 数据
+#+HTML: <img src="img/aggregation-pipeline.bakedsvg.svg"/>
 
-#+BEGIN_SRC js
-  { "_id": ObjectId("56cea763d43e3500f6768482"),
-    "name": "aaa",
-    "model": { "lang": "en",
-               "title": "b",
-               "date": ISODate("2016-02-25T07:04:03.414Z")
-             },
-  }
-#+END_SRC
-
-- 表达式
-
-#+BEGIN_SRC js
-  db.articles.aggregate([
-      {$match: {'model.lang': 'en'}},
-      {$project: {
-          _id: 0,
-          'title': '$model.title',
-          'date': {$dateToString: {format: '%Y-%m-%d',
-                                   date: '$model.date'}}}}])
-#+END_SRC
-
-
-- 结果
-
-#+BEGIN_SRC js
-  { "date" : "2016-02-25", "title" : "b" }
-  { "date" : "2016-02-25", "title" : "c" }
-#+END_SRC
-
-
-** $unwind
-
-*** 将数组中每一个元素拆分为单独的文档
-
-- 数据
-
-  #+BEGIN_SRC js
-    {
-        "_id" : ObjectId("50eeffc4c82a5271290530be"),
-        "author" : "k",
-        "post" : "Hello, world!",
-        "comments" : [
-            {
-                "author" : "mark",
-                "date" : ISODate("2013-01-10T17:52:04.148Z"),
-                "text" : "Nice post"
-            },
-            {
-                "author" : "bill",
-                "date" : ISODate("2013-01-10T17:52:04.148Z"),
-                "text" : "I agree"
-            }
-        ]
-    }
-  #+END_SRC
-
-
-- 表达式
-
-  #+BEGIN_SRC js
-    db.blog.aggregate({"$unwind" : "$comments"})
-  #+END_SRC
-
-
-- 结果
-
-  #+BEGIN_SRC js
-    {
-        "results" : [
-            {
-                "_id" : ObjectId("50eeffc4c82a5271290530be"),
-                "author" : "k",
-                "post" : "Hello, world!",
-                "comments" : {
-                    "author" : "mark",
-                    "date" : ISODate("2013-01-10T17:52:04.148Z"),
-                    "text" : "Nice post"
-                }
-            },
-            {
-                "_id" : ObjectId("50eeffc4c82a5271290530be"),
-                "author" : "k",
-                "post" : "Hello, world!",
-                "comments" : {
-                    "author" : "bill",
-                    "date" : ISODate("2013-01-10T17:52:04.148Z"),
-                    "text" : "I agree"
-                }
-            }
-        ],
-        "ok" : 1
-    }
-  #+END_SRC
+[[https://docs.mongodb.com/manual/meta/aggregation-quick-reference/][快速参考]]
