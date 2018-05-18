@@ -30,6 +30,8 @@
 
 #+HTML: <img src="https://docs.mongodb.com/manual/_images/crud-annotated-mongodb-find.bakedsvg.svg"/>
 
+** [[https://docs.mongodb.com/manual/reference/operator/query/][Query and Projection Operators]]
+
 ** 基本查询
 
 #+BEGIN_SRC mongo :host localhost :port 27017 :db emacs
@@ -966,12 +968,430 @@ then the cursor is automatically *iterated up to 20 times* to print up to the fi
 
 * 聚合
 
-** Pipeline
-
-The aggregation pipeline is a framework for data aggregation modeled on the concept of data processing pipelines.
-
-Documents enter a *multi-stage pipeline* that transforms the documents into aggregated results.
+** [[https://docs.mongodb.com/manual/meta/aggregation-quick-reference/][Pipeline stages]]
 
 #+HTML: <img src="https://docs.mongodb.com/manual/_images/aggregation-pipeline.bakedsvg.svg"/>
 
-[[https://docs.mongodb.com/manual/meta/aggregation-quick-reference/][快速参考]]
+
+*** [[https://docs.mongodb.com/manual/reference/operator/aggregation/addFields/][$addFields]]
+
+*不能为一个数组字段添加元素*
+
+**** 使用 2 次 $addFields
+
+#+BEGIN_SRC mongo :host localhost :port 27017 :db emacs
+  db.scores.insertMany(
+      [
+          {
+              _id: 1,
+              student: "Maya",
+              homework: [ 10, 5, 10 ],
+              quiz: [ 10, 8 ],
+              extraCredit: 0
+          },
+          {
+              _id: 2,
+              student: "Ryan",
+              homework: [ 5, 6, 5 ],
+              quiz: [ 8, 8 ],
+              extraCredit: 8
+          }
+      ]
+  );
+#+END_SRC
+
+#+RESULTS:
+: Mongo-Hacker 0.0.14
+: {
+:   "acknowledged": true,
+:   "insertedIds": [
+:     1,
+:     2
+:   ]
+: }
+
+#+BEGIN_SRC mongo :host localhost :port 27017 :db emacs :exports both
+  db.scores.aggregate( [
+      {
+          $addFields: {
+              totalHomework: { $sum: "$homework" } ,
+              totalQuiz: { $sum: "$quiz" }
+          }
+      },
+      {
+          $addFields: { totalScore: { $add: [ "$totalHomework", "$totalQuiz", "$extraCredit" ] } }
+      }
+  ] )
+#+END_SRC
+
+
+#+BEGIN_EXAMPLE
+  /* 1 */
+  {
+      "_id" : 1.0,
+      "student" : "Maya",
+      "homework" : [
+          10.0,
+          5.0,
+          10.0
+      ],
+      "quiz" : [
+          10.0,
+          8.0
+      ],
+      "extraCredit" : 0.0,
+      "totalHomework" : 25.0,
+      "totalQuiz" : 18.0,
+      "totalScore" : 43.0
+  }
+
+  /* 2 */
+  {
+      "_id" : 2.0,
+      "student" : "Ryan",
+      "homework" : [
+          5.0,
+          6.0,
+          5.0
+      ],
+      "quiz" : [
+          8.0,
+          8.0
+      ],
+      "extraCredit" : 8.0,
+      "totalHomework" : 16.0,
+      "totalQuiz" : 16.0,
+      "totalScore" : 40.0
+  }
+#+END_EXAMPLE
+
+**** 为嵌入式文档添加字段
+
+#+BEGIN_SRC mongo :host localhost :port 27017 :db emacs
+  db.vehicles.insertMany([
+      { _id: 1, type: "car",        specs: { doors: 4, wheels: 4 } },
+      { _id: 2, type: "motorcycle", specs: { doors: 0, wheels: 2 } },
+      { _id: 3, type: "jet ski" }
+  ]);
+#+END_SRC
+
+#+RESULTS:
+: Mongo-Hacker 0.0.14
+: {
+:   "acknowledged": true,
+:   "insertedIds": [
+:     1,
+:     2,
+:     3
+:   ]
+: }
+
+#+BEGIN_SRC mongo :host localhost :port 27017 :db emacs :exports both
+  db.vehicles.aggregate( [
+      {
+          $addFields: {
+              "specs.fuel_type": "unleaded"
+          }
+      }
+  ] );
+#+END_SRC
+
+
+#+BEGIN_EXAMPLE
+  /* 1 */
+  {
+      "_id" : 1.0,
+      "type" : "car",
+      "specs" : {
+          "doors" : 4.0,
+          "wheels" : 4.0,
+          "fuel_type" : "unleaded"
+      }
+  }
+
+  /* 2 */
+  {
+      "_id" : 2.0,
+      "type" : "motorcycle",
+      "specs" : {
+          "doors" : 0.0,
+          "wheels" : 2.0,
+          "fuel_type" : "unleaded"
+      }
+  }
+
+  /* 3 */
+  {
+      "_id" : 3.0,
+      "type" : "jet ski",
+      "specs" : {
+          "fuel_type" : "unleaded"
+      }
+  }
+#+END_EXAMPLE
+
+
+**** 覆盖已存在的字段
+
+#+BEGIN_SRC mongo :host localhost :port 27017 :db emacs
+  db.fruit.insertMany([
+      { "_id" : 1, "item" : "tangerine",  "type" : "citrus" },
+      { "_id" : 2, "item" : "lemon",      "type" : "citrus" },
+      { "_id" : 3, "item" : "grapefruit", "type" : "citrus" }
+  ]);
+#+END_SRC
+
+#+RESULTS:
+: Mongo-Hacker 0.0.14
+: {
+:   "acknowledged": true,
+:   "insertedIds": [
+:     1,
+:     2,
+:     3
+:   ]
+: }
+
+#+BEGIN_SRC mongo :host localhost :port 27017 :db emacs :exports both
+  db.fruit.aggregate( [
+    {
+      $addFields: {
+        _id : "$item",
+        item: "fruit"
+      }
+    }
+  ] );
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  /* 1 */
+  {
+      "_id" : "tangerine",
+      "item" : "fruit",
+      "type" : "citrus"
+  }
+
+  /* 2 */
+  {
+      "_id" : "lemon",
+      "item" : "fruit",
+      "type" : "citrus"
+  }
+
+  /* 3 */
+  {
+      "_id" : "grapefruit",
+      "item" : "fruit",
+      "type" : "citrus"
+  }
+#+END_EXAMPLE
+
+*** [[https://docs.mongodb.com/manual/reference/operator/aggregation/count/][$count]]
+
+#+BEGIN_SRC mongo :host localhost :port 27017 :db emacs
+  db.scores.insertMany([
+      { "_id" : 1, "subject" : "History", "score" : 88 },
+      { "_id" : 2, "subject" : "History", "score" : 92 },
+      { "_id" : 3, "subject" : "History", "score" : 97 },
+      { "_id" : 4, "subject" : "History", "score" : 71 },
+      { "_id" : 5, "subject" : "History", "score" : 79 },
+      { "_id" : 6, "subject" : "History", "score" : 83 }
+  ]);
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+Mongo-Hacker 0.0.14
+{
+  "acknowledged": true,
+  "insertedIds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ]
+}
+#+end_example
+
+#+BEGIN_SRC mongo :host localhost :port 27017 :db emacs :exports both
+  db.scores.aggregate(
+    [
+      {
+        $match: {
+          score: {
+            $gt: 80
+          }
+        }
+      },
+      {
+        $count: "passing_scores"
+      }
+    ]
+  );
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  { "passing_scores" : 4 }
+#+END_EXAMPLE
+
+*** [[https://docs.mongodb.com/manual/reference/operator/aggregation/facet/][$facet]]
+
+#+BEGIN_SRC js
+  { "_id" : 1, "title" : "The Pillars of Society", "artist" : "Grosz", "year" : 1926,
+    "price" : NumberDecimal("199.99"),
+    "tags" : [ "painting", "satire", "Expressionism", "caricature" ] }
+  { "_id" : 2, "title" : "Melancholy III", "artist" : "Munch", "year" : 1902,
+    "price" : NumberDecimal("280.00"),
+    "tags" : [ "woodcut", "Expressionism" ] }
+  { "_id" : 3, "title" : "Dancer", "artist" : "Miro", "year" : 1925,
+    "price" : NumberDecimal("76.04"),
+    "tags" : [ "oil", "Surrealism", "painting" ] }
+  { "_id" : 4, "title" : "The Great Wave off Kanagawa", "artist" : "Hokusai",
+    "price" : NumberDecimal("167.30"),
+    "tags" : [ "woodblock", "ukiyo-e" ] }
+  { "_id" : 5, "title" : "The Persistence of Memory", "artist" : "Dali", "year" : 1931,
+    "price" : NumberDecimal("483.00"),
+    "tags" : [ "Surrealism", "painting", "oil" ] }
+  { "_id" : 6, "title" : "Composition VII", "artist" : "Kandinsky", "year" : 1913,
+    "price" : NumberDecimal("385.00"),
+    "tags" : [ "oil", "painting", "abstract" ] }
+  { "_id" : 7, "title" : "The Scream", "artist" : "Munch", "year" : 1893,
+    "tags" : [ "Expressionism", "painting", "oil" ] }
+  { "_id" : 8, "title" : "Blue Flower", "artist" : "O'Keefe", "year" : 1918,
+    "price" : NumberDecimal("118.42"),
+    "tags" : [ "abstract", "painting" ] }
+#+END_SRC
+
+#+BEGIN_SRC mongo
+  db.artwork.aggregate( [
+    {
+      $facet: {
+        "categorizedByTags": [
+          { $unwind: "$tags" },
+          { $sortByCount: "$tags" }
+        ],
+        "categorizedByPrice": [
+          // Filter out documents without a price e.g., _id: 7
+          { $match: { price: { $exists: 1 } } },
+          {
+            $bucket: {
+              groupBy: "$price",
+              boundaries: [  0, 150, 200, 300, 400 ],
+              default: "Other",
+              output: {
+                "count": { $sum: 1 },
+                "titles": { $push: "$title" }
+              }
+            }
+          }
+        ],
+        "categorizedByYears(Auto)": [
+          {
+            $bucketAuto: {
+              groupBy: "$year",
+              buckets: 4
+            }
+          }
+        ]
+      }
+    }
+  ])
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  {
+    "categorizedByYears(Auto)" : [
+      // First bucket includes the document without a year, e.g., _id: 4
+      { "_id" : { "min" : null, "max" : 1902 }, "count" : 2 },
+      { "_id" : { "min" : 1902, "max" : 1918 }, "count" : 2 },
+      { "_id" : { "min" : 1918, "max" : 1926 }, "count" : 2 },
+      { "_id" : { "min" : 1926, "max" : 1931 }, "count" : 2 }
+    ],
+    "categorizedByPrice" : [
+      {
+        "_id" : 0,
+        "count" : 2,
+        "titles" : [
+          "Dancer",
+          "Blue Flower"
+        ]
+      },
+      {
+        "_id" : 150,
+        "count" : 2,
+        "titles" : [
+          "The Pillars of Society",
+          "The Great Wave off Kanagawa"
+        ]
+      },
+      {
+        "_id" : 200,
+        "count" : 1,
+        "titles" : [
+          "Melancholy III"
+        ]
+      },
+      {
+        "_id" : 300,
+        "count" : 1,
+        "titles" : [
+          "Composition VII"
+        ]
+      },
+      {
+        // Includes document price outside of bucket boundaries, e.g., _id: 5
+        "_id" : "Other",
+        "count" : 1,
+        "titles" : [
+          "The Persistence of Memory"
+        ]
+      }
+    ],
+    "categorizedByTags" : [
+      { "_id" : "painting", "count" : 6 },
+      { "_id" : "oil", "count" : 4 },
+      { "_id" : "Expressionism", "count" : 3 },
+      { "_id" : "Surrealism", "count" : 2 },
+      { "_id" : "abstract", "count" : 2 },
+      { "_id" : "woodblock", "count" : 1 },
+      { "_id" : "woodcut", "count" : 1 },
+      { "_id" : "ukiyo-e", "count" : 1 },
+      { "_id" : "satire", "count" : 1 },
+      { "_id" : "caricature", "count" : 1 }
+    ]
+  }
+#+END_EXAMPLE
+
+
+*** [[https://docs.mongodb.com/manual/reference/operator/aggregation/group/][$group]]
+
+Specify an '_id' value of null to calculate accumulated values *for all the input documents as a whole*.
+
+*** [[https://docs.mongodb.com/manual/reference/operator/aggregation/limit/][$limit]]
+
+#+BEGIN_SRC mongo
+  db.article.aggregate(
+      { $limit : 5 }
+  );
+#+END_SRC
+
+
+*** [[https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/][$lookup]]
+
+*** [[https://docs.mongodb.com/manual/reference/operator/aggregation/match/][$match]]
+
+*** [[https://docs.mongodb.com/manual/reference/operator/aggregation/project/][$project]]
+
+*** [[https://docs.mongodb.com/manual/reference/operator/aggregation/replaceRoot/][$relpaceRoot]]
+
+*** [[https://docs.mongodb.com/manual/reference/operator/aggregation/sample/][$sample]]
+
+*** [[https://docs.mongodb.com/manual/reference/operator/aggregation/skip/][$skip]]
+
+*** [[https://docs.mongodb.com/manual/reference/operator/aggregation/sort/][$sort]]
+
+*** [[https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/][$unwind]]
+
+** [[https://docs.mongodb.com/manual/reference/operator/aggregation/][Pipeline operators]]
