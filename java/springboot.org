@@ -160,6 +160,7 @@
   }
 #+END_SRC
 
+
 *** 调用
 
 #+BEGIN_SRC java
@@ -169,6 +170,44 @@
   ClassA.MAPPER.from(objC);
 #+END_SRC
 
+
+** MapperFactory
+
+*** 配置
+
+#+BEGIN_SRC java
+  @Configuration
+  public class MapperConfig extends ConfigurableMapper {
+
+      @Bean
+      public MapperFactory mapperFactory(){
+          MapperFactory factory = new DefaultMapperFactory.Builder().build();
+          factory.classMap(NetworkDto.class, Network.class)
+              .field("group.id", "groupId")
+              .mapNulls(false)
+              .byDefault()
+              .register();
+          return factory;
+      }
+  }
+#+END_SRC
+
+*** 使用
+
+#+BEGIN_SRC java
+  class NetworkBo {
+
+      @Autowired
+      private MapperFactory mapperFactory;
+
+      public void handle() {
+          NetworkDto dto = ...;
+          Network network = ...;
+          mapperFactory.getMapperFacade().map(dto, network);
+      }
+  }
+
+#+END_SRC
 
 * 实践
 
