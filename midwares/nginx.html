@@ -1,23 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<!-- 2018-05-23 Wed 17:58 -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nginx</title>
-<!-- 2018-02-05 Mon 13:31 -->
-<meta  charset="utf-8">
-<meta  name="generator" content="Org-mode">
-<meta  name="author" content="Hao Ruan">
+<meta name="generator" content="Org mode">
+<meta name="author" content="Hao Ruan">
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
-  .title  { text-align: center; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
   .todo   { font-family: monospace; color: red; }
-  .done   { color: green; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
   .tag    { background-color: #eee; font-family: monospace;
             padding: 2px; font-size: 80%; font-weight: normal; }
   .timestamp { color: #bebebe; }
   .timestamp-kwd { color: #5f9ea0; }
-  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
-  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
-  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
   .underline { text-decoration: underline; }
   #postamble p, #preamble p { font-size: 90%; margin: .2em; }
   p.verse { margin-left: 3%; }
@@ -44,27 +51,111 @@
     border: 1px solid black;
   }
   pre.src:hover:before { display: inline;}
-  pre.src-sh:before    { content: 'sh'; }
-  pre.src-bash:before  { content: 'sh'; }
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
   pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
-  pre.src-R:before     { content: 'R'; }
-  pre.src-perl:before  { content: 'Perl'; }
-  pre.src-java:before  { content: 'Java'; }
-  pre.src-sql:before   { content: 'SQL'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
 
   table { border-collapse:collapse; }
   caption.t-above { caption-side: top; }
   caption.t-bottom { caption-side: bottom; }
   td, th { vertical-align:top;  }
-  th.right  { text-align: center;  }
-  th.left   { text-align: center;   }
-  th.center { text-align: center; }
-  td.right  { text-align: right;  }
-  td.left   { text-align: left;   }
-  td.center { text-align: center; }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
   dt { font-weight: bold; }
-  .footpara:nth-child(2) { display: inline; }
-  .footpara { display: block; }
+  .footpara { display: inline; }
   .footdef  { margin-bottom: 1em; }
   .figure { padding: 1em; }
   .figure p { text-align: center; }
@@ -84,16 +175,17 @@
     { font-size: 10px; font-weight: bold; white-space: nowrap; }
   .org-info-js_search-highlight
     { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
   /*]]>*/-->
 </style>
 <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
-<link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+<link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2013 Free Software Foundation, Inc.
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -142,51 +234,59 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. 基本原理</a>
+<li><a href="#orgc807b59">1. 基本原理</a>
 <ul>
-<li><a href="#sec-1-1">1.1. 设计架构</a>
+<li><a href="#org85b73bd">1.1. 设计架构</a>
 <ul>
-<li><a href="#sec-1-1-1">1.1.1. master 进程</a></li>
-<li><a href="#sec-1-1-2">1.1.2. worker 进程</a></li>
-<li><a href="#sec-1-1-3">1.1.3. cache loader 进程</a></li>
-<li><a href="#sec-1-1-4">1.1.4. cache manager 进程</a></li>
+<li><a href="#org998fd71">1.1.1. master 进程</a></li>
+<li><a href="#org6a27c79">1.1.2. worker 进程</a></li>
+<li><a href="#org6000195">1.1.3. cache loader 进程</a></li>
+<li><a href="#org7691b74">1.1.4. cache manager 进程</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#sec-2">2. 常用配置</a>
+<li><a href="#orgba9c65e">2. 常用配置</a>
 <ul>
-<li><a href="#sec-2-1">2.1. 基本配置</a></li>
-<li><a href="#sec-2-2">2.2. 反向代理</a>
+<li><a href="#org226092d">2.1. 基本配置</a></li>
+<li><a href="#orgc9eceb5">2.2. 反向代理</a>
 <ul>
-<li><a href="#sec-2-2-1">2.2.1. 直接转发</a></li>
-<li><a href="#sec-2-2-2">2.2.2. 动态转发</a></li>
-<li><a href="#sec-2-2-3">2.2.3. websocket 转发</a></li>
+<li><a href="#org9d868b5">2.2.1. 直接转发</a></li>
+<li><a href="#org93e3e11">2.2.2. 动态转发</a></li>
+<li><a href="#org6940896">2.2.3. websocket 转发</a></li>
 </ul>
 </li>
-<li><a href="#sec-2-3">2.3. 压缩</a></li>
-<li><a href="#sec-2-4">2.4. 监控</a></li>
-<li><a href="#sec-2-5">2.5. Basic Auth</a></li>
-<li><a href="#sec-2-6">2.6. 负载均衡</a>
+<li><a href="#org04f0c25">2.3. 压缩</a></li>
+<li><a href="#org051b3df">2.4. 监控</a></li>
+<li><a href="#org83786ba">2.5. Basic Auth</a></li>
+<li><a href="#orgb58dddf">2.6. 负载均衡</a>
 <ul>
-<li><a href="#sec-2-6-1">2.6.1. least_conn</a></li>
-<li><a href="#sec-2-6-2">2.6.2. ip_hash</a></li>
-<li><a href="#sec-2-6-3">2.6.3. hash</a></li>
-<li><a href="#sec-2-6-4">2.6.4. down</a></li>
-<li><a href="#sec-2-6-5">2.6.5. backup</a></li>
-<li><a href="#sec-2-6-6">2.6.6. weight</a></li>
+<li><a href="#orgee49219">2.6.1. least_conn</a></li>
+<li><a href="#org029df12">2.6.2. ip_hash</a></li>
+<li><a href="#org1f6a76f">2.6.3. hash</a></li>
+<li><a href="#org6a6e264">2.6.4. down</a></li>
+<li><a href="#org230a9d3">2.6.5. backup</a></li>
+<li><a href="#orgf6f9b17">2.6.6. weight</a></li>
 </ul>
 </li>
-<li><a href="#sec-2-7">2.7. 返回状态码</a></li>
-<li><a href="#sec-2-8">2.8. URL 重写</a></li>
-<li><a href="#sec-2-9">2.9. Location</a>
+<li><a href="#org65d6944">2.7. 返回状态码</a></li>
+<li><a href="#orgb90452f">2.8. URL 重写</a></li>
+<li><a href="#org2050f1c">2.9. Location</a>
 <ul>
-<li><a href="#sec-2-9-1">2.9.1. 优先级</a></li>
-<li><a href="#sec-2-9-2">2.9.2. 转发规则</a></li>
+<li><a href="#orge7f0a36">2.9.1. 优先级</a></li>
+<li><a href="#org87471a3">2.9.2. 转发规则</a></li>
 </ul>
 </li>
-<li><a href="#sec-2-10">2.10. 访问控制</a></li>
-<li><a href="#sec-2-11">2.11. 端口转发</a></li>
+<li><a href="#org954a7be">2.10. 访问控制</a></li>
+<li><a href="#org58e835a">2.11. 端口转发</a></li>
+<li><a href="#orgaa90fe0">2.12. 添加模块</a></li>
+<li><a href="#orgfaed7f1">2.13. Nginx in Docker</a>
+<ul>
+<li><a href="#orge5e556f">2.13.1. 获取 nginx.conf</a></li>
+<li><a href="#orgc274810">2.13.2. 自定义 nginx.conf</a></li>
+<li><a href="#org3fe4ed2">2.13.3. 自定义静态文件</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -197,19 +297,19 @@ for the JavaScript code in this tag.
 
 
 <colgroup>
-<col  class="left">
+<col  class="org-left">
 
-<col  class="left">
+<col  class="org-left">
 </colgroup>
 <tbody>
 <tr>
-<td class="left">Author</td>
-<td class="left">Hao Ruan (ruanhao1116@gmail.com)</td>
+<td class="org-left">Author</td>
+<td class="org-left">Hao Ruan (ruanhao1116@gmail.com)</td>
 </tr>
 
 <tr>
-<td class="left">Date</td>
-<td class="left">2018-02-05 13:31:17</td>
+<td class="org-left">Date</td>
+<td class="org-left">2018-05-23 17:58:47</td>
 </tr>
 </tbody>
 </table>
@@ -218,51 +318,59 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. 基本原理</a>
+<li><a href="#orgc807b59">1. 基本原理</a>
 <ul>
-<li><a href="#sec-1-1">1.1. 设计架构</a>
+<li><a href="#org85b73bd">1.1. 设计架构</a>
 <ul>
-<li><a href="#sec-1-1-1">1.1.1. master 进程</a></li>
-<li><a href="#sec-1-1-2">1.1.2. worker 进程</a></li>
-<li><a href="#sec-1-1-3">1.1.3. cache loader 进程</a></li>
-<li><a href="#sec-1-1-4">1.1.4. cache manager 进程</a></li>
+<li><a href="#org998fd71">1.1.1. master 进程</a></li>
+<li><a href="#org6a27c79">1.1.2. worker 进程</a></li>
+<li><a href="#org6000195">1.1.3. cache loader 进程</a></li>
+<li><a href="#org7691b74">1.1.4. cache manager 进程</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#sec-2">2. 常用配置</a>
+<li><a href="#orgba9c65e">2. 常用配置</a>
 <ul>
-<li><a href="#sec-2-1">2.1. 基本配置</a></li>
-<li><a href="#sec-2-2">2.2. 反向代理</a>
+<li><a href="#org226092d">2.1. 基本配置</a></li>
+<li><a href="#orgc9eceb5">2.2. 反向代理</a>
 <ul>
-<li><a href="#sec-2-2-1">2.2.1. 直接转发</a></li>
-<li><a href="#sec-2-2-2">2.2.2. 动态转发</a></li>
-<li><a href="#sec-2-2-3">2.2.3. websocket 转发</a></li>
+<li><a href="#org9d868b5">2.2.1. 直接转发</a></li>
+<li><a href="#org93e3e11">2.2.2. 动态转发</a></li>
+<li><a href="#org6940896">2.2.3. websocket 转发</a></li>
 </ul>
 </li>
-<li><a href="#sec-2-3">2.3. 压缩</a></li>
-<li><a href="#sec-2-4">2.4. 监控</a></li>
-<li><a href="#sec-2-5">2.5. Basic Auth</a></li>
-<li><a href="#sec-2-6">2.6. 负载均衡</a>
+<li><a href="#org04f0c25">2.3. 压缩</a></li>
+<li><a href="#org051b3df">2.4. 监控</a></li>
+<li><a href="#org83786ba">2.5. Basic Auth</a></li>
+<li><a href="#orgb58dddf">2.6. 负载均衡</a>
 <ul>
-<li><a href="#sec-2-6-1">2.6.1. least_conn</a></li>
-<li><a href="#sec-2-6-2">2.6.2. ip_hash</a></li>
-<li><a href="#sec-2-6-3">2.6.3. hash</a></li>
-<li><a href="#sec-2-6-4">2.6.4. down</a></li>
-<li><a href="#sec-2-6-5">2.6.5. backup</a></li>
-<li><a href="#sec-2-6-6">2.6.6. weight</a></li>
+<li><a href="#orgee49219">2.6.1. least_conn</a></li>
+<li><a href="#org029df12">2.6.2. ip_hash</a></li>
+<li><a href="#org1f6a76f">2.6.3. hash</a></li>
+<li><a href="#org6a6e264">2.6.4. down</a></li>
+<li><a href="#org230a9d3">2.6.5. backup</a></li>
+<li><a href="#orgf6f9b17">2.6.6. weight</a></li>
 </ul>
 </li>
-<li><a href="#sec-2-7">2.7. 返回状态码</a></li>
-<li><a href="#sec-2-8">2.8. URL 重写</a></li>
-<li><a href="#sec-2-9">2.9. Location</a>
+<li><a href="#org65d6944">2.7. 返回状态码</a></li>
+<li><a href="#orgb90452f">2.8. URL 重写</a></li>
+<li><a href="#org2050f1c">2.9. Location</a>
 <ul>
-<li><a href="#sec-2-9-1">2.9.1. 优先级</a></li>
-<li><a href="#sec-2-9-2">2.9.2. 转发规则</a></li>
+<li><a href="#orge7f0a36">2.9.1. 优先级</a></li>
+<li><a href="#org87471a3">2.9.2. 转发规则</a></li>
 </ul>
 </li>
-<li><a href="#sec-2-10">2.10. 访问控制</a></li>
-<li><a href="#sec-2-11">2.11. 端口转发</a></li>
+<li><a href="#org954a7be">2.10. 访问控制</a></li>
+<li><a href="#org58e835a">2.11. 端口转发</a></li>
+<li><a href="#orgaa90fe0">2.12. 添加模块</a></li>
+<li><a href="#orgfaed7f1">2.13. Nginx in Docker</a>
+<ul>
+<li><a href="#orge5e556f">2.13.1. 获取 nginx.conf</a></li>
+<li><a href="#orgc274810">2.13.2. 自定义 nginx.conf</a></li>
+<li><a href="#org3fe4ed2">2.13.3. 自定义静态文件</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -270,11 +378,12 @@ for the JavaScript code in this tag.
 </div>
 
 
-<div id="outline-container-sec-1" class="outline-2">
-<h2 id="sec-1"><span class="section-number-2">1</span> 基本原理</h2>
+<div id="outline-container-orgc807b59" class="outline-2">
+<h2 id="orgc807b59"><span class="section-number-2">1</span> 基本原理</h2>
 <div class="outline-text-2" id="text-1">
-</div><div id="outline-container-sec-1-1" class="outline-3">
-<h3 id="sec-1-1"><span class="section-number-3">1.1</span> 设计架构</h3>
+</div>
+<div id="outline-container-org85b73bd" class="outline-3">
+<h3 id="org85b73bd"><span class="section-number-3">1.1</span> 设计架构</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 Nginx 会同时运行多个进程，一个主进程（master）和多个工作进程（worker），配置缓存时还会有缓存加载器进程（cache loader）和
@@ -283,57 +392,47 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 </p>
 </div>
 
-<div id="outline-container-sec-1-1-1" class="outline-4">
-<h4 id="sec-1-1-1"><span class="section-number-4">1.1.1</span> master 进程</h4>
+<div id="outline-container-org998fd71" class="outline-4">
+<h4 id="org998fd71"><span class="section-number-4">1.1.1</span> master 进程</h4>
 <div class="outline-text-4" id="text-1-1-1">
 <ul class="org-ul">
-<li>读取并验证配置信息
-</li>
-<li>创建，绑定及关闭套接字
-</li>
-<li>启动，终止及维护 worker 进程的个数
-</li>
-<li>配置热部署（平滑升级）
-</li>
-<li>编译嵌入式脚本
-</li>
-<li>日志文件管理
-</li>
+<li>读取并验证配置信息</li>
+<li>创建，绑定及关闭套接字</li>
+<li>启动，终止及维护 worker 进程的个数</li>
+<li>配置热部署（平滑升级）</li>
+<li>编译嵌入式脚本</li>
+<li>日志文件管理</li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-sec-1-1-2" class="outline-4">
-<h4 id="sec-1-1-2"><span class="section-number-4">1.1.2</span> worker 进程</h4>
+<div id="outline-container-org6a27c79" class="outline-4">
+<h4 id="org6a27c79"><span class="section-number-4">1.1.2</span> worker 进程</h4>
 <div class="outline-text-4" id="text-1-1-2">
 <ul class="org-ul">
-<li>接受并处理客户端连接
-</li>
-<li>提供反向代理及过滤功能
-</li>
+<li>接受并处理客户端连接</li>
+<li>提供反向代理及过滤功能</li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-sec-1-1-3" class="outline-4">
-<h4 id="sec-1-1-3"><span class="section-number-4">1.1.3</span> cache loader 进程</h4>
+<div id="outline-container-org6000195" class="outline-4">
+<h4 id="org6000195"><span class="section-number-4">1.1.3</span> cache loader 进程</h4>
 <div class="outline-text-4" id="text-1-1-3">
 <ul class="org-ul">
-<li>建立内存数据库
-</li>
+<li>建立内存数据库</li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-sec-1-1-4" class="outline-4">
-<h4 id="sec-1-1-4"><span class="section-number-4">1.1.4</span> cache manager 进程</h4>
+<div id="outline-container-org7691b74" class="outline-4">
+<h4 id="org7691b74"><span class="section-number-4">1.1.4</span> cache manager 进程</h4>
 <div class="outline-text-4" id="text-1-1-4">
 <ul class="org-ul">
-<li>缓存失效及过期检查
-</li>
+<li>缓存失效及过期检查</li>
 </ul>
 </div>
 </div>
@@ -341,14 +440,14 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 </div>
 
 
-<div id="outline-container-sec-2" class="outline-2">
-<h2 id="sec-2"><span class="section-number-2">2</span> 常用配置</h2>
+<div id="outline-container-orgba9c65e" class="outline-2">
+<h2 id="orgba9c65e"><span class="section-number-2">2</span> 常用配置</h2>
 <div class="outline-text-2" id="text-2">
-</div><div id="outline-container-sec-2-1" class="outline-3">
-<h3 id="sec-2-1"><span class="section-number-3">2.1</span> 基本配置</h3>
+</div>
+<div id="outline-container-org226092d" class="outline-3">
+<h3 id="org226092d"><span class="section-number-3">2.1</span> 基本配置</h3>
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
-
 <pre class="src src-nginx"><span style="color: #5f8700;">server</span> {
 
     <span style="color: #5f8700;">listen</span> 40839;
@@ -379,19 +478,19 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 </div>
 
 
-<div id="outline-container-sec-2-2" class="outline-3">
-<h3 id="sec-2-2"><span class="section-number-3">2.2</span> 反向代理</h3>
+<div id="outline-container-orgc9eceb5" class="outline-3">
+<h3 id="orgc9eceb5"><span class="section-number-3">2.2</span> 反向代理</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 反向代理是依赖于 `ngx_http_proxy_module` 这个模块来实现的
 </p>
 </div>
 
-<div id="outline-container-sec-2-2-1" class="outline-4">
-<h4 id="sec-2-2-1"><span class="section-number-4">2.2.1</span> 直接转发</h4>
+
+<div id="outline-container-org9d868b5" class="outline-4">
+<h4 id="org9d868b5"><span class="section-number-4">2.2.1</span> 直接转发</h4>
 <div class="outline-text-4" id="text-2-2-1">
 <div class="org-src-container">
-
 <pre class="src src-nginx"><span style="color: #5f8700;">server</span> {
     <span style="color: #5f8700;">server_name</span> www.example.com;
     <span style="color: #5f8700;">listen</span>       443;
@@ -406,11 +505,11 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 </div>
 </div>
 
-<div id="outline-container-sec-2-2-2" class="outline-4">
-<h4 id="sec-2-2-2"><span class="section-number-4">2.2.2</span> 动态转发</h4>
+
+<div id="outline-container-org93e3e11" class="outline-4">
+<h4 id="org93e3e11"><span class="section-number-4">2.2.2</span> 动态转发</h4>
 <div class="outline-text-4" id="text-2-2-2">
 <div class="org-src-container">
-
 <pre class="src src-nginx"><span style="color: #5f8700;">upstream</span> <span style="color: #0087ff;">pool</span> {
     <span style="color: #5f8700;">server</span> 127.0.0.1:8888;
 }
@@ -435,25 +534,30 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 </div>
 </div>
 
-<div id="outline-container-sec-2-2-3" class="outline-4">
-<h4 id="sec-2-2-3"><span class="section-number-4">2.2.3</span> websocket 转发</h4>
+
+<div id="outline-container-org6940896" class="outline-4">
+<h4 id="org6940896"><span class="section-number-4">2.2.3</span> websocket 转发</h4>
 <div class="outline-text-4" id="text-2-2-3">
 <div class="org-src-container">
-
 <pre class="src src-nginx"><span style="color: #5f8700;">upstream</span> <span style="color: #0087ff;">ws</span> {
-  <span style="color: #5f8700;">server</span> 127.0.0.1:8888;
+  <span style="color: #5f8700;">server</span> http://127.0.0.1:8888;
 }
 
 <span style="color: #5f8700;">server</span> {
 
   <span style="color: #5f8700;">location</span> <span style="color: #0087ff;">/ws/</span> {
-    <span style="color: #5f8700;">proxy_pass</span> http://ws;
+    <span style="color: #5f8700;">proxy_pass</span> ws;
     <span style="color: #5f8700;">proxy_http_version</span> 1.1;
+
+    <span style="color: #5f8700;">proxy_read_timeout</span>    7200;
+    <span style="color: #5f8700;">proxy_send_timeout</span>    7200;
+
     <span style="color: #5f8700;">proxy_set_header</span> Upgrade <span style="color: #0087ff;">$http_upgrade</span>;
     <span style="color: #5f8700;">proxy_set_header</span> Connection <span style="color: #00afaf;">"upgrade"</span>;
   }
 
 }
+
 </pre>
 </div>
 </div>
@@ -461,11 +565,10 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 </div>
 
 
-<div id="outline-container-sec-2-3" class="outline-3">
-<h3 id="sec-2-3"><span class="section-number-3">2.3</span> 压缩</h3>
+<div id="outline-container-org04f0c25" class="outline-3">
+<h3 id="org04f0c25"><span class="section-number-3">2.3</span> 压缩</h3>
 <div class="outline-text-3" id="text-2-3">
 <div class="org-src-container">
-
 <pre class="src src-nginx"><span style="color: #5f8700;">http</span> {
 
     <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#24320;&#21551;gzip</span>
@@ -500,11 +603,10 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 </div>
 
 
-<div id="outline-container-sec-2-4" class="outline-3">
-<h3 id="sec-2-4"><span class="section-number-3">2.4</span> 监控</h3>
+<div id="outline-container-org051b3df" class="outline-3">
+<h3 id="org051b3df"><span class="section-number-3">2.4</span> 监控</h3>
 <div class="outline-text-3" id="text-2-4">
 <div class="org-src-container">
-
 <pre class="src src-sh">pip install ngxtop
 </pre>
 </div>
@@ -512,8 +614,8 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 </div>
 
 
-<div id="outline-container-sec-2-5" class="outline-3">
-<h3 id="sec-2-5"><span class="section-number-3">2.5</span> Basic Auth</h3>
+<div id="outline-container-org83786ba" class="outline-3">
+<h3 id="org83786ba"><span class="section-number-3">2.5</span> Basic Auth</h3>
 <div class="outline-text-3" id="text-2-5">
 <p>
 `ngx_http_auth_basic_module` 是使用文件作为存储介质的，用户名和密码必须和文件的信息匹配才能认证成功。
@@ -524,13 +626,11 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 </p>
 
 <div class="org-src-container">
-
 <pre class="src src-sh">htpasswd -bc /etc/nginx/.htpasswd &lt;username&gt; &lt;password&gt;
 </pre>
 </div>
 
 <div class="org-src-container">
-
 <pre class="src src-nginx"><span style="color: #5f8700;">location</span> <span style="color: #0087ff;">/target</span> {
     <span style="color: #5f8700;">auth_basic</span> <span style="color: #00afaf;">"Restricted"</span>;
     <span style="color: #5f8700;">auth_basic_user_file</span> /etc/nginx/.htpasswd; <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">htpasswd &#25991;&#20214;</span>
@@ -541,18 +641,18 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 </div>
 
 
-<div id="outline-container-sec-2-6" class="outline-3">
-<h3 id="sec-2-6"><span class="section-number-3">2.6</span> 负载均衡</h3>
+<div id="outline-container-orgb58dddf" class="outline-3">
+<h3 id="orgb58dddf"><span class="section-number-3">2.6</span> 负载均衡</h3>
 <div class="outline-text-3" id="text-2-6">
-</div><div id="outline-container-sec-2-6-1" class="outline-4">
-<h4 id="sec-2-6-1"><span class="section-number-4">2.6.1</span> least_conn</h4>
+</div>
+<div id="outline-container-orgee49219" class="outline-4">
+<h4 id="orgee49219"><span class="section-number-4">2.6.1</span> least_conn</h4>
 <div class="outline-text-4" id="text-2-6-1">
 <p>
 优先发送给那些接受请求少的
 </p>
 
 <div class="org-src-container">
-
 <pre class="src src-nginx"><span style="color: #5f8700;">upstream</span> <span style="color: #0087ff;">servers</span> {
     <span style="color: #5f8700;">least_conn</span>;
     <span style="color: #5f8700;">server</span> &lt;server_ip_1&gt;;
@@ -564,15 +664,14 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 </div>
 
 
-<div id="outline-container-sec-2-6-2" class="outline-4">
-<h4 id="sec-2-6-2"><span class="section-number-4">2.6.2</span> ip_hash</h4>
+<div id="outline-container-org029df12" class="outline-4">
+<h4 id="org029df12"><span class="section-number-4">2.6.2</span> ip_hash</h4>
 <div class="outline-text-4" id="text-2-6-2">
 <p>
 可以记录请求来源的ip，如果是同一个ip，下次访问的时候还是会到相同的主机
 </p>
 
 <div class="org-src-container">
-
 <pre class="src src-nginx"><span style="color: #5f8700;">upstream</span> <span style="color: #0087ff;">servers</span> {
     <span style="color: #5f8700;">ip_hash</span>;
     <span style="color: #5f8700;">server</span> &lt;server_ip_1&gt;;
@@ -584,15 +683,14 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 </div>
 
 
-<div id="outline-container-sec-2-6-3" class="outline-4">
-<h4 id="sec-2-6-3"><span class="section-number-4">2.6.3</span> hash</h4>
+<div id="outline-container-org1f6a76f" class="outline-4">
+<h4 id="org1f6a76f"><span class="section-number-4">2.6.3</span> hash</h4>
 <div class="outline-text-4" id="text-2-6-3">
 <p>
 通过任何变量来控制
 </p>
 
 <div class="org-src-container">
-
 <pre class="src src-nginx"><span style="color: #5f8700;">upstream</span> <span style="color: #0087ff;">servers</span> {
     <span style="color: #5f8700;">hash</span> <span style="color: #0087ff;">$request_uri</span> consistent; <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#36890;&#36807;&#35831;&#27714;&#22320;&#22336;($request_uri)&#26469;&#25511;&#21046;</span>
     <span style="color: #5f8700;">server</span> &lt;server_ip_1&gt;;
@@ -604,15 +702,14 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 </div>
 
 
-<div id="outline-container-sec-2-6-4" class="outline-4">
-<h4 id="sec-2-6-4"><span class="section-number-4">2.6.4</span> down</h4>
+<div id="outline-container-org6a6e264" class="outline-4">
+<h4 id="org6a6e264"><span class="section-number-4">2.6.4</span> down</h4>
 <div class="outline-text-4" id="text-2-6-4">
 <p>
 假如有一台主机是出了故障，或者下线了，要暂时移出，那可以把它标为down，表示请求会略过这台主机
 </p>
 
 <div class="org-src-container">
-
 <pre class="src src-nginx"><span style="color: #5f8700;">upstream</span> <span style="color: #0087ff;">servers</span> {
     <span style="color: #5f8700;">server</span> &lt;server_ip_1&gt;;
     <span style="color: #5f8700;">server</span> &lt;server_ip_2&gt; down;
@@ -623,15 +720,14 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 </div>
 
 
-<div id="outline-container-sec-2-6-5" class="outline-4">
-<h4 id="sec-2-6-5"><span class="section-number-4">2.6.5</span> backup</h4>
+<div id="outline-container-org230a9d3" class="outline-4">
+<h4 id="org230a9d3"><span class="section-number-4">2.6.5</span> backup</h4>
 <div class="outline-text-4" id="text-2-6-5">
 <p>
 backup 是指备份的机器，相对于备份的机器来说，其他的机器就相当于主要服务器，只要当主要服务器不可用的时候，才会用到备用服务器
 </p>
 
 <div class="org-src-container">
-
 <pre class="src src-nginx"><span style="color: #5f8700;">upstream</span> <span style="color: #0087ff;">servers</span> {
     <span style="color: #5f8700;">server</span> &lt;server_ip_1&gt;;
     <span style="color: #5f8700;">server</span> &lt;server_ip_2&gt; backup;
@@ -642,8 +738,8 @@ backup 是指备份的机器，相对于备份的机器来说，其他的机器�
 </div>
 
 
-<div id="outline-container-sec-2-6-6" class="outline-4">
-<h4 id="sec-2-6-6"><span class="section-number-4">2.6.6</span> weight</h4>
+<div id="outline-container-orgf6f9b17" class="outline-4">
+<h4 id="orgf6f9b17"><span class="section-number-4">2.6.6</span> weight</h4>
 <div class="outline-text-4" id="text-2-6-6">
 <p>
 weight指的是权重，默认情况下，每台主机的权重都是1，也就是说，接收请求的次数的比例是一样的。
@@ -654,7 +750,6 @@ weight指的是权重，默认情况下，每台主机的权重都是1，也就�
 </p>
 
 <div class="org-src-container">
-
 <pre class="src src-nginx"><span style="color: #5f8700;">upstream</span> <span style="color: #0087ff;">servers</span> {
     <span style="color: #5f8700;">server</span> &lt;server_ip_0&gt; weight=3;
     <span style="color: #5f8700;">server</span> &lt;server_ip_1&gt;;
@@ -667,11 +762,10 @@ weight指的是权重，默认情况下，每台主机的权重都是1，也就�
 </div>
 
 
-<div id="outline-container-sec-2-7" class="outline-3">
-<h3 id="sec-2-7"><span class="section-number-3">2.7</span> 返回状态码</h3>
+<div id="outline-container-org65d6944" class="outline-3">
+<h3 id="org65d6944"><span class="section-number-3">2.7</span> 返回状态码</h3>
 <div class="outline-text-3" id="text-2-7">
 <div class="org-src-container">
-
 <pre class="src src-nginx"><span style="color: #5f8700;">location</span> <span style="color: #0087ff;">/error</span> {
     <span style="color: #5f8700;">return</span> 404 <span style="color: #00afaf;">"Not Found !"</span>;
 }
@@ -681,11 +775,10 @@ weight指的是权重，默认情况下，每台主机的权重都是1，也就�
 </div>
 
 
-<div id="outline-container-sec-2-8" class="outline-3">
-<h3 id="sec-2-8"><span class="section-number-3">2.8</span> URL 重写</h3>
+<div id="outline-container-orgb90452f" class="outline-3">
+<h3 id="orgb90452f"><span class="section-number-3">2.8</span> URL 重写</h3>
 <div class="outline-text-3" id="text-2-8">
 <div class="org-src-container">
-
 <pre class="src src-nginx"><span style="color: #5f8700;">location</span> <span style="color: #0087ff;">/</span> {
     <span style="color: #5f8700;">rewrite</span> '^/images/(.*)\.(png|jpg|gif)$' /data?file=<span style="color: #00afaf;">$1</span>.<span style="color: #00afaf;">$2</span>;
     <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#27880;&#24847;&#19981;&#33021;&#22312;&#19978;&#38754;&#36825;&#26465;&#35268;&#21017;&#21518;&#38754;&#21152;&#19978;&#8220;last&#8221;&#21442;&#25968;&#65292;&#21542;&#21017;&#19979;&#38754;&#30340; set &#25351;&#20196;&#19981;&#20250;&#25191;&#34892;</span>
@@ -706,7 +799,6 @@ weight指的是权重，默认情况下，每台主机的权重都是1，也就�
 </div>
 
 <div class="org-src-container">
-
 <pre class="src src-nginx"><span style="color: #5f8700;">location</span> <span style="color: #0087ff;">/images/</span> {
     <span style="color: #5f8700;">rewrite</span> ^/images/(.*)$ http://1.2.3.4/images/<span style="color: #00afaf;">$1</span>/; <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#27983;&#35272;&#22120;&#37325;&#23450;&#21521;&#33267; http://1.2.3.4/images/$1</span>
 }
@@ -716,11 +808,10 @@ weight指的是权重，默认情况下，每台主机的权重都是1，也就�
 </div>
 
 
-<div id="outline-container-sec-2-9" class="outline-3">
-<h3 id="sec-2-9"><span class="section-number-3">2.9</span> Location</h3>
+<div id="outline-container-org2050f1c" class="outline-3">
+<h3 id="org2050f1c"><span class="section-number-3">2.9</span> Location</h3>
 <div class="outline-text-3" id="text-2-9">
 <div class="org-src-container">
-
 <pre class="src src-sh">location    &lt;uri&gt; { ... }  <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#23545;&#24403;&#21069;&#36335;&#24452;&#21450;&#23376;&#36335;&#24452;&#19979;&#30340;&#25152;&#26377;&#36164;&#28304;&#37117;&#29983;&#25928;</span>
 location =  &lt;uri&gt; { ... }  <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#21482;&#23545;&#24403;&#21069;&#36335;&#24452;&#29983;&#25928;&#65288;&#31934;&#30830;&#21305;&#37197;&#65292;&#19981;&#21253;&#25324;&#23376;&#36335;&#24452;&#65289;</span>
 location ~  &lt;uri&gt; { ... }  <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#27491;&#21017;&#21305;&#37197;&#65288;&#21306;&#20998;&#22823;&#23567;&#20889;&#65289;</span>
@@ -730,8 +821,8 @@ location ^~ &lt;uri&gt; { ... }  <span style="color: #585858; font-style: italic
 </div>
 </div>
 
-<div id="outline-container-sec-2-9-1" class="outline-4">
-<h4 id="sec-2-9-1"><span class="section-number-4">2.9.1</span> 优先级</h4>
+<div id="outline-container-orge7f0a36" class="outline-4">
+<h4 id="orge7f0a36"><span class="section-number-4">2.9.1</span> 优先级</h4>
 <div class="outline-text-4" id="text-2-9-1">
 <pre class="example">
 1. Directives with the "=" prefix that match the query exactly. If found, searching stops.
@@ -743,15 +834,14 @@ location ^~ &lt;uri&gt; { ... }  <span style="color: #585858; font-style: italic
 </div>
 
 
-<div id="outline-container-sec-2-9-2" class="outline-4">
-<h4 id="sec-2-9-2"><span class="section-number-4">2.9.2</span> 转发规则</h4>
+<div id="outline-container-org87471a3" class="outline-4">
+<h4 id="org87471a3"><span class="section-number-4">2.9.2</span> 转发规则</h4>
 <div class="outline-text-4" id="text-2-9-2">
 <p>
 location 和 target 尽量都以 / 结尾，否则可能会遇到循环重定向问题，遇到问题请抓包分析即可知来龙去脉。
 </p>
 
 <div class="org-src-container">
-
 <pre class="src src-sh">location /hello {
     root /home/test;   <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#35775;&#38382; http://&lt;domain&gt;/hello</span>
                        <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#33509;&#19981;&#23384;&#22312;&#30446;&#24405; /home/test/hello &#65292;&#21017;&#36820;&#22238; 404</span>
@@ -774,7 +864,6 @@ location /hello/ {
 </div>
 
 <div class="org-src-container">
-
 <pre class="src src-sh">location /world {
     proxy_pass http://127.0.0.1:9999;   <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#35775;&#38382; http://&lt;domain&gt;/world &#65292;   &#36716;&#21457;&#20026; GET /world HTTP/1.0</span>
                                         <span style="color: #585858; font-style: italic;">## </span><span style="color: #585858; font-style: italic;">&#35775;&#38382; http://&lt;domain&gt;/world/hk &#65292;&#36716;&#21457;&#20026; GET /world/hk HTTP/1.0</span>
@@ -803,15 +892,14 @@ location /world/ {
 </div>
 
 
-<div id="outline-container-sec-2-10" class="outline-3">
-<h3 id="sec-2-10"><span class="section-number-3">2.10</span> 访问控制</h3>
+<div id="outline-container-org954a7be" class="outline-3">
+<h3 id="org954a7be"><span class="section-number-3">2.10</span> 访问控制</h3>
 <div class="outline-text-3" id="text-2-10">
 <p>
 默认是 <code>allow all</code> ，如果要启用访问控制功能，则最后一行必须为 <code>deny all</code>
 </p>
 
 <div class="org-src-container">
-
 <pre class="src src-nginx"><span style="color: #5f8700;">location</span> <span style="color: #0087ff;">&lt;uri&gt;</span> {
     <span style="color: #5f8700;">deny</span>  192.168.0.2;
     <span style="color: #5f8700;">allow</span> 192.168.1.0/24;
@@ -823,11 +911,14 @@ location /world/ {
 </div>
 
 
-<div id="outline-container-sec-2-11" class="outline-3">
-<h3 id="sec-2-11"><span class="section-number-3">2.11</span> 端口转发</h3>
+<div id="outline-container-org58e835a" class="outline-3">
+<h3 id="org58e835a"><span class="section-number-3">2.11</span> 端口转发</h3>
 <div class="outline-text-3" id="text-2-11">
-<div class="org-src-container">
+<p>
+<b>The ngx_stream_core_module module is available since version 1.9.0</b>
+</p>
 
+<div class="org-src-container">
 <pre class="src src-nginx"><span style="color: #5f8700;">stream</span> {
     <span style="color: #5f8700;">server</span> {
         <span style="color: #5f8700;">listen</span>     48080;
@@ -835,6 +926,59 @@ location /world/ {
     }
 }
 </pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgaa90fe0" class="outline-3">
+<h3 id="orgaa90fe0"><span class="section-number-3">2.12</span> 添加模块</h3>
+<div class="outline-text-3" id="text-2-12">
+<div class="org-src-container">
+<pre class="src src-sh">sudo apt-get install libpcre3 libpcre3-dev build-essential zlib1g-dev -y
+<span style="color: #0087ff;">version</span>=<span style="color: #fa8072;">`nginx -v 2&gt;&amp;1 | grep -o '[0-9]*\.[0-9]*\.[0-9]*'`</span>
+curl -O http://hg.nginx.org/nginx/archive/release-$<span style="color: #0087ff;">version</span>.tar.gz
+tar xfvz release-$<span style="color: #0087ff;">version</span>.tar.gz
+<span style="color: #5f8700;">cd</span> nginx-release-$<span style="color: #0087ff;">version</span>
+./auto/configure --with-stream
+make
+sudo make install
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgfaed7f1" class="outline-3">
+<h3 id="orgfaed7f1"><span class="section-number-3">2.13</span> Nginx in Docker</h3>
+<div class="outline-text-3" id="text-2-13">
+</div>
+<div id="outline-container-orge5e556f" class="outline-4">
+<h4 id="orge5e556f"><span class="section-number-4">2.13.1</span> 获取 nginx.conf</h4>
+<div class="outline-text-4" id="text-2-13-1">
+<div class="org-src-container">
+<pre class="src src-sh">docker run --rm --name tmp-nginx -d nginx
+docker cp tmp-nginx:/etc/nginx/nginx.conf /host/path/nginx.conf
+docker rm -f tmp-nginx
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc274810" class="outline-4">
+<h4 id="orgc274810"><span class="section-number-4">2.13.2</span> 自定义 nginx.conf</h4>
+<div class="outline-text-4" id="text-2-13-2">
+<p>
+<code>docker run --rm --name my-nginx -p 8080:80 -v /host/path/nginx.conf:/etc/nginx/nginx.conf:ro -d nginx</code>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org3fe4ed2" class="outline-4">
+<h4 id="org3fe4ed2"><span class="section-number-4">2.13.3</span> 自定义静态文件</h4>
+<div class="outline-text-4" id="text-2-13-3">
+<p>
+<code>docker run --rm --name my-nginx -v /some/content:/usr/share/nginx/html:ro -d nginx</code>
+</p>
 </div>
 </div>
 </div>

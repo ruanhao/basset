@@ -6,7 +6,7 @@
 #+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
 #+HTML_DOCTYPE: <!DOCTYPE html>
 #+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
-#+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
  #+HTML: <div class="outline-2" id="meta">
 | Author   | {{{author}}} ({{{email}}})    |
 | Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
@@ -84,6 +84,7 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 
 反向代理是依赖于 `ngx_http_proxy_module` 这个模块来实现的
 
+
 *** 直接转发
 
 #+BEGIN_SRC nginx
@@ -97,6 +98,7 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
 
   }
 #+END_SRC
+
 
 *** 动态转发
 
@@ -122,18 +124,23 @@ Nginx 会同时运行多个进程，一个主进程（master）和多个工作�
   }
 #+END_SRC
 
+
 *** websocket 转发
 
 #+BEGIN_SRC nginx
   upstream ws {
-    server 127.0.0.1:8888;
+    server http://127.0.0.1:8888;
   }
 
   server {
 
     location /ws/ {
-      proxy_pass http://ws;
+      proxy_pass ws;
       proxy_http_version 1.1;
+
+      proxy_read_timeout    7200;
+      proxy_send_timeout    7200;
+
       proxy_set_header Upgrade $http_upgrade;
       proxy_set_header Connection "upgrade";
     }
@@ -404,6 +411,8 @@ location ^~ <uri> { ... }  ## 降低正则匹配的优先级
 
 ** 端口转发
 
+*The ngx_stream_core_module module is available since version 1.9.0*
+
 #+BEGIN_SRC nginx
   stream {
       server {
@@ -412,3 +421,35 @@ location ^~ <uri> { ... }  ## 降低正则匹配的优先级
       }
   }
 #+END_SRC
+
+
+** 添加模块
+
+#+BEGIN_SRC sh
+  sudo apt-get install libpcre3 libpcre3-dev build-essential zlib1g-dev -y
+  version=`nginx -v 2>&1 | grep -o '[0-9]*\.[0-9]*\.[0-9]*'`
+  curl -O http://hg.nginx.org/nginx/archive/release-$version.tar.gz
+  tar xfvz release-$version.tar.gz
+  cd nginx-release-$version
+  ./auto/configure --with-stream
+  make
+  sudo make install
+#+END_SRC
+
+** Nginx in Docker
+
+*** 获取 nginx.conf
+
+#+BEGIN_SRC sh
+  docker run --rm --name tmp-nginx -d nginx
+  docker cp tmp-nginx:/etc/nginx/nginx.conf /host/path/nginx.conf
+  docker rm -f tmp-nginx
+#+END_SRC
+
+*** 自定义 nginx.conf
+
+=docker run --rm --name my-nginx -p 8080:80 -v /host/path/nginx.conf:/etc/nginx/nginx.conf:ro -d nginx=
+
+*** 自定义静态文件
+
+=docker run --rm --name my-nginx -v /some/content:/usr/share/nginx/html:ro -d nginx=
