@@ -6,7 +6,7 @@
 #+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
 #+HTML_DOCTYPE: <!DOCTYPE html>
 #+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
-#+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
 #+HTML: <div class="outline-2" id="meta">
 | Author | {{{author}}} ({{{email}}})    |
 | Date   | {{{time(%Y-%m-%d %H:%M:%S)}}} |
@@ -37,49 +37,115 @@
 
 ** 运行容器
 
+*** 前台运行
+
+=docker run --name my_container -i -t ubuntu /bin/bash=
+
+- -i:     保证容器中 STDIN 开启
+- -t:     为容器创建伪终端
+- --name: 命名必须唯一
+
+
+*** 后台运行
+
+=docker run --name my_container -d ubuntu <cmd>=
+
+
+*** 公开端口
+
 #+BEGIN_SRC sh
-  docker run --name my_container -i -t ubuntu /bin/bash
-  # -i:     保证容器中 STDIN 开启
-  # -t:     为容器创建伪终端
-  # --name: 命名必须唯一
-
-  docker run --name my_container -d ubuntu <cmd>
-  # -d: 后台运行
-
   docker run --name my_container -p 80 -d ubuntu <cmd>
-  # -p: 控制 docker 运行时应公开哪些端口
-  docker run --name my_container -p 8080:80 -d ubuntu <cmd> # 将容器中的80端口绑定到宿主机的8080端口
+
+  # 将容器中的 80 端口绑定到宿主机的 8080 端口
+  docker run --name my_container -p 8080:80 -d ubuntu <cmd>
+
   docker run --name my_container -p 127.0.0.1:8080:80 -d ubuntu <cmd>
+
   docker run --name my_container -p 127.0.0.1::80 -d ubuntu <cmd> # 随机端口
+
+  # 公开在 Dockerfile 中通过 EXPOSE 指令公开的所有端口
   docker run --name my_container -P -d ubuntu <cmd>
-  # -P: 公开在 Dockerfile 中通过 EXPOSE 指令公开的所有端口
-
-  docker run --name my_container -P -d -v $PWD/website:/var/www/html/ ubuntu <cmd> # 卷
-  docker run --name my_container -P -d -v $PWD/website:/var/www/html/:ro ubuntu <cmd> # 只读卷
-  docker run --name my_container -P -d --volumes-from <cname> ubuntu <cmd> # 授权一个容器访问另一个容器的 Volume
-
-  docker run --name my_container -P -d --net=<name> ubuntu <cmd>
-  # --net: 表示新容器将在哪个网络中运行
-
-  docker run --name my_container -P -d --previleged ubuntu <cmd>
-  # --previleged: 容器对于宿主机拥有 root 权限，用于在 Docker 中运行 Docker 的场景
-
-  # --cidfile=/tmp/containerid.txt: 保存容器 ID 到指定文件中
-  # --rm: 进程运行完毕自动删除容器，适用于只用一次的容器
 #+END_SRC
+
+
+*** 添加卷
+
+#+BEGIN_SRC sh
+  docker run --name my_container -P -d -v $PWD/website:/var/www/html/ ubuntu <cmd>
+
+  # 只读卷
+  docker run --name my_container -P -d -v $PWD/website:/var/www/html/:ro ubuntu <cmd>
+
+  # 授权一个容器访问另一个容器的 Volume
+  docker run --name my_container -P -d --volumes-from <cname> ubuntu <cmd>
+#+END_SRC
+
+
+*** 指定网络
+
+#+BEGIN_SRC sh
+  docker network create <name>
+  docker run --name my_container -P -d --network=<name> ubuntu <cmd>
+#+END_SRC
+
+*** 提升权限
+
+=docker run --name my_container -P -d --previleged ubuntu <cmd>=
+
+容器对于宿主机拥有 root 权限，用于在 Docker 中运行 Docker 的场景
+
+
+*** 保存容器 ID 到指定文件中
+
+=--cidfile=/tmp/containerid.txt=
+
+
+*** 进程运行完毕自动删除容器
+
+=--rm=
+
+适用于只用一次的容器
+
+*** 指定环境变量
+
+=--env MYSQL_ROOT_PASSWORD=123456=
+
 
 ** 查看容器
 
+*** 正在运行的容器
+
+=docker ps=
+
+*** 所有容器
+
+=docker ps -a=
+
+*** 查看最后 x 个容器，不论运行或停止
+
+=docker ps -n <x>=
+
+*** 查看容器中的进程
+
+=docker top <cname>=
+
+*** 监控 cpu,mem,io 信息
+
+=docker stats=
+
+*** 查看容器端口映射情况
+
+如果 --network 为 host ，则无显示
+
+=docker port <cname> <port>=
+
+*** inspect
+
 #+BEGIN_SRC sh
-  docker ps          # 正在运行的容器
-  docker ps -a       # 所有容器
-  docker ps -n <x>   # 查看最后 x 个容器，不论运行或停止
-  docker top <cname> # 查看容器中的进程
-  docker stats
   docker inspect <cname>
-  docker inspct -f "{{ range .Mounts }}{{.}}{{end}}" <cname>
-  docker port <image_hash> <port> # 查看容器端口映射情况
+  docker inspect -f "{{ range .Mounts }}{{.}}{{end}}" <cname>
 #+END_SRC
+
 
 ** 删除容器
 
@@ -105,13 +171,23 @@ EXPOSE 8080
 
 ** 构建镜像
 
+*** build
+
+=docker build -t "<username>/<image_name>:<tag>" .=
+
+
+*** 查看镜像
+
+=docker images [<username>/<image_name>]=
+
+*** 查看镜像构建过程
+
+=docker history <image_hash>=
+
+
+*** 删除镜像
+
 #+BEGIN_SRC sh
-  docker build -t "<username>/<image_name>:<tag>" .
-
-  docker images [<username>/<image_name>] # 查看镜像
-
-  docker history <image_hash> # 查看镜像构建过程
-
   docker rmi # 删除镜像
   docker rmi `docker images -a -q` # 删除所有镜像
 #+END_SRC
@@ -201,7 +277,7 @@ docker network disconnect <net_name> <cname>
 
 * Docker Save & Export
 
-** export
+** Export
 
 用于导出容器，丢失镜像层次关系。
 
@@ -210,7 +286,7 @@ docker network disconnect <net_name> <cname>
   cat hinaWeb_Export.tar | docker import - local/hinaweb
 #+END_SRC
 
-** save
+** Save
 
 导出镜像，保留层次关系。
 
@@ -218,3 +294,94 @@ docker network disconnect <net_name> <cname>
   docker save ubuntu:latest > hinaWeb_Save.tar
   docker load < hinaWeb_Save.tar
 #+END_SRC
+
+
+* [[https://docs.docker.com/compose/compose-file][Docker Compose]]
+
+** Compose file 示例
+
+#+BEGIN_SRC yaml
+  version: "3"
+  services:
+    redis.aio:
+      container_name: "Cache_Server"
+      image: "docker.finditnm.com/netmanager/redis:v3.2.0-2"
+      restart: "on-failure"
+      logging:
+        options:
+          max-size: "1024k"
+          max-file: "2"
+      volumes:
+        - ${NM_DATA_DIR}/redis:/opt/maglev/srv/redis
+      network_mode: "host"
+      environment:
+        CONFIG_DIR: /opt/maglev/etc
+        CONFIG_FILE: /config/maglev.conf
+      command: ["redis-server","/opt/maglev/etc/redis.conf","--maxmemory","${REDIS_MAX_MEM}mb","--bind","127.0.0.1"]
+    mongo.aio:
+      container_name: "Database_Server"
+      image: "docker.finditnm.com/netmanager/mongodb:v1.0.2-3.4.9"
+      restart: "on-failure"
+      logging:
+        options:
+          max-size: "1024k"
+          max-file: "2"
+      volumes:
+        - ${NM_DATA_DIR}/mongodb:/opt/maglev/srv/mongodb
+      network_mode: "host"
+      environment:
+        CONFIG_DIR: /opt/maglev/config
+      command: ["/usr/bin/mongod","--dbpath","/opt/maglev/srv/mongodb","--wiredTigerCacheSizeGB",".25","--bind_ip","127.0.0.1"]
+    rabbitmq.aio:
+      container_name: "Queuing_Server"
+      image: "docker.finditnm.com/netmanager/rabbitmq:v3.6.5-2"
+      restart: "on-failure"
+      logging:
+        options:
+          max-size: "1024k"
+          max-file: "2"
+      volumes:
+        - ${NM_DATA_DIR}/rabbitmq:/opt/maglev/srv/rabbitmq
+      network_mode: "host"
+      environment:
+        CONFIG_DIR: /etc/rabbitmq
+        RABBITMQ_NODE_IP_ADDRESS: 127.0.0.1
+      command: "rabbitmq-plugins disable --offline rabbitmq_management && /usr/lib/rabbitmq/bin/rabbitmq-server start"
+    tomcat.aio:
+      container_name: "FindIT_Manager"
+      image: "docker.finditnm.com/netmanager/nm-aio-services:latest"
+      restart: "on-failure"
+      environment:
+        DCLOUD: ${DCLOUD}
+        DISABLE_NORTHBOUND: ${DISABLE_NORTHBOUND}
+        JAVA_OPTS: -Xms${TOMCAT_JAVA_MIN_MEM}m -Xmx${TOMCAT_JAVA_MAX_MEM}m
+      logging:
+        options:
+          max-size: "10240k"
+          max-file: "2"
+      volumes:
+        - ${NM_LOG_DIR}:/opt/cisco/nm/log
+        - ${NM_UPGRADE_DIR}:/opt/cisco/nm/upgrade
+        - ${NM_DATA_DIR}/smartlic:/opt/cisco/nm/smartlic
+        - ${NM_DATA_DIR}/backup:/opt/cisco/nm/backup
+        - ${NM_DATA_DIR}/restore:/opt/cisco/nm/restore
+      network_mode: "host"
+      depends_on:
+        - "redis.aio"
+        - "mongo.aio"
+        - "rabbitmq.aio"
+
+#+END_SRC
+
+
+** 启动
+
+=docker compose -f <compose-file> up [-d]=
+
+** 停止
+
+=docker compose -f <compose-file> stop=
+
+** 删除
+
+=docker compose -f <compose-file> rm -f=
