@@ -19,10 +19,37 @@
 | Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
 #+HTML: </div>
 
-* Emacs 设置
+* 环境
+
+** Emacs
 
 1. 安装 [[https://github.com/krisajenkins/ob-mongo][ob-mongo]]
 2. =rm -rf ~/.emacs.d/elpa/org-xxxxxxx/*.elc=
+
+** Docker
+
+*** 自定义配置文件
+
+#+BEGIN_SRC sh
+  docker run --name some-mongo \
+  --rm \
+  -p 27017:27017 \
+  -v /my/custom:/etc/mongo \
+  -d \
+  mongo \
+  --config /etc/mongo/mongod.conf
+#+END_SRC
+
+*** 挂载数据文件
+
+#+BEGIN_SRC sh
+  docker run --name some-mongo \
+  --rm \
+  -p 27017:27017 \
+  -v /my/own/datadir:/data/db \
+  -d mongo
+#+END_SRC
+
 
 
 
@@ -1395,3 +1422,78 @@ Specify an '_id' value of null to calculate accumulated values *for all the inpu
 *** [[https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/][$unwind]]
 
 ** [[https://docs.mongodb.com/manual/reference/operator/aggregation/][Pipeline operators]]
+
+
+* 索引
+
+Indexes are [[https://docs.mongodb.com/manual/indexes/#b-tree][special data structure]] that store a small portion of the collection’s data set in an easy to traverse form.
+The index stores the value of a specific field or set of fields, ordered by the value of the field.
+The ordering of the index entries supports efficient equality matches and range-based query operations.
+In addition, MongoDB can return sorted results by using the ordering in the index.
+
+#+HTML: <img src="https://docs.mongodb.com/manual/_images/index-for-sort.bakedsvg.svg"/>
+
+** 索引类型
+
+*** Single Field
+
+#+HTML: <img src="https://docs.mongodb.com/manual/_images/index-ascending.bakedsvg.svg"/>
+
+#+BEGIN_SRC mongo
+  db.records.createIndex( { score: 1 } )
+#+END_SRC
+
+
+*** Compound Index
+
+*MongoDB imposes a limit of 31 fields for any compound index.*
+
+
+#+HTML: <img src="https://docs.mongodb.com/manual/_images/index-compound-key.bakedsvg.svg"/>
+
+#+BEGIN_SRC mongo
+  db.products.createIndex( { "item": 1, "stock": 1 } )
+#+END_SRC
+
+*** Multikey Index
+
+MongoDB uses multikey indexes to index the content stored in *arrays*.
+
+MongoDB automatically determines whether to create a multikey index if the indexed field contains an array value;
+*you do not need to explicitly specify the multikey type.*
+
+#+HTML: <img src="https://docs.mongodb.com/manual/_images/index-multikey.bakedsvg.svg"/>
+
+
+*** Geospatial Index
+
+*** Text Indexes
+
+#+BEGIN_SRC mongo
+  db.reviews.createIndex( { comments: "text" } )
+#+END_SRC
+
+*** Hash Indexes
+
+
+** 索引属性
+
+*** Unique Indexes
+
+*** Partial Indexes
+
+Only index the documents in a collection that meet a specified filter expression.
+
+Partial indexes offer a *superset* of the functionality of sparse indexes and should be *preferred over sparse indexes*.
+
+*** Sparse Indexes
+
+Ensures that the index *only contain* entries for documents that have the indexed field.
+The index skips documents that do not have the indexed field.
+
+The index is *sparse* because it does not include all documents of a collection.
+
+
+*** TTL Indexes
+
+To create a TTL index, use the db.collection.createIndex() method with the expireAfterSeconds option on a field whose value is *either a date or an array that contains date values.*
