@@ -1497,3 +1497,43 @@ The index is *sparse* because it does not include all documents of a collection.
 *** TTL Indexes
 
 To create a TTL index, use the db.collection.createIndex() method with the expireAfterSeconds option on a field whose value is *either a date or an array that contains date values.*
+
+* Replica Set
+
+Replication can provide increased read capacity as *clients can send read operations to different servers.*
+
+A replica set contains several data bearing nodes and optionally one arbiter node.
+Of the data bearing nodes, *one and only one member is deemed the primary node, while the other nodes are deemed secondary nodes.*
+
+MongoDB applies write operations on the primary and then records the operations on the primary’s oplog. Secondary members *replicate this log* and apply the operations to their data sets.
+
+#+HTML: <img src="https://docs.mongodb.com/manual/_images/replica-set-read-write-operations-primary.bakedsvg.svg"/>
+
+#+HTML: <img src="https://docs.mongodb.com/manual/_images/replica-set-primary-with-two-secondaries.bakedsvg.svg"/>
+
+
+** Automatic Failover
+
+The replica set *cannot process write operations* until the election completes successfully.
+
+The replica set can *continue to serve read queries* if such queries are configured to run on secondaries while the primary is offline.
+
+#+HTML: <img src="https://docs.mongodb.com/manual/_images/replica-set-trigger-election.bakedsvg.svg"/>
+
+* Sharding
+
+MongoDB supports horizontal scaling through sharding.
+
+MongoDB sharded cluster consists of the following components:
+
+- shard: Each shard contains a subset of the sharded data. Each shard can be deployed as a replica set.
+- mongos: The mongos acts as a query router, providing an interface between client applications and the sharded cluster.
+- config servers: Config servers store metadata and configuration settings for the cluster.
+
+#+HTML: <img src="https://docs.mongodb.com/manual/_images/sharded-cluster-production-architecture.bakedsvg.svg"/>
+
+You must connect to a mongos router to interact with any collection in the sharded cluster.
+This includes sharded and unsharded collections.
+*Clients should never connect to a single shard in order to perform read or write operations.*
+
+#+HTML: <img src="https://docs.mongodb.com/manual/_images/sharded-cluster-mixed.bakedsvg.svg"/>
