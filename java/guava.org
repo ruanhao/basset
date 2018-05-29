@@ -1,42 +1,162 @@
 #+TITLE:     Guava
 #+AUTHOR:    Hao Ruan
-#+EMAIL:     ruanhao1116@gmail.com
+#+EMAIL:     haoru@cisco.com
 #+LANGUAGE:  en
 #+LINK_HOME: http://www.github.com/ruanhao
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
-#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+OPTIONS:   h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
 #+STARTUP:   showall
+#+TOC:       headlines 3
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
+ #+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
 
 
-* Charsets
+* 基本工具类
 
-#+BEGIN_SRC java
-Charsets.ISO_8859_1
-Charsets.US_ASCII
-Charsets.UTF_16
-Charsets.UTF_16BE
-Charsets.UTF_16LE
-Charsets.UTF_8
-#+END_SRC
+** 字符串工具类
 
-
-* Joiner
+*** [[https://github.com/google/guava/wiki/StringsExplained#joiner][Joiner]]
 
 #+BEGIN_SRC java
   String[] strList = {"a", "b", "c", null, "d", "e", null, null};
   Joiner.on("|").skipNulls().join(strList);      // a|b|c|d|e
   Joiner.on("|").useForNull("NA").join(strList); // a|b|c|NA|d|e|NA|NA
+
+  Joiner.on("#").withKeyValueSeparator("=").join(strMap);
 #+END_SRC
 
 
-* Splitter
+*** [[https://github.com/google/guava/wiki/StringsExplained#splitter][Splitter]]
 
 #+BEGIN_SRC java
-  Splitter.on("|").split("boo|bar|baz");                    // [boo, bar, baz]
-  Splitter.on("|").split("boo|bar||baz||");                 // [boo, bar, , baz, , ]
-  Splitter.on("|").trimResults().split("boo|bar|baz");      // [boo, bar, baz]
-  Splitter.on(CharMatcher.JAVA_DIGIT).split("boo1bar2baz"); // [boo, bar, baz]
+  Splitter.on(',').trimResults().omitEmptyStrings().split("foo,bar,,   qux");
+  Splitter.on(',').omitEmptyStrings().split("a,,c,d"); // "a", "c", "d"
+  Splitter.on(',').trimResults().split("a, b, c, d"); // "a", "b", "c", "d"
+  Splitter.on(',').trimResults(CharMatcher.is('_')).split("_a ,_b_ ,c__"); // "a", "b_", "c"
+  Splitter.on(',').limit(3).split("a,b,c,d"); // "a", "b", "c,d"
 #+END_SRC
+
+**** 基本工厂方法
+
+- Splitter.on(char)
+- Splitter.on(CharMatcher)
+- Splitter.on(String)
+- Splitter.on(Patter)
+- Splitter.fixedLength(int)
+
+**** 修饰方法
+
+- omitEmptyStrings()
+- trimResults() , 即 =trimResults(CharMatcher.WHITESPACE)=
+- trimResults(CharMatcher)
+- limit(int)
+
+
+*** [[https://google.github.io/guava/releases/23.0/api/docs/com/google/common/base/Splitter.MapSplitter.html][Splitter.MapSplitter]]
+
+#+BEGIN_SRC java
+  Splitter.on(';').trimResults().withKeyValueSeparator("=>").split("a=>b ; c=>b");
+  /*
+    {
+      "a": "b",
+      "c": "b"
+    }
+  */
+#+END_SRC
+
+
+*** [[https://github.com/google/guava/wiki/StringsExplained#charmatcher][CharMatcher]]
+
+#+BEGIN_SRC java
+  String noControl = CharMatcher.javaIsoControl().removeFrom(string); // remove control characters
+  String theDigits = CharMatcher.digit().retainFrom(string); // only the digits
+  String spaced = CharMatcher.whitespace().trimAndCollapseFrom(string, ' ');
+  // trim whitespace at ends, and replace/collapse whitespace into single spaces
+  String noDigits = CharMatcher.javaDigit().replaceFrom(string, "*"); // star out all digits
+  String lowerAndDigit = CharMatcher.javaDigit().or(CharMatcher.javaLowerCase()).retainFrom(string);
+  // eliminate all characters that aren't digits or lowercase
+#+END_SRC
+
+**** 内置工厂方法
+
+- any()
+- none()
+- whitespace()
+- breakingWhitespace()
+- invisible()
+- digit()
+- javaLetter()
+- javaDigit()
+- javaLetterOrDigit()
+- javaIsoControl()
+- javaLowerCase()
+- javaUpperCase()
+- ascii()
+- singleWidth()
+
+**** 自定义工厂方法
+
+- anyOf(CharSequence)
+- is(char)
+- inRange(char, char)
+
+**** 逻辑运算工厂方法
+
+- negate()
+- and(CharMatcher)
+- or(CharMatcher)
+
+
+*** Charsets
+
+*** CaseFormat
+
+|------------------+------------------|
+| Format           | Example          |
+| LOWER_CAMEL      | lowerCamel       |
+| LOWER_HYPHEN     | lower-hyphen     |
+| LOWER_UNDERSCORE | lower_underscore |
+| UPPER_CAMEL      | UpperCamel       |
+| UPPER_UNDERSCORE | UPPER_UNDERSCORE |
+|------------------+------------------|
+
+#+BEGIN_SRC java
+  CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, "CONSTANT_NAME"));
+  // returns "constantName"
+#+END_SRC
+
+*** Strings
+
+#+BEGIN_SRC java
+  Strings.padEnd("foo", 6, 'x');  // fooxxx
+
+  Strings.nullToEmpty("");        // ""
+  Strings.nullToEmpty(null);      // ""
+  Strings.nullToEmpty("hello");   // "hello"
+
+  Strings.emptyToNull("");        // null
+  Strings.emptyToNull(null);      // null
+  Strings.emptyToNull("hello");   // "hello"
+
+  Strings.isNullOrEmpty(null);    // true
+  Strings.isNullOrEmpty("");      // true
+  Strings.isNullOrEmpty("hello"); // false
+#+END_SRC
+
+- commonPrefix(CharSequence a, CharSequence b) (公共前缀)
+- commonSuffix(CharSequence a, CharSequence b) (公共后缀)
+- emptyToNull(String)
+- isNullOrEmpty(String)
+- nullToEmpty(String)
+- padEnd(String s, int minLength, char padChar)
+- padStart(String s, int minLength, char padChar)
+- repeat(String s, int count)
+
+
 
 
 * Collections
@@ -87,35 +207,3 @@ ImmutableMap<String,String> map = ImmutableMap.of("key1", "value1", "key2", "val
 *** InputStream to byte array
 
 =byte[] bytes = ByteStreams.toByteArray(inputStream);=
-
-* Strings
-
-#+BEGIN_SRC java
-  Strings.padEnd("foo", 6, 'x');  // fooxxx
-
-  Strings.nullToEmpty("");        // ""
-  Strings.nullToEmpty(null);      // ""
-  Strings.nullToEmpty("hello");   // "hello"
-
-  Strings.emptyToNull("");        // null
-  Strings.emptyToNull(null);      // null
-  Strings.emptyToNull("hello");   // "hello"
-
-  Strings.isNullOrEmpty(null);    // true
-  Strings.isNullOrEmpty("");      // true
-  Strings.isNullOrEmpty("hello"); // false
-#+END_SRC
-
-
-* CharMatcher
-
-#+BEGIN_SRC java
-  String stringWithLinebreaks = "hello\nworld";
-  String tabsAndSpaces        = "       String with   spaces   and \t tabs";
-
-  CharMatcher.BREAKING_WHITESPACE.replaceFrom(stringWithLinebreaks, ' '); // "hello world"
-  CharMatcher.WHITESPACE.collapseFrom(tabsAndSpaces, ' ');                // " String with spaces and tabs"
-  CharMatcher.WHITESPACE.trimAndCollapseFrom(tabsAndSpaces, ' ');         // "String with spaces and tabs"
-  CharMatcher.JAVA_DIGIT.retainFrom("foo989yxbar234");                    // "989234"
-  CharMatcher.DIGIT.removeFrom("some text 89983 and more");               // "some text  and more"
-#+END_SRC
