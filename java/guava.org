@@ -219,3 +219,25 @@ ImmutableMap<String,String> map = ImmutableMap.of("key1", "value1", "key2", "val
 *** InputStream to byte array
 
 =byte[] bytes = ByteStreams.toByteArray(inputStream);=
+
+
+* IO
+
+** [[https://github.com/google/guava/wiki/IOExplained#io-utilities][Source/Sink]]
+
+** [[https://google.github.io/guava/releases/23.0/api/docs/com/google/common/io/Closer.html][Closer]]
+
+#+BEGIN_SRC java
+  Closer closer = Closer.create();
+  try {
+      InputStream in = closer.register(openInputStream());
+      OutputStream out = closer.register(openOutputStream());
+      // do stuff
+  } catch (Throwable e) {
+      // ensure that any checked exception types other than IOException that could be thrown are
+      // provided here, e.g. throw closer.rethrow(e, CheckedException.class);
+      throw closer.rethrow(e);
+  } finally {
+      closer.close();
+  }
+#+END_SRC
