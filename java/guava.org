@@ -241,3 +241,145 @@ ImmutableMap<String,String> map = ImmutableMap.of("key1", "value1", "key2", "val
       closer.close();
   }
 #+END_SRC
+
+
+* 线程
+
+** [[https://google.github.io/guava/releases/19.0/api/docs/com/google/common/util/concurrent/Monitor.html][Monitor]]
+
+#+BEGIN_SRC java
+  public class SafeBox<V> {
+      private final Monitor monitor = new Monitor();
+      private final Monitor.Guard valuePresent = new Monitor.Guard(monitor) {
+              public boolean isSatisfied() {
+                  return value != null;
+              }
+          };
+      private final Monitor.Guard valueAbsent = new Monitor.Guard(monitor) {
+              public boolean isSatisfied() {
+                  return value == null;
+              }
+          };
+      private V value;
+
+      public V get() throws InterruptedException {
+          monitor.enterWhen(valuePresent);
+          try {
+              V result = value;
+              value = null;
+              return result;
+          } finally {
+              monitor.leave();
+          }
+      }
+
+      public void set(V newValue) throws InterruptedException {
+          monitor.enterWhen(valueAbsent);
+          try {
+              value = newValue;
+          } finally {
+              monitor.leave();
+          }
+      }
+  }
+#+END_SRC
+
+
+* [[https://google.github.io/guava/releases/22.0/api/docs/com/google/common/eventbus/EventBus.html][EventBus]]
+
+** Setup
+
+#+BEGIN_SRC java
+  EventBus eventBus = new EventBus();
+#+END_SRC
+
+** Create Listeners
+
+#+BEGIN_SRC java
+  public class EventListener {
+
+      private static int eventsHandled;
+
+      @Subscribe
+      public void stringEvent(String event) {
+          eventsHandled++;
+      }
+  }
+#+END_SRC
+
+在要订阅消息的方法上加上 =@Subscribe= 注解即可实现对多个消息的订阅:
+
+#+BEGIN_SRC java
+  public class MultipleListener {
+      public Integer lastInteger;
+      public Long lastLong;
+
+      @Subscribe
+      public void listenInteger(Integer event) {
+          lastInteger = event;
+          System.out.println("event Integer:"+lastInteger);
+      }
+
+      @Subscribe
+      public void listenLong(Long event) {
+          lastLong = event;
+          System.out.println("event Long:"+lastLong);
+      }
+
+      public Integer getLastInteger() {
+          return lastInteger;
+      }
+
+      public Long getLastLong() {
+          return lastLong;
+      }
+  }
+#+END_SRC
+
+** Register Listeners
+
+#+BEGIN_SRC java
+  EventListener listener = new EventListener();
+  eventBus.register(listener);
+#+END_SRC
+
+
+
+
+** Unregister Listeners
+
+#+BEGIN_SRC java
+  eventBus.unregister(listener);
+#+END_SRC
+
+
+** Post Events
+
+*Events are routed based on their type.*
+
+When post is called, all registered subscribers for an event are run in sequence, so subscribers should be reasonably quick.
+If an event may trigger an extended process (such as a database load), spawn a thread or queue it for later.
+(For a convenient way to do this, use an [[https://google.github.io/guava/releases/22.0/api/docs/com/google/common/eventbus/AsyncEventBus.html][AsyncEventbus]].)
+
+
+
+#+BEGIN_SRC java
+  @Test
+  public void givenStringEvent_whenEventHandled_thenSuccess() {
+      eventBus.post("String Event");
+      assertEquals(1, listener.getEventsHandled());
+  }
+#+END_SRC
+
+*** Event 继承
+
+如果 Listener A 监听 Event A , 而 Event A 有一个子类 Event B , 此时 Listener A 将同时接收 Event A 和 B 消息
+
+** Handle an Unsubscribed Event
+
+#+BEGIN_SRC java
+  @Subscribe
+  public void handleDeadEvent(DeadEvent deadEvent) {
+      eventsHandled++;
+  }
+#+END_SRC

@@ -1,0 +1,54 @@
+#+TITLE:     知识点
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS:   h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+STARTUP:   showall
+#+TOC:       headlines 4
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
+ #+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+
+
+* SPI
+
+** 传送门
+
+- [[https://cxis.me/2017/04/17/Java%E4%B8%ADSPI%E6%9C%BA%E5%88%B6%E6%B7%B1%E5%85%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/][Java 中 SPI 机制深入及源码解析]]
+
+* 线程
+
+** 状态图
+
+#+BEGIN_SRC plantuml :file img/java_thread_states.png :eval never-export
+[*] --> Runnable : start()
+Runnable --> Running : CPU schedule
+Running --> Runnable
+Running --> [*] : run()
+
+state Blocked {
+    WaitPool --> LockPool : notifyAll()
+    BlockedPool --> Runnable : unblocked
+    LockPool --> Runnable : get lock
+}
+
+Running --> BlockedPool : blocked
+Running --> WaitPool : wait()
+Running --> LockPool : synchronized
+
+
+
+#+END_SRC
+
+#+RESULTS:
+[[file:img/java_thread_states.png]]
+
+
+** 传送门
+
+- [[https://www.zhihu.com/question/37601861][java 中的 notify 和 notifyAll 有什么区别？]]
