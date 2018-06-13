@@ -19,7 +19,7 @@
 
 ** 不调用 =__init__= 方法来创建实例
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from time import localtime
 
   class Date:
@@ -56,10 +56,17 @@
   print(d.year, d.month, d.day)
 #+END_SRC
 
+#+RESULTS:
+: <__main__.Date object at 0x1085e1588>
+: False
+: 2012
+: 8
+: 2018 6 13
+
 
 ** 创建缓存对象
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   class Spam:
       def __init__(self, name):
           self.name = name
@@ -84,8 +91,12 @@
       print('a is c:', a is c)
 #+END_SRC
 
+#+RESULTS:
+: a is b: False
+: a is c: True
 
-#+BEGIN_SRC ipython :session :exports both :results output
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import weakref
 
   class CachedSpamManager:
@@ -116,7 +127,11 @@
       print('a is c:', a is c)
 #+END_SRC
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+RESULTS:
+: a is b: False
+: a is c: True
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   # Example involving new and some of its problems
 
   import weakref
@@ -142,9 +157,15 @@
       print(s is t)
 #+END_SRC
 
+#+RESULTS:
+: This should print 'Initializing Spam' twice
+: Initializing Spam
+: Initializing Spam
+: True
+
 ** 抽象类
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from abc import ABCMeta, abstractmethod
 
   class A(metaclass=ABCMeta):
@@ -169,10 +190,12 @@
           pass
 #+END_SRC
 
+#+RESULTS:
+
 
 ** 动态定义类
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   # Example of making a class manually from parts
 
   # Methods
@@ -200,8 +223,12 @@
       print(s.cost())
 #+END_SRC
 
+#+RESULTS:
+: <types.Stock object at 0x1085e1518>
+: 4555.0
 
-#+BEGIN_SRC ipython :session :exports both :results output
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   # An alternative formulation of namedtuples
 
   import operator
@@ -241,12 +268,20 @@
       print('%s %s' % p)
 #+END_SRC
 
+#+RESULTS:
+: <class '__main__.Point'>
+: 2
+: 4 4
+: 5 5
+: can't set attribute
+: 4 5
+
 
 ** 使用元类控制类的创建
 
 *** 实例缓存
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   # Cached instances
 
   import weakref
@@ -277,10 +312,16 @@
       print('a is c:', a is c)
 #+END_SRC
 
+#+RESULTS:
+: Creating Spam('foo')
+: Creating Spam('bar')
+: a is b: False
+: a is c: True
+
 
 *** 单例
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   # Singleton
 
   class Singleton(type):
@@ -305,10 +346,14 @@
       print(a is b)
 #+END_SRC
 
+#+RESULTS:
+: Creating Spam
+: True
+
 
 *** 禁用直接实例化
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   # Not allowing direct instantiation
 
   class NoInstances(type):
@@ -329,12 +374,16 @@
       Spam.grok(42)
 #+END_SRC
 
+#+RESULTS:
+: Can't instantiate directly
+: Spam.grok
+
 
 * 进程与多线程
 
 ** 创建子进程
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from multiprocessing import Process
   import os
 
@@ -353,7 +402,7 @@
 
 ** 子进程的输入输出
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import subprocess
 
   r = subprocess.call(['nslookup', 'www.python.org'])
@@ -370,12 +419,45 @@
   # exit
 #+END_SRC
 
+#+RESULTS:
+#+begin_example
+r: 0
+Server:		64.104.123.144
+Address:	64.104.123.144#53
+
+Non-authoritative answer:
+python.org	mail exchanger = 50 mail.python.org.
+
+Authoritative answers can be found from:
+org	nameserver = d0.org.afilias-nst.org.
+org	nameserver = a2.org.afilias-nst.info.
+org	nameserver = a0.org.afilias-nst.info.
+org	nameserver = b0.org.afilias-nst.org.
+org	nameserver = b2.org.afilias-nst.org.
+org	nameserver = c0.org.afilias-nst.info.
+a0.org.afilias-nst.info	internet address = 199.19.56.1
+a2.org.afilias-nst.info	internet address = 199.249.112.1
+b0.org.afilias-nst.org	internet address = 199.19.54.1
+b2.org.afilias-nst.org	internet address = 199.249.120.1
+c0.org.afilias-nst.info	internet address = 199.19.53.1
+d0.org.afilias-nst.org	internet address = 199.19.57.1
+a0.org.afilias-nst.info	has AAAA address 2001:500:e::1
+a2.org.afilias-nst.info	has AAAA address 2001:500:40::1
+b0.org.afilias-nst.org	has AAAA address 2001:500:c::1
+b2.org.afilias-nst.org	has AAAA address 2001:500:48::1
+c0.org.afilias-nst.info	has AAAA address 2001:500:b::1
+d0.org.afilias-nst.org	has AAAA address 2001:500:f::1
+
+
+Exit code: 0
+#+end_example
+
 
 ** 进程间通信
 
 父进程中创建两个子进程，一个往 Queue 里写数据，一个从 Queue 里读数据：
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from multiprocessing import Process, Queue
   import os, time, random
 
@@ -401,10 +483,20 @@
   pr.terminate()  # pr 进程里是死循环，无法等待其结束，只能强行终止:
 #+END_SRC
 
+#+RESULTS:
+: Process to write: 92549
+: Put A to queue...
+: Process to read: 92550
+: Get A from queue.
+: Put B to queue...
+: Get B from queue.
+: Put C to queue...
+: Get C from queue.
+
 
 ** 创建线程
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import time, threading
 
   def worker():
@@ -417,10 +509,14 @@
   t.join()
 #+END_SRC
 
+#+RESULTS:
+: thread WorkerThread is running...
+: thread WorkerThread ended.
+
 
 ** 线程加锁
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import threading
   from concurrent.futures import ThreadPoolExecutor
 
@@ -431,7 +527,7 @@
       global count
       while count < 10:
           count += 1
-          print("\x1b[31m%s\x1b[0m, " % count, end='')
+          print("%s, " % count, end='')
 
   def run_thread_with_lock():
       global count
@@ -451,6 +547,9 @@
           executor.submit(run_thread_with_lock)
 #+END_SRC
 
+#+RESULTS:
+: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+
 
 ** thread local 变量
 
@@ -458,7 +557,7 @@
 
 最常用的地方就是为每个线程绑定一个数据库连接，HTTP 请求，用户身份信息等，这样一个线程的所有调用到的处理函数都可以非常方便地访问这些资源。
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import threading, time
 
   tl = threading.local()
@@ -473,6 +572,9 @@
   tl.name = 'world'
   print("in main:", tl.name)
 #+END_SRC
+
+#+RESULTS:
+: in main: world
 
 
 ** 线程池
@@ -496,14 +598,55 @@
   y = b.result()
 #+END_SRC
 
+#+RESULTS:
+: # Out[1]:
+
 
 * 数据结构
 
 ** 列表
 
+*** 列表中删除数据的陷阱
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  lst = ['a', 'b', 'c', '', '']
+  for i in lst:
+      if i is '':
+          lst.remove(i)
+
+  print(lst)
+#+END_SRC
+
+#+RESULTS:
+: ['a', 'b', 'c', '']
+
+**** 原理
+
+list 属于线性表，它的连续在于用一块连续的内存空间存储元素，在调用 =remove= 时，只是删除了地址内的元素。
+
+回到问题，当删除列表中的元素时， =for in= 是对下标进行操作，而 =remove= 是对值进行操作, 当 =for= 到达索引为 3 ，即第一个空字符位置时，符合条件即删除。因为 list 是线性表，所以删除这个空字符时， *同时后面的所有元素自动移动位置 1* ，此时的 lst 等于 =['a', 'b', 'c', '']= ，因为 =for in= 已经遍历到了索引 3 处，所以循环结束。
+
+**** 解决方法
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+
+  lst = ['a','','b','','c','','']
+
+  # 做法一
+  while '' in lst:
+      lst.remove('')
+  print(lst)
+
+
+  # 做法二
+
+  lst_new = [i for i in lst if i != '']
+#+END_SRC
+
+
 *** 列表中出现频率最高
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   words = [
      'look', 'into', 'my', 'eyes', 'look', 'into', 'my', 'eyes',
      'the', 'eyes', 'the', 'eyes', 'the', 'eyes', 'not', 'around', 'the',
@@ -517,10 +660,13 @@
   print(top_three)
 #+END_SRC
 
+#+RESULTS:
+: [('eyes', 8), ('the', 5), ('look', 4)]
+
 
 *** 列表中最大或最小的几项
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import heapq
 
   portfolio = [
@@ -539,9 +685,9 @@
 #+END_SRC
 
 
-***  对列表中的数据分组
+*** 对列表中的数据分组
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export :eval never-export
   rows = [
       {'address': '5412 N CLARK', 'date': '07/01/2012'},
       {'address': '5148 N CLARK', 'date': '07/04/2012'},
@@ -562,9 +708,25 @@
           print('    ', i)
 #+END_SRC
 
+#+RESULTS:
+#+begin_example
+07/01/2012
+     {'address': '5412 N CLARK', 'date': '07/01/2012'}
+     {'address': '4801 N BROADWAY', 'date': '07/01/2012'}
+07/02/2012
+     {'address': '5800 E 58TH', 'date': '07/02/2012'}
+     {'address': '5645 N RAVENSWOOD', 'date': '07/02/2012'}
+     {'address': '1060 W ADDISON', 'date': '07/02/2012'}
+07/03/2012
+     {'address': '2122 N CLARK', 'date': '07/03/2012'}
+07/04/2012
+     {'address': '5148 N CLARK', 'date': '07/04/2012'}
+     {'address': '1039 W GRANVILLE', 'date': '07/04/2012'}
+#+end_example
+
 或者使用 defaultdict 来实现：
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from collections import defaultdict
   rows_by_date = defaultdict(list)
   for row in rows:
@@ -572,10 +734,13 @@
   print(rows_by_date)
 #+END_SRC
 
+#+RESULTS:
+: defaultdict(<class 'list'>, {'07/01/2012': [{'address': '5412 N CLARK', 'date': '07/01/2012'}, {'address': '4801 N BROADWAY', 'date': '07/01/2012'}], '07/02/2012': [{'address': '5800 E 58TH', 'date': '07/02/2012'}, {'address': '5645 N RAVENSWOOD', 'date': '07/02/2012'}, {'address': '1060 W ADDISON', 'date': '07/02/2012'}], '07/03/2012': [{'address': '2122 N CLARK', 'date': '07/03/2012'}], '07/04/2012': [{'address': '5148 N CLARK', 'date': '07/04/2012'}, {'address': '1039 W GRANVILLE', 'date': '07/04/2012'}]})
+
 
 *** 消除序列中的重复数据，同时保持数据顺序
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   def dedupe(items, key=None):
       seen = set()
       for item in items:
@@ -595,8 +760,11 @@
   print(list(dedupe(a, key=lambda a: (a['x'],a['y']))))
 #+END_SRC
 
+#+RESULTS:
+: [{'x': 2, 'y': 3}, {'x': 1, 'y': 4}, {'x': 10, 'y': 15}]
 
-#+BEGIN_SRC ipython :session :exports both :results output
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   def dedupe(items):
       seen = set()
       for item in items:
@@ -608,10 +776,13 @@
   print(list(dedupe(a)))
 #+END_SRC
 
+#+RESULTS:
+: [1, 5, 2, 9, 10]
+
 
 *** 序列解包 (unpack)
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   records = [
        ('foo', 1, 2),
        ('bar', 'hello'),
@@ -631,10 +802,15 @@
           do_bar(*args)
 #+END_SRC
 
+#+RESULTS:
+: foo 1 2
+: bar hello
+: foo 3 4
+
 
 *** flatten 列表
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from collections import Iterable
 
   def flatten(items, ignore_types=(str, bytes)):
@@ -656,12 +832,28 @@
 
 #+END_SRC
 
+#+RESULTS:
+#+begin_example
+1
+2
+3
+4
+5
+6
+7
+8
+Dave
+Paula
+Thomas
+Lewis
+#+end_example
+
 
 ** 字典
 
 *** 对字典作集合运算
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   a = {
      'x' : 1,
      'y' : 2,
@@ -679,10 +871,15 @@
   print('(key,value) pairs in common:', a.items() & b.items())
 #+END_SRC
 
+#+RESULTS:
+: Common keys: {'y', 'x'}
+: Keys in a not in b: {'z'}
+: (key,value) pairs in common: {('y', 2)}
+
 
 *** 组合多个字典当作一个字典使用
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   a = {'x': 1, 'z': 3 }
   b = {'y': 2, 'z': 4 }
 
@@ -708,10 +905,20 @@
   print("a:", a)
 #+END_SRC
 
+#+RESULTS:
+: c: ChainMap({'x': 1, 'z': 3}, {'y': 2, 'z': 4})
+: 1
+: 2
+: 3
+: len(c): 3
+: c.keys(): ['z', 'y', 'x']
+: c.values(): [3, 2, 1]
+: a: {'z': 10, 'w': 40}
+
 
 *** 字典栈
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   # Example of stacking mappings (like scopes)
   values = ChainMap()
   values['x'] = 1
@@ -738,12 +945,20 @@
   print(values['x'])
 #+END_SRC
 
+#+RESULTS:
+: ChainMap({'x': 3}, {'x': 2}, {'x': 1})
+: 3
+: ChainMap({'x': 2}, {'x': 1})
+: 2
+: ChainMap({'x': 1})
+: 1
+
 
 ** 队列
 
 *** 优先队列
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import heapq
 
   class PriorityQueue:
@@ -776,6 +991,12 @@
   print("Should be foo:", q.pop())
   print("Should be grok:", q.pop())
 #+END_SRC
+
+#+RESULTS:
+: Should be bar: Item('bar')
+: Should be spam: Item('spam')
+: Should be foo: Item('foo')
+: Should be grok: Item('grok')
 
 
 
@@ -834,7 +1055,7 @@
 
 *** 内存字符串
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from io import StringIO
   f = StringIO()
   f.write('hello')
@@ -843,7 +1064,7 @@
   print(f.getvalue())
 #+END_SRC
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   f = StringIO('Hello!\nHi!\nGoodbye!')
   while True:
       s = f.readline()
@@ -855,14 +1076,14 @@
 
 *** 内存比特流
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from io import BytesIO
   f = BytesIO()
   f.write('中文'.encode('utf-8'))
   print(f.getvalue())
 #+END_SRC
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   f = BytesIO(b'\xe4\xb8\xad\xe6\x96\x87')
   r = f.read().decode('utf-8')
   print(r)
@@ -872,7 +1093,7 @@
 
 ** 读写 JSON
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   # Some advanced JSON examples involving ordered dicts and classes
   import json
 
@@ -934,12 +1155,22 @@
   print(a.y)
 #+END_SRC
 
+#+RESULTS:
+: OrderedDict([('name', 'ACME'), ('shares', 50), ('price', 490.1)])
+: ACME
+: 50
+: 490.1
+: {"__classname__": "Point", "x": 3, "y": 4}
+: <__main__.Point object at 0x1086228d0>
+: 3
+: 4
+
 
 * 模块
 
 ** 猴子补丁
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import importlib
   import sys
   from collections import defaultdict
@@ -980,7 +1211,7 @@
   sys.meta_path.insert(0, PostImportFinder())
 #+END_SRC
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   @when_imported('threading')
   def warn_threads(mod):
       print('Threads? Are you crazy?')
@@ -1025,7 +1256,7 @@
           print('B.bar')
 #+END_EXAMPLE
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import mymodule
   a = mymodule.A()
   a.spam()
@@ -1045,20 +1276,20 @@ time 模块始终返回 UTC 时间。
 
 即从 Epoch (1970年1月1日00:00:00 UTC) 开始所经过的秒数。
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import time
   print(time.time())
 #+END_SRC
 
 *** 获取具体时间值
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   current_time = time.time()
   current_struct_time = time.gmtime(current_time)
   print(current_struct_time)
 #+END_SRC
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   current_year = current_struct_time.tm_year
   current_mon  = current_struct_time.tm_mon
   current_mday = current_struct_time.tm_mday
@@ -1074,7 +1305,7 @@ datetime 模块简化了日期操作，如增加天数，设置时区等。
 
 *** 创建时间
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import datetime
   d = datetime.datetime(year=2017, month=12, day=31, hour=12, minute=59, second=59)
   r = (d.year, d.month, d.day, d.hour, d.minute, d.second, d.microsecond)
@@ -1084,20 +1315,20 @@ datetime 模块简化了日期操作，如增加天数，设置时区等。
 
 *** 获取 UTC 时间
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   print(datetime.datetime.utcnow())
 #+END_SRC
 
 
 *** 获取当前时区时间
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   print(datetime.datetime.now())
 #+END_SRC
 
 *** 日期运算
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   today = datetime.datetime.now()
   diff = datetime.timedelta(weeks=3, days=2)
   future = today + diff
@@ -1108,7 +1339,7 @@ datetime 模块简化了日期操作，如增加天数，设置时区等。
 
 *** 日期转字符串
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   r = '{:%Y-%m-%d %H:%M}'.format(datetime.datetime(2001, 2, 3, 4, 5))
   print(r)
 #+END_SRC
@@ -1116,14 +1347,14 @@ datetime 模块简化了日期操作，如增加天数，设置时区等。
 
 *** 字符串转日期
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   r = datetime.datetime.strptime("Mar 03, 2010", "%b %d, %Y")
   print(r)
 #+END_SRC
 
 ** 月份缩写
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from calendar import month_abbr
   print(list(month_abbr))
 #+END_SRC
@@ -1131,7 +1362,7 @@ datetime 模块简化了日期操作，如增加天数，设置时区等。
 
 ** 数字精度格式化
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   print('{:06.2f}'.format(3.141592653589793))
   print('{:04d}'.format(42))
   print('{:+d}'.format(42))
@@ -1149,7 +1380,7 @@ datetime 模块简化了日期操作，如增加天数，设置时区等。
 
 *** 填充与对齐
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   print('{:>10}'.format('test'))
   print('{:10}'.format('test'))
   print('{:^10}'.format('test'))
@@ -1159,7 +1390,7 @@ datetime 模块简化了日期操作，如增加天数，设置时区等。
 
 *** 字符串截断
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   print('{:.5}'.format('xylophone'))
   print('{:10.5}'.format('xylophone'))
 #+END_SRC
@@ -1167,14 +1398,14 @@ datetime 模块简化了日期操作，如增加天数，设置时区等。
 
 *** 占位符
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   data = {'first': 'Hodor', 'last': 'Hodor!'}
   print('{first} {last}'.format(**data))
 
   print('{first} {last}'.format(first='Hodor', last='Hodor!'))
 #+END_SRC
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   person = {'first': 'Jean-Luc', 'last': 'Picard'}
   data = [4, 8, 15, 16, 23, 42]
   class Plant(object):
@@ -1190,7 +1421,7 @@ datetime 模块简化了日期操作，如增加天数，设置时区等。
 
 *** 排版
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import textwrap
 
   s = "Look into my eyes, look into my eyes, the eyes, the eyes, \
@@ -1214,7 +1445,7 @@ datetime 模块简化了日期操作，如增加天数，设置时区等。
 
 *** 使用 shell 风格的通配符匹配字符串
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from fnmatch import fnmatchcase as match
 
   addresses = [
@@ -1235,7 +1466,7 @@ datetime 模块简化了日期操作，如增加天数，设置时区等。
 
 *** 贪婪和非贪婪匹配
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import re
 
   # Sample text
