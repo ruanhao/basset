@@ -6,7 +6,7 @@
 #+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
 #+HTML_DOCTYPE: <!DOCTYPE html>
 #+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
-#+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
  #+HTML: <div class="outline-2" id="meta">
 | Author   | {{{author}}} ({{{email}}})    |
 | Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
@@ -28,11 +28,16 @@
 - 如果消费者收到一条消息，在确认之前断开了连接（或者从队列上取消订阅），RabbitMQ 会认为这条消息没有分发，然后重新分发给下一个订阅的消费者。
 - 一个信道上可以创建多个订阅，使用 =consumer_tag= 来标识。
 
+** AMQP 0-9-1 模型
+
+#+HTML: <img src="https://www.rabbitmq.com/img/tutorials/intro/hello-world-example-routing.png"/>
+
+
 ** 订阅消息
 
 
 
-#+BEGIN_SRC plantuml :file img/rabbitmq_consume.png
+#+BEGIN_SRC plantuml :file img/rabbitmq_consume.png :eval never-export
   hide footbox
   participant Consumer as c
   database RabbitMQ as q
@@ -45,14 +50,15 @@
   q -> c : msg
   c --> q : basic.ack
 #+END_SRC
-#+NAME: subcribe
-#+CAPTION: 订阅
+
 #+RESULTS:
+[[file:img/rabbitmq_consume.png]]
+
 
 
 ** 获取消息
 
-#+BEGIN_SRC plantuml :file img/rabbitmq_get.png
+#+BEGIN_SRC plantuml :file img/rabbitmq_get.png :eval never-export
   hide footbox
   participant Consumer as c
   database RabbitMQ as q
@@ -61,9 +67,9 @@
   q -> c : msg
   c --> q : basic.ack
 #+END_SRC
-#+NAME: get
-#+CAPTION: 获取单个消息
+
 #+RESULTS:
+[[file:img/rabbitmq_get.png]]
 
 - =basic.get= 命令会订阅消息，获得单条消息，然后取消订阅，因此效率不高。
 
@@ -71,7 +77,7 @@
 
 ** 拒绝消息
 
-#+BEGIN_SRC plantuml :file img/rabbitmq_reject.png
+#+BEGIN_SRC plantuml :file img/rabbitmq_reject.png :eval never-export
   hide footbox
   participant Consumer as c
   database RabbitMQ as q
@@ -83,9 +89,10 @@
   requeue=false: 立即把消息从队列中移除，不会发送给新的消费者
   end note
 #+END_SRC
-#+NAME: reject
-#+CAPTION: 拒绝消息
+
 #+RESULTS:
+[[file:img/rabbitmq_reject.png]]
+
 
 =requeue=false= 的意义在于：RabbitMQ 会支持一个特殊的队列（dead letter）用来存放那些被拒绝而不重入队列的消息。
 dead letter 队列可以让管理者通过检测拒绝或未送达的消息来发现问题所在。
@@ -94,7 +101,7 @@ dead letter 队列可以让管理者通过检测拒绝或未送达的消息来�
 
 ** 创建队列
 
-#+BEGIN_SRC plantuml :file img/rabbitmq_create.png
+#+BEGIN_SRC plantuml :file img/rabbitmq_create.png :eval never-export
   hide footbox
   participant "Consumer/Producer" as c
   database RabbitMQ as r
@@ -107,9 +114,10 @@ dead letter 队列可以让管理者通过检测拒绝或未送达的消息来�
   end note
   r --> c : response
 #+END_SRC
-#+NAME: create
-#+CAPTION: 创建队列
+
 #+RESULTS:
+[[file:img/rabbitmq_create.png]]
+
 
 - 消费者和生产者都能使用 =queue.delare= 命令来创建队列。
 - 如果消费者在同一信道上已订阅了另一个信道的话，则无法再声明队列了，必须先取消订阅。
@@ -119,6 +127,13 @@ dead letter 队列可以让管理者通过检测拒绝或未送达的消息来�
 
 
 * 交换器
+
+** 属性
+
+- Name
+- Durability (exchanges survive broker restart)
+- Auto-delete (exchange is deleted when last queue is unbound from it)
+- Arguments (optional, used by plugins and broker-specific features)
 
 ** direct
 
@@ -152,6 +167,10 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 - =*= 匹配特定位置的任意文本
 - =#= 匹配所有规则
 
+
+** 路由
+
+#+HTML: <img src="http://javasampleapproach.com/wp-content/uploads/2017/10/springboot-rabbitmq-exchange-to-exchange-architecture.png"/>
 
 * RabbitMQ 管理
 
