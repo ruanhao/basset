@@ -171,6 +171,7 @@
   log.info("time: " + stopwatch); // formatted string like "12.3 ms"
 #+END_SRC
 
+
 * Collections
 
 ** List
@@ -243,7 +244,7 @@ ImmutableMap<String,String> map = ImmutableMap.of("key1", "value1", "key2", "val
 #+END_SRC
 
 
-* 线程
+* 并发
 
 ** [[https://google.github.io/guava/releases/19.0/api/docs/com/google/common/util/concurrent/Monitor.html][Monitor]]
 
@@ -283,6 +284,37 @@ ImmutableMap<String,String> map = ImmutableMap.of("key1", "value1", "key2", "val
       }
   }
 #+END_SRC
+
+
+
+
+** [[https://google.github.io/guava/releases/19.0/api/docs/index.html?com/google/common/util/concurrent/RateLimiter.html][RateLimiter]]
+
+*** 限制任务执行速率
+
+#+BEGIN_SRC java
+  final RateLimiter rateLimiter = RateLimiter.create(2.0); // rate is "2 permits per second"
+  void submitTasks(List<Runnable> tasks, Executor executor) {
+      for (Runnable task : tasks) {
+          rateLimiter.acquire(); // may wait
+          executor.execute(task);
+      }
+  }
+#+END_SRC
+
+*** 限制数据流的发送
+
+#+BEGIN_SRC java
+  final RateLimiter rateLimiter = RateLimiter.create(5000.0); // rate = 5000 permits per second
+  void submitPacket(byte[] packet) {
+      rateLimiter.acquire(packet.length);
+      networkService.send(packet);
+  }
+#+END_SRC
+
+*** 传送门
+
+[[https://blog.csdn.net/SunnyYoona/article/details/51228456][令牌桶算法限流]]
 
 
 * [[https://google.github.io/guava/releases/22.0/api/docs/com/google/common/eventbus/EventBus.html][EventBus]]
