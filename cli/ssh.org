@@ -6,7 +6,7 @@
 #+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
 #+HTML_DOCTYPE: <!DOCTYPE html>
 #+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
-#+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
  #+HTML: <div class="outline-2" id="meta">
 | Author   | {{{author}}} ({{{email}}})    |
 | Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
@@ -15,23 +15,170 @@
 #+STARTUP:   showall
 
 
-* 远端转发
+* 本地端口转发
 
-#+CAPTION: 远端转发示意图
-#+NAME: ssh-remote-forward
-[[file:./img/ssh-remote-forward.png]]
+*空心箭头代表虚拟的 SSH 隧道*
 
-#+BEGIN_SRC sh
-  ssh -N -f -R <remote-port>:<dest-host>:<dest-host-port> user@remote-host
+#+BEGIN_SRC plantuml :file img/ssh-local.png :eval never-export
+skinparam rectangle {
+	roundCorner 25
+}
+
+actor user
+
+note left
+1) ssh -f -N -g -L 8888:192.168.1.2:9999 HostB
+2) 1.2.3.4:8888
+end note
+
+node "HostA\n1.2.3.4/24" as hostA
+
+rectangle "LAN" {
+	node "HostB\n1.2.3.5\n192.168.1.2/24" as hostB
+	node "HostC\n192.168.1.2/24" as hostC
+	boundary "NAT" as nat
+}
+
+user -down-^ hostA
+hostA -right-^ hostB
+hostB -right-^ hostC
+
+
+nat <.right. hostA
+hostB <.left. nat
+
 #+END_SRC
 
-<remote-port> 监听在 localhost 上，如需要被外部访问，可以在 remote-host 上再添加一个端口转发:
+#+RESULTS:
+[[file:img/ssh-local.png]]
 
-#+BEGIN_SRC sh
-  socat TCP4-LISTEN:8888,reuseaddr,fork TCP4:127.0.0.1:<remote-port> &
+=-g= 表示监听于所有接口上
+
+
+* 远程端口转发
+
+*空心箭头代表虚拟的 SSH 隧道*
+
+** 外网访问内网 SSH 服务
+
+#+BEGIN_SRC plantuml :file img/ssh-remote.png :eval never-export
+
+skinparam rectangle {
+	roundCorner 25
+}
+
+actor user
+
+note left
+2) 1.2.3.4:8888
+end note
+
+node "HostA\n1.2.3.4/24" as hostA
+
+rectangle "LAN" {
+	node "HostB\n192.168.1.2/24" as hostB
+  note right
+  1) ssh -f -N -R 8888:127.0.0.1:22 HostA
+  end note
+	boundary "NAT" as nat
+}
+
+user -down-^ hostA
+hostA -right-^ hostB
+
+
+nat .right.> hostA
+hostB .left.> nat
+
 #+END_SRC
 
-这样外部可以通过 <remote-host>:8888 访问 <dest-host>:<dest-host-port>
+#+RESULTS:
+[[file:img/ssh-remote.png]]
+
+
+** 通用端口转发模式
+
+=-R [bind_address:]port:host:hostport=
+
+#+BEGIN_SRC plantuml :file img/ssh-remote-2.png :eval never-export
+
+skinparam rectangle {
+	roundCorner 25
+}
+
+actor user
+
+note left
+2) 1.2.3.4:8888
+end note
+
+node "HostA\n1.2.3.4/24" as hostA
+
+rectangle "LAN" {
+	node "HostB\n192.168.1.2/24" as hostB
+  note right
+  1) ssh -f -N -R 8888:192.168.1.3:22 HostA
+  end note
+  node "HostC\n192.168.1.3/24" as hostC
+	boundary "NAT" as nat
+}
+
+user --^ hostA
+hostA --^ hostB
+hostA <.. nat
+hostB ..> nat
+hostB --^ hostC
+
+
+
+#+END_SRC
+
+#+RESULTS:
+[[file:img/ssh-remote-2.png]]
+
+
+
+当省略 =bind_address= ，=port= 监听在 localhost 上，指定 =bind_address= 可以公开端口：
+
+#+BEGIN_SRC sh
+  ssh -R \*:8080:localhost:80 -N root@example.com
+  # or
+  ssh -R 0.0.0.0:8080:localhost:80 -N root@example.com
+  # or
+  ssh -R "[::]:8080:localhost:80" -N root@example.com
+#+END_SRC
+
+如果使用 OpenSSH ，需要修改服务器端 =/etc/ssh/sshd_config= 配置：
+
+#+BEGIN_SRC sh
+  GatewayPorts yes
+#+END_SRC
+
+
+
+
+* 指纹和公钥
+
+** 删除指纹和公钥信息
+
+=sed -i -e '/^10.74.68.58/d' $HOME/.ssh/known_hosts=
+
+=ssh-keygen -R 10.74.68.58=
+
+** 禁止检查指纹和公钥信息
+
+=ssh -l admin -o StrictHostKeyChecking=no 10.74.68.58=
+
+** 获取指纹和公钥信息
+
+=ssh-keyscan -H 10.74.68.58=
+
+*** 更新指纹和公钥信息
+
+#+BEGIN_SRC sh
+  ssh-keygen -R <IP>
+  ssh-keyscan -H <IP> >> ~/.ssh/known_hosts
+#+END_SRC
 
 * 在远程机器上运行脚本
 
@@ -39,11 +186,13 @@
   ssh user@server bash < /path/to/local/script.sh
 #+END_SRC
 
+
 * 将本地文件和远程的比较
 
 #+BEGIN_SRC sh
   ssh user@host cat /path/to/remotefile | diff /path/to/localfile -
 #+END_SRC
+
 
 * cat 文件
 

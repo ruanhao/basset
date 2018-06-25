@@ -1,23 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<!-- 2018-06-25 Mon 17:46 -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SSH</title>
-<!-- 2018-02-06 Tue 23:08 -->
-<meta  charset="utf-8">
-<meta  name="generator" content="Org-mode">
-<meta  name="author" content="Hao Ruan">
+<meta name="generator" content="Org mode">
+<meta name="author" content="Hao Ruan">
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
-  .title  { text-align: center; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
   .todo   { font-family: monospace; color: red; }
-  .done   { color: green; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
   .tag    { background-color: #eee; font-family: monospace;
             padding: 2px; font-size: 80%; font-weight: normal; }
   .timestamp { color: #bebebe; }
   .timestamp-kwd { color: #5f9ea0; }
-  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
-  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
-  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
   .underline { text-decoration: underline; }
   #postamble p, #preamble p { font-size: 90%; margin: .2em; }
   p.verse { margin-left: 3%; }
@@ -44,27 +51,111 @@
     border: 1px solid black;
   }
   pre.src:hover:before { display: inline;}
-  pre.src-sh:before    { content: 'sh'; }
-  pre.src-bash:before  { content: 'sh'; }
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
   pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
-  pre.src-R:before     { content: 'R'; }
-  pre.src-perl:before  { content: 'Perl'; }
-  pre.src-java:before  { content: 'Java'; }
-  pre.src-sql:before   { content: 'SQL'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
 
   table { border-collapse:collapse; }
   caption.t-above { caption-side: top; }
   caption.t-bottom { caption-side: bottom; }
   td, th { vertical-align:top;  }
-  th.right  { text-align: center;  }
-  th.left   { text-align: center;   }
-  th.center { text-align: center; }
-  td.right  { text-align: right;  }
-  td.left   { text-align: left;   }
-  td.center { text-align: center; }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
   dt { font-weight: bold; }
-  .footpara:nth-child(2) { display: inline; }
-  .footpara { display: block; }
+  .footpara { display: inline; }
   .footdef  { margin-bottom: 1em; }
   .figure { padding: 1em; }
   .figure p { text-align: center; }
@@ -84,16 +175,17 @@
     { font-size: 10px; font-weight: bold; white-space: nowrap; }
   .org-info-js_search-highlight
     { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
   /*]]>*/-->
 </style>
 <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
-<link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+<link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2013 Free Software Foundation, Inc.
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -142,10 +234,27 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. 远端转发</a></li>
-<li><a href="#sec-2">2. 在远程机器上运行脚本</a></li>
-<li><a href="#sec-3">3. 将本地文件和远程的比较</a></li>
-<li><a href="#sec-4">4. cat 文件</a></li>
+<li><a href="#orgfd21bb3">1. 本地端口转发</a></li>
+<li><a href="#org9daf764">2. 远程端口转发</a>
+<ul>
+<li><a href="#orgd645fdd">2.1. 外网访问内网 SSH 服务</a></li>
+<li><a href="#org93fe7a8">2.2. 通用端口转发模式</a></li>
+</ul>
+</li>
+<li><a href="#orgab4ca5b">3. 指纹和公钥</a>
+<ul>
+<li><a href="#org7dddbf7">3.1. 删除指纹和公钥信息</a></li>
+<li><a href="#org6681ba4">3.2. 禁止检查指纹和公钥信息</a></li>
+<li><a href="#org3b94338">3.3. 获取指纹和公钥信息</a>
+<ul>
+<li><a href="#orgada5b8b">3.3.1. 更新指纹和公钥信息</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org759ede2">4. 在远程机器上运行脚本</a></li>
+<li><a href="#orgf345ac4">5. 将本地文件和远程的比较</a></li>
+<li><a href="#org384f21f">6. cat 文件</a></li>
 </ul>
 </div>
 </div>
@@ -154,19 +263,19 @@ for the JavaScript code in this tag.
 
 
 <colgroup>
-<col  class="left">
+<col  class="org-left">
 
-<col  class="left">
+<col  class="org-left">
 </colgroup>
 <tbody>
 <tr>
-<td class="left">Author</td>
-<td class="left">Hao Ruan (haoru@cisco.com)</td>
+<td class="org-left">Author</td>
+<td class="org-left">Hao Ruan (haoru@cisco.com)</td>
 </tr>
 
 <tr>
-<td class="left">Date</td>
-<td class="left">2018-02-06 23:08:41</td>
+<td class="org-left">Date</td>
+<td class="org-left">2018-06-25 17:46:41</td>
 </tr>
 </tbody>
 </table>
@@ -175,75 +284,189 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. 远端转发</a></li>
-<li><a href="#sec-2">2. 在远程机器上运行脚本</a></li>
-<li><a href="#sec-3">3. 将本地文件和远程的比较</a></li>
-<li><a href="#sec-4">4. cat 文件</a></li>
+<li><a href="#orgfd21bb3">1. 本地端口转发</a></li>
+<li><a href="#org9daf764">2. 远程端口转发</a>
+<ul>
+<li><a href="#orgd645fdd">2.1. 外网访问内网 SSH 服务</a></li>
+<li><a href="#org93fe7a8">2.2. 通用端口转发模式</a></li>
+</ul>
+</li>
+<li><a href="#orgab4ca5b">3. 指纹和公钥</a>
+<ul>
+<li><a href="#org7dddbf7">3.1. 删除指纹和公钥信息</a></li>
+<li><a href="#org6681ba4">3.2. 禁止检查指纹和公钥信息</a></li>
+<li><a href="#org3b94338">3.3. 获取指纹和公钥信息</a>
+<ul>
+<li><a href="#orgada5b8b">3.3.1. 更新指纹和公钥信息</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org759ede2">4. 在远程机器上运行脚本</a></li>
+<li><a href="#orgf345ac4">5. 将本地文件和远程的比较</a></li>
+<li><a href="#org384f21f">6. cat 文件</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-sec-1" class="outline-2">
-<h2 id="sec-1"><span class="section-number-2">1</span> 远端转发</h2>
+<div id="outline-container-orgfd21bb3" class="outline-2">
+<h2 id="orgfd21bb3"><span class="section-number-2">1</span> 本地端口转发</h2>
 <div class="outline-text-2" id="text-1">
-
-<div id="ssh-remote-forward" class="figure">
-<p><img src="./img/ssh-remote-forward.png" alt="ssh-remote-forward.png">
+<p>
+<b>空心箭头代表虚拟的 SSH 隧道</b>
 </p>
-<p><span class="figure-number">Figure 1:</span> 远端转发示意图</p>
-</div>
 
-<div class="org-src-container">
 
-<pre class="src src-sh">ssh -N -f -R &lt;remote-port&gt;:&lt;dest-host&gt;:&lt;dest-host-port&gt; user@remote-host
-</pre>
+<div class="figure">
+<p><img src="img/ssh-local.png" alt="ssh-local.png">
+</p>
 </div>
 
 <p>
-&lt;remote-port&gt; 监听在 localhost 上，如需要被外部访问，可以在 remote-host 上再添加一个端口转发:
-</p>
-
-<div class="org-src-container">
-
-<pre class="src src-sh">socat TCP4-LISTEN:8888,reuseaddr,fork TCP4:127.0.0.1:&lt;remote-port&gt; &amp;
-</pre>
-</div>
-
-<p>
-这样外部可以通过 &lt;remote-host&gt;:8888 访问 &lt;dest-host&gt;:&lt;dest-host-port&gt;
+<code>-g</code> 表示监听于所有接口上
 </p>
 </div>
 </div>
 
-<div id="outline-container-sec-2" class="outline-2">
-<h2 id="sec-2"><span class="section-number-2">2</span> 在远程机器上运行脚本</h2>
+
+<div id="outline-container-org9daf764" class="outline-2">
+<h2 id="org9daf764"><span class="section-number-2">2</span> 远程端口转发</h2>
 <div class="outline-text-2" id="text-2">
-<div class="org-src-container">
+<p>
+<b>空心箭头代表虚拟的 SSH 隧道</b>
+</p>
+</div>
 
+<div id="outline-container-orgd645fdd" class="outline-3">
+<h3 id="orgd645fdd"><span class="section-number-3">2.1</span> 外网访问内网 SSH 服务</h3>
+<div class="outline-text-3" id="text-2-1">
+
+<div class="figure">
+<p><img src="img/ssh-remote.png" alt="ssh-remote.png">
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org93fe7a8" class="outline-3">
+<h3 id="org93fe7a8"><span class="section-number-3">2.2</span> 通用端口转发模式</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+<code>-R [bind_address:]port:host:hostport</code>
+</p>
+
+
+<div class="figure">
+<p><img src="img/ssh-remote-2.png" alt="ssh-remote-2.png">
+</p>
+</div>
+
+
+
+<p>
+当省略 <code>bind_address</code> ，=port= 监听在 localhost 上，指定 <code>bind_address</code> 可以公开端口：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">ssh -R <span style="color: #87af5f;">\*</span>:8080:localhost:80 -N root@example.com
+<span style="color: #707070; font-style: italic;"># </span><span style="color: #707070; font-style: italic;">or</span>
+ssh -R 0.0.0.0:8080:localhost:80 -N root@example.com
+<span style="color: #707070; font-style: italic;"># </span><span style="color: #707070; font-style: italic;">or</span>
+ssh -R <span style="color: #87af5f;">"[::]:8080:localhost:80"</span> -N root@example.com
+</pre>
+</div>
+
+<p>
+如果使用 OpenSSH ，需要修改服务器端 <code>/etc/ssh/sshd_config</code> 配置：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">GatewayPorts yes
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+<div id="outline-container-orgab4ca5b" class="outline-2">
+<h2 id="orgab4ca5b"><span class="section-number-2">3</span> 指纹和公钥</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org7dddbf7" class="outline-3">
+<h3 id="org7dddbf7"><span class="section-number-3">3.1</span> 删除指纹和公钥信息</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+<code>sed -i -e '/^10.74.68.58/d' $HOME/.ssh/known_hosts</code>
+</p>
+
+<p>
+<code>ssh-keygen -R 10.74.68.58</code>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org6681ba4" class="outline-3">
+<h3 id="org6681ba4"><span class="section-number-3">3.2</span> 禁止检查指纹和公钥信息</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+<code>ssh -l admin -o StrictHostKeyChecking=no 10.74.68.58</code>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org3b94338" class="outline-3">
+<h3 id="org3b94338"><span class="section-number-3">3.3</span> 获取指纹和公钥信息</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+<code>ssh-keyscan -H 10.74.68.58</code>
+</p>
+</div>
+
+<div id="outline-container-orgada5b8b" class="outline-4">
+<h4 id="orgada5b8b"><span class="section-number-4">3.3.1</span> 更新指纹和公钥信息</h4>
+<div class="outline-text-4" id="text-3-3-1">
+<div class="org-src-container">
+<pre class="src src-sh">ssh-keygen -R &lt;IP&gt;
+ssh-keyscan -H &lt;IP&gt; &gt;&gt; ~/.ssh/known_hosts
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org759ede2" class="outline-2">
+<h2 id="org759ede2"><span class="section-number-2">4</span> 在远程机器上运行脚本</h2>
+<div class="outline-text-2" id="text-4">
+<div class="org-src-container">
 <pre class="src src-sh">ssh user@server bash &lt; /path/to/local/script.sh
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-sec-3" class="outline-2">
-<h2 id="sec-3"><span class="section-number-2">3</span> 将本地文件和远程的比较</h2>
-<div class="outline-text-2" id="text-3">
-<div class="org-src-container">
 
+<div id="outline-container-orgf345ac4" class="outline-2">
+<h2 id="orgf345ac4"><span class="section-number-2">5</span> 将本地文件和远程的比较</h2>
+<div class="outline-text-2" id="text-5">
+<div class="org-src-container">
 <pre class="src src-sh">ssh user@host cat /path/to/remotefile | diff /path/to/localfile -
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-sec-4" class="outline-2">
-<h2 id="sec-4"><span class="section-number-2">4</span> cat 文件</h2>
-<div class="outline-text-2" id="text-4">
-<div class="org-src-container">
 
-<pre class="src src-sh">ssh user@host 'mkdir -p .ssh &amp;&amp; cat &gt;&gt; .ssh/authorized_keys' &lt; ~/.ssh/id_rsa.pub
+<div id="outline-container-org384f21f" class="outline-2">
+<h2 id="org384f21f"><span class="section-number-2">6</span> cat 文件</h2>
+<div class="outline-text-2" id="text-6">
+<div class="org-src-container">
+<pre class="src src-sh">ssh user@host <span style="color: #87af5f;">'mkdir -p .ssh &amp;&amp; cat &gt;&gt; .ssh/authorized_keys'</span> &lt; ~/.ssh/id_rsa.pub
 </pre>
 </div>
 </div>
