@@ -385,3 +385,53 @@ docker network disconnect <net_name> <cname>
 ** 删除
 
 =docker compose -f <compose-file> rm -f=
+
+
+* 基础服务搭建
+
+** DNS 服务器
+
+#+BEGIN_SRC sh
+  mkdir ~/dns
+
+  # 配置上行真正的 DNS 服务器
+  cat <<EOF >~/dns/resolv.dnsmasq
+  nameserver 64.104.123.144
+  nameserver 8.8.8.8
+  EOF
+
+  cat <<EOF >~/dns/dnsmasqhosts
+  1.2.3.4 host1
+  1.2.3.5 host2
+  1.2.3.6 host3
+  EOF
+
+  docker run --rm \
+         -d \
+         -v ~/dns:/dns
+         -p 153:53/tcp -p 153:53/udp \
+         --cap-add=NET_ADMIN \
+         andyshinn/dnsmasq \
+         --log-facility=- \
+         --address /test.haoru.com/1.1.1.1 \
+         --address /test.fiona.com/2.2.2.2 \
+         --addn-hosts=/dns/dnsmasqhosts \
+         --resolv-file=/dns/resolv.dnsmasq
+
+#+END_SRC
+
+=--cap-add=NET_ADMIN= ：默认 Docker 中的 root 用户的权限仍会有一定的限制，若服务需要用到小于 1024 的低位端口，需要赋予 root 更多的权限。
+*NET_ADMIN 是网络部分的权限* 。
+
+*** 快速重读 addn-hosts 文件
+
+*dnsmasq 特性，非容器特性*
+
+=docker kill -s HUP <container-ID>=
+
+
+*** 测试
+
+#+BEGIN_SRC sh
+dig @localhost -p 153 test.haoru.com
+#+END_SRC
