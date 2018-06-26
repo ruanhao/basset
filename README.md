@@ -33,6 +33,7 @@
 - [cut](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/cli/cut.html)
 - [date](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/cli/date.html)
 - [dig](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/cli/dig.html)
+- [dnsmasq](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/cli/dnsmasq.html)
 - [find](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/cli/find.html)
 - [git](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/cli/git.html)
 - [grep](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/cli/grep.html)

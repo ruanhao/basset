@@ -1,0 +1,134 @@
+#+TITLE:     DNSMASQ
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
+#+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+#+TOC: headlines 3
+#+STARTUP:   showall
+
+
+* DHCP 服务器
+
+DHCP 服务器通常提供以下信息：
+
+- IP 地址
+- IP 地址的子网掩码
+- IP 地址的租约时间
+- 网关地址
+- DNS 服务器地址
+
+
+** 配置文件
+
+=/etc/dnsmasq.d/dhcp.conf=
+
+#+BEGIN_SRC sh
+  interface=eth0                  # 指定监听接口
+  # 指定地址池，DHCP 服务器自己的 IP 地址必须在此范围内
+  dhcp-range=172.18.0.50,172.18.0.150,255.255.255.0,24h
+  # 使用 option 6 发送 DNS 服务器信息
+  dhcp-option=6,8.8.8.8,8.8.4.4
+  # 使用 option 3 发送网关信息
+  dhcp-option=3,172.18.0.1
+  # 地址分配后，记录文件的位置
+  dhcp-leasefile=/dnsmasq/dnsmasq.leases
+
+#+END_SRC
+
+** 执行
+
+=dnsmasq -k=
+
+** 测试
+
+*** 创建网络
+
+=docker network create --subnet=192.168.0.0/24 dhcp=
+
+*** DHCP Server 容器
+
+#+BEGIN_SRC sh
+  docker run -d \
+         --network=dhcp \
+         --rm \
+         -v ~/dhcp.conf:/etc/dnsmasq.d/dhcp.conf \
+         --cap-add=NET_ADMIN \
+         andyshinn/dnsmasq \
+         --log-facility=-
+#+END_SRC
+
+
+*** 测试容器
+
+#+BEGIN_SRC sh
+  docker run -d --rm \
+         --cap-add=NET_ADMIN \
+         --network=dhcp \
+         --ip 192.168.0.200 \
+         centos \
+         sleep 1000000
+#+END_SRC
+
+**** 使用 [[https://github.com/saravana815/dhtest][dhtest]] 测试
+
+=./dhtest -i eth0 -V -f=
+
+**** 使用 nmap 测试
+
+=nmap -e eth0 --script broadcast-dhcp-discover=
+
+
+* DNS 服务器
+
+** 指定上行真正的 DNS 服务器
+
+=/etc/dnsmasq.d/resolv.conf=
+
+#+BEGIN_SRC sh
+  nameserver 64.104.123.144
+  nameserver 8.8.8.8
+#+END_SRC
+
+** hosts 文件
+
+=/etc/dnsmasq.d/hosts.conf=
+
+#+BEGIN_SRC sh
+  1.2.3.4 host1
+  1.2.3.5 host2
+  1.2.3.6 host3
+#+END_SRC
+
+
+** 执行
+
+#+BEGIN_SRC sh
+  dnsmasq -k \                    # 前端执行
+  --log-facility=- \
+                --address /test.haoru.com/1.1.1.1 \ # 添加地址
+                --address /test.fiona.com/2.2.2.2 \
+                --addn-hosts=/etc/dnsmasq.d/hosts.conf \ # dnsmasq 默认会加载 /etc/dnsmasq.d/ 目录下所有 .conf 结尾的配置文件
+                --resolv-file=/etc/dnsmasq.d/resolv.conf
+
+#+END_SRC
+
+
+* TFTP 服务器 (readonly)
+
+#+BEGIN_SRC sh
+  dnsmasq -k \
+          --enable-tftp \
+          --log-facility=- \
+          --tftp-root=<filepath> \
+          --port=0                # 禁用 DNS 服务
+#+END_SRC
+
+*在Mac Docker上运行有问题*
