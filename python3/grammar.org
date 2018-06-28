@@ -15,7 +15,7 @@
 #+HTML: </div>
 
 
-#+BEGIN_SRC ipython :session :exports none
+#+BEGIN_SRC ipython :session :exports none :eval never-export
   def log(title0, value):
       title1 = ' ' + title0 + ' '
       print("{}\n{}".format(title1.center(30, '='), value))
@@ -41,7 +41,7 @@
 即使实现了， *子类也必须覆盖抽象方法* ，但是在子类中可以使用 =super()= 函数调用抽象方法。
 
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from abc import ABC, abstractmethod
 
   class Pet(ABC):
@@ -63,6 +63,9 @@
   Pet.from_name("dog").hello()
 #+END_SRC
 
+#+RESULTS:
+: WonWonWon
+
 *** 虚拟子类
 
 注册虚拟子类的方式是在抽象基类上调用 =register= 方法，
@@ -71,7 +74,7 @@
 这么做之后，注册的类会变成抽象基类的虚拟子类，而且 =issubclass= 和 =isinstance= 都能识别，
 *但是注册的类不会从抽象基类中继承任何方法或属性* 。
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   @Pet.register
   class Cat:
       pass
@@ -85,6 +88,14 @@
   log("isinstance(Bird(), Pet)", isinstance(Bird(), Pet))
   log("Bird.__mro__", Bird.__mro__)
 #+END_SRC
+
+#+RESULTS:
+: ==== issubclass(Cat, Pet) ====
+: True
+: == isinstance(Bird(), Pet) ===
+: True
+: ======== Bird.__mro__ ========
+: (<class '__main__.Bird'>, <class 'list'>, <class 'object'>)
 
 虚拟子类的 =__mro__= 属性中没有虚拟基类，也从侧面反映了虚拟子类没有从虚拟基类中继承任何方法。
 
@@ -132,7 +143,7 @@ chunksize 只对 ProcessPoolExecutor 有用，用于切分 iterables ，提高�
 
 返回值是一个迭代器， *迭代器的 __next__ 方法调用各个 future 对象的 result 方法，得到各个 future 的结果。*
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from concurrent.futures import ThreadPoolExecutor
   import time
 
@@ -152,11 +163,17 @@ chunksize 只对 ProcessPoolExecutor 有用，用于切分 iterables ，提高�
       print("time consumed1: ", time_delta)
 #+END_SRC
 
+#+RESULTS:
+: time consumed0:  0.009264230728149414
+: <generator object Executor.map.<locals>.result_iterator at 0x110912e60>
+: [6, 4, 2]
+: time consumed1:  2.9983181953430176
+
 *** Executor.sumit()
 
 =Executor.sumit(fn, *args, **kwargs)=
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   with ThreadPoolExecutor(max_workers=1) as executor:
       time0 = time.time()
       future = executor.submit(sleep_and_double, 3)
@@ -168,12 +185,17 @@ chunksize 只对 ProcessPoolExecutor 有用，用于切分 iterables ，提高�
       print("time consumed1: ", time_delta)
 #+END_SRC
 
+#+RESULTS:
+: time consumed0:  0.00031113624572753906
+: 6
+: time consumed1:  3.004795789718628
+
 
 *** concurrent.futures.as_completed()
 
 *concurrent.futures.as_completed(fs, timeout=None)*
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from concurrent import futures
   fs = []
 
@@ -190,6 +212,11 @@ chunksize 只对 ProcessPoolExecutor 有用，用于切分 iterables ，提高�
       time_delta = time.time() - time0
       print("time consumed1: ", time_delta)
 #+END_SRC
+
+#+RESULTS:
+: time consumed0:  2.86102294921875e-06
+: [2, 4, 6, 8, 10]
+: time consumed1:  4.999896287918091
 
 
 * async 并发编程
@@ -254,7 +281,7 @@ asyncio.Future 类的目的是与 =yield from= 一起使用，通常不需要使
 
 *** 协程和 Future 测试脚本
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import asyncio
   import time
 
@@ -284,7 +311,7 @@ asyncio 的事件循环在背后维护着一个 ThreadPoolExecutor 对象，
 
 第一个参数是 Executor 实例，如果为 None ，则使用默认的 ThreadPoolExecutor 实例。
 
-#+BEGIN_SRC ipython
+#+BEGIN_SRC ipython :eval never-export
   loop = asyncio.get_event_loop()
   loop.run_in_executor(None, )
 #+END_SRC
@@ -294,7 +321,7 @@ asyncio 的事件循环在背后维护着一个 ThreadPoolExecutor 对象，
 
 *asyncio.as_complete(fs, *, loop=None, timeout=None)*
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import asyncio
   import time
 
@@ -327,7 +354,7 @@ Semaphore 对象维护一个内部计数器:
 可以把 Semaphore 对象 _当作上下文管理器使用_ 。
 
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   time0 = time.time()
 
   async def foo(semaphore):
@@ -352,7 +379,7 @@ Semaphore 对象维护一个内部计数器:
 参数是一个由 Future 或协程构成的可迭代对象，wait 会分别把各个协程包装进一个 Task 对象。
 wait 是协程函数，因此它 *不会阻塞* ，默认行为是等传给它的所有协程运行完毕后结束。
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import random
   async def foo():
       sec = random.randint(1, 3)
@@ -404,7 +431,7 @@ with 语句的目的是简化 try/finally 模式。
 
 如果对象提供了 =close()= 方法，但没有实现 =__enter__/__exit__= 协议，则可以用这个函数构建上下文管理器。
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from contextlib import closing
 
   class Door:
@@ -419,12 +446,16 @@ with 语句的目的是简化 try/finally 模式。
       door.open()
 #+END_SRC
 
+#+RESULTS:
+: door opened
+: door closed
+
 
 *** suppress
 
 构建忽略指定异常的上下文管理器。
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from contextlib import suppress
   import os
 
@@ -432,9 +463,11 @@ with 语句的目的是简化 try/finally 模式。
       os.remove('somefile.tmp')
 #+END_SRC
 
+#+RESULTS:
+
 *** redirect
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import io
   from contextlib import redirect_stdout
 
@@ -445,11 +478,27 @@ with 语句的目的是简化 try/finally 模式。
   log("f.getvalue()", f.getvalue())
 #+END_SRC
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+RESULTS:
+#+begin_example
+======== f.getvalue() ========
+Help on built-in function pow in module builtins:
+
+pow(x, y, z=None, /)
+    Equivalent to x**y (with two arguments) or x**y % z (with three arguments)
+
+    Some types, such as ints, are able to use a more efficient algorithm when
+    invoked using the three argument form.
+
+
+#+end_example
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   with open('/tmp/help.txt', 'w') as f:
       with redirect_stdout(f):
           help(pow)
 #+END_SRC
+
+#+RESULTS:
 
 
 *** @contextmanager
@@ -462,7 +511,7 @@ with 语句的目的是简化 try/finally 模式。
 - yield 语句后面的代码在 with 块结束时 (即调用 =__exit__= 方法时) 执行
 
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from contextlib import contextmanager
 
   class Query(object):
@@ -484,8 +533,13 @@ with 语句的目的是简化 try/finally 模式。
       q.query()
 #+END_SRC
 
+#+RESULTS:
+: Begin
+: Query info about Bob...
+: End
 
-#+BEGIN_SRC ipython :session :exports both :results output
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   @contextmanager
   def tag(name):
       print("<%s>" % name, end='')
@@ -496,6 +550,9 @@ with 语句的目的是简化 try/finally 模式。
   with tag("h1"):
       print("hello", end='')
 #+END_SRC
+
+#+RESULTS:
+: <h1>hello</h1>
 
 本质上，contextlib.contextmanager 装饰器会把函数包装成实现了 =__enter__= 和 =__exit__= 方法的类 (类的名称是 _GeneraorContextManager) 。这个类的 =__enter__= 方法有如下作用：
 
@@ -562,7 +619,7 @@ with 块终止时， =__exit__= 方法会做以下几件事：
 
 有时可以自定义一个预激装饰器以简化协程的用法：
 
-#+BEGIN_SRC ipython
+#+BEGIN_SRC ipython :eval never-export
   from functools import wraps
 
   def coroutine(func):
@@ -610,7 +667,7 @@ with 块终止时， =__exit__= 方法会做以下几件事：
 
 return 的值会偷偷传给调用方，赋值给 StopIteration 异常的一个属性。这样的做法有点奇怪，但是能保留住生成器对象的常规行为，即耗尽时抛出 StopIteration 异常。
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from collections import namedtuple
   Result = namedtuple('Result', 'count average')
 
@@ -638,6 +695,10 @@ return 的值会偷偷传给调用方，赋值给 StopIteration 异常的一个�
 
   log("result", result)
 #+END_SRC
+
+#+RESULTS:
+: =========== result ===========
+: Result(count=2, average=15.0)
 
 
 ** yield from
@@ -674,7 +735,7 @@ return 的值会偷偷传给调用方，赋值给 StopIteration 异常的一个�
 
 **** RESULT = yield from EXPR 执行逻辑
 
-#+BEGIN_SRC ipython
+#+BEGIN_SRC ipython :eval never-export
   # _i: The subgenerator
   # _y: A value yielded from the subgenerator
   # _r: The eventual result
@@ -729,7 +790,7 @@ return 的值会偷偷传给调用方，赋值给 StopIteration 异常的一个�
 
 这个例子是说明如何在一个主循环中处理事件，以及如何通过发送数据驱动协程。这是 asyncio 包底层的基本思想。
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from collections import namedtuple
   import queue
   import random
@@ -781,6 +842,41 @@ return 的值会偷偷传给调用方，赋值给 StopIteration 异常的一个�
   Simulator(taxis).run(100)
 #+END_SRC
 
+#+RESULTS:
+#+begin_example
+taxi: 0  leave garage  [ 0 ]
+taxi: 0  pick up passenger  [ 2 ]
+taxi: 0  drop off passenger  [ 3 ]
+taxi: 1    leave garage  [ 5 ]
+taxi: 1    pick up passenger  [ 10 ]
+taxi: 2      leave garage  [ 10 ]
+taxi: 0  pick up passenger  [ 13 ]
+taxi: 0  drop off passenger  [ 14 ]
+taxi: 1    drop off passenger  [ 18 ]
+taxi: 1    pick up passenger  [ 20 ]
+taxi: 2      pick up passenger  [ 20 ]
+taxi: 2      drop off passenger  [ 21 ]
+taxi: 0  going home  [ 22 ]
+taxi: 1    drop off passenger  [ 22 ]
+taxi: 2      pick up passenger  [ 27 ]
+taxi: 1    pick up passenger  [ 31 ]
+taxi: 1    drop off passenger  [ 36 ]
+taxi: 1    pick up passenger  [ 37 ]
+taxi: 2      drop off passenger  [ 37 ]
+taxi: 2      pick up passenger  [ 39 ]
+taxi: 1    drop off passenger  [ 41 ]
+taxi: 2      drop off passenger  [ 42 ]
+taxi: 1    going home  [ 43 ]
+taxi: 2      pick up passenger  [ 44 ]
+taxi: 2      drop off passenger  [ 54 ]
+taxi: 2      pick up passenger  [ 59 ]
+taxi: 2      drop off passenger  [ 62 ]
+taxi: 2      pick up passenger  [ 68 ]
+taxi: 2      drop off passenger  [ 76 ]
+taxi: 2      going home  [ 83 ]
+=== end of events ===
+#+end_example
+
 
 * 数据结构
 
@@ -794,7 +890,7 @@ return 的值会偷偷传给调用方，赋值给 StopIteration 异常的一个�
 
 **** 星号(*)的使用
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   a, b, *rest1 = range(5)
   log("rest1", rest1)
 
@@ -805,9 +901,17 @@ return 的值会偷偷传给调用方，赋值给 StopIteration 异常的一个�
   log("rest3", rest3)
 #+END_SRC
 
+#+RESULTS:
+: =========== rest1 ============
+: [2, 3, 4]
+: =========== rest2 ============
+: [2]
+: =========== rest3 ============
+: []
+
 *星号前缀只能用在一个变量名前，但是这个变量可以出现在赋值表达式的任意位置：*
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   a, *body, c, d = range(5)
   log("body", body)
 
@@ -815,26 +919,39 @@ return 的值会偷偷传给调用方，赋值给 StopIteration 异常的一个�
   log("head", head)
 #+END_SRC
 
+#+RESULTS:
+: ============ body ============
+: [1, 2]
+: ============ head ============
+: [0, 1]
+
 **** 嵌套拆包
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   name, cc, pop, (latitude, longitude) = ('Tokyo', 'JP', 36.933, (35.689722, 139.691667))
   log("[name, cc, pop, latitude, longitude]", [name, cc, pop, latitude, longitude])
 #+END_SRC
 
+#+RESULTS:
+:  [name, cc, pop, latitude, longitude]
+: ['Tokyo', 'JP', 36.933, 35.689722, 139.691667]
+
 
 ** 具名元组
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from collections import namedtuple
   Point = namedtuple('Point', ['x', 'y'])
   p = Point(1, 2)
   print("x: {}, y: {}".format(p.x, p.y))
 #+END_SRC
 
+#+RESULTS:
+: x: 1, y: 2
+
 除了从普通元组继承来的属性之外，具名元祖还有一些自己专用的属性：
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   # _fields 属性包含这个类所有字段名称的元组
   log("Point._fields", Point._fields)
 
@@ -843,6 +960,12 @@ return 的值会偷偷传给调用方，赋值给 StopIteration 异常的一个�
   log("pt._asdict()", pt._asdict())
 
 #+END_SRC
+
+#+RESULTS:
+: ======= Point._fields ========
+: ('x', 'y')
+: ======== pt._asdict() ========
+: OrderedDict([('x', 3), ('y', 4)])
 
 
 ** 列表
@@ -855,7 +978,7 @@ return 的值会偷偷传给调用方，赋值给 StopIteration 异常的一个�
 
 *** 切片选择
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   s = 'bicycle'
   log("s[::3]", s[::3])
 
@@ -867,10 +990,18 @@ return 的值会偷偷传给调用方，赋值给 StopIteration 异常的一个�
 
 #+END_SRC
 
+#+RESULTS:
+: =========== s[::3] ===========
+: bye
+: ========== s[::-1] ===========
+: elcycib
+: ============ s[:] ============
+: bicycle
+
 
 *** 切片赋值
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   l = list(range(10))
   log("l", l)
 
@@ -894,13 +1025,29 @@ return 的值会偷偷传给调用方，赋值给 StopIteration 异常的一个�
 
 #+END_SRC
 
+#+RESULTS:
+#+begin_example
+============= l ==============
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+===== l[2:5] = [20, 30] ======
+[0, 1, 20, 30, 5, 6, 7, 8, 9]
+========= del l[5:7] =========
+[0, 1, 20, 30, 5, 8, 9]
+===== l[3::2] = [11, 22] =====
+[0, 1, 20, 11, 5, 22, 9]
+========test exception========
+can only assign an iterable
+======= l[2:5] = [100] =======
+[0, 1, 100, 22, 9]
+#+end_example
+
 
 
 ** bisect
 
 *** 搜索
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import bisect
   def grade(score, breakpoints=[60, 70, 80, 90], grades='FDCBA'):
       i = bisect.bisect(breakpoints, score)
@@ -910,10 +1057,14 @@ return 的值会偷偷传给调用方，赋值给 StopIteration 异常的一个�
   log("result", result)
 #+END_SRC
 
+#+RESULTS:
+: =========== result ===========
+: ['F', 'A', 'C', 'C', 'B', 'A', 'A']
+
 
 *** 插入新元素
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import bisect
   import random
   random.seed(1729)
@@ -926,6 +1077,10 @@ return 的值会偷偷传给调用方，赋值给 StopIteration 异常的一个�
   log("my_list", my_list)
 #+END_SRC
 
+#+RESULTS:
+: ========== my_list ===========
+: [0, 2, 3, 9, 10, 11, 13, 18, 18, 23, 23, 25, 26, 29, 29, 31, 32, 33, 35, 39]
+
 
 ** 数组
 
@@ -933,12 +1088,16 @@ return 的值会偷偷传给调用方，赋值给 StopIteration 异常的一个�
 
 创建数组需要一个类型码，用来表示底层的 C 语言应存放怎样的数据类型。
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from array import array
   from random import random
   floats = array('d', (random() for i in range(1000)))  # 'd' 表示双精度浮点
   log("floats[-1]", floats[-1])
 #+END_SRC
+
+#+RESULTS:
+: ========= floats[-1] =========
+: 0.970088201571867
 
 
 ** 内存视图
@@ -946,7 +1105,7 @@ return 的值会偷偷传给调用方，赋值给 StopIteration 异常的一个�
 memoryview 是一个内置类，能让用户在不复制内容的情况下，在数据结构之间共享内存，
 *这个功能在处理大型数据集合时非常重要。*
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   # 通过改变数组中的一个字节来更新数组里某个元素的值
   import array
   numbers = array.array('h', [-2, -1, 0, 1, 2])  # 'h' 表示 16 位二进制整数
@@ -958,6 +1117,10 @@ memoryview 是一个内置类，能让用户在不复制内容的情况下，在
 
   log("numbers", numbers)
 #+END_SRC
+
+#+RESULTS:
+: ========== numbers ===========
+: array('h', [-2, -1, 1024, 1, 2])
 
 
 ** 双向队列
@@ -971,7 +1134,7 @@ deque 是为了高效实现插入和删除操作的双向列表，适合用于�
 如果想要一种数据结构来存放 *最近用到的几个元素* ，deque 是一个很好的选择。
 
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from collections import deque
   dq = deque(range(10), maxlen=10)
   log("dq", dq)
@@ -989,6 +1152,20 @@ deque 是为了高效实现插入和删除操作的双向列表，适合用于�
   log("dq.extend([11, 22, 33])", dq)
 
 #+END_SRC
+
+#+RESULTS:
+#+begin_example
+============= dq =============
+deque([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], maxlen=10)
+======== dq.rotate(3) ========
+deque([7, 8, 9, 0, 1, 2, 3, 4, 5, 6], maxlen=10)
+======= dq.rotate(-4) ========
+deque([1, 2, 3, 4, 5, 6, 7, 8, 9, 0], maxlen=10)
+===== dq.appendleft(-1) ======
+deque([-1, 1, 2, 3, 4, 5, 6, 7, 8, 9], maxlen=10)
+== dq.extend([11, 22, 33]) ===
+deque([3, 4, 5, 6, 7, 8, 9, 11, 22, 33], maxlen=10)
+#+end_example
 
 
 ** 生成器
@@ -1011,7 +1188,7 @@ deque 是为了高效实现插入和删除操作的双向列表，适合用于�
 
   并行处理两个可迭代对象：如果 selector_it 中的元素是真值，产出 it 中对应的元素。
 
-  #+BEGIN_SRC ipython :session :exports both :results output
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
     import itertools
     def vowel(c):
         return c.lower() in 'aeiou'
@@ -1020,23 +1197,32 @@ deque 是为了高效实现插入和删除操作的双向列表，适合用于�
     print(result)
 #+END_SRC
 
+#+RESULTS:
+: ['A', 'r', 'd', 'a']
+
 
 - itertools.dropwhile(predicate, it)
 
   处理 it ，跳过 predicate 计算结果为真值的元素，产出剩下的元素。
 
-  #+BEGIN_SRC ipython :session :exports both :results output
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
     print(list(itertools.dropwhile(vowel, 'Aardvark')))
 #+END_SRC
+
+#+RESULTS:
+: ['r', 'd', 'v', 'a', 'r', 'k']
 
 
 - builtin.filter(predicate, it)
 
   如果 =predicate(item)= 返回真值，产出对应的元素，如果 predicate 是 None ，则只产出真值元素。
 
-  #+BEGIN_SRC ipython :session :exports both :results output
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
     print(list(filter(vowel, 'Aardvark')))
 #+END_SRC
+
+#+RESULTS:
+: ['A', 'a', 'a']
 
 
 - itertools.filterfalse(predicate, it)
@@ -1048,19 +1234,27 @@ deque 是为了高效实现插入和删除操作的双向列表，适合用于�
 
   产出 it 的切片，类似于 =s[:stop]= 或 =s[start:stop:step]= 。
 
-  #+BEGIN_SRC ipython :session :exports both :results output
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
     print(list(itertools.islice('Aardvark', 4)))
     print(list(itertools.islice('Aardvark', 4, 7)))
     print(list(itertools.islice('Aardvark', 1, 7, 2)))
 #+END_SRC
 
+#+RESULTS:
+: ['A', 'a', 'r', 'd']
+: ['v', 'a', 'r']
+: ['a', 'd', 'a']
+
 - itertools.takewhile(predicate, it)
 
   如果 =predicate(item)= 返回真值，产出对应的元素，然后停止。
 
-  #+BEGIN_SRC ipython :session :exports both :results output
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
     print(list(itertools.takewhile(vowel, 'Aardvark')))
 #+END_SRC
+
+#+RESULTS:
+: ['A', 'a']
 
 
 **** 用于映射的生成器函数
@@ -1070,7 +1264,7 @@ deque 是为了高效实现插入和删除操作的双向列表，适合用于�
   产出累计值，默认为求和；如果提供了 func ，则把前面两个元素传个 func ，
   然后把计算结果和下一个元素传给它，以此类推，最后产出结果。
 
-  #+BEGIN_SRC ipython :session :exports both :results output
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
     from operator import mul
     sample = [5, 4, 2, 8, 7, 6, 3, 0, 9, 1]
 
@@ -1079,6 +1273,11 @@ deque 是为了高效实现插入和删除操作的双向列表，适合用于�
     print(list(itertools.accumulate(sample, mul)))
 
   #+END_SRC
+
+  #+RESULTS:
+  : [5, 9, 11, 19, 26, 32, 35, 35, 44, 45]
+  : [5, 4, 2, 2, 2, 2, 2, 0, 0, 0]
+  : [5, 20, 40, 320, 2240, 13440, 40320, 0, 0, 0]
 
 
 - builtin.enumerate(it, start=0)
@@ -1093,11 +1292,15 @@ deque 是为了高效实现插入和删除操作的双向列表，适合用于�
 
   把 it 中各个元素传给 func ，产出结果。
 
-  #+BEGIN_SRC ipython :session :exports both :results output
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
     print(list(itertools.starmap(mul, enumerate('albatroz', 1))))
     print(list(itertools.starmap(lambda a, b: b/a,
                                  enumerate(itertools.accumulate(sample), 1))))
   #+END_SRC
+
+  #+RESULTS:
+  : ['a', 'll', 'bbb', 'aaaa', 'ttttt', 'rrrrrr', 'ooooooo', 'zzzzzzzz']
+  : [5.0, 4.5, 3.6666666666666665, 4.75, 5.2, 5.333333333333333, 5.0, 4.375, 4.888888888888889, 4.5]
 
 
 **** 用于合并可迭代对象的生成器函数
@@ -1106,18 +1309,24 @@ deque 是为了高效实现插入和删除操作的双向列表，适合用于�
 
   无缝连接多个可迭代对象。
 
-  #+BEGIN_SRC ipython :session :exports both :results output
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
     print(list(itertools.chain('ABC', range(3))))
   #+END_SRC
+
+  #+RESULTS:
+  : ['A', 'B', 'C', 0, 1, 2]
 
 
 - itertools.chain.from_iterable(it)
 
   产出 it 生成的各个可迭代对象中的元素，无缝连接在一起。
 
-  #+BEGIN_SRC ipython :session :exports both :results output
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
     print(list(itertools.chain.from_iterable(enumerate('ABC'))))
   #+END_SRC
+
+  #+RESULTS:
+  : [0, 'A', 1, 'B', 2, 'C']
 
 
 - itertaools.product(it1, ..., itN, repeat=1)
@@ -1125,30 +1334,40 @@ deque 是为了高效实现插入和删除操作的双向列表，适合用于�
   计算笛卡尔积，合并成由 N 个元素组成的元组。
   repeat 关键字参数告诉 product 函数重复 N 次处理输入的各个可迭代对象。
 
-  #+BEGIN_SRC ipython :session :exports both :results output
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   print(list(itertools.product('ABC', range(2))))
   # list(itertools.product('ABC', 'ABC'))
   print(list(itertools.product('ABC', repeat=2)))
   #+END_SRC
 
+  #+RESULTS:
+  : [('A', 0), ('A', 1), ('B', 0), ('B', 1), ('C', 0), ('C', 1)]
+  : [('A', 'A'), ('A', 'B'), ('A', 'C'), ('B', 'A'), ('B', 'B'), ('B', 'C'), ('C', 'A'), ('C', 'B'), ('C', 'C')]
+
 - builtin.zip(it1, .., itN)
 
   产出由 N 个元素组成的元组，只要有一个可迭代对象到头了，即停止。
 
-  #+BEGIN_SRC ipython :session :exports both :results output
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   print(list(zip('ABC', range(5), [10, 20, 30, 40, 50, 60])))
   #+END_SRC
+
+  #+RESULTS:
+  : [('A', 0, 10), ('B', 1, 20), ('C', 2, 30)]
 
 - itertools.zip_longest(it1, ..., itN, fillvalue=None)
 
   产出由 N 个元素组成的元组，等到最长的可迭代对象到头了，即停止。
 
-  #+BEGIN_SRC ipython :session :exports both :results output
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
     print(list(itertools.zip_longest('ABC',
                                      range(5),
                                      [10, 20, 30, 40, 50, 60],
                                      fillvalue='?')))
   #+END_SRC
+
+  #+RESULTS:
+  : [('A', 0, 10), ('B', 1, 20), ('C', 2, 30), ('?', 3, 40), ('?', 4, 50), ('?', '?', 60)]
 
 
 **** 用于扩展输出元素的生成器函数
@@ -1157,50 +1376,68 @@ deque 是为了高效实现插入和删除操作的双向列表，适合用于�
 
   把 it 产出的 out_len 个元素组合在一起，然后产出。
 
-  #+BEGIN_SRC ipython :session :exports both :results output
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
     print(list(itertools.combinations('ABC', 2)))
   #+END_SRC
+
+  #+RESULTS:
+  : [('A', 'B'), ('A', 'C'), ('B', 'C')]
 
 - itertools.combinations_with_replacement(it, out_len)
 
   把 it 产出的 out_len 个元素组合在一起，然后产出，包含相同元素的组合。
 
-  #+BEGIN_SRC ipython :session :exports both :results output
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
     print(list(itertools.combinations_with_replacement('ABC', 2)))
   #+END_SRC
+
+  #+RESULTS:
+  : [('A', 'A'), ('A', 'B'), ('A', 'C'), ('B', 'B'), ('B', 'C'), ('C', 'C')]
 
 - itertools.permutation(it, out_len=None)
 
   把 out_len 个 it 产出元素排列在一起，然后产出这些排列；out_len 的默认值等于 =len(list(it))= 。
 
-  #+BEGIN_SRC ipython :session :exports both :results output
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
     print(list(itertools.permutations('ABC', 2)))
   #+END_SRC
+
+  #+RESULTS:
+  : [('A', 'B'), ('A', 'C'), ('B', 'A'), ('B', 'C'), ('C', 'A'), ('C', 'B')]
 
 - itertools.count(start=0, step=1)
 
   从 start 开支不断产出数字，按 step 步幅增加。
 
-  #+BEGIN_SRC ipython :session :exports both :results output
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
     print(list(itertools.islice(itertools.count(1, .3), 3)))
   #+END_SRC
+
+  #+RESULTS:
+  : [1, 1.3, 1.6]
 
 - itertools.cycle(it)
 
   从 it 中产出元素，存储各个元素的 *副本* ，然后按顺序重复不断地产出各个元素。
 
-  #+BEGIN_SRC ipython :session :exports both :results output
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
     print(list(itertools.islice(itertools.cycle('ABC'), 7)))
   #+END_SRC
+
+  #+RESULTS:
+  : ['A', 'B', 'C', 'A', 'B', 'C', 'A']
 
 
 - itertools.repeat(item, [times])
 
   不断产出指定元素，除非指定次数。常见用途，为 map 函数提供固定参数：
 
-  #+BEGIN_SRC ipython :session :exports both :results output
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
     print(list(map(mul, range(11), itertools.repeat(5))))
   #+END_SRC
+
+  #+RESULTS:
+  : [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
 
 
 - builtin.iter(callable, sentinel)
@@ -1209,7 +1446,7 @@ deque 是为了高效实现插入和删除操作的双向列表，适合用于�
 
   iter 的[[https://docs.python.org/3/library/functions.html#iter][文档]]中有个实用的例子，这段代码逐行读取文件，直到遇到空行或到达文件末尾为止：
 
-  #+BEGIN_SRC ipython
+  #+BEGIN_SRC ipython :eval never-export
     with open('mydata.txt') as fp:
         for line in iter(fp.readline, ''):
             process_line(line)
@@ -1224,17 +1461,27 @@ deque 是为了高效实现插入和删除操作的双向列表，适合用于�
 
   注意， =itertool.groupby= 假定输入的可迭代对象已使用指定的 key 分组了各个元素。
 
-  #+BEGIN_SRC ipython :session :exports both :results output
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
     print(list(itertools.groupby('LLLAAGGG')))
     print(list(itertools.groupby('LLAALAAGGG')))
   #+END_SRC
 
-  #+BEGIN_SRC ipython :session :exports both :results output
+  #+RESULTS:
+  : [('L', <itertools._grouper object at 0x106a79208>), ('A', <itertools._grouper object at 0x106a791d0>), ('G', <itertools._grouper object at 0x106a79080>)]
+  : [('L', <itertools._grouper object at 0x106a79cf8>), ('A', <itertools._grouper object at 0x106a791d0>), ('L', <itertools._grouper object at 0x106a79080>), ('A', <itertools._grouper object at 0x106a79160>), ('G', <itertools._grouper object at 0x106a79358>)]
+
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
     animals = ['duck', 'eagle', 'rat', 'giraffe', 'bear', 'bat', 'dolphin', 'shark', 'lion']
     animals.sort(key=len)
     for length, group in itertools.groupby(animals, len):
         print(length, '->', list(group))
   #+END_SRC
+
+  #+RESULTS:
+  : 3 -> ['rat', 'bat']
+  : 4 -> ['duck', 'bear', 'lion']
+  : 5 -> ['eagle', 'shark']
+  : 7 -> ['giraffe', 'dolphin']
 
 
 - builtin.reversed(seq)
@@ -1245,9 +1492,12 @@ deque 是为了高效实现插入和删除操作的双向列表，适合用于�
 
   产出一个由 n 个生成器组成的元组，每个生成器用于单独产出输入的可迭代对象中的元素。
 
-  #+BEGIN_SRC ipython :session :exports both :results output
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
     print(list(zip(*itertools.tee('ABC'))))
   #+END_SRC
+
+  #+RESULTS:
+  : [('A', 'A'), ('B', 'B'), ('C', 'C')]
 
 
 *** yield from 语法
@@ -1255,7 +1505,7 @@ deque 是为了高效实现插入和删除操作的双向列表，适合用于�
 这个语句的作用是把不同的生成器结合在一起使用。
 
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   def chain(*iterables):
       for it in iterables:
           for i in it:
@@ -1264,16 +1514,22 @@ deque 是为了高效实现插入和删除操作的双向列表，适合用于�
   print(list(chain('ABC', range(3))))
 #+END_SRC
 
+#+RESULTS:
+: ['A', 'B', 'C', 0, 1, 2]
+
 
 *等效于：*
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   def chain(*iterables):
       for i in iterables:
           yield from i
 
   print(list(chain('ABC', range(3))))
 #+END_SRC
+
+#+RESULTS:
+: ['A', 'B', 'C', 0, 1, 2]
 
 *** 把生成器当成协程
 
@@ -1290,15 +1546,18 @@ deque 是为了高效实现插入和删除操作的双向列表，适合用于�
 
 *** 广义映射类型
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from collections import abc
   d = {}
   print(isinstance(d, abc.Mapping))
 #+END_SRC
 
+#+RESULTS:
+: True
+
 *** 字典构造
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   a = dict(one=1, two=2, three=3)
   b = {'one': 1, 'two': 2, 'three': 3}
   c = dict(zip(['one', 'two', 'three'], [1, 2, 3]))
@@ -1307,10 +1566,13 @@ deque 是为了高效实现插入和删除操作的双向列表，适合用于�
   print(a == b == c == d == e)
 #+END_SRC
 
+#+RESULTS:
+: True
+
 
 *** 字典推导
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   CODES = [
       (86, 'China'),
       (91, 'India'),
@@ -1320,6 +1582,9 @@ deque 是为了高效实现插入和删除操作的双向列表，适合用于�
 
 #+END_SRC
 
+#+RESULTS:
+: {'China': 86, 'India': 91, 'USA': 1}
+
 *** 弹性键查询
 
 **** defaultdict
@@ -1327,13 +1592,17 @@ deque 是为了高效实现插入和删除操作的双向列表，适合用于�
 在实例化一个 defaultdict 的时候，需要给构造方法提供一个可调用对象，
 这个可调用对象会在 =__getitem__= 找不到键的时候被调用，以便 =__getitem__= 返回默认值。
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import collections
   d = collections.defaultdict(list)
   d['a'].append('b')
   d['c'].append('d')
   log("d", d)
 #+END_SRC
+
+#+RESULTS:
+: ============= d ==============
+: defaultdict(<class 'list'>, {'a': ['b'], 'c': ['d']})
 
 
 **** =__missing__=
@@ -1360,7 +1629,7 @@ OrderedDict 的 popitem 方法默认删除并返回字典里最后一个元素�
 
 这个功能在给有嵌套作用域的语言做解释器的时候很有用，可以用一个映射对象来代表一个作用域上下文。
 
-#+BEGIN_SRC ipython
+#+BEGIN_SRC ipython :eval never-export
   import builtins
   from collections import ChainMap
   pylookup = ChainMap(locals(), globals(), vars(builtins))
@@ -1374,7 +1643,7 @@ OrderedDict 的 popitem 方法默认删除并返回字典里最后一个元素�
 
 Counter 实现了 + 和 - 运算符来合并记录。 =most_common([n])= 方法会返回最常见的 n 个键和它们的计数。
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from collections import Counter
   ct = Counter('abracadabra')
   print(ct)
@@ -1383,6 +1652,12 @@ Counter 实现了 + 和 - 运算符来合并记录。 =most_common([n])= 方法�
   print(ct)
   print(ct.most_common(2))
 #+END_SRC
+
+#+RESULTS:
+: Counter({'a': 5, 'b': 2, 'r': 2, 'c': 1, 'd': 1})
+: =========after update=========
+: Counter({'a': 10, 'z': 3, 'b': 2, 'r': 2, 'c': 1, 'd': 1})
+: [('a', 10), ('z', 3)]
 
 
 *** UserDict
@@ -1393,7 +1668,7 @@ Counter 实现了 + 和 - 运算符来合并记录。 =most_common([n])= 方法�
 导致不得不在子类中重写这些方法（比如 dict 的子类实现的 =__getitem__= 方法不会被 get() 方法所调用），
 但是 UserDict 就不会有这个问题。
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   class MyDict(dict):
       def __setitem__(self, key, value):
           super().__setitem__(key, value*2)
@@ -1405,13 +1680,20 @@ Counter 实现了 + 和 - 运算符来合并记录。 =most_common([n])= 方法�
   print(d)
 #+END_SRC
 
+#+RESULTS:
+: {'one': 1}
+: {'one': 1, 'two': 4}
+
 
 继承自 dict 的 =__init__= 方法忽略了子类的 =__setitem__= 方法。
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   d.update(three=3)
   print(d)
 #+END_SRC
+
+#+RESULTS:
+: {'one': 1, 'two': 4, 'three': 3}
 
 继承自 dict 的 update 方法也忽略了子类的 =__setitem__= 方法。
 
@@ -1425,7 +1707,7 @@ types.MappingProxyType 会返回一个只读的映射视图。
 虽然是只读视图，但是它是动态的，如果对原映射做出改动，
 通过这个视图可以观察到，但是无法通过这个视图对原映射做出修改。
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from types import MappingProxyType
   d = {1: 'A'}
   d_proxy = MappingProxyType(d)
@@ -1442,11 +1724,18 @@ types.MappingProxyType 会返回一个只读的映射视图。
   print(d_proxy)
 #+END_SRC
 
+#+RESULTS:
+: {1: 'A'}
+: ========= d_proxy[1] =========
+: A
+: 'mappingproxy' object does not support item assignment
+: {1: 'A', 2: 'B'}
+
 ** 集合
 
 *** 创建
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   s = {1, 2, 3, 1, 2, 3}
   print(s)
   s = set()  # 空集须写成 set()
@@ -1456,6 +1745,12 @@ types.MappingProxyType 会返回一个只读的映射视图。
   s = { c for c in 'helloworld'}
   print(s)
 #+END_SRC
+
+#+RESULTS:
+: {1, 2, 3}
+: set()
+: frozenset({0, 1, 2, 3, 4, 5, 6, 7, 8, 9})
+: {'o', 'e', 'h', 'r', 'l', 'd', 'w'}
 
 *** 合集，交集，差集
 
@@ -1494,7 +1789,7 @@ types.MappingProxyType 会返回一个只读的映射视图。
 
 ** 提取函数签名
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from inspect import signature
 
   def foo(a, b=1, **c):
@@ -1507,25 +1802,37 @@ types.MappingProxyType 会返回一个只读的映射视图。
   log("result", result)
 #+END_SRC
 
+#+RESULTS:
+: ============ sig =============
+: (a, b=1, **c)
+: =========== result ===========
+: [('a', <class 'inspect._empty'>), ('b', 1), ('c', <class 'inspect._empty'>)]
+
 
 inspect.Signature 对象有个 bind 方法，可以把任意个参数绑定到签名中的形参上，
 所用的规则与实参到形参的匹配方式一样。框架可以使用这个方法在真正调用函数前验证函数：
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   args = {'a': 'aaa', 'b': 'bbb', 'x': 'xxx', 'y': 'yyy'}
   bound_args = sig.bind(**args)
   result = [(name, value) for name, value in bound_args.arguments.items()]
   print(result)
 #+END_SRC
 
+#+RESULTS:
+: [('a', 'aaa'), ('b', 'bbb'), ('c', {'x': 'xxx', 'y': 'yyy'})]
 
-#+BEGIN_SRC ipython :session :exports both :results output
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   del args['a']
   try:
       sig.bind(**args)
   except Exception as e:
       print(e)
 #+END_SRC
+
+#+RESULTS:
+: missing a required argument: 'a'
 
 
 ** 支持函数式编程的模块
@@ -1537,19 +1844,22 @@ inspect.Signature 对象有个 bind 方法，可以把任意个参数绑定到�
 operator 模块为多个算术运算符提供了对应的函数，
 从而避免编写类似 =lambda a, b: a * b= 这种平凡的匿名函数：
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from functools import reduce
   from operator import mul
 
   print(reduce(mul, range(1, 6)))
 #+END_SRC
 
+#+RESULTS:
+: 120
+
 
 **** itemgetter
 
 operator 模块中还有一类函数，能替代从序列中取出元素或读取对象属性的 lambda 表达式：
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from operator import itemgetter
 
   data = [
@@ -1561,11 +1871,17 @@ operator 模块中还有一类函数，能替代从序列中取出元素或读�
   print(sorted(data, key=itemgetter(0)))
 #+END_SRC
 
+#+RESULTS:
+: [('a', 1), ('b', 3), ('c', 2)]
+
 如果把多个参数传给 itemgetter ，它构建的函数会返回提取的值构成的元组：
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   print([itemgetter(1, 0)(t) for t in data])
 #+END_SRC
+
+#+RESULTS:
+: [(2, 'c'), (3, 'b'), (1, 'a')]
 
 
 **** attrgetter
@@ -1581,7 +1897,7 @@ attrgetter 与 itemgetter 作用类似，它创建的函数根据名称提取对
 
 methodcall 会自行创建函数，该函数会在对象上调用参数指定的方法：
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from operator import methodcaller
   s = "hello world"
   upcase = methodcaller('upper')
@@ -1591,13 +1907,17 @@ methodcall 会自行创建函数，该函数会在对象上调用参数指定的
   print(hiphenate(s))
 #+END_SRC
 
+#+RESULTS:
+: HELLO WORLD
+: hello-world
+
 
 ** 闭包
 
 闭包是一种函数，它会保留定义函数时存在的 *自由变量(free variable)* 的绑定，
 这样调用函数时，虽然定义作用域不可用了，但是仍能使用那些绑定。
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   def make_averager():
       series = []
 
@@ -1618,20 +1938,32 @@ methodcall 会自行创建函数，该函数会在对象上调用参数指定的
   log("avg.__code__.co_freevars", avg.__code__.co_freevars)
 #+END_SRC
 
+#+RESULTS:
+: == avg.__code__.co_varnames ==
+: ('new_value', 'total')
+: == avg.__code__.co_freevars ==
+: ('series',)
+
 =__closure__= 中的各个元素对应于 =__code__.co_freevars= 中的一个名称：
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   log("avg.__closure__", avg.__closure__)
 
   log("avg.__closure__[0].cell_contents",
       avg.__closure__[0].cell_contents)
 #+END_SRC
 
+#+RESULTS:
+: ====== avg.__closure__ =======
+: (<cell at 0x10697bac8: list object at 0x1068a41c8>,)
+:  avg.__closure__[0].cell_contents
+: [10, 11, 12]
+
 *** nonlocal
 
 nonlocal 的作用是把变量标记为自由变量。
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   def make_averager():
       count = 0
       total = 0
@@ -1650,10 +1982,13 @@ nonlocal 的作用是把变量标记为自由变量。
   print(avg(3))
 #+END_SRC
 
+#+RESULTS:
+: 2.0
+
 
 *** 闭包的陷阱
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   def count():
       fs = []
       for i in range(1, 4):
@@ -1668,9 +2003,12 @@ nonlocal 的作用是把变量标记为自由变量。
 
 #+END_SRC
 
+#+RESULTS:
+: 9 9 9
+
 需注意： *闭包中不要引用任何可能会变化的变量。* 如果一定要引用会变化的变量，可以再创建一个函数：
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   def count():
       def f(j):
           def g():
@@ -1685,12 +2023,15 @@ nonlocal 的作用是把变量标记为自由变量。
   print(f1(), f2(), f3())
 #+END_SRC
 
+#+RESULTS:
+: 1 4 9
+
 
 ** 装饰器
 
 *** functool.wraps
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import functools
   import time
 
@@ -1719,6 +2060,9 @@ nonlocal 的作用是把变量标记为自由变量。
   snooze()
 #+END_SRC
 
+#+RESULTS:
+: [1.00478457] snooze() -> None
+
 
 *** functools.lru_cache
 
@@ -1735,7 +2079,7 @@ typed 参数如果设为 True ，把不同参数类型得到的结果分开保�
 因为 lru_cache 使用字典存储结果，而且键根据调用时传入的定位参数和关键字参数创建，
 因此被 lru_cache 装饰的函数，它的所有参数必须是可散列的。
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   @clock
   def fib(n):
       if n < 2: return n
@@ -1744,7 +2088,37 @@ typed 参数如果设为 True ，把不同参数类型得到的结果分开保�
   print("result: ", fib(6))
 #+END_SRC
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+RESULTS:
+#+begin_example
+[0.00000045] fib(0) -> 0
+[0.00000053] fib(1) -> 1
+[0.00029566] fib(2) -> 1
+[0.00000040] fib(1) -> 1
+[0.00000035] fib(0) -> 0
+[0.00000041] fib(1) -> 1
+[0.00005358] fib(2) -> 1
+[0.00010595] fib(3) -> 2
+[0.00048775] fib(4) -> 3
+[0.00000033] fib(1) -> 1
+[0.00000032] fib(0) -> 0
+[0.00000110] fib(1) -> 1
+[0.00010550] fib(2) -> 1
+[0.00015888] fib(3) -> 2
+[0.00000056] fib(0) -> 0
+[0.00000050] fib(1) -> 1
+[0.00012996] fib(2) -> 1
+[0.00000042] fib(1) -> 1
+[0.00000048] fib(0) -> 0
+[0.00000041] fib(1) -> 1
+[0.00005725] fib(2) -> 1
+[0.00025901] fib(3) -> 2
+[0.00050781] fib(4) -> 3
+[0.00088358] fib(5) -> 5
+[0.00145318] fib(6) -> 8
+result:  8
+#+end_example
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import functools
 
   @functools.lru_cache()
@@ -1757,6 +2131,16 @@ typed 参数如果设为 True ，把不同参数类型得到的结果分开保�
   print("result:", fib(6))
 #+END_SRC
 
+#+RESULTS:
+: [0.00000047] fib(0) -> 0
+: [0.00000077] fib(1) -> 1
+: [0.00021293] fib(2) -> 1
+: [0.00000149] fib(3) -> 2
+: [0.00030547] fib(4) -> 3
+: [0.00000166] fib(5) -> 5
+: [0.00044729] fib(6) -> 8
+: result: 8
+
 *** functools.singledispatch
 
 使用 @singledispatch 装饰的普通函数会变成分派函数，
@@ -1764,7 +2148,7 @@ typed 参数如果设为 True ，把不同参数类型得到的结果分开保�
 
 分派函数：
 
-#+BEGIN_SRC ipython
+#+BEGIN_SRC ipython :eval never-export
   def handle_value(value):
       if isinstance(value, int):
           handle_value_int(value)
@@ -1777,7 +2161,7 @@ typed 参数如果设为 True ，把不同参数类型得到的结果分开保�
 
 @singledispatch 的优点是支持模块化扩展：各个模块可以为它支持的各个类型注册一个专门的函数。
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from functools import singledispatch
   from collections import abc
   import numbers
@@ -1810,6 +2194,16 @@ typed 参数如果设为 True ，把不同参数类型得到的结果分开保�
   log("fun.registry.keys()", fun.registry.keys())
 #+END_SRC
 
+#+RESULTS:
+: Let me just say, 3
+: Strength in numbers, eh? 3
+: Enumerate this:
+: 0 3
+: ==== fun.dispatch(tuple) =====
+: <function handle_seq at 0x106aa5620>
+: ==== fun.registry.keys() =====
+: dict_keys([<class 'object'>, <class 'numbers.Integral'>, <class 'tuple'>, <class 'collections.abc.MutableSequence'>])
+
 
 注册的专门函数应该处理抽象基类 (如 numbers.Integral 和 abc.MutableSequence) ，
 不要处理具体实现 (如 int 和 list) ，这样，代码支持的兼容类型更广泛。
@@ -1826,7 +2220,7 @@ typed 参数如果设为 True ，把不同参数类型得到的结果分开保�
 命名关键字参数可以用于限制关键字参数的名字。
 命名关键字参数必须传入参数名，如果没有传入参数名，调用将报错。
 
-#+BEGIN_SRC ipython
+#+BEGIN_SRC ipython :eval never-export
   # 只接收 city 和 job 作为关键字参数
   def person(name, age, *, city, job):             # 命名关键字参数需要一个特殊分隔符 *
       print(name, age, city, job)                  # * 后面的参数被视为命名关键字参数
@@ -1840,11 +2234,12 @@ typed 参数如果设为 True ，把不同参数类型得到的结果分开保�
       print(name, age, args, city, job)
 #+END_SRC
 
+
 *** 默认参数
 
 *定义默认参数时，默认参数必须指向不可变对象。*
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   def add_end(L=[]):
       L.append('END')
       return L
@@ -1855,6 +2250,11 @@ typed 参数如果设为 True ，把不同参数类型得到的结果分开保�
 
 #+END_SRC
 
+#+RESULTS:
+: ['END']
+: ['END', 'END']
+: ['END', 'END', 'END']
+
 原因：
 
 函数在定义的时候，默认参数 L 的值就被计算出来了，即 [] ，且保存在函数对象中。
@@ -1862,7 +2262,7 @@ typed 参数如果设为 True ，把不同参数类型得到的结果分开保�
 
 可以用 None 这个不可变对象来实现：
 
-#+BEGIN_SRC ipython
+#+BEGIN_SRC ipython :eval never-export
   def add_end(L=None):
       if L is None:
           L = []
@@ -1911,12 +2311,15 @@ a==b 等同于 =a.__eq__(b)= 。
 - 弱引用是可调用对象，如果对象存在，调用弱引用可以获取对象，否则返回 None
 - 弱引用在缓存应用中很有用，因为一般不希望由于被缓存引用着而始终保存缓存对象
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import weakref
   a = {0, 1}
   wref = weakref.ref(a)
   print(wref())
 #+END_SRC
+
+#+RESULTS:
+: {0, 1}
 
 weakref.ref 类是低层接口，
 *应该多使用 WeakKeyDictionary, WeakValueDictionary, WeakSet 和 finalize ，*
@@ -1925,14 +2328,17 @@ weakref.ref 类是低层接口，
 
 *** weakref.finalize
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import weakref
   s = {1, 2, 3}
   ender = weakref.finalize(s, lambda: print("Gone with the wind ..."))
   print(ender.alive)
 #+END_SRC
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+RESULTS:
+: True
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   # del 不会删除对象，但是执行 del 后可能会导致对象不可获取，从而被删除
   del s
 
@@ -1944,7 +2350,7 @@ weakref.ref 类是低层接口，
 WeakValueDictionary 类实现的是一种可变映射， *里面的值是对象的弱引用* 。
 被引用的对象在程序中的其他地方被当作垃圾回收后，对应的键会自动从 WeakValueDictionary 中删除。因此，WeakValueDictionary 经常用于缓存。
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import weakref
 
   class Cheese:
@@ -1963,6 +2369,10 @@ WeakValueDictionary 类实现的是一种可变映射， *里面的值是对象�
   del cheese
   print(sorted(stock.keys()))
 #+END_SRC
+
+#+RESULTS:
+: ['Brie', 'Parmesan', 'Read Leicester', 'Tilsit']
+: []
 
 
 *** weakref.WeakKeyDictionary
@@ -2024,7 +2434,7 @@ int 和 tuple 实例不能作为弱引用的目标，甚至它们的子类也不
 
 Python 构建对象的过程可以用下述伪代码概括：
 
-#+BEGIN_SRC ipython
+#+BEGIN_SRC ipython :eval never-export
   def object_maker(the_class, some_arg):
       new_object = the_class.__new__(some_arg)
       if isinstance(new_object, the_class):
@@ -2102,7 +2512,7 @@ Python 构建对象的过程可以用下述伪代码概括：
 
 *** 使用 type 动态创建类
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   def fn(self, name='world'):
       print('Hello, %s.' % name)
 
@@ -2112,6 +2522,9 @@ Python 构建对象的过程可以用下述伪代码概括：
   print((type(Hello), type(h)))
 #+END_SRC
 
+#+RESULTS:
+: (<class 'type'>, <class '__main__.Hello'>)
+
 
 *** 使用 metaclass 控制类的创建
 
@@ -2120,7 +2533,7 @@ Python 构建对象的过程可以用下述伪代码概括：
 元类的 =__init__= 方法可以做到类装饰器能做的任何事情。
 (如果想进一步定制类，可以在元类中实现 =__new__= 方法。不过，通常情况下实现 =__init__= 方法就够了)
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   class MetaFoo(type):
 
       def __new__(metacls, name, bases, attrs):
@@ -2136,6 +2549,11 @@ Python 构建对象的过程可以用下述伪代码概括：
   print(dir(Foo))
 #+END_SRC
 
+#+RESULTS:
+: metacls: <class '__main__.MetaFoo'>, name: Foo, bases: (<class 'str'>,), attrs: {'__module__': '__main__', '__qualname__': 'Foo'}
+: cls: <class '__main__.Foo'>, name: Foo, bases: (<class 'str'>,), attrs: {'__module__': '__main__', '__qualname__': 'Foo'}
+: ['__add__', '__class__', '__contains__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getitem__', '__getnewargs__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__iter__', '__le__', '__len__', '__lt__', '__mod__', '__module__', '__mul__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__rmod__', '__rmul__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', 'capitalize', 'casefold', 'center', 'count', 'encode', 'endswith', 'expandtabs', 'find', 'format', 'format_map', 'index', 'isalnum', 'isalpha', 'isdecimal', 'isdigit', 'isidentifier', 'islower', 'isnumeric', 'isprintable', 'isspace', 'istitle', 'isupper', 'join', 'ljust', 'lower', 'lstrip', 'maketrans', 'partition', 'replace', 'rfind', 'rindex', 'rjust', 'rpartition', 'rsplit', 'rstrip', 'split', 'splitlines', 'startswith', 'strip', 'swapcase', 'title', 'translate', 'upper', 'zfill']
+
 
 *** =__prepare__=
 
@@ -2150,7 +2568,7 @@ Python3 引入了特殊方法 =__prepare__= ，这个特殊方法只在元类中
 
 =__prepare__= 的用法一般都比较简单，比如想要控制类的属性定义的顺序：
 
-#+BEGIN_SRC ipython
+#+BEGIN_SRC ipython :eval never-export
   import collections
 
   class EntityMeta(type):
@@ -2186,22 +2604,34 @@ Python3 引入了特殊方法 =__prepare__= ，这个特殊方法只在元类中
 
 ** Code Point 转换
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   print(ord('A'))
   print(ord('中'))
   print(chr(66))
   print(chr(25991))
 #+END_SRC
 
+#+RESULTS:
+: 65
+: 20013
+: B
+: 文
+
 
 ** 编解码
 
-#+BEGIN_SRC ipython :session :exports both :results output
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   print('ABC'.encode('ascii'))
   print('中文'.encode('utf-8'))
   print(b'ABC'.decode('ascii'))
   print(b'\xe4\xb8\xad\xe6\x96\x87'.decode('utf-8'))
 #+END_SRC
+
+#+RESULTS:
+: b'ABC'
+: b'\xe4\xb8\xad\xe6\x96\x87'
+: ABC
+: 中文
 
 
 * 参考资料
