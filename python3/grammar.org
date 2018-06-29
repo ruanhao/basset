@@ -5,7 +5,7 @@
 #+LINK_HOME: http://www.github.com/ruanhao
 #+OPTIONS:   h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
 #+STARTUP:   showall
-#+TOC:       headlines 4
+#+TOC:       headlines 5
 #+HTML_DOCTYPE: <!DOCTYPE html>
 #+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
 #+HTML_HEAD: <link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
@@ -1416,6 +1416,14 @@ deque([3, 4, 5, 6, 7, 8, 9, 11, 22, 33], maxlen=10)
   #+RESULTS:
   : [1, 1.3, 1.6]
 
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(list(zip(count(), ['a', 'b', 'c'])))
+#+END_SRC
+
+#+RESULTS:
+: [(0, 'a'), (1, 'b'), (2, 'c')]
+
 - itertools.cycle(it)
 
   从 it 中产出元素，存储各个元素的 *副本* ，然后按顺序重复不断地产出各个元素。
@@ -1761,7 +1769,7 @@ types.MappingProxyType 会返回一个只读的映射视图。
 
 *** Hash 算法
 
-#+BEGIN_SRC plantuml :file img/p3_hash.png
+#+BEGIN_SRC plantuml :file img/p3_hash.png :eval never-export
   :计算键的散列值;
   :使用散列值最低的几位数字来定位散列表用的一个表元(bucket);
   while (表元为空) is (否)
@@ -1775,8 +1783,10 @@ types.MappingProxyType 会返回一个只读的映射视图。
   endwhile (是)
       :KeyError;
 #+END_SRC
-#+NAME: hash
-#+CAPTION: 哈希算法
+
+#+RESULTS:
+[[file:img/p3_hash.png]]
+
 
 如果实现了一个类的 =__eq__= 方法，并且希望它是可散列的，
 则一定需要有一个恰当的 =__hash__= 方法，保证在 a == b 为真的情况下 hash(a)==hash(b) 也必定为真。
