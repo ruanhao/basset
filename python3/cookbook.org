@@ -5,7 +5,7 @@
 #+LINK_HOME: http://www.github.com/ruanhao
 #+OPTIONS:   h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
 #+STARTUP:   showall
-#+TOC:       headlines 3
+#+TOC:       headlines 4
 #+HTML_DOCTYPE: <!DOCTYPE html>
 #+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
 #+HTML_HEAD: <link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
@@ -13,6 +13,13 @@
 | Author   | {{{author}}} ({{{email}}})    |
 | Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
 #+HTML: </div>
+
+#+BEGIN_SRC ipython :session :exports none :eval never-export
+  def log(title0, value):
+      title1 = ' ' + title0 + ' '
+      print("{}\n{}".format(title1.center(30, '='), value))
+#+END_SRC
+
 
 
 * 类
@@ -1493,6 +1500,313 @@ datetime 模块简化了日期操作，如增加天数，设置时区等。
   print('User:', user)
   print('Passwd:', passwd)
 #+END_SRC
+
+
+* 网络
+
+** netaddr
+
+netaddr 有两个基本类： =IPAddress= 和 =IPNetwork=
+
+*** IP 地址操作
+
+**** 定义网络
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from netaddr import IPAddress, IPNetwork
+  nw = IPNetwork('192.168.0.1/24')
+  print(nw)
+#+END_SRC
+
+#+RESULTS:
+: 192.168.0.1/24
+
+**** 网络掩码
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(nw.netmask)
+#+END_SRC
+
+#+RESULTS:
+: 255.255.255.0
+
+**** 广播地址
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(nw.broadcast)
+#+END_SRC
+
+#+RESULTS:
+: 192.168.0.255
+
+**** 网络地址
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(nw.network)
+#+END_SRC
+
+#+RESULTS:
+: 192.168.0.0
+
+**** 主机掩码
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(nw.hostmask)
+#+END_SRC
+
+#+RESULTS:
+: 0.0.0.255
+
+**** 网段包含主机数量
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(nw.size)
+#+END_SRC
+
+#+RESULTS:
+: 256
+
+**** 获取所有主机地址
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import itertools
+  print(list(itertools.islice(nw.iter_hosts(), 3)))
+#+END_SRC
+
+#+RESULTS:
+: [IPAddress('192.168.0.1'), IPAddress('192.168.0.2'), IPAddress('192.168.0.3')]
+
+**** 将 IP 地址所在网段根据掩码长度划分子网
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  subnets = [x for x in nw.subnet(30)] # 分为掩码长度为 30 的几个子网
+  print(subnets[:3])
+#+END_SRC
+
+#+RESULTS:
+: [IPNetwork('192.168.0.0/30'), IPNetwork('192.168.0.4/30'), IPNetwork('192.168.0.8/30')]
+
+
+**** 修改掩码长度
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  nw.prefixlen = 28
+  print(nw)
+#+END_SRC
+
+#+RESULTS:
+: 192.168.0.1/28
+
+
+**** 判断公私网
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("IPAddress('10.74.68.58').is_private()", IPAddress('10.74.68.58').is_private())
+  log("IPAddress('1.1.1.2').is_private()", IPAddress('1.1.1.2').is_private())
+#+END_SRC
+
+#+RESULTS:
+:  IPAddress('10.74.68.58').is_private()
+: True
+:  IPAddress('1.1.1.2').is_private()
+: False
+
+
+**** 定义网段地址范围
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from netaddr import IPRange
+  ipRange = IPRange('192.168.1.10', '192.168.1.130')
+  print(ipRange)
+#+END_SRC
+
+#+RESULTS:
+: 192.168.1.10-192.168.1.130
+
+
+**** 地址聚合
+
+***** IPRange
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(ipRange.cidrs())
+#+END_SRC
+
+#+RESULTS:
+: [IPNetwork('192.168.1.10/31'), IPNetwork('192.168.1.12/30'), IPNetwork('192.168.1.16/28'), IPNetwork('192.168.1.32/27'), IPNetwork('192.168.1.64/26'), IPNetwork('192.168.1.128/31'), IPNetwork('192.168.1.130/32')]
+
+
+***** cidr_merge
+
+这个方法可以用于路由汇总的计算
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from netaddr import cidr_merge
+  ip_list = []
+  ip_list.append(IPNetwork("192.168.1.0/25"))
+  ip_list.append(IPNetwork("192.168.1.128/25"))
+  ip_list.append(IPNetwork("192.168.0.0/24"))
+  ip_list.append(IPNetwork("192.168.3.0/26"))
+  ip_list.append(IPNetwork("192.168.3.64/26"))
+  print(cidr_merge(ip_list))
+
+#+END_SRC
+
+#+RESULTS:
+: [IPNetwork('192.168.0.0/23'), IPNetwork('192.168.3.0/25')]
+
+
+**** 地址加减
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  ip = IPAddress('172.20.1.1')
+  ip += 256
+  print(ip)
+  ip -= 3
+  print(ip)
+
+#+END_SRC
+
+#+RESULTS:
+: 172.20.2.1
+: 172.20.1.254
+
+
+
+
+
+*** MAC 地址操作
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from netaddr import *
+  mac = EUI('98:5a:eb:9f:35:f8')
+  mac.dialect = mac_unix
+  log("unix mac", mac)
+  mac.dialect = mac_cisco
+  log("cisco mac", mac)
+  mac.dialect = mac_bare
+  log("bare mac", mac)
+#+END_SRC
+
+#+RESULTS:
+: ========== unix mac ==========
+: 98:5a:eb:9f:35:f8
+: ========= cisco mac ==========
+: 985a.eb9f.35f8
+: ========== bare mac ==========
+: 985AEB9F35F8
+
+**** 获取厂家信息
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(mac.info)
+#+END_SRC
+
+#+RESULTS:
+: {'OUI': {'address': ['1 Infinite Loop', 'Cupertino  CA  95014', 'US'],
+:  'idx': 9984747,
+:  'offset': 750381,
+:  'org': 'Apple, Inc.',
+:  'oui': '98-5A-EB',
+:  'size': 123}}
+
+
+
+** ipaddr
+
+轻量级 IP 处理模块，不支持 MAC 地址处理。
+
+Python3.3 起，加入标准库中，模块名为 *ipaddress*
+
+*** 定义地址
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import ipaddr
+  ipv4 = ipaddr.IPNetwork('192.168.33.83/28')
+  ipv6 = ipaddr.IPNetwork('2017:11:AF::17/56')
+  log("ipv4", ipv4)
+  log("ipv6", ipv6)
+#+END_SRC
+
+#+RESULTS:
+: ============ ipv4 ============
+: 192.168.33.83/28
+: ============ ipv6 ============
+: 2017:11:af::17/56
+
+*** 子网掩码
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("ipv4.netmask", ipv4.netmask)
+  log("ipv6.netmask", ipv6.netmask)
+#+END_SRC
+
+#+RESULTS:
+: ======== ipv4.netmask ========
+: 255.255.255.240
+: ======== ipv6.netmask ========
+: ffff:ffff:ffff:ff00::
+
+
+*** 广播地址
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(ipv4.broadcast)
+  print(ipv6.broadcast)
+#+END_SRC
+
+#+RESULTS:
+: 192.168.33.95
+: 2017:11:af:ff:ffff:ffff:ffff:ffff
+
+
+*** 网络地址
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(ipv4.network)
+#+END_SRC
+
+#+RESULTS:
+: 192.168.33.80
+
+
+*** 主机掩码
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(ipv4.hostmask)
+#+END_SRC
+
+#+RESULTS:
+: 0.0.0.15
+
+
+*** 地址包含关系
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("ipaddr.IPAddress('192.168.33.84') in ipv4", ipaddr.IPAddress('192.168.33.84') in ipv4)
+#+END_SRC
+
+#+RESULTS:
+:  ipaddr.IPAddress('192.168.33.84') in ipv4
+: True
+
+
+*** 地址聚合
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  ip_list = []
+  ip_list.append(ipaddr.IPNetwork("192.168.1.0/25"))
+  ip_list.append(ipaddr.IPNetwork("192.168.1.128/25"))
+  ip_list.append(ipaddr.IPNetwork("192.168.0.0/24"))
+  ip_list.append(ipaddr.IPNetwork("192.168.3.0/26"))
+  ip_list.append(ipaddr.IPNetwork("192.168.3.64/26"))
+  print(ipaddr.CollapseAddrList(ip_list))
+#+END_SRC
+
+#+RESULTS:
+: [IPv4Network('192.168.0.0/23'), IPv4Network('192.168.3.0/25')]
+
+
 
 
 * 参考资料
