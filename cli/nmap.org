@@ -1,0 +1,63 @@
+#+TITLE:     Nmap
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS:   h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+STARTUP:   showall
+#+TOC:       headlines 3
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
+ #+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+
+
+
+* 端口状态
+
+- Open
+
+  有应用程序监听该端口
+
+- Close
+
+  没有应用程序监听，端口是关闭的，但 Nmap 可以访问，通常有应用程序负载均衡设备时会出现这个情况
+
+- Filtered
+
+  Nmap 无法确定端口是否开放
+
+- Unfiltered
+
+  Nmap 无法确定端口是否开放，只有用于映射防火墙规则集的 ACK 扫描才会把端口分为此类
+
+- Open|filtered
+
+  Nmap 无法确定是开放的或是被过滤的，在 UDP 与 IP 扫描中较为常见
+
+
+* 基于 ICMP 的 ping 扫描
+
+=nmap -sP 10.74.68.0/24=
+
+*-sP*: 进行 ping 扫描
+
+
+* 基于 ARP 的活跃主机扫描
+
+若服务器开启防火墙，则无法通过 ICMP 的方式探测主机。可以在 *同一个广播域* 中使用 ARP 协议探测：
+
+=nmap -sP -PR 192.168.1.0/24=
+
+
+* 基于 UDP 扫描
+
+=nmap -sU -p 53 1.2.3.4=
+
+
+* 基于 TCP 扫描
+
+=nmap -sT -p 80,443 www.baidu.com=

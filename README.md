@@ -40,6 +40,7 @@
 - [iptables](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/cli/iptables.html)
 - [lsof](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/cli/lsof.html)
 - [netcat](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/cli/netcat.html)
+- [nmap](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/cli/nmap.html)
 - [openssl](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/cli/openssl.html)
 - [ps](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/cli/ps.html)
 - [sed](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/cli/sed.html)
