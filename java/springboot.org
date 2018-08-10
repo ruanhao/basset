@@ -175,6 +175,15 @@
 
 *** 配置
 
+#+BEGIN_SRC xml
+  <dependency>
+    <groupId>ma.glasnost.orika</groupId>
+    <artifactId>orika-core</artifactId>
+    <version>1.5.2</version><!-- or latest version -->
+  </dependency>
+#+END_SRC
+
+
 #+BEGIN_SRC java
   @Configuration
   public class MapperConfig extends ConfigurableMapper {
@@ -208,6 +217,11 @@
   }
 
 #+END_SRC
+
+
+*** 传送门
+
+- [[https://orika-mapper.github.io/orika-docs/advanced-mappings.html][高级映射配置]]
 
 * 实践
 
@@ -642,3 +656,458 @@ HttpMessageConverter 工作于两个方向：
 
 
     #+END_SRC
+
+
+** Springboot Test
+
+*** 样板文件
+
+#+BEGIN_SRC java
+  @RunWith(SpringRunner.class)
+  @SpringBootTest(SpringBootTest.WebEnvironment.MOCK, classes=XxxApplication.class)
+  @AutoConfigureMockMvc
+  @ActiveProfiles("xxx")
+  @TestPropertySource(locations="classpath:xxx.properties")
+  public class ApplicationTest {
+
+      @Test
+      public void test() {
+        // TODO
+      }
+
+  }
+
+#+END_SRC
+
+
+
+*** MockMvc
+
+#+BEGIN_SRC java
+  @Autowired
+  private MockMvc mockMvc;
+
+  @Test
+  public void testHttpMethodWithPathVariable() throws Exception {
+      mockMvc.perform(MockMvcRequestBuilders.get("/hello/{name}", "John"))
+          .andDo(MockMvcResultHandlers.print()) // print request and response
+          .andExpect(MockMvcResultMatchers.status().isOk())
+          .andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+          .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Hello World John!!!"));
+  }
+
+  @Test
+  public void testHttpMethodWithQueryParameters() throws Exception {
+      this.mockMvc.perform(get("/greetWithQueryVariable")
+                           .param("name", "John Doe")
+                           .param("age", "30"))
+          .andDo(MockMvcResultHandlers.print())
+          .andExpect(MockMvcResultMatchers.status().isOk())
+          .andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+          .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Hello World John Doe!!!"));
+  }
+
+
+#+END_SRC
+
+
+*** Hamcrest
+
+=import static org.hamcrest.Matchers.*;=
+
+=import static org.junit.Assert.assertThat;=
+
+**** Core API
+
+- is
+- not
+- anyOf :: assertThat(str, anyOf(startsWith(start), containsString(end)))
+- allOf :: assertThat(str, allOf(startsWith(start), containsString(end)))
+
+
+**** Object Matcher
+
+- hasToString(str) :: To assert that the `toString` method of an Object returns a specified `str`
+- typeCompatibleWith(clazz) :: check that one class is a sub-class of another
+- sameInstance
+- instanceOf
+
+
+**** Bean Matcher
+
+- hasProperty
+- samePropertyValuesAs
+
+
+**** Collection Matcher
+
+- empty
+- hasSize
+- arrayWithSize
+- containsInAnyOrder
+- contains :: in given order
+- hasItemInArray
+- isOneOf / isIn
+- arrayContainingInAnyOrder
+- arrayContaining
+- hasKey
+- hasValue
+- hasEntry
+- everyItem :: assertThat(list, everyItem(greaterThan(0)))
+
+**** Number Matcher
+
+- greaterThan
+- greaterThanOrEqualTo
+- lessThan
+- lessThanOrEqualTo
+- closeTo(pivot, deviation)
+
+
+**** Text Matcher
+
+- isEmptyString
+- isEmptyOrNullString
+- equalToIgnoringWhiteSpace
+- stringContainsInOrder
+- equalToIgnoringCase
+- containsString(str)
+- startsWith(str)
+- endsWith(str)
+- notNullValue
+
+
+*** Mockito
+
+Mock 测试就是在测试过程中，对于某些不容易构造（如 HttpServletRequest 必须在Servlet 容器中才能构造出来）
+或者不容易获取比较复杂的对象（如 JDBC 中的ResultSet 对象），用一个虚拟的对象（Mock 对象）来创建以便测试的测试方法。
+
+Mock 最大的功能是把单元测试的耦合分解开，如果代码对另一个类或者接口有依赖，它能够模拟这些依赖，并帮助验证所调用的依赖的行为。
+
+
+**** Mock 与 Stub 的区别
+
+Mock 不是 Stub，两者是有区别的：
+
+- 前者被称为 mockist TDD，而后者一般称为 classic TDD
+- 前者是基于行为的验证（behavior verification），后者是基于状态的验证 （state verification）
+- 前者使用的是模拟的对象，而后者使用的是真实的对象
+
+
+
+**** 验证行为
+
+#+BEGIN_SRC java
+  //Let's import Mockito statically so that the code looks clearer
+  import static org.mockito.Mockito.*;
+
+  //mock creation
+  List mockedList = mock(List.class);
+
+  //using mock object
+  mockedList.add("one");
+  mockedList.clear();
+
+  //verification
+  verify(mockedList).add("one");
+  verify(mockedList).clear();
+#+END_SRC
+
+一旦创建 mock 将会 *记得所有的交互* 。可以选择验证感兴趣的任何交互。
+
+
+**** 打桩
+
+#+BEGIN_SRC java
+  //You can mock concrete classes, not just interfaces
+  LinkedList mockedList = mock(LinkedList.class);
+
+  //stubbing
+  when(mockedList.get(0)).thenReturn("first");
+  when(mockedList.get(1)).thenThrow(new RuntimeException());
+
+  //following prints "first"
+  System.out.println(mockedList.get(0));
+
+  //following throws runtime exception
+  System.out.println(mockedList.get(1));
+
+  //following prints "null" because get(999) was not stubbed
+  System.out.println(mockedList.get(999));
+#+END_SRC
+
+
+**** 连续调用打桩对象
+
+#+BEGIN_SRC java
+  when(mock.someMethod("some arg"))
+   .thenThrow(new RuntimeException())
+   .thenReturn("foo");
+
+  //First call: throws runtime exception:
+  mock.someMethod("some arg");
+
+  //Second call: prints "foo"
+  System.out.println(mock.someMethod("some arg"));
+
+  //Any consecutive call: prints "foo" as well (last stubbing wins).
+  System.out.println(mock.someMethod("some arg"));
+
+#+END_SRC
+
+#+BEGIN_SRC java
+  when(mock.someMethod("some arg"))
+      .thenReturn("one", "two", "three");
+
+#+END_SRC
+
+
+**** 参数匹配器
+
+#+BEGIN_SRC java
+  //stubbing using built-in anyInt() argument matcher
+  when(mockedList.get(anyInt())).thenReturn("element");
+
+  //stubbing using custom matcher (let's say isValid() returns your own matcher implementation):
+  when(mockedList.contains(argThat(isValid()))).thenReturn("element");
+
+  //following prints "element"
+  System.out.println(mockedList.get(999));
+
+  //you can also verify using an argument matcher
+  verify(mockedList).get(anyInt());
+#+END_SRC
+
+[[https://static.javadoc.io/org.mockito/mockito-core/2.21.0/org/mockito/Matchers.html][更多内置匹配器]]
+
+
+**** 调用次数
+
+#+BEGIN_SRC java
+  //using mock
+  mockedList.add("once");
+
+  mockedList.add("twice");
+  mockedList.add("twice");
+
+  mockedList.add("three times");
+  mockedList.add("three times");
+  mockedList.add("three times");
+
+  //following two verifications work exactly the same - times(1) is used by default
+  verify(mockedList).add("once");
+  verify(mockedList, times(1)).add("once");
+
+  //exact number of invocations verification
+  verify(mockedList, times(2)).add("twice");
+  verify(mockedList, times(3)).add("three times");
+
+  //verification using never(). never() is an alias to times(0)
+  verify(mockedList, never()).add("never happened");
+
+  //verification using atLeast()/atMost()
+  verify(mockedList, atLeastOnce()).add("three times");
+  verify(mockedList, atLeast(2)).add("five times");
+  verify(mockedList, atMost(5)).add("three times");
+#+END_SRC
+
+times(1) 是默认的，因此，使用的 times(1) 可以显示的省略
+
+
+**** 处理异常
+
+#+BEGIN_SRC java
+  doThrow(new RuntimeException()).when(mockedList).clear();
+
+  //following throws RuntimeException:
+  mockedList.clear();
+
+#+END_SRC
+
+
+**** 确保不发生交互
+
+#+BEGIN_SRC java
+  //using mocks - only mockOne is interacted
+  mockOne.add("one");
+
+  //ordinary verification
+  verify(mockOne).add("one");
+
+  //verify that method was never called on a mock
+  verify(mockOne, never()).add("two");
+
+  //verify that other mocks were not interacted
+  verifyZeroInteractions(mockTwo, mockThree);
+#+END_SRC
+
+
+**** 寻找多余交互
+
+#+BEGIN_SRC java
+  //using mocks
+  mockedList.add("one");
+  mockedList.add("two");
+
+  verify(mockedList).add("one");
+
+  //following verification will fail
+  verifyNoMoreInteractions(mockedList);
+#+END_SRC
+
+
+**** 注解
+
+***** 启用注解
+
+#+BEGIN_SRC java
+  @RunWith(MockitoJUnitRunner.class)
+  public class MockitoAnnotationTest {
+
+  }
+#+END_SRC
+
+
+***** @Mock
+
+不使用注解：
+
+#+BEGIN_SRC java
+  @Test
+  public void whenNotUseMockAnnotation_thenCorrect() {
+      List mockList = Mockito.mock(ArrayList.class);
+
+      mockList.add("one");
+      Mockito.verify(mockList).add("one");
+      assertEquals(0, mockList.size());
+
+      Mockito.when(mockList.size()).thenReturn(100);
+      assertEquals(100, mockList.size());
+  }
+#+END_SRC
+
+使用注解：
+
+#+BEGIN_SRC java
+  @Mock
+  List<String> mockedList;
+
+  @Test
+  public void whenUseMockAnnotation_thenMockIsInjected() {
+      mockedList.add("one");
+      Mockito.verify(mockedList).add("one");
+      assertEquals(0, mockedList.size());
+
+      Mockito.when(mockedList.size()).thenReturn(100);
+      assertEquals(100, mockedList.size());
+  }
+#+END_SRC
+
+
+***** @Spy
+
+不使用注解：
+
+#+BEGIN_SRC java
+  @Test
+  public void whenNotUseSpyAnnotation_thenCorrect() {
+      List<String> spyList = Mockito.spy(new ArrayList<String>());
+
+      spyList.add("one");
+      spyList.add("two");
+
+      Mockito.verify(spyList).add("one");
+      Mockito.verify(spyList).add("two");
+
+      assertEquals(2, spyList.size());
+
+      Mockito.doReturn(100).when(spyList).size();
+      assertEquals(100, spyList.size());
+  }
+#+END_SRC
+
+
+使用注解：
+
+#+BEGIN_SRC java
+  @Spy
+  List<String> spiedList = new ArrayList<String>();
+
+  @Test
+  public void whenUseSpyAnnotation_thenSpyIsInjected() {
+      spiedList.add("one");
+      spiedList.add("two");
+
+      Mockito.verify(spiedList).add("one");
+      Mockito.verify(spiedList).add("two");
+
+      assertEquals(2, spiedList.size());
+
+      Mockito.doReturn(100).when(spiedList).size();
+      assertEquals(100, spiedList.size());
+  }
+
+#+END_SRC
+
+
+***** @Captor
+
+不使用注解：
+
+#+BEGIN_SRC java
+  @Test
+  public void whenNotUseCaptorAnnotation_thenCorrect() {
+      List mockList = Mockito.mock(List.class);
+      ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
+
+      mockList.add("one");
+      Mockito.verify(mockList).add(arg.capture());
+
+      assertEquals("one", arg.getValue());
+  }
+
+#+END_SRC
+
+使用注解：
+
+#+BEGIN_SRC java
+  @Mock
+  List mockedList;
+
+  @Captor
+  ArgumentCaptor argCaptor;
+
+  @Test
+  public void whenUseCaptorAnnotation_thenTheSam() {
+      mockedList.add("one");
+      Mockito.verify(mockedList).add(argCaptor.capture());
+
+      assertEquals("one", argCaptor.getValue());
+  }
+
+#+END_SRC
+
+
+***** @InjectMocks
+
+相当于同时使用 @Spy 和 @Mock
+
+#+BEGIN_SRC java
+  @Mock
+  Map<String, String> wordMap;
+
+  @InjectMocks
+  MyDictionary dic = new MyDictionary();
+
+  @Test
+  public void whenUseInjectMocksAnnotation_thenCorrect() {
+      Mockito.when(wordMap.get("aWord")).thenReturn("aMeaning");
+
+      assertEquals("aMeaning", dic.getMeaning("aWord"));
+  }
+
+#+END_SRC
+
+**** 传送门
+
+[[https://www.baeldung.com/tag/mockito/][Baeldung Mockito]]
