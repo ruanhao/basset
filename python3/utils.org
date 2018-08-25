@@ -133,3 +133,84 @@ pyenv 会从当前目录开始向上逐级查找 *.python-version* 文件，直�
   python setup.py bdist_wheel --universal # universal is to creates a py2.py3 wheel
   pip install <wheel-file>
 #+END_SRC
+
+
+* UnitTest
+
+** 范例
+
+*** 基本用法
+
+#+BEGIN_SRC python
+  import unittest
+
+  class TestStringMethods(unittest.TestCase):
+
+      # executed before each test method
+      # If the setUp() method raises an exception while the test is running,
+      # the framework will consider the test to have suffered an error,
+      # and the test method will not be executed.
+      def setUp(self):
+          pass
+
+      # executed after each test method
+      # if setUp() succeeded, tearDown() will be run whether the test method succeeded or not.
+      def tearDown(self):
+          pass
+
+      def test_upper(self):
+          self.assertEqual('foo'.upper(), 'FOO')
+
+      def test_isupper(self):
+          self.assertTrue('FOO'.isupper())
+          self.assertFalse('Foo'.isupper())
+
+      def test_split(self):
+          s = 'hello world'
+          self.assertEqual(s.split(), ['hello', 'world'])
+          # check that s.split fails when the separator is not a string
+          with self.assertRaises(TypeError):
+              s.split(2)
+
+  if __name__ == '__main__':
+      unittest.main()
+#+END_SRC
+
+
+*** Test Suite
+
+#+BEGIN_SRC python
+  def suite():
+      suite = unittest.TestSuite()
+      suite.addTest(WidgetTestCase('test_default_widget_size'))
+      suite.addTest(WidgetTestCase('test_widget_resize'))
+      return suite
+
+  if __name__ == '__main__':
+      runner = unittest.TextTestRunner()
+      runner.run(suite())
+#+END_SRC
+
+#+BEGIN_SRC python
+  from unittest import TestLoader, TestSuite
+  from HtmlTestRunner import HTMLTestRunner
+  import ExampleTest
+  import Example2Test
+
+  example_tests = TestLoader().loadTestsFromTestCase(ExampleTests)
+  example2_tests = TestLoader().loadTestsFromTestCase(Example2Test)
+
+  suite = TestSuite([example_tests, example2_tests])
+
+  runner = HTMLTestRunner(output='example_suite')
+
+  runner.run(suite)
+#+END_SRC
+
+** Command-Line Interface
+
+#+BEGIN_SRC sh
+  python -m unittest test_module1 test_module2
+  python -m unittest test_module.TestClass
+  python -m unittest test_module.TestClass.test_method
+#+END_SRC
