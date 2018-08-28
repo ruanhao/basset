@@ -194,11 +194,11 @@ pyenv 会从当前目录开始向上逐级查找 *.python-version* 文件，直�
 #+BEGIN_SRC python
   from unittest import TestLoader, TestSuite
   from HtmlTestRunner import HTMLTestRunner
-  import ExampleTest
-  import Example2Test
+  import ExampleTestClass
+  import Example2TestClass
 
-  example_tests = TestLoader().loadTestsFromTestCase(ExampleTests)
-  example2_tests = TestLoader().loadTestsFromTestCase(Example2Test)
+  example_tests = TestLoader().loadTestsFromTestCase(ExampleTestsClass)
+  example2_tests = TestLoader().loadTestsFromTestCase(Example2TestClass)
 
   suite = TestSuite([example_tests, example2_tests])
 
@@ -214,3 +214,71 @@ pyenv 会从当前目录开始向上逐级查找 *.python-version* 文件，直�
   python -m unittest test_module.TestClass
   python -m unittest test_module.TestClass.test_method
 #+END_SRC
+
+
+* Logging
+
+** 处理逻辑
+
+#+BEGIN_SRC plantuml :file img/logging_logic.png :eval never-export
+start
+: logger.info("Hello, %s", name);
+if (Is this logger enable for the level?) then (yes)
+    : Create LogRecord;
+    if (The record is loggable by consulting all the logger filters?) then (yes)
+        : Pass a record to all relevant handlers (callHandlers);
+    endif
+endif
+stop
+
+#+END_SRC
+
+#+RESULTS:
+[[file:img/logging_logic.png]]
+
+
+*** callHandlers 逻辑
+
+#+BEGIN_SRC python
+  def callHandlers(self, record):
+      """
+      Pass a record to all relevant handlers.
+
+      Loop through all handlers for this logger and its parents in the
+      logger hierarchy. If no handler was found, output a one-off error
+      message to sys.stderr. Stop searching up the hierarchy whenever a
+      logger with the "propagate" attribute set to zero is found - that
+      will be the last logger whose handlers are called.
+      """
+      c = self
+      found = 0
+      while c:
+          for hdlr in c.handlers:
+              found = found + 1
+              if record.levelno >= hdlr.level:
+                  hdlr.handle(record)
+          if not c.propagate:
+              c = None    #break out
+          else:
+              c = c.parent
+      if (found == 0):
+          if lastResort:
+              if record.levelno >= lastResort.level:
+                  lastResort.handle(record)
+          elif raiseExceptions and not self.manager.emittedNoHandlerWarning:
+              sys.stderr.write("No handlers could be found for logger"
+                               " \"%s\"\n" % self.name)
+              self.manager.emittedNoHandlerWarning = True
+#+END_SRC
+
+
+**** Handler 处理逻辑
+
+file:img/handler_logic.png
+
+
+
+** 传送门
+
+- [[https://gist.github.com/mariocj89/73824162a3e35d50db8e758a42e39aab][Understanding logging in Python]]
+- [[https://docs.python.org/3/howto/logging-cookbook.html][Logging Cookbook]]
