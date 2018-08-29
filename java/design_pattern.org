@@ -14,109 +14,86 @@
 | Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
 #+HTML: </div>
 
+* 行为型模式
 
+** 策略模式
 
-* 策略模式
-
-** 模式定义
+*** 模式定义
 
 策略模式封装了了算法族（行为族），使它们之间可以相互替换，此模式让算法的变化独立于使用算法的客户。
 
-** 非模式设计
+*** UML
 
-#+BEGIN_SRC plantuml :file img/without-strategy.png :eval never-export
-abstract class Duck {
-    {abstract} display()
-}
+#+HTML: <img src="https://www.dofactory.com/images/diagrams/net/strategy.gif"/>
 
-interface Flyable {
-    fly()
-}
+*** Participants
 
-interface Quackable {
-    quack()
-}
-
-' class MallardDuck {
-'     display()
-'     fly()
-'     quack()
-' }
-'
-' class RedheadDuck {
-'     display()
-'     fly()
-'     quack()
-' }
-'
-' class RubberDuck {
-'     display()
-'     quack()
-' }
-'
-' class DecoyDuck {
-'     display()
-' }
-
-Duck <|-- MallardDuck
-Duck <|-- RedheadDuck
-Duck <|-- RubberDuck
-Duck <|-- DecoyDuck
-
-Flyable <|.. MallardDuck
-Flyable <|.. RedheadDuck
-
-Quackable <|.. MallardDuck
-Quackable <|.. RedheadDuck
-Quackable <|.. RubberDuck
-#+END_SRC
-
-#+RESULTS:
-[[file:img/without-strategy.png]]
+- Strategy  (SortStrategy)
+  - declares an interface common to all supported algorithms. Context uses this interface to call the algorithm defined by a ConcreteStrategy
+- ConcreteStrategy  (QuickSort, ShellSort, MergeSort)
+  - implements the algorithm using the Strategy interface
+- Context  (SortedList)
+  - is configured with a ConcreteStrategy object
+  - maintains a reference to a Strategy object
+  - may define an interface that lets Strategy access its data.
 
 
-** 模式设计
-
-#+BEGIN_SRC plantuml :file img/with-strategy.png :eval never-export
-package "客户" <<Rectangle>> {
-    abstract class Duck {
-
-        FlyBehavior flyBehavior
-        QuackBehavior quackBehavior
-
-        {abstract} display()
-        performQuack()
-        performFly()
-        setFlyBehavior()
-        setQuackBehavior()
-    }
-
-    Duck <|-- MallardDuck
-    Duck <|-- RedheadDuck
-    Duck <|-- RubberDuck
-    Duck <|-- DecoyDuck
-}
 
 
-package "封装飞行行为" <<Rectangle>> {
-    interface FlyBehavior {
-        fly()
-    }
+* 创建型模式
 
-    FlyBehavior <|.. FlyWithWings
-    FlyBehavior <|.. FlyNoWay
-}
+** 工厂方法模式
 
-package "封装呱呱叫行为" <<Rectangle>> {
-    interface QuackBehavior {
-        quack()
-    }
+*** 模式定义
 
-    QuackBehavior <|.. Quack
-    QuackBehavior <|.. Squeak
-    QuackBehavior <|.. MuteQuack
-}
-#+END_SRC
+定义了一个创建对象的接口，由子类决定要实例化哪个具体类。该模式将实例化类的任务委托给子类。
 
-#+RESULTS:
-[[file:img/with-strategy.png]]
+
+*** UML
+
+#+HTML: <img src="https://www.dofactory.com/images/diagrams/net/factory.gif"/>
+
+- 创建者（Creator）类
+  抽象类，定义一个 *抽象的工厂方法* ，子类实现此方法制造产品。创建者通常会包含依赖于抽象产品的代码，而这些抽象产品由子类制造。创建者不需要知道具体产品类型。
+
+
+*** Participants
+
+- Product  (Page)
+  - defines the interface of objects the factory method creates
+- ConcreteProduct  (SkillsPage, EducationPage, ExperiencePage)
+  - implements the Product interface
+- Creator  (Document)
+  - declares the factory method, which returns an object of type Product. Creator may also define a default implementation of the factory method that returns a default ConcreteProduct object.
+  - may call the factory method to create a Product object.
+- ConcreteCreator  (Report, Resume)
+  - overrides the factory method to return an instance of a ConcreteProduct.
+
+
+
+** 抽象工厂模式
+
+*** 模式定义
+
+提供一个接口，用于创建一个 *创建对象的家族* 。
+
+换句话说，该模式的任务是定义一个负责创建一组产品的接口。
+
+*** UML
+
+#+HTML: <img src="https://www.dofactory.com/images/diagrams/net/abstract.gif"/>
+
+*** Participants
+
+
+- AbstractFactory  (ContinentFactory)
+  - declares an interface for operations that create abstract products
+- ConcreteFactory   (AfricaFactory, AmericaFactory)
+  - implements the operations to create concrete product objects
+- AbstractProduct   (Herbivore, Carnivore)
+  - declares an interface for a type of product object
+- Product  (Wildebeest, Lion, Bison, Wolf)
+  - defines a product object to be created by the corresponding concrete factory
+  - implements the AbstractProduct interface
+- Client  (AnimalWorld)
+  - uses interfaces declared by AbstractFactory and AbstractProduct classes
