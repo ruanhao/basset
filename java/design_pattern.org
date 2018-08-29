@@ -1,0 +1,122 @@
+#+TITLE:     设计模式
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS:   h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+STARTUP:   showall
+#+TOC:       headlines 3
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
+ #+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+
+
+
+* 策略模式
+
+** 模式定义
+
+策略模式封装了了算法族（行为族），使它们之间可以相互替换，此模式让算法的变化独立于使用算法的客户。
+
+** 非模式设计
+
+#+BEGIN_SRC plantuml :file img/without-strategy.png :eval never-export
+abstract class Duck {
+    {abstract} display()
+}
+
+interface Flyable {
+    fly()
+}
+
+interface Quackable {
+    quack()
+}
+
+' class MallardDuck {
+'     display()
+'     fly()
+'     quack()
+' }
+'
+' class RedheadDuck {
+'     display()
+'     fly()
+'     quack()
+' }
+'
+' class RubberDuck {
+'     display()
+'     quack()
+' }
+'
+' class DecoyDuck {
+'     display()
+' }
+
+Duck <|-- MallardDuck
+Duck <|-- RedheadDuck
+Duck <|-- RubberDuck
+Duck <|-- DecoyDuck
+
+Flyable <|.. MallardDuck
+Flyable <|.. RedheadDuck
+
+Quackable <|.. MallardDuck
+Quackable <|.. RedheadDuck
+Quackable <|.. RubberDuck
+#+END_SRC
+
+#+RESULTS:
+[[file:img/without-strategy.png]]
+
+
+** 模式设计
+
+#+BEGIN_SRC plantuml :file img/with-strategy.png :eval never-export
+package "客户" <<Rectangle>> {
+    abstract class Duck {
+
+        FlyBehavior flyBehavior
+        QuackBehavior quackBehavior
+
+        {abstract} display()
+        performQuack()
+        performFly()
+        setFlyBehavior()
+        setQuackBehavior()
+    }
+
+    Duck <|-- MallardDuck
+    Duck <|-- RedheadDuck
+    Duck <|-- RubberDuck
+    Duck <|-- DecoyDuck
+}
+
+
+package "封装飞行行为" <<Rectangle>> {
+    interface FlyBehavior {
+        fly()
+    }
+
+    FlyBehavior <|.. FlyWithWings
+    FlyBehavior <|.. FlyNoWay
+}
+
+package "封装呱呱叫行为" <<Rectangle>> {
+    interface QuackBehavior {
+        quack()
+    }
+
+    QuackBehavior <|.. Quack
+    QuackBehavior <|.. Squeak
+    QuackBehavior <|.. MuteQuack
+}
+#+END_SRC
+
+#+RESULTS:
+[[file:img/with-strategy.png]]
