@@ -14,11 +14,46 @@
 | Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
 #+HTML: </div>
 
+* 面向对象设计原则
+
+* 各类模式设计目的
+
+- 装饰者模式 :: 不改变接口，但加入责任
+- 适配器模式 :: 将一个接口转成另一个接口
+- 外观模式 :: 让接口更简单
+- 模板方法模式 :: 子类决定如何实现算法中的步骤
+- 策略模式 :: 封装可互换的行为，然后使用委托来决定要采用哪一个行为
+- 工厂方法模式 :: 由子类决定实例化哪个具体类
+
+
 * 结构型模式
+
+** 适配器模式
+
+*** 定义
+
+将一个类的接口，转换成客户期望的另一个接口。让原本接口不兼容的类可以合作无间。
+
+*** UML
+
+#+HTML: <img src="https://www.dofactory.com/images/diagrams/net/adapter.gif"/>
+
+
+**** Participants
+
+- Target   (ChemicalCompound)
+  - defines the domain-specific interface that Client uses.
+- Adapter   (Compound)
+  - adapts the interface Adaptee to the Target interface.
+- Adaptee   (ChemicalDatabank)
+  - defines an existing interface that needs adapting.
+- Client   (AdapterApp)
+  - collaborates with objects conforming to the Target interface.
+
 
 ** 装饰者模式
 
-*** 模式定义
+*** 定义
 
 #+BEGIN_EXAMPLE
   动态地将责任附加到对象上。当需要扩展时，使用该模式比使用继承更有弹性。
@@ -35,7 +70,7 @@
 #+HTML: <img src="https://www.dofactory.com/images/diagrams/net/decorator.gif"/>
 
 
-*** Participants
+**** Participants
 
 - Component   (LibraryItem)
   - defines the interface for objects that can have responsibilities added to them dynamically.
@@ -47,11 +82,74 @@
   - adds responsibilities to the component.
 
 
+** 外观模式
+
+*** 定义
+
+提供一个统一的接口，用来访问子系统中的一群接口。
+
+外观定义了一个高层接口，让子系统更容易使用，即 *简化接口* 。
+
+
+*** UML
+
+#+HTML: <img src="https://www.dofactory.com/images/diagrams/net/facade.gif"/>
+
+
+**** Participants
+
+- Facade   (MortgageApplication)
+  - knows which subsystem classes are responsible for a request.
+  - delegates client requests to appropriate subsystem objects.
+- Subsystem classes   (Bank, Credit, Loan)
+  - implement subsystem functionality.
+  - handle work assigned by the Facade object.
+  - have no knowledge of the facade and keep no reference to it.
+
+
+
+
+
+
 * 行为型模式
+
+** 命令模式
+
+*** 定义
+
+将 =请求= 封装成对象，当需要将发出请求的对象和执行请求的对象解耦的时候，使用命令模式。
+
+*** UML
+
+#+HTML: <img src="https://www.dofactory.com/images/diagrams/net/command.gif"/>
+
+**** Participants
+
+- Command  (Command)
+  - declares an interface for executing an operation
+- ConcreteCommand  (CalculatorCommand)
+  - defines a binding between a Receiver object and an action
+  - implements Execute by invoking the corresponding operation(s) on Receiver
+- Client  (CommandApp)
+  - creates a ConcreteCommand object and sets its receiver
+- Invoker  (User)
+  - asks the command to carry out the request
+- Receiver  (Calculator)
+  - knows how to perform the operations associated with carrying out the request.
+
+*** 命令模式与策略模式的区别
+
+- 策略模式是通过不同的算法做同一件事情，而命令模式则是通过不同的命令做不同的事情，常含有接收者。设计目标不同
+- 命令模式含有不同的命令，隐藏接收者执行细节，做不同的事情；而策略模式含有不同的算法，做相同的事情
+- 命令模式含有接收者，策略模式不含有
+- 命令模式中的命令可以单独运行
+
+
+
 
 ** 观察者模式
 
-*** 模式定义
+*** 定义
 
 定义了对象间一对多的依赖，当一个对象改变状态时，它的所有依赖者都会收到通知并自动更新。
 
@@ -60,7 +158,7 @@
 #+HTML: <img src="https://www.dofactory.com/images/diagrams/net/observer.gif"/>
 
 
-*** Participants
+**** Participants
 
 - Subject  (Stock)
   - knows its observers. Any number of Observer objects may observe a subject
@@ -80,7 +178,7 @@
 
 ** 策略模式
 
-*** 模式定义
+*** 定义
 
 策略模式封装了了算法族（行为族），使它们之间可以相互替换，此模式让算法的变化独立于使用算法的客户。
 
@@ -88,7 +186,7 @@
 
 #+HTML: <img src="https://www.dofactory.com/images/diagrams/net/strategy.gif"/>
 
-*** Participants
+**** Participants
 
 - Strategy  (SortStrategy)
   - declares an interface common to all supported algorithms. Context uses this interface to call the algorithm defined by a ConcreteStrategy
@@ -102,11 +200,40 @@
 
 
 
+** 模板方法模式
+
+*** 定义
+
+在一个方法中定义一个算法的骨架，而将一些步骤延迟到子类中。模板方法使得子类可以在不改变算法结构的情况下，重新定义算法中的某些步骤。
+
+
+*** 代码示例
+
+#+BEGIN_SRC java
+  public abstract class TemplateMethodClass {
+      void final templateMethod() {
+          primitiveOperation1();
+          primitiveOperation2();
+          concreteOperation();
+          hook();
+      }
+
+      abstract void primitiveOperation1();
+
+      abstract void primitiveOperation2();
+
+      final void concreteOperation() {}
+
+      void hook() {}
+
+  }
+#+END_SRC
+
 * 创建型模式
 
 ** 单例模式
 
-*** 模式定义
+*** 定义
 
 确保一个类只有一个实例，并提供一个全局访问点。
 
@@ -115,7 +242,7 @@
 #+HTML: <img src="https://www.dofactory.com/images/diagrams/net/singleton.gif"/>
 
 
-*** Participants
+**** Participants
 
 - Singleton   (LoadBalancer)
   - defines an Instance operation that lets clients access its unique instance. Instance is a class operation.
@@ -162,7 +289,7 @@
 
 ** 工厂方法模式
 
-*** 模式定义
+*** 定义
 
 定义了一个创建对象的接口，由子类决定要实例化哪个具体类。该模式将实例化类的任务委托给子类。
 
@@ -177,7 +304,7 @@
   抽象类，定义一个 *抽象的工厂方法* ，子类实现此方法制造产品。创建者通常会包含依赖于抽象产品的代码，而这些抽象产品由子类制造。创建者不需要知道具体产品类型。
 
 
-*** Participants
+**** Participants
 
 - Product  (Page)
   - defines the interface of objects the factory method creates
@@ -193,7 +320,7 @@
 
 ** 抽象工厂模式
 
-*** 模式定义
+*** 定义
 
 提供一个接口，用于创建一个 *创建对象的家族* 。
 
@@ -203,7 +330,7 @@
 
 #+HTML: <img src="https://www.dofactory.com/images/diagrams/net/abstract.gif"/>
 
-*** Participants
+**** Participants
 
 
 - AbstractFactory  (ContinentFactory)
