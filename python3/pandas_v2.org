@@ -1,0 +1,1019 @@
+#+TITLE:     Pandas
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS:   h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+STARTUP:   showall
+#+TOC:       headlines 4
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
+#+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+
+#+BEGIN_SRC ipython :session :exports none :eval never-export
+  #! /usr/bin/env python3
+  # -*- coding: utf-8 -*-
+
+
+  import pandas as pd
+  import numpy as np
+  import matplotlib.pyplot as plt
+  import subprocess
+  from PIL import Image
+
+  def run_script(script):
+      """Returns (stdout, stderr), raises error on non-zero return code"""
+      proc = subprocess.Popen(['bash', '-c', script],
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                              stdin=subprocess.PIPE)
+      stdout, stderr = proc.communicate()
+      if proc.returncode:
+          raise Exception('exit code %s' % proc.returncode)
+      return stdout, stderr
+
+  def show_dataframe(df):
+      global path
+      df.to_html("/tmp/df.html")
+      run_script('webkit2png -F --transparent /tmp/df.html -D /tmp -o df')
+      # try:
+      #     subprocess.call('webkit2png -F --transparent /tmp/df.html -D /tmp -o df', shell=True, timeout=5)
+      # except:
+      #     pass
+      image = Image.open('/tmp/df-full.png')
+      box = image.getbbox()
+      cropped = image.crop(box)
+      image.close()
+      w = cropped.size[0]
+      h = cropped.size[1]
+      ratio = 0.618
+      cropped.thumbnail((int(w*ratio), int(h*ratio)), Image.ANTIALIAS)
+      cropped.save(path)
+      cropped.close()
+
+  def plot():
+      global path
+      plt.savefig(path)
+      plt.clf()
+
+  def show_fig(o):
+      global path
+      plt.clf()
+      o.plot()
+      plt.savefig(path)
+
+
+  def log(title0, value):
+      title1 = ' ' + title0 + ' '
+      print("{}\n{}".format(title1.center(80, '='), value))
+#+END_SRC
+
+#+RESULTS:
+: # Out[1]:
+
+* 核心数据结构
+
+** 索引对象
+
+Pandas 中的索引对象适用于存储标签和其他元数据的。
+
+索引对象是不可变的。
+
+[[index obj][常见方法和属性]]
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series(range(3), index=list('abc'))
+  index = s.index
+  log("index", index)
+  log("index[1:]", index[1:])
+  try:
+      index[1] = 'd' # TypeError
+  except Exception as e:
+      log("TypeError", e)
+#+END_SRC
+
+#+RESULTS:
+: ==================================== index =====================================
+: Index(['a', 'b', 'c'], dtype='object')
+: ================================== index[1:] ===================================
+: Index(['b', 'c'], dtype='object')
+: ================================== TypeError ===================================
+: Index does not support mutable operations
+
+
+
+
+** Panel
+
+Panel 是三维带标签的数组。
+
+Panel 由三个标签组成：
+
+- items :: 坐标轴 0 ，索引对应的元素是一个 DataFrame
+- major_axis :: 坐标轴 1 , DataFrame 里的行标签
+- minor_axis :: 坐标轴 2 , DataFrame 里的列标签
+
+
+
+** Series
+
+Series 是一维带标签的数组，数组里可以放任意的数据（整数，浮点数，字符串，Python Object）。
+
+其基本的创建函数是： =pd.Series(data, index=index)=
+
+其中 index 是一个列表，用来作为数据的标签。data 可以是不同的数据类型：
+
+- Python 字典
+- ndarray 对象
+- 一个标量值，如 5
+
+
+*** 创建
+
+**** 从 ndarray 创建
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series(np.random.randn(5), index=['a', 'b', 'c', 'd', 'e'])
+  log("s", s)
+  log("s.index", s.index)
+  s2 = pd.Series(np.random.randn(5))
+  log("s2", s2)
+  log("s2.index", s2.index)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== s =======================================
+a   -0.701251
+b    1.857044
+c   -0.775307
+d    0.652000
+e    1.178334
+dtype: float64
+=================================== s.index ====================================
+Index(['a', 'b', 'c', 'd', 'e'], dtype='object')
+====================================== s2 ======================================
+0    0.393573
+1   -0.042283
+2    0.557877
+3    2.094997
+4    0.671984
+dtype: float64
+=================================== s2.index ===================================
+RangeIndex(start=0, stop=5, step=1)
+#+end_example
+
+
+**** 从字典创建
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  d = {'a' : 0., 'b' : 1., 'd' : 3}
+  s = pd.Series(d, index=list('abcd'))
+  log("s", s)
+#+END_SRC
+
+#+RESULTS:
+: ====================================== s =======================================
+: a    0.0
+: b    1.0
+: c    NaN
+: d    3.0
+: dtype: float64
+
+
+**** 从标量创建
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series(3, index=list('abcde'))
+  log("s", s)
+#+END_SRC
+
+#+RESULTS:
+: ====================================== s =======================================
+: a    3
+: b    3
+: c    3
+: d    3
+: e    3
+: dtype: int64
+
+
+*** 操作
+
+**** 赋值
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series([4, 7, -5, 3], index=['d', 'b', 'a', 'c'])
+  log("s", s)
+  s['b':'a'] = 5
+  log("s", s)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== s =======================================
+d    4
+b    7
+a   -5
+c    3
+dtype: int64
+====================================== s =======================================
+d    4
+b    5
+a    5
+c    3
+dtype: int64
+#+end_example
+
+
+**** 与标量相乘
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series([4, 7, -5, 3], index=['d', 'b', 'a', 'c'])
+  log("s * 2", s * 2)
+#+END_SRC
+
+#+RESULTS:
+: ==================================== s * 2 =====================================
+: d     8
+: b    14
+: a   -10
+: c     6
+: dtype: int64
+
+
+
+**** 应用数学函数
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series([4, 7, -5, 3], index=['d', 'b', 'a', 'c'])
+  log("np.exp(s)", np.exp(s))
+#+END_SRC
+
+#+RESULTS:
+: ================================== np.exp(s) ===================================
+: d      54.598150
+: b    1096.633158
+: a       0.006738
+: c      20.085537
+: dtype: float64
+
+
+**** 在字典上下文中使用
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series([4, 7, -5, 3], index=['d', 'b', 'a', 'c'])
+  log("'b' in s", 'b' in s)
+  log("'e' in s", 'e' in s)
+  log("7 in s", 7 in s)
+#+END_SRC
+
+#+RESULTS:
+: =================================== 'b' in s ===================================
+: True
+: =================================== 'e' in s ===================================
+: False
+: ==================================== 7 in s ====================================
+: False
+
+
+**** 检查缺失数据
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  data = {'Ohio': 35000, 'Texas': 71000, 'Oregon': 16000, 'Utah': 5000}
+  states = ['California', 'Ohio', 'Oregon', 'Texas']
+  s = pd.Series(data, index=states)
+  log("s", s)
+  log("s.isnull()", s.isnull())
+  log("s.notnull()", s.notnull())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== s =======================================
+California        NaN
+Ohio          35000.0
+Oregon        16000.0
+Texas         71000.0
+dtype: float64
+================================== s.isnull() ==================================
+California     True
+Ohio          False
+Oregon        False
+Texas         False
+dtype: bool
+================================= s.notnull() ==================================
+California    False
+Ohio           True
+Oregon         True
+Texas          True
+dtype: bool
+#+end_example
+
+
+
+
+*** 索引
+
+**** 设置对象自身和索引的 name 属性
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  data = {'Ohio': 35000, 'Texas': 71000, 'Oregon': 16000, 'Utah': 5000}
+  states = ['California', 'Ohio', 'Oregon', 'Texas']
+  s = pd.Series(data, index=states)
+  s.name = 'population'
+  s.index.name = 'state'
+  log("s", s)
+#+END_SRC
+
+#+RESULTS:
+: ====================================== s =======================================
+: state
+: California        NaN
+: Ohio          35000.0
+: Oregon        16000.0
+: Texas         71000.0
+: Name: population, dtype: float64
+
+
+**** 获取值和索引
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series(np.random.randn(5), index=['a', 'b', 'c', 'd', 'e'])
+  log("s", s)
+  log("s.values", s.values)
+  log("s.index", s.index)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== s =======================================
+a    0.007460
+b   -0.346364
+c   -1.524387
+d   -0.389066
+e    0.464790
+dtype: float64
+=================================== s.values ===================================
+[ 0.00745967 -0.34636371 -1.52438655 -0.38906608  0.46479046]
+=================================== s.index ====================================
+Index(['a', 'b', 'c', 'd', 'e'], dtype='object')
+#+end_example
+
+
+**** 索引对齐
+
+相同索引值才进行操作
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s1 = pd.Series(np.random.randint(3, size=3), index=['a', 'c', 'e'])
+  s2 = pd.Series(np.random.randint(3, size=3), index=['a', 'd', 'e'])
+  log("s1", s1)
+  log("s2", s2)
+  log("s1 + s2", s1 + s2)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== s1 ======================================
+a    1
+c    0
+e    1
+dtype: int64
+====================================== s2 ======================================
+a    1
+d    1
+e    0
+dtype: int64
+=================================== s1 + s2 ====================================
+a    2.0
+c    NaN
+d    NaN
+e    1.0
+dtype: float64
+#+end_example
+
+
+**** 重建索引
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series([4.5, 7.2, -5.3, 3.6], index=['d', 'b', 'a', 'c'])
+  log("s", s)
+  log("s.reindex(['a', 'b', 'c', 'd', 'e'])", s.reindex(['a', 'b', 'c', 'd', 'e']))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== s =======================================
+d    4.5
+b    7.2
+a   -5.3
+c    3.6
+dtype: float64
+===================== s.reindex(['a', 'b', 'c', 'd', 'e']) =====================
+a   -5.3
+b    7.2
+c    3.6
+d    4.5
+e    NaN
+dtype: float64
+#+end_example
+
+重建索引时插值: ([[reindex][reindex 方法的参数]])
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series(['blue', 'purple', 'yellow'], index=[0, 2, 4])
+  log("s", s)
+  log("s.reindex(range(6), method='ffill')", s.reindex(range(6), method='ffill'))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== s =======================================
+0      blue
+2    purple
+4    yellow
+dtype: object
+===================== s.reindex(range(6), method='ffill') ======================
+0      blue
+1      blue
+2    purple
+3    purple
+4    yellow
+5    yellow
+dtype: object
+#+end_example
+
+
+
+**** 删除索引
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series(np.arange(5.), index=list('abcde'))
+  log("s", s)
+  log("s.drop('c')", s.drop('c'))
+  log("s.drop(['d', 'c'])", s.drop(['d', 'c']))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== s =======================================
+a    0.0
+b    1.0
+c    2.0
+d    3.0
+e    4.0
+dtype: float64
+================================= s.drop('c') ==================================
+a    0.0
+b    1.0
+d    3.0
+e    4.0
+dtype: float64
+============================== s.drop(['d', 'c']) ==============================
+a    0.0
+b    1.0
+e    4.0
+dtype: float64
+#+end_example
+
+
+**** 标签索引
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series([4, 7, -5, 3], index=['a', 'b', 'c', 'd'])
+  log("s", s)
+  log("s['a']", s['a'])
+  s['d'] = 6
+  log("s[['c', 'a', 'd']]", s[['c', 'a', 'd']])
+  log("s['b' : 'c']", s['b' : 'c'])
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== s =======================================
+a    4
+b    7
+c   -5
+d    3
+dtype: int64
+==================================== s['a'] ====================================
+4
+============================== s[['c', 'a', 'd']] ==============================
+c   -5
+a    4
+d    6
+dtype: int64
+================================= s['b' : 'c'] =================================
+b    7
+c   -5
+dtype: int64
+#+end_example
+
+
+
+
+**** 布尔索引
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series([4, 7, -5, 3], index=['d', 'b', 'a', 'c'])
+  log("s[s > 0]", s[s > 0])
+#+END_SRC
+
+#+RESULTS:
+: =================================== s[s > 0] ===================================
+: d    4
+: b    7
+: c    3
+: dtype: int64
+
+
+
+** DataFrame
+
+DataFrame 是 *二维带行索引和列索引的矩阵* 。
+
+可以把 DataFrame 想象成一个包含 _已排序的列_ 的集合。
+
+创建 DataFrame 的基本格式是：
+
+#+BEGIN_SRC ipython
+  pd.DataFrame(data, index=index, columns=columns)
+#+END_SRC
+
+其中 index 是行标签，=columns= 是列标签，=data= 可以是下面的数据：
+
+- 由一维 numpy 数组，list，Series 构成的字典
+- 二维 numpy 数组
+- 一个 Series
+- 另外的 DataFrame 对象
+
+
+*** 创建
+
+
+*** 操作
+
+**** 转置
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  data = {'Nevada': {2001: 2.4, 2002: 2.9},
+          'Ohio': {2001: 1.5, 2001: 1.7, 2002: 3.6}}
+  df = pd.DataFrame(data)
+  log("df", df)
+  log("df.T", df.T)
+#+END_SRC
+
+#+RESULTS:
+: ====================================== df ======================================
+:       Nevada  Ohio
+: 2001     2.4   1.7
+: 2002     2.9   3.6
+: ===================================== df.T =====================================
+:         2001  2002
+: Nevada   2.4   2.9
+: Ohio     1.7   3.6
+
+
+**** 算数运算填充
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df1 = pd.DataFrame(np.arange(12.).reshape((3, 4)),
+                     columns=list('abcd'))
+
+  df2 = pd.DataFrame(np.arange(20.).reshape((4, 5)),
+                     columns=list('abcde'))
+
+  log("df1", df1)
+  log("df2", df2)
+  log("df1 + df2", df1 + df2)
+  log("df1.add(df2, fill_value=0)", df1.add(df2, fill_value=0))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+===================================== df1 ======================================
+     a    b     c     d
+0  0.0  1.0   2.0   3.0
+1  4.0  5.0   6.0   7.0
+2  8.0  9.0  10.0  11.0
+===================================== df2 ======================================
+      a     b     c     d     e
+0   0.0   1.0   2.0   3.0   4.0
+1   5.0   6.0   7.0   8.0   9.0
+2  10.0  11.0  12.0  13.0  14.0
+3  15.0  16.0  17.0  18.0  19.0
+================================== df1 + df2 ===================================
+      a     b     c     d   e
+0   0.0   2.0   4.0   6.0 NaN
+1   9.0  11.0  13.0  15.0 NaN
+2  18.0  20.0  22.0  24.0 NaN
+3   NaN   NaN   NaN   NaN NaN
+========================== df1.add(df2, fill_value=0) ==========================
+      a     b     c     d     e
+0   0.0   2.0   4.0   6.0   4.0
+1   9.0  11.0  13.0  15.0   9.0
+2  18.0  20.0  22.0  24.0  14.0
+3  15.0  16.0  17.0  18.0  19.0
+#+end_example
+
+**** 列赋值
+
+当将列表或数组赋值给一个列时，长度必须和 DataFrame 的长度相匹配。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada', 'Nevada'],
+          'year': [2000, 2001, 2002, 2001, 2002, 2003],
+          'pop': [1.5, 1.7, 3.6, 2.4, 2.9, 3.2]}
+  columns = ['year', 'state', 'pop']
+  index = ['one', 'two', 'three', 'four', 'five', 'six']
+  df = pd.DataFrame(data, columns=columns, index=index)
+  df['debt'] = 16.5 # 标量赋值
+  df['income'] = np.arange(6.) # 数组赋值
+  log("df", df)
+#+END_SRC
+
+#+RESULTS:
+: ====================================== df ======================================
+:        year   state  pop  debt  income
+: one    2000    Ohio  1.5  16.5     0.0
+: two    2001    Ohio  1.7  16.5     1.0
+: three  2002    Ohio  3.6  16.5     2.0
+: four   2001  Nevada  2.4  16.5     3.0
+: five   2002  Nevada  2.9  16.5     4.0
+: six    2003  Nevada  3.2  16.5     5.0
+
+
+将 Series 赋值给一列时，Series 的索引会按照 DataFrame 的索引重新排列。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  val = pd.Series([-1.2, -1.5, -1.7], index=['two', 'four', 'five'])
+  df['debt'] = val
+  log("df", df)
+#+END_SRC
+
+#+RESULTS:
+: ====================================== df ======================================
+:        year   state  pop  debt  income
+: one    2000    Ohio  1.5   NaN     0.0
+: two    2001    Ohio  1.7  -1.2     1.0
+: three  2002    Ohio  3.6   NaN     2.0
+: four   2001  Nevada  2.4  -1.5     3.0
+: five   2002  Nevada  2.9  -1.7     4.0
+: six    2003  Nevada  3.2   NaN     5.0
+
+
+**** 删除列
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada', 'Nevada'],
+          'year': [2000, 2001, 2002, 2001, 2002, 2003],
+          'pop': [1.5, 1.7, 3.6, 2.4, 2.9, 3.2]}
+  columns = ['year', 'state', 'pop']
+  index = ['one', 'two', 'three', 'four', 'five', 'six']
+  df = pd.DataFrame(data, columns=columns, index=index)
+  del df['pop']
+  yearSeries = df.pop('year')
+  df.drop('state', axis='columns', inplace=True)
+  log("df", df)
+#+END_SRC
+
+#+RESULTS:
+: ====================================== df ======================================
+: Empty DataFrame
+: Columns: []
+: Index: [one, two, three, four, five, six]
+
+
+
+*** 索引
+
+**** 设置行/列索引的 name 属性
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  data = {'Nevada': {2001: 2.4, 2002: 2.9},
+          'Ohio': {2001: 1.5, 2001: 1.7, 2002: 3.6}}
+  df = pd.DataFrame(data)
+  df.index.name = 'year'
+  df.columns.name = 'state'
+  log("df", df)
+#+END_SRC
+
+#+RESULTS:
+: ====================================== df ======================================
+: state  Nevada  Ohio
+: year
+: 2001      2.4   1.7
+: 2002      2.9   3.6
+
+
+**** 重建索引
+
+在 DataFrame 中， =reindex= 可以改变行索引，列索引，也可以同时改变两者。
+
+=fill method= 只对行重新索引有效，不适用列。
+
+[[reindex][reindex 方法的参数]]
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame(np.arange(9).reshape((3,3)),
+                    index=list('acd'),
+                    columns=['Ohio', 'Texas', 'California'])
+  log("df", df)
+  # 重建行索引
+  log("df.reindex(['a', 'b', 'c', 'd'])", df.reindex(['a', 'b', 'c', 'd']))
+  # 重建列索引
+  states = ['Texas', 'Utah', 'California']
+  log("df.reindex(columns=states)", df.reindex(columns=states))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+   Ohio  Texas  California
+a     0      1           2
+c     3      4           5
+d     6      7           8
+======================= df.reindex(['a', 'b', 'c', 'd']) =======================
+   Ohio  Texas  California
+a   0.0    1.0         2.0
+b   NaN    NaN         NaN
+c   3.0    4.0         5.0
+d   6.0    7.0         8.0
+========================== df.reindex(columns=states) ==========================
+   Texas  Utah  California
+a      1   NaN           2
+c      4   NaN           5
+d      7   NaN           8
+#+end_example
+
+
+**** 索引对齐
+
+行和列都会执行对齐操作
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df1 = pd.DataFrame(np.arange(9.).reshape((3, 3)),
+                     columns=list('bcd'),
+                     index=['Ohio', 'Texas', 'Colorado'])
+
+  df2 = pd.DataFrame(np.arange(12.).reshape((4, 3)),
+                     columns=list('bde'),
+                     index=['Utah', 'Ohio', 'Texas', 'Oregon'])
+
+  log("df1", df1)
+  log("df2", df2)
+  log("df1 + df2", df1 + df2)
+#+END_SRC
+
+**** 列标签索引
+
+从 DataFrame 中玄虚的列是数据的 _视图_ ，而不是拷贝。
+如果需要复制，应当显式地使用 Series 的 =copy= 方法。
+
+返回的 Series 与原 DataFrame 有相同的索引，且 Series 的 =name= 属性也会被合理地设置。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada', 'Nevada'],
+          'year': [2000, 2001, 2002, 2001, 2002, 2003],
+          'pop': [1.5, 1.7, 3.6, 2.4, 2.9, 3.2]}
+  columns = ['year', 'state', 'pop']
+  df = pd.DataFrame(data, columns=columns)
+  log("df", df)
+  log("df['state']", df['state'])
+  log("df.year", df.year)
+  log("df[['state', 'pop']]", df[['state', 'pop']])
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+   year   state  pop
+0  2000    Ohio  1.5
+1  2001    Ohio  1.7
+2  2002    Ohio  3.6
+3  2001  Nevada  2.4
+4  2002  Nevada  2.9
+5  2003  Nevada  3.2
+================================= df['state'] ==================================
+0      Ohio
+1      Ohio
+2      Ohio
+3    Nevada
+4    Nevada
+5    Nevada
+Name: state, dtype: object
+=================================== df.year ====================================
+0    2000
+1    2001
+2    2002
+3    2001
+4    2002
+5    2003
+Name: year, dtype: int64
+============================= df[['state', 'pop']] =============================
+    state  pop
+0    Ohio  1.5
+1    Ohio  1.7
+2    Ohio  3.6
+3  Nevada  2.4
+4  Nevada  2.9
+5  Nevada  3.2
+#+end_example
+
+
+**** 行整数索引
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame(np.arange(16).reshape((4, 4)),
+                    index=["Ohio", "Colorado", "Utah", "New York"],
+                    columns=["one", "two", "three", "four"])
+  log("df", df)
+  log("df[:2]", df[:2])
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+          one  two  three  four
+Ohio        0    1      2     3
+Colorado    4    5      6     7
+Utah        8    9     10    11
+New York   12   13     14    15
+==================================== df[:2] ====================================
+          one  two  three  four
+Ohio        0    1      2     3
+Colorado    4    5      6     7
+#+end_example
+
+
+**** 行布尔索引
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame(np.arange(16).reshape((4, 4)),
+                    index=["Ohio", "Colorado", "Utah", "New York"],
+                    columns=["one", "two", "three", "four"])
+  log("df", df)
+  log("df[df['three'] > 5]", df[df['three'] > 5])
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+          one  two  three  four
+Ohio        0    1      2     3
+Colorado    4    5      6     7
+Utah        8    9     10    11
+New York   12   13     14    15
+============================= df[df['three'] > 5] ==============================
+          one  two  three  four
+Colorado    4    5      6     7
+Utah        8    9     10    11
+New York   12   13     14    15
+#+end_example
+
+
+**** loc 索引
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame(np.arange(16).reshape((4, 4)),
+                    index=["Ohio", "Colorado", "Utah", "New York"],
+                    columns=["one", "two", "three", "four"])
+  log("df", df)
+  log("df.loc['Colorado', ['two', 'three']]", df.loc['Colorado', ['two', 'three']])
+  log("df.loc[:'Utah', 'two']", df.loc[:'Utah', 'two'])
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+          one  two  three  four
+Ohio        0    1      2     3
+Colorado    4    5      6     7
+Utah        8    9     10    11
+New York   12   13     14    15
+===================== df.loc['Colorado', ['two', 'three']] =====================
+two      5
+three    6
+Name: Colorado, dtype: int64
+============================ df.loc[:'Utah', 'two'] ============================
+Ohio        1
+Colorado    5
+Utah        9
+Name: two, dtype: int64
+#+end_example
+
+**** iloc 索引
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame(np.arange(16).reshape((4, 4)),
+                    index=["Ohio", "Colorado", "Utah", "New York"],
+                    columns=["one", "two", "three", "four"])
+  log("df", df)
+  log("df.iloc[2, [3, 0, 1]]", df.iloc[2, [3, 0, 1]])
+  log("df.iloc[[1, 2], [3, 0, 1]]", df.iloc[[1, 2], [3, 0, 1]])
+  log("df.iloc[:, :3][df.three > 5]", df.iloc[:, :3][df.three > 5])
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+          one  two  three  four
+Ohio        0    1      2     3
+Colorado    4    5      6     7
+Utah        8    9     10    11
+New York   12   13     14    15
+============================ df.iloc[2, [3, 0, 1]] =============================
+four    11
+one      8
+two      9
+Name: Utah, dtype: int64
+========================== df.iloc[[1, 2], [3, 0, 1]] ==========================
+          four  one  two
+Colorado     7    4    5
+Utah        11    8    9
+========================= df.iloc[:, :3][df.three > 5] =========================
+          one  two  three
+Colorado    4    5      6
+Utah        8    9     10
+New York   12   13     14
+#+end_example
+
+**** 删除索引
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame(np.arange(16).reshape((4, 4)),
+                    index=["Ohio", "Colorado", "Utah", "New York"],
+                    columns=["one", "two", "three", "four"])
+  log("df", df)
+  log("df.drop('Colorado')", df.drop('Colorado'))
+  log("df.drop('two', axis='columns')", df.drop('two', axis='columns'))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+          one  two  three  four
+Ohio        0    1      2     3
+Colorado    4    5      6     7
+Utah        8    9     10    11
+New York   12   13     14    15
+============================= df.drop('Colorado') ==============================
+          one  two  three  four
+Ohio        0    1      2     3
+Utah        8    9     10    11
+New York   12   13     14    15
+======================== df.drop('two', axis='columns') ========================
+          one  three  four
+Ohio        0      2     3
+Colorado    4      6     7
+Utah        8     10    11
+New York   12     14    15
+#+end_example
+
+
+* 附录
+
+** reindex 方法的参数 <<reindex>>
+
+- method
+
+  插值方式， =ffill= 为前向填充， =bfill= 是后向填充
+
+- fill_value
+
+- limit
+
+  前向或后向填充时，所需填充的最大尺寸间隙（以元素数量）
+
+- tolerance
+
+  前向或后向填充时，所需填充的不精确匹配下的最大尺寸间隙（以绝对数字距离）
+
+- level
+
+  匹配 MultiIndex 级别的简单索引；否则选择子集
+
+- copy
+
+  如果为 =True= ，即使新索引等于旧索引，也总是复制底层数据；
+  如果是 =False= ，则在索引相同时不复制数据
+
+
+** 索引对象常见方法和属性 <<index obj>>
+
+- append
+- difference
+- intersection
+- union
+- isin
+- delete
+- drop
+- insert
+- is_monotonic
+- is_unique
+- unique
