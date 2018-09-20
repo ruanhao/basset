@@ -1809,6 +1809,462 @@ F    1.028409  1.627355 -1.264463 -0.109870
 #+end_example
 
 
+* 数据清洗
+
+** 处理缺失值
+
+pandas 对象的所有统计信息默认情况下是 _排除_ 缺失值的。
+
+Python 内建的 None 值也被当做 NA 处理。
+
+*** 过滤缺失值(dropna)
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series([1, np.nan, 3.5, np.nan, 7])
+  log("s.dropna()", s.dropna()) # 等价于 s[s.notnull()]
+#+END_SRC
+
+#+RESULTS:
+: ================================== s.dropna() ==================================
+: 0    1.0
+: 2    3.5
+: 4    7.0
+: dtype: float64
+
+
+当处理 DataFrame 对象时， =dropna= *默认情况下删除包含缺失值的行* ：
+（使用 =axis = 1= 删除列）
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame([
+      [1, 6.5, 3],
+      [1, np.nan, np.nan],
+      [np.nan, np.nan, np.nan],
+      [np.nan, 6.5, 3]
+  ])
+  log("df", df)
+  log("df.dropna()", df.dropna())
+#+END_SRC
+
+#+RESULTS:
+: ====================================== df ======================================
+:      0    1    2
+: 0  1.0  6.5  3.0
+: 1  1.0  NaN  NaN
+: 2  NaN  NaN  NaN
+: 3  NaN  6.5  3.0
+: ================================= df.dropna() ==================================
+:      0    1    2
+: 0  1.0  6.5  3.0
+
+
+当传入 =how = 'all'= 时， *删除所有值均为 NA 的那些行* ：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("df.dropna(how='all')", df.dropna(how='all'))
+#+END_SRC
+
+使用 =thresh= 参数来保留 *包含一定数量观察值* 的行：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame(np.random.randn(7, 3))
+  df.iloc[:4, 1] = np.nan
+  df.iloc[:2, 2] = np.nan
+  log("df", df)
+  log("df.dropna()", df.dropna())
+  log("df.dropna(thresh=2)", df.dropna(thresh=2))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+          0         1         2
+0 -0.215937       NaN       NaN
+1 -1.358234       NaN       NaN
+2  0.331335       NaN -0.901148
+3 -0.466495       NaN  2.392151
+4 -0.178190  0.446226  0.710607
+5 -0.446093 -0.317979 -0.601814
+6  0.550952  1.036072 -1.812287
+================================= df.dropna() ==================================
+          0         1         2
+4 -0.178190  0.446226  0.710607
+5 -0.446093 -0.317979 -0.601814
+6  0.550952  1.036072 -1.812287
+============================= df.dropna(thresh=2) ==============================
+          0         1         2
+2  0.331335       NaN -0.901148
+3 -0.466495       NaN  2.392151
+4 -0.178190  0.446226  0.710607
+5 -0.446093 -0.317979 -0.601814
+6  0.550952  1.036072 -1.812287
+#+end_example
+
+*** 补全缺失值(fillna)
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame(np.random.randn(7, 3))
+  df.iloc[:4, 1] = np.nan
+  df.iloc[:2, 2] = np.nan
+  log("df", df)
+  log("df.fillna(0)", df.fillna(0))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+          0         1         2
+0  0.997841       NaN       NaN
+1 -0.554321       NaN       NaN
+2 -0.804640       NaN  0.838684
+3  0.666262       NaN -1.009344
+4  0.049296 -0.091335 -0.724490
+5  0.172516 -0.255515  0.760672
+6  3.210886  1.221200  0.913991
+================================= df.fillna(0) =================================
+          0         1         2
+0  0.997841  0.000000  0.000000
+1 -0.554321  0.000000  0.000000
+2 -0.804640  0.000000  0.838684
+3  0.666262  0.000000 -1.009344
+4  0.049296 -0.091335 -0.724490
+5  0.172516 -0.255515  0.760672
+6  3.210886  1.221200  0.913991
+#+end_example
+
+调用 =fillna= 时使用字典，可以 *为不同列设定不同的填充值* ：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("df.fillna({1: 0.5, 2: 0})", df.fillna({1: 0.5, 2: 0}))
+#+END_SRC
+
+#+RESULTS:
+: ========================== df.fillna({1: 0.5, 2: 0}) ===========================
+:           0         1         2
+: 0  0.997841  0.500000  0.000000
+: 1 -0.554321  0.500000  0.000000
+: 2 -0.804640  0.500000  0.838684
+: 3  0.666262  0.500000 -1.009344
+: 4  0.049296 -0.091335 -0.724490
+: 5  0.172516 -0.255515  0.760672
+: 6  3.210886  1.221200  0.913991
+
+使用 *插值方法* ：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame(np.random.randn(6, 3))
+  df.iloc[2:, 1] = np.nan
+  df.iloc[4:, 2] = np.nan
+  log("df", df)
+  log("df.fillna(method='ffill')", df.fillna(method='ffill'))
+  log("df.fillna(method='ffill', limit=2)", df.fillna(method='ffill', limit=2))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+          0         1         2
+0  0.663103  0.176675 -1.293323
+1 -0.108963  0.912126  0.806356
+2  0.215125       NaN -1.686062
+3 -0.411193       NaN -0.738710
+4 -0.038864       NaN       NaN
+5 -0.561398       NaN       NaN
+========================== df.fillna(method='ffill') ===========================
+          0         1         2
+0  0.663103  0.176675 -1.293323
+1 -0.108963  0.912126  0.806356
+2  0.215125  0.912126 -1.686062
+3 -0.411193  0.912126 -0.738710
+4 -0.038864  0.912126 -0.738710
+5 -0.561398  0.912126 -0.738710
+====================== df.fillna(method='ffill', limit=2) ======================
+          0         1         2
+0  0.663103  0.176675 -1.293323
+1 -0.108963  0.912126  0.806356
+2  0.215125  0.912126 -1.686062
+3 -0.411193  0.912126 -0.738710
+4 -0.038864       NaN -0.738710
+5 -0.561398       NaN -0.738710
+#+end_example
+
+
+[[fillna arg][fillna 函数参数]]
+
+** 数据转换
+
+*** 删除重复值
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame(
+      {
+          "k1": ['one', 'two'] * 3 + ['two'],
+          "k2": [1, 1, 2, 3, 3, 4, 4]
+      }
+  )
+  log("df", df)
+  log("df.duplicated()", df.duplicated())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+    k1  k2
+0  one   1
+1  two   1
+2  one   2
+3  two   3
+4  one   3
+5  two   4
+6  two   4
+=============================== df.duplicated() ================================
+0    False
+1    False
+2    False
+3    False
+4    False
+5    False
+6     True
+dtype: bool
+#+end_example
+
+=drop_duplicates= 返回的是 DataFrame ，内容是 =duplicated= 返回 Series 中为 False 的部分：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("df.drop_duplicates()", df.drop_duplicates())
+#+END_SRC
+
+#+RESULTS:
+: ============================= df.drop_duplicates() =============================
+:     k1  k2
+: 0  one   1
+: 1  two   1
+: 2  one   2
+: 3  two   3
+: 4  one   3
+: 5  two   4
+
+*基于某列* 去除重复值：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df['v1'] = range(7)
+  log("df", df)
+  log("df.drop_duplicates(['k1'])", df.drop_duplicates(['k1']))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+    k1  k2  v1
+0  one   1   0
+1  two   1   1
+2  one   2   2
+3  two   3   3
+4  one   3   4
+5  two   4   5
+6  two   4   6
+========================== df.drop_duplicates(['k1']) ==========================
+    k1  k2  v1
+0  one   1   0
+1  two   1   1
+#+end_example
+
+=drop_duplicates= 默认保留第一个观测值，传入参数 =keep = 'last'= 将返回最后一个：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("df.drop_duplicates(['k1', 'k2'], keep='last')", df.drop_duplicates(['k1', 'k2'], keep='last'))
+#+END_SRC
+
+#+RESULTS:
+: ================ df.drop_duplicates(['k1', 'k2'], keep='last') =================
+:     k1  k2  v1
+: 0  one   1   0
+: 1  two   1   1
+: 2  one   2   2
+: 3  two   3   3
+: 4  one   3   4
+: 6  two   4   6
+
+*** 使用函数或映射进行数据转换
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame(
+      {
+          "food": ['bacon',
+                   'pulled pork',
+                   'bacon',
+                   'Pastrami',
+                   'corned beef',
+                   'Bacon',
+                   'pastrami',
+                   'honey ham',
+                   'nova lox'],
+          "ounces": [4, 3, 12, 6, 7.5, 8, 3, 5, 6]
+      }
+  )
+
+  meat_to_animal = {
+      "bacon": 'pig',
+      "pulled pork": 'pig',
+      "pastrami": 'cow',
+      "corned beef": 'cow',
+      "honey ham": 'pig',
+      "nova lox": 'salmon'
+  }
+
+log("df", df)
+# 将值转换为小写
+lowercased = df['food'].str.lower()
+log("lowercased", lowercased)
+df['animal'] = lowercased.map(meat_to_animal)
+log("df", df)
+# 也可以 data['food'].map(lambda x: meat_to_animal[x.lower()])
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+          food  ounces
+0        bacon     4.0
+1  pulled pork     3.0
+2        bacon    12.0
+3     Pastrami     6.0
+4  corned beef     7.5
+5        Bacon     8.0
+6     pastrami     3.0
+7    honey ham     5.0
+8     nova lox     6.0
+================================== lowercased ==================================
+0          bacon
+1    pulled pork
+2          bacon
+3       pastrami
+4    corned beef
+5          bacon
+6       pastrami
+7      honey ham
+8       nova lox
+Name: food, dtype: object
+====================================== df ======================================
+          food  ounces  animal
+0        bacon     4.0     pig
+1  pulled pork     3.0     pig
+2        bacon    12.0     pig
+3     Pastrami     6.0     cow
+4  corned beef     7.5     cow
+5        Bacon     8.0     pig
+6     pastrami     3.0     cow
+7    honey ham     5.0     pig
+8     nova lox     6.0  salmon
+#+end_example
+
+*** 替代值(replace)
+
+使用 =fillna()= 是通用值替换的特殊案例。
+
+使用 =map()= 可以用来修改一个数据中的值，但是 =replace()= 提供了 *更为简单* 的实现。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series([1, -999, 2, -999, -1000, 3])
+  log("s", s)
+  log("s.replace(-999, np.nan)", s.replace(-999, np.nan))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== s =======================================
+0       1
+1    -999
+2       2
+3    -999
+4   -1000
+5       3
+dtype: int64
+=========================== s.replace(-999, np.nan) ============================
+0       1.0
+1       NaN
+2       2.0
+3       NaN
+4   -1000.0
+5       3.0
+dtype: float64
+#+end_example
+
+如果想要 *一次替代多个值* ，可以传入一个列表：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("s.replace([-999, -1000], np.nan)", s.replace([-999, -1000], np.nan))
+#+END_SRC
+
+#+RESULTS:
+: ======================= s.replace([-999, -1000], np.nan) =======================
+: 0    1.0
+: 1    NaN
+: 2    2.0
+: 3    NaN
+: 4    NaN
+: 5    3.0
+: dtype: float64
+
+*将不同的值替换为不同的值* ：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("s.replace([-999, -1000], [np.nan, 0])", s.replace([-999, -1000], [np.nan, 0]))
+  log("s.replace({-999: np.nan, -1000: 0})", s.replace({-999: np.nan, -1000: 0}))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+==================== s.replace([-999, -1000], [np.nan, 0]) =====================
+0    1.0
+1    NaN
+2    2.0
+3    NaN
+4    0.0
+5    3.0
+dtype: float64
+===================== s.replace({-999: np.nan, -1000: 0}) ======================
+0    1.0
+1    NaN
+2    2.0
+3    NaN
+4    0.0
+5    3.0
+dtype: float64
+#+end_example
+
+*** 重命名索引
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame(np.arange(12).reshape((3,4)),
+                    index=['Ohio', 'Colorado', 'New York'],
+                    columns=['one', 'two', 'three', 'four'])
+
+  df.index = df.index.map(lambda x: x[:4].upper())
+  log("df", df)
+  log("df.rename(index=str.title, columns=str.upper)", df.rename(index=str.title, columns=str.upper))
+  log("df.rename(index={'OHIO': 'INDIANA'}, columns={'three': 'peekaboo'})", df.rename(index={'OHIO': 'INDIANA'}, columns={'three': 'peekaboo'}))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+      one  two  three  four
+OHIO    0    1      2     3
+COLO    4    5      6     7
+NEW     8    9     10    11
+================ df.rename(index=str.title, columns=str.upper) =================
+      ONE  TWO  THREE  FOUR
+Ohio    0    1      2     3
+Colo    4    5      6     7
+New     8    9     10    11
+===== df.rename(index={'OHIO': 'INDIANA'}, columns={'three': 'peekaboo'}) ======
+         one  two  peekaboo  four
+INDIANA    0    1         2     3
+COLO       4    5         6     7
+NEW        8    9        10    11
+#+end_example
+
 * 附录
 
 ** reindex 方法的参数 <<reindex>>
@@ -1869,3 +2325,15 @@ F    1.028409  1.627355 -1.264463 -0.109870
 - max
 - first
 - dense
+
+** fillna 函数参数 <<fillna arg>>
+
+|---------+------------------------------------------|
+| 参数    | 描述                                     |
+|---------+------------------------------------------|
+| value   | 标量值或字典型对象，用于填充缺失值       |
+| method  | 插值方法，如果没有其他参数，默认是 ffill |
+| axis    | 需要填充的轴，默认 axis=0                |
+| inplace | 原地修改                                 |
+| limit   | 用于前向或后向填充时最大的填充范围       |
+|---------+------------------------------------------|
