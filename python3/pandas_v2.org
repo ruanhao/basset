@@ -72,7 +72,8 @@
 #+END_SRC
 
 #+RESULTS:
-: # Out[10]:
+: # Out[1]:
+
 
 * 核心数据结构
 
@@ -256,6 +257,89 @@ dtype: int64
 : a       0.006738
 : c      20.085537
 : dtype: float64
+
+
+*** 映射 (apply)
+
+=s.apply(value_to_value_func) -> Series=
+
+
+*** 排序(sort_index/sort_values)
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series(range(4), index=list('dabc'))
+  log("s.sort_index()", s.sort_index())
+  log("s.sort_values()", s.sort_values())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+================================ s.sort_index() ================================
+a    1
+b    2
+c    3
+d    0
+dtype: int64
+=============================== s.sort_values() ================================
+d    0
+a    1
+b    2
+c    3
+dtype: int64
+#+end_example
+
+
+*** 唯一值(unique)，计数(count)和成员(isin)
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series(list('cadaabbcc'))
+  log("s.unique()", s.unique())
+  log("s.value_counts()", s.value_counts())
+  log("s.isin(['b', 'c'])", s.isin(['b', 'c']))
+#+END_SRC
+
+*** 排名(rank)
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series([7, -5, 7, 4, 2, 0, 4])
+  log("s.rank()", s.rank())
+  log("s.rank(method='first')", s.rank(method='first'))
+  log("s.rank(ascending=False, method='max')", s.rank(ascending=False, method='max'))
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+=================================== s.rank() ===================================
+0    6.5
+1    1.0
+2    6.5
+3    4.5
+4    3.0
+5    2.0
+6    4.5
+dtype: float64
+============================ s.rank(method='first') ============================
+0    6.0
+1    1.0
+2    7.0
+3    4.0
+4    3.0
+5    2.0
+6    5.0
+dtype: float64
+==================== s.rank(ascending=False, method='max') =====================
+0    2.0
+1    7.0
+2    2.0
+3    4.0
+4    5.0
+5    6.0
+6    4.0
+dtype: float64
+#+end_example
+
+[[break equal class][打破平级关系方法列表]]
 
 
 *** 在字典上下文中使用
@@ -618,6 +702,65 @@ DatetimeIndex(['2016-03-01', '2016-03-02', '2016-03-03', '2016-03-04',
 
 
 
+*** 和 Series 之间的运算（广播机制）
+
+默认会将 Series 的索引与 DataFrame 的列进行匹配，并广播到各行：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame(np.arange(12.).reshape((4, 3)),
+                    columns=list('bde'),
+                    index=['Utah', 'Ohio', 'Texas', 'Oregon'])
+  log("df", df)
+  s = df.iloc[0]
+  log("s", s)
+  log("df - s", df - s)
+  s2 = pd.Series(range(3), index=['b', 'e', 'f'])
+  log("df + s2", df + s2)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+          b     d     e
+Utah    0.0   1.0   2.0
+Ohio    3.0   4.0   5.0
+Texas   6.0   7.0   8.0
+Oregon  9.0  10.0  11.0
+====================================== s =======================================
+b    0.0
+d    1.0
+e    2.0
+Name: Utah, dtype: float64
+==================================== df - s ====================================
+          b    d    e
+Utah    0.0  0.0  0.0
+Ohio    3.0  3.0  3.0
+Texas   6.0  6.0  6.0
+Oregon  9.0  9.0  9.0
+=================================== df + s2 ====================================
+          b   d     e   f
+Utah    0.0 NaN   3.0 NaN
+Ohio    3.0 NaN   6.0 NaN
+Texas   6.0 NaN   9.0 NaN
+Oregon  9.0 NaN  12.0 NaN
+#+end_example
+
+如果想在列上广播，在行上匹配，必须使用[[math method][算数方法]]中的一种：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s3 = df['d']
+  log("df.sub(s3, axis='index')", df.sub(s3, axis='index'))
+#+END_SRC
+
+#+RESULTS:
+: =========================== df.sub(s3, axis='index') ===========================
+:           b    d    e
+: Utah   -1.0  0.0  1.0
+: Ohio   -1.0  0.0  1.0
+: Texas  -1.0  0.0  1.0
+: Oregon -1.0  0.0  1.0
+
+
 *** 应用函数
 
 从本质上讲，DataFrame 内部用的数据结构就是 numpy 的 ndarray 。
@@ -670,6 +813,132 @@ DatetimeIndex(['2016-03-01', '2016-03-02', '2016-03-03', '2016-03-04',
 #+end_example
 
 
+*** 行/列映射 (apply)
+
+  =df.apply(series_to_series_func) -> DataFrame=
+
+  =df.apply(series_to_value_func) -> Series=
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame(np.arange(12).reshape(4, 3),
+                    index=['one', 'two', 'three', 'four'],
+                    columns=list('ABC'))
+  log("df", df)
+  log("df.apply(lambda x: x.max() - x.min())", df.apply(lambda x: x.max() - x.min()))
+  log("df.apply(lambda x: x.max() - x.min(), axis=1)", df.apply(lambda x: x.max() - x.min(), axis=1))
+  def min_max(x):
+      return pd.Series([x.min(), x.max()], index=['min', 'max'])
+  log("df.apply(min_max, axis=1)", df.apply(min_max, axis=1))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+       A   B   C
+one    0   1   2
+two    3   4   5
+three  6   7   8
+four   9  10  11
+==================== df.apply(lambda x: x.max() - x.min()) =====================
+A    9
+B    9
+C    9
+dtype: int64
+================ df.apply(lambda x: x.max() - x.min(), axis=1) =================
+one      2
+two      2
+three    2
+four     2
+dtype: int64
+========================== df.apply(min_max, axis=1) ===========================
+       min  max
+one      0    2
+two      3    5
+three    6    8
+four     9   11
+#+end_example
+
+
+*** 逐元素映射 (applymap)
+
+=df.applymap(value_to_value_func) -> DataFrame=
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame(np.random.randn(4, 3),
+                    index=['one', 'two', 'three', 'four'],
+                    columns=list('ABC'))
+
+  log("df", df)
+  log("df.applymap(lambda x: '{0:.03f}'.format(x))", df.applymap(lambda x: '{0:.03f}'.format(x)))
+#+END_SRC
+
+
+*** 排序(sort_index/sort_values)
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame(np.arange(8).reshape((2, 4)),
+                    index=['three', 'one'],
+                    columns=list('dabc'))
+  log("df", df)
+  log("df.sort_index()", df.sort_index())
+  log("df.sort_index(axis=1)", df.sort_index(axis=1))
+  log("df.sort_values(by='a')", df.sort_values(by='a'))
+  log("df.sort_values(by=['a', 'b'])", df.sort_values(by=['a', 'b']))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+       d  a  b  c
+three  0  1  2  3
+one    4  5  6  7
+=============================== df.sort_index() ================================
+       d  a  b  c
+one    4  5  6  7
+three  0  1  2  3
+============================ df.sort_index(axis=1) =============================
+       a  b  c  d
+three  1  2  3  0
+one    5  6  7  4
+============================ df.sort_values(by='a') ============================
+       d  a  b  c
+three  0  1  2  3
+one    4  5  6  7
+======================== df.sort_values(by=['a', 'b']) =========================
+       d  a  b  c
+three  0  1  2  3
+one    4  5  6  7
+#+end_example
+
+
+*** 排名(rank)
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame({'b': [4.3, 7, -3, 2], 'a': [0, 1, 0, 1], 'c': [-2, 5, 8, -2.5]})
+  log("df", df)
+  log("df.rank(axis='columns')", df.rank(axis='columns'))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+     b  a    c
+0  4.3  0 -2.0
+1  7.0  1  5.0
+2 -3.0  0  8.0
+3  2.0  1 -2.5
+=========================== df.rank(axis='columns') ============================
+     b    a    c
+0  3.0  2.0  1.0
+1  3.0  1.0  2.0
+2  1.0  2.0  3.0
+3  3.0  2.0  1.0
+#+end_example
+
+
+打破平级关系方法列表
+
+
 *** 转换为 ndarray 对象
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
@@ -717,6 +986,47 @@ DatetimeIndex(['2016-03-01', '2016-03-02', '2016-03-03', '2016-03-04',
 8  True  True   True  True
 9  True  True   True  True
 #+end_example
+
+
+
+*** 统计
+
+- count
+  非 NA 值个数
+- describe
+  计算 Series 或 DataFrame 各列的汇总统计集合
+- min, max
+- argmin, argmax
+  最大最小值所在索引位置（整数）
+- idxmin, idxmax
+  最大最小值所在索引标签
+- quantile
+  计算样本从 0 到 1 间的分位数
+- sum
+- mean
+- median
+- mad
+  平均值的平均绝对偏差
+- mod
+  频繁统计
+- prod
+  所有值的积
+- var
+  样本方差
+- std
+  标准差
+- skew
+  样本偏度（第三时刻）值
+- kurt
+  样本峰度（第四时刻）值
+- cumsum
+  累计值
+- cummin, cummax
+- cumprod
+- diff
+  计算第一个算术差值（对时间序列有用）
+- pct_change
+  计算百分比
 
 
 *** concat
@@ -1540,3 +1850,22 @@ F    1.028409  1.627355 -1.264463 -0.109870
 - is_monotonic
 - is_unique
 - unique
+
+
+** 算数方法 <<math method>>
+
+- add, radd :: +
+- sub, rsub :: -
+- div, rdiv :: /
+- floordiv, rfloordiv :: //
+- mul, rmul :: *
+- pow, rpow :: **
+
+
+** 打破平级关系方法 <<break equal class>>
+
+- average
+- min
+- max
+- first
+- dense
