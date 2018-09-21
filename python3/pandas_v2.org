@@ -1817,6 +1817,8 @@ pandas 对象的所有统计信息默认情况下是 _排除_ 缺失值的。
 
 Python 内建的 None 值也被当做 NA 处理。
 
+[[file:img/pandas_nan.png]]
+
 *** 过滤缺失值(dropna)
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
@@ -1990,6 +1992,7 @@ Python 内建的 None 值也被当做 NA 处理。
 
 
 [[fillna arg][fillna 函数参数]]
+
 
 ** 数据转换
 
@@ -2264,6 +2267,283 @@ INDIANA    0    1         2     3
 COLO       4    5         6     7
 NEW        8    9        10    11
 #+end_example
+
+
+*** 离散化和分箱(cut/qcut)
+
+连续值经常需要离散化，或者分离成 _箱子_ 进行分析。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  ages = [20, 22, 25, 27, 21, 23, 37, 31, 61, 45, 41, 32]
+  bins = [18, 25, 35, 60, 100]
+  cats = pd.cut(ages, bins)
+  log("cats", cats)
+  log("cats.codes", cats.codes)
+  log("cats.categories", cats.categories)
+  log("cats.value_counts()", cats.value_counts())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+===================================== cats =====================================
+[(18, 25], (18, 25], (18, 25], (25, 35], (18, 25], ..., (25, 35], (60, 100], (35, 60], (35, 60], (25, 35]]
+Length: 12
+Categories (4, interval[int64]): [(18, 25] < (25, 35] < (35, 60] < (60, 100]]
+================================== cats.codes ==================================
+[0 0 0 1 0 0 2 1 3 2 2 1]
+=============================== cats.categories ================================
+IntervalIndex([(18, 25], (25, 35], (35, 60], (60, 100]]
+              closed='right',
+              dtype='interval[int64]')
+============================= cats.value_counts() ==============================
+(18, 25]     5
+(25, 35]     3
+(35, 60]     3
+(60, 100]    1
+dtype: int64
+#+end_example
+
+通过传递 =right = False= 来改变区间哪一边是封闭的。
+
+*自定义箱名* ：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  group_names = ['Youth', 'YoungAdult', 'MiddleAged', 'Senior']
+  log("pd.cut(ages, bins, labels=group_names)", pd.cut(ages, bins, labels=group_names))
+#+END_SRC
+
+#+RESULTS:
+: ==================== pd.cut(ages, bins, labels=group_names) ====================
+: [Youth, Youth, Youth, YoungAdult, Youth, ..., YoungAdult, Senior, MiddleAged, MiddleAged, YoungAdult]
+: Length: 12
+: Categories (4, object): [Youth < YoungAdult < MiddleAged < Senior]
+
+若 *使用分箱的个数代替箱边* ， pandas 将根据数据中的最小值和最大值计算出等长的箱：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  data = np.random.rand(20)
+  # precision 表示将十进制精度限制在两位
+  log("pd.cut(data, 4, precision=2)", pd.cut(data, 4, precision=2))
+#+END_SRC
+
+#+RESULTS:
+: ========================= pd.cut(data, 4, precision=2) =========================
+: [(0.5, 0.73], (0.5, 0.73], (0.73, 0.97], (0.26, 0.5], (0.024, 0.26], ..., (0.024, 0.26], (0.26, 0.5], (0.73, 0.97], (0.5, 0.73], (0.73, 0.97]]
+: Length: 20
+: Categories (4, interval[float64]): [(0.024, 0.26] < (0.26, 0.5] < (0.5, 0.73] < (0.73, 0.97]]
+
+使用 =cut= 通常不会使每个箱具有相同的数据量。
+=qcut= 基于样本分位数进行分箱，可以获得 *等长的箱* ：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  data = np.random.randn(1000)
+  qcats = pd.qcut(data, 4)
+  log("qcats.value_counts()", qcats.value_counts())
+#+END_SRC
+
+#+RESULTS:
+: ============================= qcats.value_counts() =============================
+: (-3.532, -0.671]    250
+: (-0.671, 0.0582]    250
+: (0.0582, 0.744]     250
+: (0.744, 3.077]      250
+: dtype: int64
+
+
+*自定义分位数* ：(0 和 1 之间的数字)
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  qcuts = pd.qcut(data, [0, 0.1, 0.5, 0.9, 1])
+  log("qcuts.value_counts()", qcuts.value_counts())
+#+END_SRC
+
+#+RESULTS:
+: ============================= qcuts.value_counts() =============================
+: (-3.532, -1.302]    100
+: (-1.302, 0.0582]    400
+: (0.0582, 1.374]     400
+: (1.374, 3.077]      100
+: dtype: int64
+
+
+*** 检测异常值(any)
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame(np.random.randn(5, 4))
+  log("df", df)
+  log("np.abs(df) > 1", np.abs(df) > 1)
+  log("(np.abs(df) > 1).any()", (np.abs(df) > 1).any())
+  log("(np.abs(df) > 1).any(axis=1)", (np.abs(df) > 1).any(axis=1))
+  log("(np.abs(df) > 1).any().any()", (np.abs(df) > 1).any().any())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+          0         1         2         3
+0  0.634347 -0.504562  0.337217  0.191453
+1 -0.378714 -1.212778 -0.194362 -2.113623
+2 -1.422029  0.532520 -0.348306  0.059880
+3 -1.184722 -0.297884 -0.620028  0.378589
+4  0.846286 -0.714991 -0.127334 -0.089754
+================================ np.abs(df) > 1 ================================
+       0      1      2      3
+0  False  False  False  False
+1  False   True  False   True
+2   True  False  False  False
+3   True  False  False  False
+4  False  False  False  False
+============================ (np.abs(df) > 1).any() ============================
+0     True
+1     True
+2    False
+3     True
+dtype: bool
+========================= (np.abs(df) > 1).any(axis=1) =========================
+0    False
+1     True
+2     True
+3     True
+4    False
+dtype: bool
+========================= (np.abs(df) > 1).any().any() =========================
+True
+#+end_example
+
+
+*** 随机重排序
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame(np.arange(5*4).reshape((5, 4)))
+  sampler = np.random.permutation(5)
+  log("df", df)
+  log("sampler", sampler)
+  log("df.take(sampler)", df.take(sampler)) # 和 iloc 类似
+
+  log("df.sample(3)", df.sample(3))
+  log("df.sample(3, replace=True)", df.sample(3, replace=True)) # 允许有重复
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+    0   1   2   3
+0   0   1   2   3
+1   4   5   6   7
+2   8   9  10  11
+3  12  13  14  15
+4  16  17  18  19
+=================================== sampler ====================================
+[2 3 0 1 4]
+=============================== df.take(sampler) ===============================
+    0   1   2   3
+2   8   9  10  11
+3  12  13  14  15
+0   0   1   2   3
+1   4   5   6   7
+4  16  17  18  19
+================================= df.sample(3) =================================
+   0  1   2   3
+2  8  9  10  11
+0  0  1   2   3
+1  4  5   6   7
+========================== df.sample(3, replace=True) ==========================
+    0   1   2   3
+3  12  13  14  15
+3  12  13  14  15
+0   0   1   2   3
+#+end_example
+
+
+
+*** 指标矩阵(get_dummies)
+
+如果一列有 k 个不同的值，可以衍生一个k 列的，值为 0 或 1 的矩阵。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame({'key': list('bbacab'), 'data': range(6)})
+  log("df", df)
+  log("pd.get_dummies(df['key'])", pd.get_dummies(df['key']))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+  key  data
+0   b     0
+1   b     1
+2   a     2
+3   c     3
+4   a     4
+5   b     5
+========================== pd.get_dummies(df['key']) ===========================
+   a  b  c
+0  0  1  0
+1  0  1  0
+2  1  0  0
+3  0  0  1
+4  1  0  0
+5  0  1  0
+#+end_example
+
+添加前缀：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  dummies = pd.get_dummies(df['key'], prefix='key')
+  log("dummies", dummies)
+  df_with_dummies = df[['data']].join(dummies)
+  log("df_with_dummies", df_with_dummies)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+=================================== dummies ====================================
+   key_a  key_b  key_c
+0      0      1      0
+1      0      1      0
+2      1      0      0
+3      0      0      1
+4      1      0      0
+5      0      1      0
+=============================== df_with_dummies ================================
+   data  key_a  key_b  key_c
+0     0      0      1      0
+1     1      0      1      0
+2     2      1      0      0
+3     3      0      0      1
+4     4      1      0      0
+5     5      0      1      0
+#+end_example
+
+=get_dummies= 与 =cut= 等离散化函数结合使用是 *统计操作中一个有用的方法* ：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  np.random.seed(12345)
+  values = np.random.rand(10)
+  log("values", values)
+  bins = [0, 0.2, 0.4, 0.6, 0.8, 1]
+  log("pd.get_dummies(pd.cut(values, bins))", pd.get_dummies(pd.cut(values, bins)))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+==================================== values ====================================
+[0.92961609 0.31637555 0.18391881 0.20456028 0.56772503 0.5955447
+ 0.96451452 0.6531771  0.74890664 0.65356987]
+===================== pd.get_dummies(pd.cut(values, bins)) =====================
+   (0.0, 0.2]  (0.2, 0.4]  (0.4, 0.6]  (0.6, 0.8]  (0.8, 1.0]
+0           0           0           0           0           1
+1           0           1           0           0           0
+2           1           0           0           0           0
+3           0           1           0           0           0
+4           0           0           1           0           0
+5           0           0           1           0           0
+6           0           0           0           0           1
+7           0           0           0           1           0
+8           0           0           0           1           0
+9           0           0           0           1           0
+#+end_example
+
 
 * 附录
 

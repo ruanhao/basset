@@ -896,62 +896,6 @@ file:img/pandas_apply.png
 #+END_SRC
 
 
-* 处理丢失数据
-
-#+NAME: missing data
-#+CAPTION: nan
-[[file:img/pandas_nan.png]]
-
-
-#+BEGIN_SRC ipython :session :var path="img/fig46981FTt.png"
-  dates = pd.date_range('20160301', periods=6)
-  df_with_nan = pd.DataFrame(data=np.random.randn(6, 4), index=dates, columns=list('ABCD'))
-  df_with_nan = df_with_nan.reindex(index=dates[0:4], columns=list(df_with_nan.columns) + ['E'])
-  df_with_nan.loc[dates[1:3], 'E'] = 1
-  show_dataframe(df_with_nan)
-#+END_SRC
-
-#+NAME: img/fig46981FTt.png
-#+CAPTION: 示例
-[[file:img/fig46981FTt.png]]
-
-** 用默认值替换 NaN
-
-=df.fillna(value=5)=
-
-
-** 判断数据集是否包含 NaN
-
-- =s_or_df.isnull()= / =pd.isnull(s_or_df)=
-- =s_or_df.notnull()= / =pd.notnull(s_or_df)=
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  log("pd.isnull(df_with_nan)", pd.isnull(df_with_nan))
-  log("pd.isnull(df_with_nan).any()", pd.isnull(df_with_nan).any())
-  log("pd.isnull(df_with_nan).any().any()", pd.isnull(df_with_nan).any().any())
-#+END_SRC
-
-
-** NaN 不参与运算
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  log("df_with_nan.mean()", df_with_nan.mean())
-  log("df_with_nan.mean(axis=1)", df_with_nan.mean(axis=1))
-#+END_SRC
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  log("df_with_nan.sum()", df_with_nan.sum())
-  log("df_with_nan.sum(axis=1)", df_with_nan.sum(axis=1))
-#+END_SRC
-
-#+BEGIN_SRC ipython :session :exports both :results output
-  s = pd.Series([1,3,5,np.nan,6,8], index=dates).shift(2)
-  log("s", s)
-  log("df_with_nan", df_with_nan)
-  log("df_with_nan.sub(s, axis='index')", df_with_nan.sub(s, axis='index'))
-#+END_SRC
-
-
 
 * 时间序列
 
