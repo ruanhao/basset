@@ -72,7 +72,7 @@
 #+END_SRC
 
 #+RESULTS:
-: # Out[1]:
+: # Out[2]:
 
 
 * 核心数据结构
@@ -2787,8 +2787,7 @@ two 0  3  4
 #+end_example
 
 
-** 连接与合并(concat,merge,combine_first)
-
+** 连接与合并
 
 *** merge
 
@@ -2890,6 +2889,7 @@ two 0  3  4
 5    a      5    a      0
 #+end_example
 
+
 **** 合并类型(inner,outer,left,right)
 
 默认情况下， =merge= 做的是内连接。
@@ -2949,7 +2949,7 @@ _如上例所示，进行列-列连接时，索引对象会被丢弃。_
 
 
 
-**** 索引作为合并键
+**** 按索引合并<<index merge>>
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   left1 = pd.DataFrame({
@@ -3211,6 +3211,342 @@ e        13       14
 a     1       2       NaN      NaN         7       8
 c     3       4       9.0     10.0         9      10
 e     5       6      13.0     14.0        11      12
+#+end_example
+
+
+*** concat
+
+=concat= 方法本质其实就是[[index merge][按索引合并]] ，默认情况下 =concat= 方法是沿着 =axis = 0= 的轴向生效的，
+*生成另一个 Series* ；如传递 =axis = 1= ， *返回的结果则是 DataFrame* 。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s1 = pd.Series([0, 1], index=['a', 'b'])
+  s2 = pd.Series([2, 3, 4], index=['c', 'd', 'e'])
+  s3 = pd.Series([5, 6], index=['f', 'g'])
+  log("s1", s1)
+  log("s2", s2)
+  log("s3", s3)
+  log("pd.concat([s1, s2, s3])", pd.concat([s1, s2, s3]))
+  log("pd.concat([s1, s2, s3], axis=1)", pd.concat([s1, s2, s3], axis=1))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== s1 ======================================
+a    0
+b    1
+dtype: int64
+====================================== s2 ======================================
+c    2
+d    3
+e    4
+dtype: int64
+====================================== s3 ======================================
+f    5
+g    6
+dtype: int64
+=========================== pd.concat([s1, s2, s3]) ============================
+a    0
+b    1
+c    2
+d    3
+e    4
+f    5
+g    6
+dtype: int64
+======================= pd.concat([s1, s2, s3], axis=1) ========================
+     0    1    2
+a  0.0  NaN  NaN
+b  1.0  NaN  NaN
+c  NaN  2.0  NaN
+d  NaN  3.0  NaN
+e  NaN  4.0  NaN
+f  NaN  NaN  5.0
+g  NaN  NaN  6.0
+#+end_example
+
+=concat= 默认使用 _外连接_ ：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s4 = pd.concat([s1, s3])
+  log("s4", s4)
+  log("pd.concat([s1, s4], axis=1)", pd.concat([s1, s4], axis=1))
+  log("pd.concat([s1, s4], axis=1, join='inner')", pd.concat([s1, s4], axis=1, join='inner'))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== s4 ======================================
+a    0
+b    1
+f    5
+g    6
+dtype: int64
+========================= pd.concat([s1, s4], axis=1) ==========================
+     0  1
+a  0.0  0
+b  1.0  1
+f  NaN  5
+g  NaN  6
+================== pd.concat([s1, s4], axis=1, join='inner') ===================
+   0  1
+a  0  0
+b  1  1
+#+end_example
+
+
+**** join_axes
+
+可以使用 =join_axes= 来指定其他轴向的轴：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("pd.concat([s1, s4], axis=1, join_axes=[['a', 'c', 'b', 'e']])", pd.concat([s1, s4], axis=1, join_axes=[['a', 'c', 'b', 'e']]))
+#+END_SRC
+
+#+RESULTS:
+: ======== pd.concat([s1, s4], axis=1, join_axes=[['a', 'c', 'b', 'e']]) =========
+:      0    1
+: a  0.0  0.0
+: c  NaN  NaN
+: b  1.0  1.0
+: e  NaN  NaN
+
+
+**** 区分拼接在一起的各部分
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  result = pd.concat([s1, s2, s3], keys=['one', 'two', 'three'])
+  log("result", result)
+  log("result.unstack()", result.unstack())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+==================================== result ====================================
+one    a    0
+       b    1
+two    c    2
+       d    3
+       e    4
+three  f    5
+       g    6
+dtype: int64
+=============================== result.unstack() ===============================
+         a    b    c    d    e    f    g
+one    0.0  1.0  NaN  NaN  NaN  NaN  NaN
+two    NaN  NaN  2.0  3.0  4.0  NaN  NaN
+three  NaN  NaN  NaN  NaN  NaN  5.0  6.0
+#+end_example
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("pd.concat([s1, s2, s3], axis=1, keys=['one', 'two', 'three'])", pd.concat([s1, s2, s3], axis=1, keys=['one', 'two', 'three']))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+======== pd.concat([s1, s2, s3], axis=1, keys=['one', 'two', 'three']) =========
+   one  two  three
+a  0.0  NaN    NaN
+b  1.0  NaN    NaN
+c  NaN  2.0    NaN
+d  NaN  3.0    NaN
+e  NaN  4.0    NaN
+f  NaN  NaN    5.0
+g  NaN  NaN    6.0
+#+end_example
+
+
+应用于 DataFrame 对象：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df1 = pd.DataFrame(np.arange(6).reshape((3, 2)),
+                     index=list('abc'),
+                     columns=['one', 'two']
+  )
+  df2 = pd.DataFrame(5 + np.arange(4).reshape((2, 2)),
+                     index=list('ac'),
+                     columns=['three', 'four']
+  )
+
+  log("df1", df1)
+  log("df2", df2)
+
+  log("pd.concat([df1, df2])", pd.concat([df1, df2]))
+  log("pd.concat([df1, df2], keys=['level1', 'level2'])", pd.concat([df1, df2], keys=['level1', 'level2']))
+  log("pd.concat([df1, df2], axis=1)", pd.concat([df1, df2], axis=1))
+  log("pd.concat([df1, df2], axis=1, keys=['level1', 'level2'])", pd.concat([df1, df2], axis=1, keys=['level1', 'level2']))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+===================================== df1 ======================================
+   one  two
+a    0    1
+b    2    3
+c    4    5
+===================================== df2 ======================================
+   three  four
+a      5     6
+c      7     8
+============================ pd.concat([df1, df2]) =============================
+   four  one  three  two
+a   NaN  0.0    NaN  1.0
+b   NaN  2.0    NaN  3.0
+c   NaN  4.0    NaN  5.0
+a   6.0  NaN    5.0  NaN
+c   8.0  NaN    7.0  NaN
+=============== pd.concat([df1, df2], keys=['level1', 'level2']) ===============
+          four  one  three  two
+level1 a   NaN  0.0    NaN  1.0
+       b   NaN  2.0    NaN  3.0
+       c   NaN  4.0    NaN  5.0
+level2 a   6.0  NaN    5.0  NaN
+       c   8.0  NaN    7.0  NaN
+======================== pd.concat([df1, df2], axis=1) =========================
+   one  two  three  four
+a    0    1    5.0   6.0
+b    2    3    NaN   NaN
+c    4    5    7.0   8.0
+=========== pd.concat([df1, df2], axis=1, keys=['level1', 'level2']) ===========
+  level1     level2
+     one two  three four
+a      0   1    5.0  6.0
+b      2   3    NaN  NaN
+c      4   5    7.0  8.0
+#+end_example
+
+
+**** ignore_index
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df1 = pd.DataFrame(np.random.randn(3, 4), columns=list('abcd'))
+  df2 = pd.DataFrame(np.random.randn(2, 3), columns=list('bda'))
+  log("df1", df1)
+  log("df2", df2)
+  log("pd.concat([df1, df2])", pd.concat([df1, df2]))
+  log("pd.concat([df1, df2], ignore_index=True)", pd.concat([df1, df2], ignore_index=True))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+===================================== df1 ======================================
+          a         b         c         d
+0  0.308352 -0.010026  1.317371 -0.614389
+1  0.363210  1.110404 -0.240416 -0.455806
+2  0.926422 -0.429935  0.196401 -1.392373
+===================================== df2 ======================================
+          b         d         a
+0 -1.277329 -0.447157  0.619382
+1 -0.210343 -0.526383 -1.627948
+============================ pd.concat([df1, df2]) =============================
+          a         b         c         d
+0  0.308352 -0.010026  1.317371 -0.614389
+1  0.363210  1.110404 -0.240416 -0.455806
+2  0.926422 -0.429935  0.196401 -1.392373
+0  0.619382 -1.277329       NaN -0.447157
+1 -1.627948 -0.210343       NaN -0.526383
+=================== pd.concat([df1, df2], ignore_index=True) ===================
+          a         b         c         d
+0  0.308352 -0.010026  1.317371 -0.614389
+1  0.363210  1.110404 -0.240416 -0.455806
+2  0.926422 -0.429935  0.196401 -1.392373
+3  0.619382 -1.277329       NaN -0.447157
+4 -1.627948 -0.210343       NaN -0.526383
+#+end_example
+
+
+
+
+
+*** combine_first
+
+=combine_first= 既不是合并操作，也不是连接操作，它是用来填补调用对象的缺失值：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  a = pd.Series([np.nan, 2.5, 0, 3.5, 4.5, np.nan],
+                index=list('fedcba')
+  )
+  b = pd.Series([0, np.nan, 2, np.nan, np.nan, 5],
+                index=list('abcdef')
+  )
+  log("a", a)
+  log("b", b)
+  log("b.combine_first(a)", b.combine_first(a))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== a =======================================
+f    NaN
+e    2.5
+d    0.0
+c    3.5
+b    4.5
+a    NaN
+dtype: float64
+====================================== b =======================================
+a    0.0
+b    NaN
+c    2.0
+d    NaN
+e    NaN
+f    5.0
+dtype: float64
+============================== b.combine_first(a) ==============================
+a    0.0
+b    4.5
+c    2.0
+d    0.0
+e    2.5
+f    5.0
+dtype: float64
+#+end_example
+
+在 DataFrame 中， =combine_first= 逐列做相同的操作：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df1 = pd.DataFrame(
+      {
+          "a": [1, np.nan, 5, np.nan],
+          "b": [np.nan, 2, np.nan, 6],
+          "c": range(2, 18, 4)
+      }
+  )
+
+  df2 = pd.DataFrame(
+      {
+          "a": [5, 4, np.nan, 3, 7],
+          "b": [np.nan, 3, 4, 6, 8]
+      }
+  )
+
+  log("df1", df1)
+  log("df2", df2)
+  log("df1.combine_first(df2)", df1.combine_first(df2))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+===================================== df1 ======================================
+     a    b   c
+0  1.0  NaN   2
+1  NaN  2.0   6
+2  5.0  NaN  10
+3  NaN  6.0  14
+===================================== df2 ======================================
+     a    b
+0  5.0  NaN
+1  4.0  3.0
+2  NaN  4.0
+3  3.0  6.0
+4  7.0  8.0
+============================ df1.combine_first(df2) ============================
+     a    b     c
+0  1.0  NaN   2.0
+1  4.0  2.0   6.0
+2  5.0  4.0  10.0
+3  3.0  6.0  14.0
+4  7.0  8.0   NaN
 #+end_example
 
 * 附录
