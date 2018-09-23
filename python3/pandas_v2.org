@@ -2545,6 +2545,674 @@ True
 #+end_example
 
 
+
+* 数据规整：连接，联合，重塑
+
+** 分层索引
+
+分层索引提供了一种在 *低维度的形式中处理高维度数据* 的方式。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series(np.random.randn(9),
+                index=[['a', 'a', 'a', 'b', 'b', 'c', 'c', 'd', 'd'],
+                       [1, 2, 3, 1, 3, 1, 2, 2, 3]])
+  log("s", s)
+  log("s.index", s.index)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== s =======================================
+a  1    1.007189
+   2   -1.296221
+   3    0.274992
+b  1    0.228913
+   3    1.352917
+c  1    0.886429
+   2   -2.001637
+d  2   -0.371843
+   3    1.669025
+dtype: float64
+=================================== s.index ====================================
+MultiIndex(levels=[['a', 'b', 'c', 'd'], [1, 2, 3]],
+           labels=[[0, 0, 0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1, 1, 2]])
+#+end_example
+
+选取数据子集：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("s['b']", s['b'])
+  log("s['b':'c']", s['b':'c'])
+  log("s.loc[['b', 'd']]", s.loc[['b', 'd']])
+  # 选择内部层级
+  log("s.loc[:, 2]", s.loc[:, 2])
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+==================================== s['b'] ====================================
+1    0.228913
+3    1.352917
+dtype: float64
+================================== s['b':'c'] ==================================
+b  1    0.228913
+   3    1.352917
+c  1    0.886429
+   2   -2.001637
+dtype: float64
+============================== s.loc[['b', 'd']] ===============================
+b  1    0.228913
+   3    1.352917
+d  2   -0.371843
+   3    1.669025
+dtype: float64
+================================= s.loc[:, 2] ==================================
+a   -1.296221
+c   -2.001637
+d   -0.371843
+dtype: float64
+#+end_example
+
+*** 层级交换(swaplevel)与排序(sort_index)
+
+=swaplevel= 接收两个层级序号或层级名称，返回一个进行了层级变更的新对象， _数据是不变的_ 。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame(np.arange(12).reshape((4, 3)),
+                    index=[['a', 'a', 'b', 'b'], [1, 2, 1, 2]],
+                    columns=[['Ohio', 'Ohio', 'Colorado'], ['Green', 'Red', 'Green']]
+  )
+  df.index.names = ['key1', 'key2']
+  df.columns.names = ['state', 'color']
+  log("df", df)
+  log("df.swaplevel('key1', 'key2')", df.swaplevel('key1', 'key2'))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+state      Ohio     Colorado
+color     Green Red    Green
+key1 key2
+a    1        0   1        2
+     2        3   4        5
+b    1        6   7        8
+     2        9  10       11
+========================= df.swaplevel('key1', 'key2') =========================
+state      Ohio     Colorado
+color     Green Red    Green
+key2 key1
+1    a        0   1        2
+2    a        3   4        5
+1    b        6   7        8
+2    b        9  10       11
+#+end_example
+
+=sort_index= 只能在单一层级上对数据进行排序。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("df.sort_index(level=1)", df.sort_index(level=1))
+  log("df.swaplevel(0, 1).sort_index(level=0)", df.swaplevel(0, 1).sort_index(level=0))
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+============================ df.sort_index(level=1) ============================
+state      Ohio     Colorado
+color     Green Red    Green
+key1 key2
+a    1        0   1        2
+b    1        6   7        8
+a    2        3   4        5
+b    2        9  10       11
+==================== df.swaplevel(0, 1).sort_index(level=0) ====================
+state      Ohio     Colorado
+color     Green Red    Green
+key2 key1
+1    a        0   1        2
+     b        6   7        8
+2    a        3   4        5
+     b        9  10       11
+#+end_example
+
+
+*如果索引按照字典顺序从最外层开始排序，则数据选择性能会更好*
+
+
+*** 列索引转为行索引 (set_index)
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame({
+      "a": range(7),
+      "b": range(7, 0, -1),
+      "c": ['one', 'one', 'one', 'two', 'two', 'two', 'two'],
+      "d": [0, 1, 2, 0, 1, 2, 3]
+  })
+  log("df", df)
+  log("df.set_index(['c', 'd'])", df.set_index(['c', 'd']))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+   a  b    c  d
+0  0  7  one  0
+1  1  6  one  1
+2  2  5  one  2
+3  3  4  two  0
+4  4  3  two  1
+5  5  2  two  2
+6  6  1  two  3
+=========================== df.set_index(['c', 'd']) ===========================
+       a  b
+c   d
+one 0  0  7
+    1  1  6
+    2  2  5
+two 0  3  4
+    1  4  3
+    2  5  2
+    3  6  1
+#+end_example
+
+默认情况下，用过行索引的列会从 DataFrame 中删除，也可以选择留下：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("df.set_index(['c', 'd'], drop=False)", df.set_index(['c', 'd'], drop=False))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+===================== df.set_index(['c', 'd'], drop=False) =====================
+       a  b    c  d
+c   d
+one 0  0  7  one  0
+    1  1  6  one  1
+    2  2  5  one  2
+two 0  3  4  two  0
+    1  4  3  two  1
+    2  5  2  two  2
+    3  6  1  two  3
+#+end_example
+
+
+*** 行索引转为列索引 (reset_index)
+
+=reset_index= 是 =set_index= 的 *反操作* ，分层索引的行索引层级会被移动为列索引。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame({
+      "a": range(7),
+      "b": range(7, 0, -1),
+      "c": ['one', 'one', 'one', 'two', 'two', 'two', 'two'],
+      "d": [0, 1, 2, 0, 1, 2, 3]
+  })
+  log("df", df)
+  df2 = df.set_index(['c', 'd'])
+  log("df2", df2)
+  log("df2.reset_index()", df2.reset_index())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+   a  b    c  d
+0  0  7  one  0
+1  1  6  one  1
+2  2  5  one  2
+3  3  4  two  0
+4  4  3  two  1
+5  5  2  two  2
+6  6  1  two  3
+===================================== df2 ======================================
+       a  b
+c   d
+one 0  0  7
+    1  1  6
+    2  2  5
+two 0  3  4
+    1  4  3
+    2  5  2
+    3  6  1
+============================== df2.reset_index() ===============================
+     c  d  a  b
+0  one  0  0  7
+1  one  1  1  6
+2  one  2  2  5
+3  two  0  3  4
+4  two  1  4  3
+5  two  2  5  2
+6  two  3  6  1
+#+end_example
+
+
+** 连接与合并(concat,merge,combine_first)
+
+
+*** merge
+
+**** 基本用法
+
+合并或连接操作是通过一个或多个键，连接行来联合数据集。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df1 = pd.DataFrame({
+      "key": list('bbacaab'),
+      "data1": range(7)
+  })
+
+  df2 = pd.DataFrame({
+      "key": list('abd'),
+      "data2": range(3)
+  })
+
+  log("df1", df1)
+  log("df2", df2)
+  log("pd.merge(df1, df2)", pd.merge(df1, df2))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+===================================== df1 ======================================
+  key  data1
+0   b      0
+1   b      1
+2   a      2
+3   c      3
+4   a      4
+5   a      5
+6   b      6
+===================================== df2 ======================================
+  key  data2
+0   a      0
+1   b      1
+2   d      2
+============================== pd.merge(df1, df2) ==============================
+  key  data1  data2
+0   b      0      1
+1   b      1      1
+2   b      6      1
+3   a      2      0
+4   a      4      0
+5   a      5      0
+#+end_example
+
+若没有指定在哪一列上进行连接，即没有指定连接的键信息， =merge= 会自动将 *重叠列名作为连接键* 。
+
+显示指定连接键才是好的做法：
+
+#+BEGIN_SRC ipython
+  pd.merge(df1, df2, on='key')
+#+END_SRC
+
+如果每个对象的列名是不同的，可以分别为它们指定列名：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df1 = pd.DataFrame({
+      "lkey": list('bbacaab'),
+      "data1": range(7)
+  })
+
+  df2 = pd.DataFrame({
+      "rkey": list('abd'),
+      "data2": range(3)
+  })
+
+  log("df1", df1)
+  log("df2", df2)
+  log("pd.merge(df1, df2, left_on='lkey', right_on='rkey')", pd.merge(df1, df2, left_on='lkey', right_on='rkey'))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+===================================== df1 ======================================
+  lkey  data1
+0    b      0
+1    b      1
+2    a      2
+3    c      3
+4    a      4
+5    a      5
+6    b      6
+===================================== df2 ======================================
+  rkey  data2
+0    a      0
+1    b      1
+2    d      2
+============= pd.merge(df1, df2, left_on='lkey', right_on='rkey') ==============
+  lkey  data1 rkey  data2
+0    b      0    b      1
+1    b      1    b      1
+2    b      6    b      1
+3    a      2    a      0
+4    a      4    a      0
+5    a      5    a      0
+#+end_example
+
+**** 合并类型(inner,outer,left,right)
+
+默认情况下， =merge= 做的是内连接。
+
+*多对多的连接是行的笛卡尔积* ：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df1 = pd.DataFrame({
+      "key": list('bbacab'),
+      "data1": range(6)
+  })
+  df1.index = ['one', 'two', 'three', 'four', 'five', 'six']
+
+  df2 = pd.DataFrame({
+      "key": list('ababd'),
+      "data2": range(5)
+  })
+
+  log("df1", df1)
+  log("df2", df2)
+  log("pd.merge(df1, df2, on='key', how='left')", pd.merge(df1, df2, on='key', how='left'))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+===================================== df1 ======================================
+      key  data1
+one     b      0
+two     b      1
+three   a      2
+four    c      3
+five    a      4
+six     b      5
+===================================== df2 ======================================
+  key  data2
+0   a      0
+1   b      1
+2   a      2
+3   b      3
+4   d      4
+=================== pd.merge(df1, df2, on='key', how='left') ===================
+   key  data1  data2
+0    b      0    1.0
+1    b      0    3.0
+2    b      1    1.0
+3    b      1    3.0
+4    a      2    0.0
+5    a      2    2.0
+6    c      3    NaN
+7    a      4    0.0
+8    a      4    2.0
+9    b      5    1.0
+10   b      5    3.0
+#+end_example
+
+_如上例所示，进行列-列连接时，索引对象会被丢弃。_
+
+
+
+**** 索引作为合并键
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  left1 = pd.DataFrame({
+      "key": list('abaabc'),
+      "value": range(6)
+  })
+
+  right1 = pd.DataFrame({
+      "group_val": [3.5, 7]
+  }, index=['a', 'b'])
+
+log("left1", left1)
+log("right1", right1)
+log("pd.merge(left1, right1, left_on='key', right_index=True)", pd.merge(left1, right1, left_on='key', right_index=True))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+==================================== left1 =====================================
+  key  value
+0   a      0
+1   b      1
+2   a      2
+3   a      3
+4   b      4
+5   c      5
+==================================== right1 ====================================
+   group_val
+a        3.5
+b        7.0
+=========== pd.merge(left1, right1, left_on='key', right_index=True) ===========
+  key  value  group_val
+0   a      0        3.5
+2   a      2        3.5
+3   a      3        3.5
+1   b      1        7.0
+4   b      4        7.0
+#+end_example
+
+多层索引的情况下，在索引上的连接是一个隐式的多键合并，
+*必须以列表的方式指明合并所需的多个列：*
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  lefth = pd.DataFrame(
+      {
+          "key1": ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada'],
+          "key2": [2000, 2001, 2002, 2001, 2002],
+          "data": np.arange(5)
+      }
+  )
+
+  righth = pd.DataFrame(np.arange(12).reshape((6, 2)),
+                        index=[
+                            ['Nevada', 'Nevada', 'Ohio', 'Ohio', 'Ohio', 'Ohio'],
+                            [2001, 2000, 2000, 2000, 2001, 2002]
+                        ],
+                        columns=['event1', 'event2']
+  )
+
+  log("lefth", lefth)
+  log("righth", righth)
+  log("pd.merge(lefth, righth, left_on=['key1', 'key2'], right_index=True)", pd.merge(lefth, righth, left_on=['key1', 'key2'], right_index=True))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+==================================== lefth =====================================
+     key1  key2  data
+0    Ohio  2000     0
+1    Ohio  2001     1
+2    Ohio  2002     2
+3  Nevada  2001     3
+4  Nevada  2002     4
+==================================== righth ====================================
+             event1  event2
+Nevada 2001       0       1
+       2000       2       3
+Ohio   2000       4       5
+       2000       6       7
+       2001       8       9
+       2002      10      11
+===== pd.merge(lefth, righth, left_on=['key1', 'key2'], right_index=True) ======
+     key1  key2  data  event1  event2
+0    Ohio  2000     0       4       5
+0    Ohio  2000     0       6       7
+1    Ohio  2001     1       8       9
+2    Ohio  2002     2      10      11
+3  Nevada  2001     3       0       1
+#+end_example
+
+两边都使用索引合并：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  left2 = pd.DataFrame([[1, 2], [3, 4], [5, 6]],
+                       index=list('ace'),
+                       columns=['Ohio', 'Nevada']
+  )
+
+  right2 = pd.DataFrame([[7, 8], [9, 10], [11, 12], [13, 14]],
+                        index=list('bcde'),
+                        columns=['Missouri', 'Alabama']
+  )
+
+  log("left2", left2)
+  log("right2", right2)
+  log("pd.merge(left2, right2, how='outer', left_index=True, right_index=True)", pd.merge(left2, right2, how='outer', left_index=True, right_index=True))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+==================================== left2 =====================================
+   Ohio  Nevada
+a     1       2
+c     3       4
+e     5       6
+==================================== right2 ====================================
+   Missouri  Alabama
+b         7        8
+c         9       10
+d        11       12
+e        13       14
+=== pd.merge(left2, right2, how='outer', left_index=True, right_index=True) ====
+   Ohio  Nevada  Missouri  Alabama
+a   1.0     2.0       NaN      NaN
+b   NaN     NaN       7.0      8.0
+c   3.0     4.0       9.0     10.0
+d   NaN     NaN      11.0     12.0
+e   5.0     6.0      13.0     14.0
+#+end_example
+
+
+**** join
+
+DataFrame 有一个方便的 =join= 方法，用于 *按照索引合并* 。(_默认是左连接_)
+
+之前的例子中，可以这样写：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  left2 = pd.DataFrame([[1, 2], [3, 4], [5, 6]],
+                       index=list('ace'),
+                       columns=['Ohio', 'Nevada']
+  )
+
+  right2 = pd.DataFrame([[7, 8], [9, 10], [11, 12], [13, 14]],
+                        index=list('bcde'),
+                        columns=['Missouri', 'Alabama']
+  )
+
+  log("left2", left2)
+  log("right2", right2)
+  log("left2.join(right2, how='outer')", left2.join(right2, how='outer'))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+==================================== left2 =====================================
+   Ohio  Nevada
+a     1       2
+c     3       4
+e     5       6
+==================================== right2 ====================================
+   Missouri  Alabama
+b         7        8
+c         9       10
+d        11       12
+e        13       14
+======================= left2.join(right2, how='outer') ========================
+   Ohio  Nevada  Missouri  Alabama
+a   1.0     2.0       NaN      NaN
+b   NaN     NaN       7.0      8.0
+c   3.0     4.0       9.0     10.0
+d   NaN     NaN      11.0     12.0
+e   5.0     6.0      13.0     14.0
+#+end_example
+
+=join= 也支持使用连接键：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  left1 = pd.DataFrame({
+      "key": list('abaabc'),
+      "value": range(6)
+  })
+
+  right1 = pd.DataFrame({
+      "group_val": [3.5, 7]
+  }, index=['a', 'b'])
+
+  log("left1", left1)
+  log("right1", right1)
+  log("left1.join(right1, on='key')", left1.join(right1, on='key'))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+==================================== left1 =====================================
+  key  value
+0   a      0
+1   b      1
+2   a      2
+3   a      3
+4   b      4
+5   c      5
+==================================== right1 ====================================
+   group_val
+a        3.5
+b        7.0
+========================= left1.join(right1, on='key') =========================
+  key  value  group_val
+0   a      0        3.5
+1   b      1        7.0
+2   a      2        3.5
+3   a      3        3.5
+4   b      4        7.0
+5   c      5        NaN
+#+end_example
+
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  another = pd.DataFrame(
+      [[7, 8], [9, 10], [11, 12], [16, 17]],
+      index=list('acef'),
+      columns=['New York', 'Oregon']
+  )
+  left2 = pd.DataFrame([[1, 2], [3, 4], [5, 6]],
+                       index=list('ace'),
+                       columns=['Ohio', 'Nevada']
+  )
+  right2 = pd.DataFrame([[7, 8], [9, 10], [11, 12], [13, 14]],
+                        index=list('bcde'),
+                        columns=['Missouri', 'Alabama']
+  )
+  log("another", another)
+  log("left2", left2)
+  log("right2", right2)
+  log("left2.join([right2, another])", left2.join([right2, another]))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+=================================== another ====================================
+   New York  Oregon
+a         7       8
+c         9      10
+e        11      12
+f        16      17
+==================================== left2 =====================================
+   Ohio  Nevada
+a     1       2
+c     3       4
+e     5       6
+==================================== right2 ====================================
+   Missouri  Alabama
+b         7        8
+c         9       10
+d        11       12
+e        13       14
+======================== left2.join([right2, another]) =========================
+   Ohio  Nevada  Missouri  Alabama  New York  Oregon
+a     1       2       NaN      NaN         7       8
+c     3       4       9.0     10.0         9      10
+e     5       6      13.0     14.0        11      12
+#+end_example
+
 * 附录
 
 ** reindex 方法的参数 <<reindex>>
