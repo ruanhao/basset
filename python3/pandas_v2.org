@@ -72,7 +72,7 @@
 #+END_SRC
 
 #+RESULTS:
-: # Out[2]:
+: # Out[1]:
 
 
 * 核心数据结构
@@ -82,8 +82,6 @@
 Pandas 中的索引对象适用于存储标签和其他元数据的。
 
 索引对象是不可变的。
-
-[[index obj][常见方法和属性]]
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   s = pd.Series(range(3), index=list('abc'))
@@ -146,20 +144,20 @@ Series 是一维带标签的数组，数组里可以放任意的数据（整数�
 #+RESULTS:
 #+begin_example
 ====================================== s =======================================
-a   -0.701251
-b    1.857044
-c   -0.775307
-d    0.652000
-e    1.178334
+a    1.048359
+b   -0.206651
+c    0.875843
+d    0.417848
+e    1.849956
 dtype: float64
 =================================== s.index ====================================
 Index(['a', 'b', 'c', 'd', 'e'], dtype='object')
 ====================================== s2 ======================================
-0    0.393573
-1   -0.042283
-2    0.557877
-3    2.094997
-4    0.671984
+0   -0.298220
+1   -0.550852
+2   -0.558227
+3   -1.762704
+4   -1.475406
 dtype: float64
 =================================== s2.index ===================================
 RangeIndex(start=0, stop=5, step=1)
@@ -298,6 +296,7 @@ dtype: int64
   log("s.isin(['b', 'c'])", s.isin(['b', 'c']))
 #+END_SRC
 
+
 *** 排名(rank)
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
@@ -339,8 +338,6 @@ dtype: float64
 dtype: float64
 #+end_example
 
-[[break equal class][打破平级关系方法列表]]
-
 
 *** 在字典上下文中使用
 
@@ -352,12 +349,14 @@ dtype: float64
 #+END_SRC
 
 #+RESULTS:
+#+BEGIN_EXAMPLE
 : =================================== 'b' in s ===================================
 : True
 : =================================== 'e' in s ===================================
 : False
 : ==================================== 7 in s ====================================
 : False
+#+END_EXAMPLE
 
 
 *** 检查缺失数据
@@ -745,7 +744,7 @@ Texas   6.0 NaN   9.0 NaN
 Oregon  9.0 NaN  12.0 NaN
 #+end_example
 
-如果想在列上广播，在行上匹配，必须使用[[math method][算数方法]]中的一种：
+如果想在列上广播，在行上匹配，必须使用 _算数方法_ 中的一种：
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   s3 = df['d']
@@ -936,9 +935,6 @@ one    4  5  6  7
 #+end_example
 
 
-打破平级关系方法列表
-
-
 *** 转换为 ndarray 对象
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
@@ -1027,89 +1023,6 @@ one    4  5  6  7
   计算第一个算术差值（对时间序列有用）
 - pct_change
   计算百分比
-
-
-*** concat
-
-[[file:img/pandas_concat.png]]
-
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  origin_df = pd.DataFrame(np.random.randn(10, 4), columns=list('ABCD'))
-  concatted = pd.concat([origin_df.iloc[:3],
-                         origin_df.iloc[3:7],
-                         origin_df.iloc[7:]])
-  log("origin_df", origin_df)
-  log("concatted", concatted) # (concatted == origin_df).all().all(): True
-#+END_SRC
-
-#+RESULTS:
-#+begin_example
-================================== origin_df ===================================
-          A         B         C         D
-0  0.755595  1.036145 -0.857988  0.229536
-1  0.337109 -1.703817  0.533003  2.126698
-2  0.155211 -1.056213  0.828939  2.576655
-3  1.091366 -0.716061  1.995065  0.031306
-4 -0.541699 -0.593141 -0.620846 -0.837288
-5  0.914868  0.855716 -0.560497  0.435672
-6 -0.918672 -0.645815 -0.252298 -0.276985
-7  0.472277  1.547128 -2.137729 -0.090565
-8  0.219269 -0.417487  0.324093  0.262393
-9 -1.435991 -1.543388  0.403208 -0.268907
-================================== concatted ===================================
-          A         B         C         D
-0  0.755595  1.036145 -0.857988  0.229536
-1  0.337109 -1.703817  0.533003  2.126698
-2  0.155211 -1.056213  0.828939  2.576655
-3  1.091366 -0.716061  1.995065  0.031306
-4 -0.541699 -0.593141 -0.620846 -0.837288
-5  0.914868  0.855716 -0.560497  0.435672
-6 -0.918672 -0.645815 -0.252298 -0.276985
-7  0.472277  1.547128 -2.137729 -0.090565
-8  0.219269 -0.417487  0.324093  0.262393
-9 -1.435991 -1.543388  0.403208 -0.268907
-#+end_example
-
-
-*** merge / join
-
-原理：( =join= 底层仍然是使用 =merge= )
-
-[[file:img/pandas_merge.png]]
-
-[[file:img/pandas_merge2.png]]
-
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  left = pd.DataFrame({'key': ['foo', 'foo'], 'lval': [1, 2]})
-  right = pd.DataFrame({'key': ['foo', 'foo'], 'rval': [4, 5]})
-
-  # SELECT * FROM left INNER JOIN right ON left.key = right.key;
-  merged = pd.merge(left, right, on='key')
-  log("left", left)
-  log("right", right)
-  log("merged", merged)
-#+END_SRC
-
-#+RESULTS:
-#+begin_example
-===================================== left =====================================
-   key  lval
-0  foo     1
-1  foo     2
-==================================== right =====================================
-   key  rval
-0  foo     4
-1  foo     5
-==================================== merged ====================================
-   key  lval  rval
-0  foo     1     4
-1  foo     1     5
-2  foo     2     4
-3  foo     2     5
-#+end_example
-
 
 
 
@@ -1223,7 +1136,7 @@ e    NaN
 dtype: float64
 #+end_example
 
-重建索引时插值: ([[reindex][reindex 方法的参数]])
+重建索引时插值:
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   s = pd.Series(['blue', 'purple', 'yellow'], index=[0, 2, 4])
@@ -1318,6 +1231,7 @@ dtype: int64
 
 
 
+
 *** 布尔索引
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
@@ -1363,8 +1277,6 @@ dtype: int64
 在 DataFrame 中， =reindex= 可以改变行索引，列索引，也可以同时改变两者。
 
 =fill method= 只对行重新索引有效，不适用列。
-
-[[reindex][reindex 方法的参数]]
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   df = pd.DataFrame(np.arange(9).reshape((3,3)),
@@ -1990,8 +1902,6 @@ Python 内建的 None 值也被当做 NA 处理。
 5 -0.561398       NaN -0.738710
 #+end_example
 
-
-[[fillna arg][fillna 函数参数]]
 
 
 ** 数据转换
@@ -2795,6 +2705,10 @@ two 0  3  4
 
 合并或连接操作是通过一个或多个键，连接行来联合数据集。
 
+[[file:img/pandas_merge.png]]
+
+[[file:img/pandas_merge2.png]]
+
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   df1 = pd.DataFrame({
       "key": list('bbacaab'),
@@ -3083,7 +2997,8 @@ e   5.0     6.0      13.0     14.0
 
 **** join
 
-DataFrame 有一个方便的 =join= 方法，用于 *按照索引合并* 。(_默认是左连接_)
+DataFrame 有一个方便的 =join= 方法，底层仍然是使用 =merge= ，用于 *按照索引合并* 。(_默认是左连接_)
+
 
 之前的例子中，可以这样写：
 
@@ -3218,6 +3133,8 @@ e     5       6      13.0     14.0        11      12
 
 =concat= 方法本质其实就是[[index merge][按索引合并]] ，默认情况下 =concat= 方法是沿着 =axis = 0= 的轴向生效的，
 *生成另一个 Series* ；如传递 =axis = 1= ， *返回的结果则是 DataFrame* 。
+
+[[file:img/pandas_concat.png]]
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   s1 = pd.Series([0, 1], index=['a', 'b'])
@@ -3549,75 +3466,343 @@ dtype: float64
 4  7.0  8.0   NaN
 #+end_example
 
-* 附录
 
-** reindex 方法的参数 <<reindex>>
+** 重排列表格型数据
 
-- method
+*** 使用多层索引进行重塑(stack/unstack)
 
-  插值方式， =ffill= 为前向填充， =bfill= 是后向填充
+- stack
 
-- fill_value
+  将列中的数据透视到行
 
-- limit
+- unstack
 
-  前向或后向填充时，所需填充的最大尺寸间隙（以元素数量）
-
-- tolerance
-
-  前向或后向填充时，所需填充的不精确匹配下的最大尺寸间隙（以绝对数字距离）
-
-- level
-
-  匹配 MultiIndex 级别的简单索引；否则选择子集
-
-- copy
-
-  如果为 =True= ，即使新索引等于旧索引，也总是复制底层数据；
-  如果是 =False= ，则在索引相同时不复制数据
+  将行中的数据透视到列
 
 
-** 索引对象常见方法和属性 <<index obj>>
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame(np.arange(6).reshape((2, 3)),
+                    index=pd.Index(['Ohio', 'Colorado'], name='state'),
+                    columns=pd.Index(['one', 'two', 'three'], name='number')
+  )
+  log("df", df)
+  log("df.stack()", df.stack())
+  log("df.stack().unstack()", df.stack().unstack())
+  log("df.stack().unstack(0)", df.stack().unstack(0))
+  log("df.stack().unstack('state')", df.stack().unstack('state'))
+#+END_SRC
 
-- append
-- difference
-- intersection
-- union
-- isin
-- delete
-- drop
-- insert
-- is_monotonic
-- is_unique
-- unique
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+number    one  two  three
+state
+Ohio        0    1      2
+Colorado    3    4      5
+================================== df.stack() ==================================
+state     number
+Ohio      one       0
+          two       1
+          three     2
+Colorado  one       3
+          two       4
+          three     5
+dtype: int64
+============================= df.stack().unstack() =============================
+number    one  two  three
+state
+Ohio        0    1      2
+Colorado    3    4      5
+============================ df.stack().unstack(0) =============================
+state   Ohio  Colorado
+number
+one        0         3
+two        1         4
+three      2         5
+========================= df.stack().unstack('state') ==========================
+state   Ohio  Colorado
+number
+one        0         3
+two        1         4
+three      2         5
+#+end_example
+
+当层级中的所有值并未包含于每个子分组中， =unstack= 会引入缺失值：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s1 = pd.Series([0, 1, 2, 3], index=list('abcd'))
+  s2 = pd.Series([4, 5, 6], index=list('cde'))
+  df = pd.concat([s1, s2], keys=['one', 'two'])
+  log("df", df)
+  log("df.unstack()", df.unstack())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+one  a    0
+     b    1
+     c    2
+     d    3
+two  c    4
+     d    5
+     e    6
+dtype: int64
+================================= df.unstack() =================================
+       a    b    c    d    e
+one  0.0  1.0  2.0  3.0  NaN
+two  NaN  NaN  4.0  5.0  6.0
+#+end_example
+
+默认情况下， =stack= 会滤除缺失值：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("df.unstack().stack()", df.unstack().stack())
+  log("df.unstack().stack(dropna=False)", df.unstack().stack(dropna=False))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+============================= df.unstack().stack() =============================
+one  a    0.0
+     b    1.0
+     c    2.0
+     d    3.0
+two  c    4.0
+     d    5.0
+     e    6.0
+dtype: float64
+======================= df.unstack().stack(dropna=False) =======================
+one  a    0.0
+     b    1.0
+     c    2.0
+     d    3.0
+     e    NaN
+two  a    NaN
+     b    NaN
+     c    4.0
+     d    5.0
+     e    6.0
+dtype: float64
+#+end_example
 
 
-** 算数方法 <<math method>>
+*** 将列的值转换为列索引(pivot)
 
-- add, radd :: +
-- sub, rsub :: -
-- div, rdiv :: /
-- floordiv, rfloordiv :: //
-- mul, rmul :: *
-- pow, rpow :: **
+=pivot(<用作行索引的列>, <用作列索引的列>, <可选的数值列>)=
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  data = [
+      ['1959-03-31', 'realgdp', 2710.349],
+      ['1959-03-31', 'infl', 0],
+      ['1959-03-31', 'unemp', 5.8],
+      ['1959-06-30', 'realgdp', 2778.801],
+      ['1959-06-30', 'infl', 2.34],
+      ['1959-06-30', 'unemp', 5.1],
+      ['1959-09-30', 'realgdp', 2775.488],
+      ['1959-09-30', 'infl', 2.74],
+      ['1959-09-30', 'unemp', 5.3],
+      ['1959-12-31', 'realgdp', 2785.204]
+  ]
+
+  df = pd.DataFrame(data, columns=['date', 'item', 'value'])
+  log("df", df)
+  # 针对所有 date ，将 item 的值转换为列索引，填入 value
+  log("df.pivot('date', 'item', 'value')", df.pivot('date', 'item', 'value'))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+         date     item     value
+0  1959-03-31  realgdp  2710.349
+1  1959-03-31     infl     0.000
+2  1959-03-31    unemp     5.800
+3  1959-06-30  realgdp  2778.801
+4  1959-06-30     infl     2.340
+5  1959-06-30    unemp     5.100
+6  1959-09-30  realgdp  2775.488
+7  1959-09-30     infl     2.740
+8  1959-09-30    unemp     5.300
+9  1959-12-31  realgdp  2785.204
+====================== df.pivot('date', 'item', 'value') =======================
+item        infl   realgdp  unemp
+date
+1959-03-31  0.00  2710.349    5.8
+1959-06-30  2.34  2778.801    5.1
+1959-09-30  2.74  2775.488    5.3
+1959-12-31   NaN  2785.204    NaN
+#+end_example
+
+多个数值列:
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df['value2'] = np.random.randn(len(df))
+  log("df", df)
+  log("df.pivot('date', 'item')", df.pivot('date', 'item'))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+         date     item     value    value2
+0  1959-03-31  realgdp  2710.349 -0.894763
+1  1959-03-31     infl     0.000  1.673363
+2  1959-03-31    unemp     5.800  0.185811
+3  1959-06-30  realgdp  2778.801 -0.905169
+4  1959-06-30     infl     2.340  0.697258
+5  1959-06-30    unemp     5.100  0.342515
+6  1959-09-30  realgdp  2775.488 -0.544010
+7  1959-09-30     infl     2.740  0.591888
+8  1959-09-30    unemp     5.300 -0.605425
+9  1959-12-31  realgdp  2785.204  1.386318
+=========================== df.pivot('date', 'item') ===========================
+           value                    value2
+item        infl   realgdp unemp      infl   realgdp     unemp
+date
+1959-03-31  0.00  2710.349   5.8  1.673363 -0.894763  0.185811
+1959-06-30  2.34  2778.801   5.1  0.697258 -0.905169  0.342515
+1959-09-30  2.74  2775.488   5.3  0.591888 -0.544010 -0.605425
+1959-12-31   NaN  2785.204   NaN       NaN  1.386318       NaN
+#+end_example
+
+*注意：*
+
+=pivot= 等价于使用 =set_index= 创建分层索引，然后调用 =unstack= ：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("df.set_index(['date', 'item']).unstack('item')", df.set_index(['date', 'item']).unstack('item'))
+#+END_SRC
+
+#+RESULTS:
+: ================ df.set_index(['date', 'item']).unstack('item') ================
+:            value                    value2
+: item        infl   realgdp unemp      infl   realgdp     unemp
+: date
+: 1959-03-31  0.00  2710.349   5.8  1.673363 -0.894763  0.185811
+: 1959-06-30  2.34  2778.801   5.1  0.697258 -0.905169  0.342515
+: 1959-09-30  2.74  2775.488   5.3  0.591888 -0.544010 -0.605425
+: 1959-12-31   NaN  2785.204   NaN       NaN  1.386318       NaN
 
 
-** 打破平级关系方法 <<break equal class>>
 
-- average
-- min
-- max
-- first
-- dense
+*** 将列索引转换为列的值(melt)
 
-** fillna 函数参数 <<fillna arg>>
+=pd.melt(df, <分组指标>)=
 
-|---------+------------------------------------------|
-| 参数    | 描述                                     |
-|---------+------------------------------------------|
-| value   | 标量值或字典型对象，用于填充缺失值       |
-| method  | 插值方法，如果没有其他参数，默认是 ffill |
-| axis    | 需要填充的轴，默认 axis=0                |
-| inplace | 原地修改                                 |
-| limit   | 用于前向或后向填充时最大的填充范围       |
-|---------+------------------------------------------|
+=melt= 用于将多列合并成一列（ _每个观测值分别位于一行_ ），可以看成是 =pivot= 的 *反操作* 。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame(
+      {
+          "key": ['foo', 'bar', 'baz'],
+          "A": [1, 2, 3],
+          "B": [4, 5, 6],
+          "C": [7, 8, 9]
+      }
+  )
+  log("df", df)
+  # key 列作为分组指标，其他列均作为数据值
+  log("pd.melt(df, ['key'])", pd.melt(df, ['key']))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+   key  A  B  C
+0  foo  1  4  7
+1  bar  2  5  8
+2  baz  3  6  9
+============================= pd.melt(df, ['key']) =============================
+   key variable  value
+0  foo        A      1
+1  bar        A      2
+2  baz        A      3
+3  foo        B      4
+4  bar        B      5
+5  baz        B      6
+6  foo        C      7
+7  bar        C      8
+8  baz        C      9
+#+end_example
+
+**** 使用pivot将数据重塑会原先的布局
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  reshaped = pd.melt(df, ['key']).pivot('key', 'variable', 'value')
+  log("reshaped", reshaped)
+  log("reshaped.reset_index()", reshaped.reset_index())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+=================================== reshaped ===================================
+variable  A  B  C
+key
+bar       2  5  8
+baz       3  6  9
+foo       1  4  7
+============================ reshaped.reset_index() ============================
+variable  key  A  B  C
+0         bar  2  5  8
+1         baz  3  6  9
+2         foo  1  4  7
+#+end_example
+
+
+**** 指定列的子集作为值列
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("pd.melt(df, id_vars=['key'], value_vars=['A', 'B'])", pd.melt(df, id_vars=['key'], value_vars=['A', 'B']))
+#+END_SRC
+
+#+RESULTS:
+: ============= pd.melt(df, id_vars=['key'], value_vars=['A', 'B']) ==============
+:    key variable  value
+: 0  foo        A      1
+: 1  bar        A      2
+: 2  baz        A      3
+: 3  foo        B      4
+: 4  bar        B      5
+: 5  baz        B      6
+
+
+
+**** 不指定分组指标
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("df", df)
+  log("pd.melt(df, value_vars=['A', 'B', 'C'])", pd.melt(df, value_vars=['A', 'B', 'C']))
+  log("pd.melt(df, value_vars=['key', 'A', 'C'])", pd.melt(df, value_vars=['key', 'A', 'C']))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+   key  A  B  C
+0  foo  1  4  7
+1  bar  2  5  8
+2  baz  3  6  9
+=================== pd.melt(df, value_vars=['A', 'B', 'C']) ====================
+  variable  value
+0        A      1
+1        A      2
+2        A      3
+3        B      4
+4        B      5
+5        B      6
+6        C      7
+7        C      8
+8        C      9
+================== pd.melt(df, value_vars=['key', 'A', 'C']) ===================
+  variable value
+0      key   foo
+1      key   bar
+2      key   baz
+3        A     1
+4        A     2
+5        A     3
+6        C     7
+7        C     8
+8        C     9
+#+end_example
