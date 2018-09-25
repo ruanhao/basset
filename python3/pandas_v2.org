@@ -23,7 +23,6 @@
   import numpy as np
   import matplotlib.pyplot as plt
   import subprocess
-  from PIL import Image
 
   def run_script(script):
       """Returns (stdout, stderr), raises error on non-zero return code"""
@@ -34,37 +33,6 @@
       if proc.returncode:
           raise Exception('exit code %s' % proc.returncode)
       return stdout, stderr
-
-  def show_dataframe(df):
-      global path
-      df.to_html("/tmp/df.html")
-      run_script('webkit2png -F --transparent /tmp/df.html -D /tmp -o df')
-      # try:
-      #     subprocess.call('webkit2png -F --transparent /tmp/df.html -D /tmp -o df', shell=True, timeout=5)
-      # except:
-      #     pass
-      image = Image.open('/tmp/df-full.png')
-      box = image.getbbox()
-      cropped = image.crop(box)
-      image.close()
-      w = cropped.size[0]
-      h = cropped.size[1]
-      ratio = 0.618
-      cropped.thumbnail((int(w*ratio), int(h*ratio)), Image.ANTIALIAS)
-      cropped.save(path)
-      cropped.close()
-
-  def plot():
-      global path
-      plt.savefig(path)
-      plt.clf()
-
-  def show_fig(o):
-      global path
-      plt.clf()
-      o.plot()
-      plt.savefig(path)
-
 
   def log(title0, value):
       title1 = ' ' + title0 + ' '
@@ -3805,4 +3773,120 @@ variable  key  A  B  C
 6        C     7
 7        C     8
 8        C     9
+#+end_example
+
+
+
+* 聚合与分组操作
+
+** GroupBy 对象
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame({'key1' : ['a', 'a', 'b', 'b', 'a'],
+                     'key2' : ['one', 'two', 'one', 'two', 'one'],
+                     'data1' : np.random.randn(5),
+                     'data2' : np.random.randn(5)})
+  log("df", df)
+  grouped = df.groupby('key1')
+  log("grouped", grouped)
+  log("dict(list(grouped))['a']", dict(list(grouped))['a'])
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+  key1 key2     data1     data2
+0    a  one -0.199651 -0.279757
+1    a  two -1.053575  0.356160
+2    b  one  2.185409  1.448519
+3    b  two -0.701065  1.565013
+4    a  one  0.666953  0.000710
+=================================== grouped ====================================
+<pandas.core.groupby.groupby.DataFrameGroupBy object at 0x1110303c8>
+=========================== dict(list(grouped))['a'] ===========================
+  key1 key2     data1     data2
+0    a  one -0.199651 -0.279757
+1    a  two -1.053575  0.356160
+4    a  one  0.666953  0.000710
+#+end_example
+
+
+*** GroupBy 对象的列索引
+
+对 =GroupBy= 对象进行列索引，等效于对该列或列的子集做聚合。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("df", df)
+  log("list(df.groupby('key1')", list(df.groupby('key1')))
+  print()
+  # 等效于 df['date1'].groupby(df['key1'])
+  log("df.groupby('key1')['data1']", df.groupby('key1')['data1'])
+  log("list(df.groupby('key1')['data1'])", list(df.groupby('key1')['data1']))
+
+  # 等效于 df[['date2']].groupby(df['key1'])
+  log("df.groupby('key1')[['data2']]", df.groupby('key1')[['data2']])
+  log("list(df.groupby('key1')[['data2']])", list(df.groupby('key1')[['data2']]))
+  print()
+  log("type(df.groupby(['key1', 'key2'])[['data2']].mean())", type(df.groupby(['key1', 'key2'])[['data2']].mean()))
+  log("df.groupby(['key1', 'key2'])[['data2']].mean()", df.groupby(['key1', 'key2'])[['data2']].mean())
+
+  log("type(df.groupby(['key1', 'key2'])['data2'].mean())", type(df.groupby(['key1', 'key2'])['data2'].mean()))
+  log("df.groupby(['key1', 'key2'])['data2'].mean()", df.groupby(['key1', 'key2'])['data2'].mean())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+  key1 key2     data1     data2
+0    a  one -0.199651 -0.279757
+1    a  two -1.053575  0.356160
+2    b  one  2.185409  1.448519
+3    b  two -0.701065  1.565013
+4    a  one  0.666953  0.000710
+=========================== list(df.groupby('key1') ============================
+[('a',   key1 key2     data1     data2
+0    a  one -0.199651 -0.279757
+1    a  two -1.053575  0.356160
+4    a  one  0.666953  0.000710), ('b',   key1 key2     data1     data2
+2    b  one  2.185409  1.448519
+3    b  two -0.701065  1.565013)]
+
+========================= df.groupby('key1')['data1'] ==========================
+<pandas.core.groupby.groupby.SeriesGroupBy object at 0x112278320>
+====================== list(df.groupby('key1')['data1']) =======================
+[('a', 0   -0.199651
+1   -1.053575
+4    0.666953
+Name: data1, dtype: float64), ('b', 2    2.185409
+3   -0.701065
+Name: data1, dtype: float64)]
+======================== df.groupby('key1')[['data2']] =========================
+<pandas.core.groupby.groupby.DataFrameGroupBy object at 0x1122784a8>
+===================== list(df.groupby('key1')[['data2']]) ======================
+[('a',   key1 key2     data1     data2
+0    a  one -0.199651 -0.279757
+1    a  two -1.053575  0.356160
+4    a  one  0.666953  0.000710), ('b',   key1 key2     data1     data2
+2    b  one  2.185409  1.448519
+3    b  two -0.701065  1.565013)]
+
+============= type(df.groupby(['key1', 'key2'])[['data2']].mean()) =============
+<class 'pandas.core.frame.DataFrame'>
+================ df.groupby(['key1', 'key2'])[['data2']].mean() ================
+              data2
+key1 key2
+a    one  -0.139523
+     two   0.356160
+b    one   1.448519
+     two   1.565013
+============== type(df.groupby(['key1', 'key2'])['data2'].mean()) ==============
+<class 'pandas.core.series.Series'>
+================= df.groupby(['key1', 'key2'])['data2'].mean() =================
+key1  key2
+a     one    -0.139523
+      two     0.356160
+b     one     1.448519
+      two     1.565013
+Name: data2, dtype: float64
 #+end_example
