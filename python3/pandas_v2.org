@@ -36,11 +36,11 @@
 
   def log(title0, value):
       title1 = ' ' + title0 + ' '
-      print("{}\n{}".format(title1.center(80, '='), value))
+      print("{}\n{}".format(title1.center(100, '='), value))
 #+END_SRC
 
 #+RESULTS:
-: # Out[2]:
+: # Out[50]:
 
 
 * 核心数据结构
@@ -4048,7 +4048,10 @@ cty  JP  US
 
 
 
-** 数据聚合
+** 数据聚合(agg)
+
+=agg= 方法将一个函数使用在一个数列上，然后返回一个标量的值。
+即 =agg= 每次传入的是一列数据，对其聚合后返回标量。
 
 *** 对GroupBy对象调用聚合方法
 
@@ -4099,6 +4102,347 @@ a     0.024958  0.593499
 b     1.205490  0.138605
 #+end_example
 
+
+
 *** 逐列与多函数应用
 
+**** 各列同时使用多个函数聚合
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  data = [
+      (16.99, 1.01, 'No', 'Sat', 'Dinner', 2),
+      (17.99, 1.01, 'No', 'Sat', 'Lunch', 2),
+      (10.34, 1.66, 'Yes', 'Sun', 'Lunch', 3),
+      (21.01, 3.50, 'Yes', 'Sun', 'Dinner', 3),
+      (23.68, 3.31, 'Yes', 'Fri', 'Lunch', 2),
+      (27.59, 3.61, 'Yes', 'Fri', 'Dinner', 4),
+      (25.29, 4.71, 'Yes', 'Sun', 'Dinner', 4),
+  ]
+  columns=['total_bill', 'tip', 'smoker', 'day', 'time', 'size']
+  tips = pd.DataFrame(data, columns=columns)
+  tips['tip_pct'] = tips['tip'] / tips['total_bill']
+  log("tips", tips)
+
+#+END_SRC
+
+#+RESULTS:
+: ===================================== tips =====================================
+:    total_bill   tip smoker  day    time  size   tip_pct
+: 0       16.99  1.01     No  Sat  Dinner     2  0.059447
+: 1       17.99  1.01     No  Sat   Lunch     2  0.056142
+: 2       10.34  1.66    Yes  Sun   Lunch     3  0.160542
+: 3       21.01  3.50    Yes  Sun  Dinner     3  0.166587
+: 4       23.68  3.31    Yes  Fri   Lunch     2  0.139780
+: 5       27.59  3.61    Yes  Fri  Dinner     4  0.130845
+: 6       25.29  4.71    Yes  Sun  Dinner     4  0.186240
+
+传递函数或函数名的列表，可以获得 *列名是函数名* 的 DataFrame ：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  def peak_to_peak(s):
+      return s.max() - s.min()
+
+  log("tips.groupby(['day', 'smoker'])['tip_pct'].agg(['mean', 'std', peak_to_peak])", tips.groupby(['day', 'smoker'])['tip_pct'].agg(['mean', 'std', peak_to_peak]))
+  log("tips.groupby(['day', 'smoker'])['tip_pct'].agg([('foo', 'mean'), ('bar', np.std)])", tips.groupby(['day', 'smoker'])['tip_pct'].agg([('foo', 'mean'), ('bar', np.std)]))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+===== tips.groupby(['day', 'smoker'])['tip_pct'].agg(['mean', 'std', peak_to_peak]) ======
+                mean       std  peak_to_peak
+day smoker
+Fri Yes     0.135312  0.006319      0.008936
+Sat No      0.057795  0.002337      0.003304
+Sun Yes     0.171123  0.013436      0.025698
+=== tips.groupby(['day', 'smoker'])['tip_pct'].agg([('foo', 'mean'), ('bar', np.std)]) ===
+                 foo       bar
+day smoker
+Fri Yes     0.135312  0.006319
+Sat No      0.057795  0.002337
+Sun Yes     0.171123  0.013436
+#+end_example
+
+**** 使用不同的函数对多个列聚合
+
+只有多个函数应用于至少一个列时，DataFrame 才具有分层列。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  grouped = tips.groupby(['day', 'smoker'])
+  log("grouped.agg({'tip': np.max, 'size': 'sum'})", grouped.agg({'tip': np.max, 'size': 'sum'}))
+  log("grouped.agg({'tip_pct': ['min', 'max', 'mean', 'std'], 'size': 'sum'})", grouped.agg({'tip_pct': ['min', 'max', 'mean', 'std'], 'size': 'sum'}))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================== grouped.agg({'tip': np.max, 'size': 'sum'}) =======================
+             tip  size
+day smoker
+Fri Yes     3.61     6
+Sat No      1.01     4
+Sun Yes     4.71    10
+========= grouped.agg({'tip_pct': ['min', 'max', 'mean', 'std'], 'size': 'sum'}) =========
+             tip_pct                               size
+                 min       max      mean       std  sum
+day smoker
+Fri Yes     0.130845  0.139780  0.135312  0.006319    6
+Sat No      0.056142  0.059447  0.057795  0.002337    4
+Sun Yes     0.160542  0.186240  0.171123  0.013436   10
+#+end_example
+
+
+
+
 *** 返回不含行索引的聚合数据
+
+通过向 =groupby= 传递 =as_index = False= 来禁用分组键作为索引的行为：
+（通过在结果上调用 =reset_index= 可以获得相同的效果）
+
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("tips.groupby(['day', 'smoker'], as_index=False).mean()", tips.groupby(['day', 'smoker'], as_index=False).mean())
+#+END_SRC
+
+#+RESULTS:
+: ================= tips.groupby(['day', 'smoker'], as_index=False).mean() =================
+:    day smoker  total_bill   tip      size   tip_pct
+: 0  Fri    Yes      25.635  3.46  3.000000  0.135312
+: 1  Sat     No      17.490  1.01  2.000000  0.057795
+: 2  Sun    Yes      18.880  3.29  3.333333  0.171123
+
+
+** apply
+
+=apply= 是一个 _更一般化_ 的方法：将一个数据分拆-应用-汇总。
+=apply= 会将当前分组后的数据一起传入，可以返回标量，也可以返回多维数据。
+
+在 GroupBy 对象内部，当调用 =describe= 这样的方法时，实际上是以下代码的 _简写_ ：
+
+#+BEGIN_SRC ipython
+  f = lambda x: x.describe()
+  grouped.apply(f)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame({'key1': ['a', 'a', 'b', 'b', 'a', 'a', 'a', 'b', 'b', 'a'],
+                    'key2': ['one', 'two', 'one', 'two', 'one', 'one', 'two', 'one', 'two', 'one'],
+                    'data1': np.random.randint(1, 10, 10),
+                    'data2': np.random.randint(1, 10, 10)})
+
+  log("df", df)
+  # 根据 column 排序，输出其最大的 n 行数据
+  def top(df, n=2, column='data1'):
+      return df.sort_values(by=column, ascending=False)[:n]
+
+  log("df.groupby('key1').apply(top)", df.groupby('key1').apply(top))
+  # 可以传递参数：df.groupby('key1').apply(top, n=3, column='data2')
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+=========================================== df ===========================================
+  key1 key2  data1  data2
+0    a  one      2      3
+1    a  two      5      4
+2    b  one      2      4
+3    b  two      7      7
+4    a  one      4      9
+5    a  one      2      6
+6    a  two      6      3
+7    b  one      2      8
+8    b  two      9      1
+9    a  one      8      2
+============================= df.groupby('key1').apply(top) ==============================
+       key1 key2  data1  data2
+key1
+a    9    a  one      8      2
+     6    a  two      6      3
+b    8    b  two      9      1
+     3    b  two      7      7
+#+end_example
+
+*** 禁用分组键(group_keys=False)
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame({'key1': ['a', 'a', 'b', 'b', 'a', 'a', 'a', 'b', 'b', 'a'],
+                      'key2': ['one', 'two', 'one', 'two', 'one', 'one', 'two', 'one', 'two', 'one'],
+                      'data1': np.random.randint(1, 10, 10),
+                      'data2': np.random.randint(1, 10, 10)})
+
+  log("df", df)
+
+  # 根据 column 排序，输出其最大的 n 行数据
+  def top(df, n=2, column='data1'):
+      return df.sort_values(by=column, ascending=False)[:n]
+
+  log("df.groupby('key1').apply(top)", df.groupby('key1').apply(top))
+  log("df.groupby('key1', group_keys=False).apply(top)", df.groupby('key1', group_keys=False).apply(top))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+=========================================== df ===========================================
+  key1 key2  data1  data2
+0    a  one      8      9
+1    a  two      4      1
+2    b  one      2      6
+3    b  two      5      6
+4    a  one      6      5
+5    a  one      4      8
+6    a  two      7      2
+7    b  one      6      9
+8    b  two      7      1
+9    a  one      3      5
+============================= df.groupby('key1').apply(top) ==============================
+       key1 key2  data1  data2
+key1
+a    0    a  one      8      9
+     6    a  two      7      2
+b    8    b  two      7      1
+     7    b  one      6      9
+==================== df.groupby('key1', group_keys=False).apply(top) =====================
+  key1 key2  data1  data2
+0    a  one      8      9
+6    a  two      7      2
+8    b  two      7      1
+7    b  one      6      9
+#+end_example
+
+** 透视表(pivot_table)
+
+透视表是通过 =groupby= 以及使用分层索引的重塑操作实现的。
+
+[[https://nikgrozev.com/2015/07/01/reshaping-in-pandas-pivot-pivot-table-stack-and-unstack-explained-with-pictures/][pivot_table 和 pivot 区别]]
+
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame({'A' : ['one', 'one', 'two', 'three'] * 3,
+                     'B' : ['A', 'A', 'C', 'B', 'C', 'A'] * 2,
+                     'C' : ['foo', 'foo', 'foo', 'bar', 'bar', 'bar'] * 2,
+                     'D' : range(12),
+                     'E' : range(20, 32)})
+  log("df", df)
+  log("df.pivot_table(['D', 'E'], index=['A', 'B'], columns=['C'])", df.pivot_table(['D', 'E'], index=['A', 'B'], columns=['C']))
+  log("df.pivot_table(['D', 'E'], index=['A', 'B'], columns=['C'], margins=True)", df.pivot_table(['D', 'E'], index=['A', 'B'], columns=['C'], margins=True))
+  # 观察 (one, A, foo) 的 D 值变化
+  log("df.pivot_table(['D', 'E'], index=['A', 'B'], columns=['C'], margins=True, aggfunc=max)", df.pivot_table(['D', 'E'], index=['A', 'B'], columns=['C'], margins=True, aggfunc=max))
+  log("df.pivot_table(['D', 'E'], index=['A', 'B'], columns=['C'], margins=True, aggfunc=max, fill_value=0)", df.pivot_table(['D', 'E'], index=['A', 'B'], columns=['C'], margins=True, aggfunc=max, fill_value=0))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+=========================================== df ===========================================
+        A  B    C   D   E
+0     one  A  foo   0  20
+1     one  A  foo   1  21
+2     two  C  foo   2  22
+3   three  B  bar   3  23
+4     one  C  bar   4  24
+5     one  A  bar   5  25
+6     two  A  foo   6  26
+7   three  A  foo   7  27
+8     one  C  foo   8  28
+9     one  B  bar   9  29
+10    two  C  bar  10  30
+11  three  A  bar  11  31
+============== df.pivot_table(['D', 'E'], index=['A', 'B'], columns=['C']) ===============
+            D          E
+C         bar  foo   bar   foo
+A     B
+one   A   5.0  0.5  25.0  20.5
+      B   9.0  NaN  29.0   NaN
+      C   4.0  8.0  24.0  28.0
+three A  11.0  7.0  31.0  27.0
+      B   3.0  NaN  23.0   NaN
+two   A   NaN  6.0   NaN  26.0
+      C  10.0  2.0  30.0  22.0
+======= df.pivot_table(['D', 'E'], index=['A', 'B'], columns=['C'], margins=True) ========
+            D              E
+C         bar  foo All   bar   foo All
+A     B
+one   A   5.0  0.5   2  25.0  20.5  22
+      B   9.0  NaN   9  29.0   NaN  29
+      C   4.0  8.0   6  24.0  28.0  26
+three A  11.0  7.0   9  31.0  27.0  29
+      B   3.0  NaN   3  23.0   NaN  23
+two   A   NaN  6.0   6   NaN  26.0  26
+      C  10.0  2.0   6  30.0  22.0  26
+All       7.0  4.0   5  27.0  24.0  25
+= df.pivot_table(['D', 'E'], index=['A', 'B'], columns=['C'], margins=True, aggfunc=max) =
+            D              E
+C         bar  foo All   bar   foo All
+A     B
+one   A   5.0  1.0   5  25.0  21.0  25
+      B   9.0  NaN   9  29.0   NaN  29
+      C   4.0  8.0   8  24.0  28.0  28
+three A  11.0  7.0  11  31.0  27.0  31
+      B   3.0  NaN   3  23.0   NaN  23
+two   A   NaN  6.0   6   NaN  26.0  26
+      C  10.0  2.0  10  30.0  22.0  30
+All      11.0  8.0  11  31.0  28.0  31
+ df.pivot_table(['D', 'E'], index=['A', 'B'], columns=['C'], margins=True, aggfunc=max, fill_value=0)
+          D           E
+C       bar foo All bar foo All
+A     B
+one   A   5   1   5  25  21  25
+      B   9   0   9  29   0  29
+      C   4   8   8  24  28  28
+three A  11   7  11  31  27  31
+      B   3   0   3  23   0  23
+two   A   0   6   6   0  26  26
+      C  10   2  10  30  22  30
+All      11   8  11  31  28  31
+#+end_example
+
+
+** 交叉表(cross_table)
+
+交叉表是透视表的一个特殊情况， _计算的是分组中的频率_ 。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  data = [
+      (1, 'USA', 'Right-handed'),
+      (2, 'Japan', 'Left-handed'),
+      (3, 'USA', 'Right-handed'),
+      (4, 'Japan', 'Right-handed'),
+      (5, 'Japan', 'Left-handed'),
+      (6, 'Japan', 'Right-handed'),
+      (7, 'USA', 'Right-handed'),
+      (8, 'USA', 'Left-handed'),
+      (9, 'Japan', 'Right-handed'),
+      (10, 'USA', 'Right-handed'),
+  ]
+  df = pd.DataFrame(data, columns=['Sample', 'Nationality', 'Handedness'])
+  log("df", df)
+  log("pd.crosstab(df.Nationality, df.Handedness, margins=True)", pd.crosstab(df.Nationality, df.Handedness, margins=True))
+  # 等效于：
+  log("df.pivot_table(index='Nationality', columns='Handedness', aggfunc='count', margins=True)", df.pivot_table(index='Nationality', columns='Handedness', aggfunc='count', margins=True))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+================================================ df ================================================
+   Sample Nationality    Handedness
+0       1         USA  Right-handed
+1       2       Japan   Left-handed
+2       3         USA  Right-handed
+3       4       Japan  Right-handed
+4       5       Japan   Left-handed
+5       6       Japan  Right-handed
+6       7         USA  Right-handed
+7       8         USA   Left-handed
+8       9       Japan  Right-handed
+9      10         USA  Right-handed
+===================== pd.crosstab(df.Nationality, df.Handedness, margins=True) =====================
+Handedness   Left-handed  Right-handed  All
+Nationality
+Japan                  2             3    5
+USA                    1             4    5
+All                    3             7   10
+===== df.pivot_table(index='Nationality', columns='Handedness', aggfunc='count', margins=True) =====
+                 Sample
+Handedness  Left-handed Right-handed All
+Nationality
+Japan                 2            3   5
+USA                   1            4   5
+All                   3            7  10
+#+end_example
