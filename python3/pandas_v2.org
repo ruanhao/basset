@@ -40,7 +40,7 @@
 #+END_SRC
 
 #+RESULTS:
-: # Out[1]:
+: # Out[2]:
 
 
 * 核心数据结构
@@ -3890,3 +3890,215 @@ b     one     1.448519
       two     1.565013
 Name: data2, dtype: float64
 #+end_example
+
+*** 使用字典和Series分组
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  people = pd.DataFrame(np.random.randn(5, 5),
+                        columns=list('abcde'),
+                        index=['Joe', 'Steve', 'Wes', 'Jim', 'Travis']
+  )
+  people.iloc[2:3, [1, 2]] = np.nan
+  log("people", people)
+  mapping = {
+      "a": 'red',
+      "b": 'red',
+      "c": 'blue',
+      "d": 'blue',
+      "e": 'red',
+      "f": 'orange'               # 没有作用
+  }
+  log("people.groupby(mapping, axis=1).sum()", people.groupby(mapping, axis=1).sum())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+==================================== people ====================================
+               a         b         c         d         e
+Joe     0.411963 -0.851885 -0.603098  0.711264  0.244195
+Steve  -0.192852 -0.761196  0.147913 -1.878708 -1.548063
+Wes     0.226710       NaN       NaN -1.139280 -0.126362
+Jim    -1.152243 -0.869533 -0.078809 -0.971286 -1.517877
+Travis  0.381503  0.533020  0.446621  1.446923 -0.279701
+==================== people.groupby(mapping, axis=1).sum() =====================
+            blue       red
+Joe     0.108166 -0.195727
+Steve  -1.730795 -2.502111
+Wes    -1.139280  0.100347
+Jim    -1.050096 -3.539654
+Travis  1.893544  0.634822
+#+end_example
+
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  map_series = pd.Series(mapping)
+  log("map_series", map_series)
+  log("people.groupby(map_series, axis=1).count()", people.groupby(map_series, axis=1).count())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+================================== map_series ==================================
+a       red
+b       red
+c      blue
+d      blue
+e       red
+f    orange
+dtype: object
+================== people.groupby(map_series, axis=1).count() ==================
+        blue  red
+Joe        2    3
+Steve      2    3
+Wes        1    2
+Jim        2    3
+Travis     2    3
+#+end_example
+
+
+*** 使用函数分组
+
+使用函数定义分组关系是一种更为通用的方式，
+作为分组键传递的函数将会按照每个索引值调用一次，返回值会被用作分组名称。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("people", people)
+  log("people.groupby(len).sum()", people.groupby(len).sum())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+==================================== people ====================================
+               a         b         c         d         e
+Joe     0.411963 -0.851885 -0.603098  0.711264  0.244195
+Steve  -0.192852 -0.761196  0.147913 -1.878708 -1.548063
+Wes     0.226710       NaN       NaN -1.139280 -0.126362
+Jim    -1.152243 -0.869533 -0.078809 -0.971286 -1.517877
+Travis  0.381503  0.533020  0.446621  1.446923 -0.279701
+========================== people.groupby(len).sum() ===========================
+          a         b         c         d         e
+3 -0.513571 -1.721418 -0.681908 -1.399303 -1.400044
+5 -0.192852 -0.761196  0.147913 -1.878708 -1.548063
+6  0.381503  0.533020  0.446621  1.446923 -0.279701
+#+end_example
+
+
+**** 与其他分组键混合
+
+_所有的对象都会在内部转换为数组_
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  key_list = ['one', 'one', 'one', 'two', 'two']
+  log("people", people)
+  log("people.groupby([len, key_list]).min()", people.groupby([len, key_list]).min())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+==================================== people ====================================
+               a         b         c         d         e
+Joe     0.411963 -0.851885 -0.603098  0.711264  0.244195
+Steve  -0.192852 -0.761196  0.147913 -1.878708 -1.548063
+Wes     0.226710       NaN       NaN -1.139280 -0.126362
+Jim    -1.152243 -0.869533 -0.078809 -0.971286 -1.517877
+Travis  0.381503  0.533020  0.446621  1.446923 -0.279701
+==================== people.groupby([len, key_list]).min() =====================
+              a         b         c         d         e
+3 one  0.226710 -0.851885 -0.603098 -1.139280 -0.126362
+  two -1.152243 -0.869533 -0.078809 -0.971286 -1.517877
+5 one -0.192852 -0.761196  0.147913 -1.878708 -1.548063
+6 two  0.381503  0.533020  0.446621  1.446923 -0.279701
+#+end_example
+
+
+*** 根据索引层级分组
+
+能够在轴索引的某个层级上进行聚合。
+
+将层级数值或名称传递给 =level= 关键字：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  columns = pd.MultiIndex.from_arrays(
+      [
+          ['US', 'US', 'US', 'JP', 'JP'],
+          [1, 3, 5, 1, 3]
+      ],
+      names=['cty', 'tenor'])
+  df = pd.DataFrame(np.random.randn(4, 5), columns=columns)
+  log("df", df)
+  log("df.groupby(level='cty', axis=1).count())", df.groupby(level='cty', axis=1).count())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+cty          US                            JP
+tenor         1         3         5         1         3
+0      1.102170 -0.112435  1.085613 -0.967759  0.883713
+1      0.076930 -0.051798 -0.141812  0.625950  0.097327
+2     -0.261993 -0.041604  0.793321 -1.847407 -1.173491
+3     -2.023053  0.002613 -0.638650 -0.320731 -0.519337
+=================== df.groupby(level='cty', axis=1).count()) ===================
+cty  JP  US
+0     2   3
+1     2   3
+2     2   3
+3     2   3
+#+end_example
+
+
+
+** 数据聚合
+
+*** 对GroupBy对象调用聚合方法
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df = pd.DataFrame({'key1' : ['a', 'a', 'b', 'b', 'a'],
+                     'key2' : ['one', 'two', 'one', 'two', 'one'],
+                     'data1' : np.random.randn(5),
+                     'data2' : np.random.randn(5)})
+  log("df", df)
+  log("df.groupby('key1')['data1'].quantile(0.9)", df.groupby('key1')['data1'].quantile(0.9))
+  log("df['data1'].groupby(df['key1']).quantile(0.9)", df['data1'].groupby(df['key1']).quantile(0.9))
+
+  def my_quantile_0_9(s):
+      return s.quantile(0.9)
+
+  log("df.groupby('key1')['data1'].agg(my_quantile_0_9)", df.groupby('key1')['data1'].agg(my_quantile_0_9))
+  log("df.groupby('key1').agg(my_quantile_0_9)", df.groupby('key1').agg(my_quantile_0_9))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== df ======================================
+  key1 key2     data1     data2
+0    a  one  0.115562 -0.159065
+1    a  two -0.953228 -0.255576
+2    b  one -0.552461 -0.230414
+3    b  two  1.400817  0.179607
+4    a  one -0.337459  0.781640
+================== df.groupby('key1')['data1'].quantile(0.9) ===================
+key1
+a    0.024958
+b    1.205490
+Name: data1, dtype: float64
+================ df['data1'].groupby(df['key1']).quantile(0.9) =================
+key1
+a    0.024958
+b    1.205490
+Name: data1, dtype: float64
+=============== df.groupby('key1')['data1'].agg(my_quantile_0_9) ===============
+key1
+a    0.024958
+b    1.205490
+Name: data1, dtype: float64
+=================== df.groupby('key1').agg(my_quantile_0_9) ====================
+         data1     data2
+key1
+a     0.024958  0.593499
+b     1.205490  0.138605
+#+end_example
+
+*** 逐列与多函数应用
+
+*** 返回不含行索引的聚合数据
