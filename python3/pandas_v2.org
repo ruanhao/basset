@@ -43,7 +43,7 @@
 : # Out[50]:
 
 
-* 核心数据结构
+* 核心数据结构创建与基本操作
 
 ** 索引对象
 
@@ -98,7 +98,10 @@ Series 是一维带标签的数组，数组里可以放任意的数据（整数�
 - 一个标量值，如 5
 
 
-*** 从 ndarray 创建
+*** 创建
+
+
+**** 从 ndarray 创建
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   s = pd.Series(np.random.randn(5), index=['a', 'b', 'c', 'd', 'e'])
@@ -132,7 +135,7 @@ RangeIndex(start=0, stop=5, step=1)
 #+end_example
 
 
-*** 从字典创建
+**** 从字典创建
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   d = {'a' : 0., 'b' : 1., 'd' : 3}
@@ -149,7 +152,7 @@ RangeIndex(start=0, stop=5, step=1)
 : dtype: float64
 
 
-*** 从标量创建
+**** 从标量创建
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   s = pd.Series(3, index=list('abcde'))
@@ -166,7 +169,9 @@ RangeIndex(start=0, stop=5, step=1)
 : dtype: int64
 
 
-*** 赋值
+*** 基本操作
+
+**** 赋值
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   s = pd.Series([4, 7, -5, 3], index=['d', 'b', 'a', 'c'])
@@ -192,7 +197,7 @@ dtype: int64
 #+end_example
 
 
-*** 与标量相乘
+**** 与标量相乘
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   s = pd.Series([4, 7, -5, 3], index=['d', 'b', 'a', 'c'])
@@ -209,7 +214,7 @@ dtype: int64
 
 
 
-*** 应用数学函数
+**** 应用数学函数
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   s = pd.Series([4, 7, -5, 3], index=['d', 'b', 'a', 'c'])
@@ -225,12 +230,12 @@ dtype: int64
 : dtype: float64
 
 
-*** 映射 (apply)
+**** 映射 (apply)
 
 =s.apply(value_to_value_func) -> Series=
 
 
-*** 排序(sort_index/sort_values)
+**** 排序(sort_index/sort_values)
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   s = pd.Series(range(4), index=list('dabc'))
@@ -255,7 +260,7 @@ dtype: int64
 #+end_example
 
 
-*** 唯一值(unique)，计数(count)和成员(isin)
+**** 唯一值，计数和成员(unique/count/isin)
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   s = pd.Series(list('cadaabbcc'))
@@ -265,7 +270,7 @@ dtype: int64
 #+END_SRC
 
 
-*** 排名(rank)
+**** 排名(rank)
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   s = pd.Series([7, -5, 7, 4, 2, 0, 4])
@@ -307,7 +312,7 @@ dtype: float64
 #+end_example
 
 
-*** 在字典上下文中使用
+**** 在字典上下文中使用
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   s = pd.Series([4, 7, -5, 3], index=['d', 'b', 'a', 'c'])
@@ -327,7 +332,7 @@ dtype: float64
 #+END_EXAMPLE
 
 
-*** 检查缺失数据
+**** 检查缺失数据
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   data = {'Ohio': 35000, 'Texas': 71000, 'Oregon': 16000, 'Utah': 5000}
@@ -383,7 +388,10 @@ DataFrame 是 *二维带行索引和列索引的矩阵* 。
 - 一个 Series
 - 另外的 DataFrame 对象
 
-*** 从字典创建
+
+*** 创建
+
+**** 从字典创建
 
 =key= 为 DataFrame 的列； =value= 为对应列下的值
 
@@ -462,7 +470,7 @@ d    4   24
 : 3  1 2016-03-01  3  8  text  DD
 
 
-*** 从结构化数据列表创建
+**** 从结构化数据列表创建
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   data = [(1, 2.2, 'Hello'), (2, 3., "World")]
@@ -483,7 +491,7 @@ d    4   24
 : second  2  3.0  World
 
 
-*** 从字典列表创建
+**** 从字典列表创建
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   data = [{'a': 1, 'b': 2}, {'a': 5, 'b': 10, 'c': 20}]
@@ -515,7 +523,7 @@ second  5  10  20.0
 
 
 
-*** 从元组字典创建
+**** 从元组字典创建
 
 实际应用中，会通过数据清洗的方式，把数据整理成方便 Pandas 导入且可读性好的格式。
 然后再通过 *reindex/groupby* 等方式转换成复杂数据结构。
@@ -541,7 +549,7 @@ second  5  10  20.0
 
 
 
-*** 从 Series 创建
+**** 从 Series 创建
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   s = pd.Series(np.random.randn(5), index=['a', 'b', 'c', 'd', 'e'])
@@ -575,7 +583,7 @@ d -0.946448
 
 
 
-*** 指定行列索引创建
+**** 指定行列索引创建
 
 #+BEGIN_SRC ipython :session :results output :exports both :eval never-export
   dates = pd.date_range('20160301', periods=6)
@@ -602,8 +610,10 @@ DatetimeIndex(['2016-03-01', '2016-03-02', '2016-03-03', '2016-03-04',
 #+end_example
 
 
+*** 基本操作
 
-*** 转置
+
+**** 转置
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   data = {'Nevada': {2001: 2.4, 2002: 2.9},
@@ -625,7 +635,7 @@ DatetimeIndex(['2016-03-01', '2016-03-02', '2016-03-03', '2016-03-04',
 
 
 
-*** 算数运算填充
+**** 算数运算填充
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   df1 = pd.DataFrame(np.arange(12.).reshape((3, 4)),
@@ -669,7 +679,7 @@ DatetimeIndex(['2016-03-01', '2016-03-02', '2016-03-03', '2016-03-04',
 
 
 
-*** 和 Series 之间的运算（广播机制）
+**** 和 Series 之间的运算（广播机制）
 
 默认会将 Series 的索引与 DataFrame 的列进行匹配，并广播到各行：
 
@@ -728,7 +738,7 @@ Oregon  9.0 NaN  12.0 NaN
 : Oregon -1.0  0.0  1.0
 
 
-*** 应用函数
+**** 应用函数
 
 从本质上讲，DataFrame 内部用的数据结构就是 numpy 的 ndarray 。
 
@@ -780,7 +790,7 @@ Oregon  9.0 NaN  12.0 NaN
 #+end_example
 
 
-*** 行/列映射 (apply)
+**** 行/列映射 (apply)
 
   =df.apply(series_to_series_func) -> DataFrame=
 
@@ -826,7 +836,7 @@ four     9   11
 #+end_example
 
 
-*** 逐元素映射 (applymap)
+**** 逐元素映射 (applymap)
 
 =df.applymap(value_to_value_func) -> DataFrame=
 
@@ -840,7 +850,7 @@ four     9   11
 #+END_SRC
 
 
-*** 排序(sort_index/sort_values)
+**** 排序(sort_index/sort_values)
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   df = pd.DataFrame(np.arange(8).reshape((2, 4)),
@@ -878,7 +888,7 @@ one    4  5  6  7
 #+end_example
 
 
-*** 排名(rank)
+**** 排名(rank)
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   df = pd.DataFrame({'b': [4.3, 7, -3, 2], 'a': [0, 1, 0, 1], 'c': [-2, 5, 8, -2.5]})
@@ -903,7 +913,7 @@ one    4  5  6  7
 #+end_example
 
 
-*** 转换为 ndarray 对象
+**** 转换为 ndarray 对象
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   df = pd.DataFrame(np.random.randn(10, 4), columns=['one', 'two', 'three', 'four'])
@@ -953,7 +963,7 @@ one    4  5  6  7
 
 
 
-*** 统计
+**** 统计
 
 - count
   非 NA 值个数
