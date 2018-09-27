@@ -1,4 +1,4 @@
-#+TITLE:     Pandas
+#+TITLE:     Pandas V2
 #+AUTHOR:    Hao Ruan
 #+EMAIL:     haoru@cisco.com
 #+LANGUAGE:  en
@@ -2428,7 +2428,14 @@ True
 
 ** 分层索引
 
-分层索引提供了一种在 *低维度的形式中处理高维度数据* 的方式。
+分层索引提供了一种在 *低维度的形式中处理高维度数据* 的方式，它使用 =pd.MultiIndex= 类来表示。
+
+比如在分析股票数据：
+- 一级行索引可以是日期
+- 二级行索引可以是股票代码
+- 列索引可以是股票的交易量，开盘价，收盘价等等
+
+这样就可以把多个股票放在同一个时间维度下进行考察和分析。
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   s = pd.Series(np.random.randn(9),
@@ -3448,6 +3455,9 @@ dtype: float64
   将行中的数据透视到列
 
 
+file:img/pandas_stack.png
+
+
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   df = pd.DataFrame(np.arange(6).reshape((2, 3)),
                     index=pd.Index(['Ohio', 'Colorado'], name='state'),
@@ -3655,6 +3665,8 @@ date
 
 
 *** 将列索引转换为列的值(melt)
+
+file:img/pandas_melt.png
 
 =pd.melt(df, <分组指标>)=
 
@@ -4048,10 +4060,11 @@ cty  JP  US
 
 
 
-** 数据聚合(agg)
+** 数据聚合
 
-=agg= 方法将一个函数使用在一个数列上，然后返回一个标量的值。
-即 =agg= 每次传入的是一列数据，对其聚合后返回标量。
+[[file:img/pandas_agg.png]]
+
+
 
 *** 对GroupBy对象调用聚合方法
 
@@ -4210,10 +4223,11 @@ Sun Yes     0.160542  0.186240  0.171123  0.013436   10
 : 2  Sun    Yes      18.880  3.29  3.333333  0.171123
 
 
-** apply
+*** apply
 
-=apply= 是一个 _更一般化_ 的方法：将一个数据分拆-应用-汇总。
-=apply= 会将当前分组后的数据一起传入，可以返回标量，也可以返回多维数据。
+=GroupBy.agg= 方法将一个函数使用在一个数列上，然后返回一个标量的值。即每次传入的是一列数据，对其聚合后返回标量。
+
+=GroupBy.apply= 是一个 _更一般化_ 的方法：将一个数据分拆-应用-汇总。会将当前分组后的数据一起传入，可以返回标量，也可以返回多维数据。
 
 在 GroupBy 对象内部，当调用 =describe= 这样的方法时，实际上是以下代码的 _简写_ ：
 
@@ -4310,6 +4324,8 @@ b    8    b  two      7      1
 ** 透视表(pivot_table)
 
 透视表是通过 =groupby= 以及使用分层索引的重塑操作实现的。
+
+*当透视表结果为多个值的时候，默认返回平均值* ，即 =aggfunc= 默认值为 =mean= 。
 
 [[https://nikgrozev.com/2015/07/01/reshaping-in-pandas-pivot-pivot-table-stack-and-unstack-explained-with-pictures/][pivot_table 和 pivot 区别]]
 
