@@ -40,7 +40,7 @@
 #+END_SRC
 
 #+RESULTS:
-: # Out[50]:
+: # Out[1]:
 
 
 * 核心数据结构创建与基本操作
@@ -2299,7 +2299,7 @@ True
 #+end_example
 
 
-*** 随机重排序
+*** 随机重排序(sample/take)
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   df = pd.DataFrame(np.arange(5*4).reshape((5, 4)))
@@ -2340,6 +2340,45 @@ True
 3  12  13  14  15
 3  12  13  14  15
 0   0   1   2   3
+#+end_example
+
+
+**** 使用 take 优化内存 <<use take to optimize mem>>
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  values = pd.Series([0, 1, 0, 0] * 2)
+  dim = pd.Series(['apple', 'orange'])
+  log("values", values)
+  log("dim", dim)
+  log("dim.take(values)", dim.take(values))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+============================================== values ==============================================
+0    0
+1    1
+2    0
+3    0
+4    0
+5    1
+6    0
+7    0
+dtype: int64
+=============================================== dim ================================================
+0     apple
+1    orange
+dtype: object
+========================================= dim.take(values) =========================================
+0     apple
+1    orange
+0     apple
+0     apple
+0     apple
+1    orange
+0     apple
+0     apple
+dtype: object
 #+end_example
 
 
@@ -4472,3 +4511,129 @@ Japan                 2            3   5
 USA                   1            4   5
 All                   3            7  10
 #+end_example
+
+
+** Categorial 类型
+
+
+在[[use take to optimize mem][使用 take 优化内存]]的例子中，使用整数数组 (=values=) 的表达方式被称为 _categorical_ 表示法，
+=values= 被称为 _codes_ ， =dim= 被称为 _categories_ 。
+
+在 Pandas 中使用 Categorial 数据类型可以获得更好的性能和内存利用率。
+该数据类型内部就是使用 categorical 表示法。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  fruits = ['apple', 'orange', 'apple', 'apple'] * 2
+  N = len(fruits)
+  df = pd.DataFrame(
+      {
+          'fruit': fruits,
+          'basket_id': np.arange(N),
+          'count': np.random.randint(3, 15, size=N),
+          'weight': np.random.uniform(0, 4, size=N)},
+      columns=['basket_id', 'fruit', 'count', 'weight'])
+  log("df", df)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+================================================ df ================================================
+   basket_id   fruit  count    weight
+0          0   apple     13  1.775096
+1          1  orange      9  3.515737
+2          2   apple      5  3.543188
+3          3   apple      7  3.285893
+4          4   apple      4  1.591016
+5          5  orange      9  2.825891
+6          6   apple     14  1.447206
+7          7   apple     14  3.464040
+#+end_example
+
+将 fruit 列转换为 Categorical ：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  fruit_cat = df['fruit'].astype('category')
+  log("fruit_cat", fruit_cat)
+
+  log("fruit_cat.values", fruit_cat.values)
+  log("type(fruit_cat.values)", type(fruit_cat.values))
+
+  log("fruit_cat.values.categories", fruit_cat.values.categories)
+
+  log("fruit_cat.values.codes", fruit_cat.values.codes)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+============================================ fruit_cat =============================================
+0     apple
+1    orange
+2     apple
+3     apple
+4     apple
+5    orange
+6     apple
+7     apple
+Name: fruit, dtype: category
+Categories (2, object): [apple, orange]
+========================================= fruit_cat.values =========================================
+[apple, orange, apple, apple, apple, orange, apple, apple]
+Categories (2, object): [apple, orange]
+====================================== type(fruit_cat.values) ======================================
+<class 'pandas.core.arrays.categorical.Categorical'>
+=================================== fruit_cat.values.categories ====================================
+Index(['apple', 'orange'], dtype='object')
+====================================== fruit_cat.values.codes ======================================
+[0 1 0 0 0 1 0 0]
+#+end_example
+
+用 Categorical 对象直接替换原先的列：
+
+#+BEGIN_SRC ipython
+  df['fruit'] = df['fruit'].astype('category')
+#+END_SRC
+
+
+*** 直接创建 Categorical 对象
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  my_categories = pd.Categorical(['foo', 'bar', 'baz', 'foo', 'bar'])
+  log("my_categories", my_categories)
+
+  categories = ['foo', 'bar', 'baz']
+  codes=[0,1,2,0,0,1]
+  my_cats_2 = pd.Categorical.from_codes(codes, categories)
+  log("my_cats_2", my_cats_2)
+
+#+END_SRC
+
+#+RESULTS:
+: ========================================== my_categories ===========================================
+: [foo, bar, baz, foo, bar]
+: Categories (3, object): [bar, baz, foo]
+: ============================================ my_cats_2 =============================================
+: [foo, bar, baz, foo, foo, bar]
+: Categories (3, object): [foo, bar, baz]
+
+
+*** Categorical 对象排序规则
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  ordered_cat = pd.Categorical.from_codes(codes, categories, ordered=True)
+  log("ordered_cat", ordered_cat)
+  log("ordered_cat.sort_values()", ordered_cat.sort_values())
+
+  # 将无序对象转换为有序
+  log("my_cats_2.as_ordered()", my_cats_2.as_ordered())
+#+END_SRC
+
+#+RESULTS:
+: =========================================== ordered_cat ============================================
+: [foo, bar, baz, foo, foo, bar]
+: Categories (3, object): [foo < bar < baz]
+: ==================================== ordered_cat.sort_values() =====================================
+: [foo, foo, foo, bar, bar, baz]
+: Categories (3, object): [foo < bar < baz]
+: ====================================== my_cats_2.as_ordered() ======================================
+: [foo, bar, baz, foo, foo, bar]
+: Categories (3, object): [foo < bar < baz]
