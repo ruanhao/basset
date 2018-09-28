@@ -14,7 +14,1777 @@
 | Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
 #+HTML: </div>
 
+#+BEGIN_SRC ipython :session :exports none
+  #! /usr/bin/env python3
+  # -*- coding: utf-8 -*-
 
+
+  import pandas as pd
+  import numpy as np
+  import matplotlib.pyplot as plt
+  import subprocess
+  from PIL import Image
+
+  def run_script(script):
+      """Returns (stdout, stderr), raises error on non-zero return code"""
+      proc = subprocess.Popen(['bash', '-c', script],
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                              stdin=subprocess.PIPE)
+      stdout, stderr = proc.communicate()
+      if proc.returncode:
+          raise Exception('exit code %s' % proc.returncode)
+      return stdout, stderr
+
+  def show_dataframe(df):
+      global path
+      df.to_html("/tmp/df.html")
+      run_script('webkit2png -F --transparent /tmp/df.html -D /tmp -o df')
+      # try:
+      #     subprocess.call('webkit2png -F --transparent /tmp/df.html -D /tmp -o df', shell=True, timeout=5)
+      # except:
+      #     pass
+      image = Image.open('/tmp/df-full.png')
+      box = image.getbbox()
+      cropped = image.crop(box)
+      image.close()
+      w = cropped.size[0]
+      h = cropped.size[1]
+      ratio = 0.618
+      cropped.thumbnail((int(w*ratio), int(h*ratio)), Image.ANTIALIAS)
+      cropped.save(path)
+      cropped.close()
+
+  def plot():
+      global path
+      plt.savefig(path)
+      plt.clf()
+
+  def show_fig(o):
+      global path
+      plt.clf()
+      o.plot()
+      plt.savefig(path)
+
+
+  def log(title0, value):
+      title1 = ' ' + title0 + ' '
+      print("{}\n{}".format(title1.center(80, '='), value))
+#+END_SRC
+
+* 核心数据结构
+
+** Panel
+
+Panel 是三维带标签的数组。
+
+Panel 由三个标签组成：
+
+- items :: 坐标轴 0 ，索引对应的元素是一个 DataFrame
+- major_axis :: 坐标轴 1 , DataFrame 里的行标签
+- minor_axis :: 坐标轴 2 , DataFrame 里的列标签
+
+
+
+** Series
+
+Series 是一维带标签的数组，数组里可以放任意的数据（整数，浮点数，字符串，Python Object）。
+
+其基本的创建函数是： =pd.Series(data, index=index)=
+
+其中 index 是一个列表，用来作为数据的标签。data 可以是不同的数据类型：
+
+- Python 字典
+- ndarray 对象
+- 一个标量值，如 5
+
+*** 创建
+
+**** 从 ndarray 创建
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series(np.random.randn(5), index=['a', 'b', 'c', 'd', 'e'])
+  log("s", s)
+  log("s.index", s.index)
+  s2 = pd.Series(np.random.randn(5))
+  log("s2", s2)
+  log("s2.index", s2.index)
+#+END_SRC
+
+**** 从字典创建
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  d = {'a' : 0., 'b' : 1., 'd' : 3}
+  s = pd.Series(d, index=list('abcd'))
+  log("s", s)
+#+END_SRC
+
+**** 从标量创建
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series(3, index=list('abcde'))
+  log("s", s)
+#+END_SRC
+
+
+*** 特性
+
+**** 类 ndarray 对象
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series(np.random.randn(5))
+
+  log("s[0]", s[0])
+  log("s[:3]", s[:3])
+  log("s[[1, 3, 4]]", s[[1, 3, 4]])
+  log("np.exp(s)", np.exp(s))
+  log("np.sin(s)", np.sin(s))
+#+END_SRC
+
+
+**** 类字典对象
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series(np.random.randn(5), index=['a', 'b', 'c', 'd', 'e'])
+  s['e'] = 5
+  log("s", s)
+  log("'e' in s", 'e' in s)
+  log("s.get('f', np.nan)", s.get('f', np.nan))
+#+END_SRC
+
+
+**** 标签对齐
+
+相同索引值才进行操作
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s1 = pd.Series(np.random.randn(3), index=['a', 'c', 'e'])
+  s2 = pd.Series(np.random.randn(3), index=['a', 'd', 'e'])
+
+  log("s1", s1)
+  log("s2", s2)
+
+
+  log("s1 + s2", s1 + s2)
+#+END_SRC
+
+
+** DataFrame
+
+DataFrame 是 *二维带行标签和列标签的数组* 。
+
+可以把 DataFrame 想象成一个 Excel 表格或一个 SQL 数据库的表格，还可以想象成是一个 Series 对象字典。
+
+它是 Pandas 里最常用的数据结构。
+
+创建 DataFrame 的基本格式是：
+
+#+BEGIN_SRC ipython
+  pd.DataFrame(data, index=index, columns=columns)
+#+END_SRC
+
+其中 index 是行标签，columns 是列标签，data 可以是下面的数据：
+
+- 由一维 numpy 数组，list，Series 构成的字典
+- 二维 numpy 数组
+- 一个 Series
+- 另外的 DataFrame 对象
+
+*** 创建
+
+**** 从字典创建
+
+key 为 DataFrame 的列；value 为对应列下的值
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  d = {'one' : pd.Series([1, 2, 3], index=['a', 'b', 'c']),
+       'two' : pd.Series([1, 2, 3, 4], index=['a', 'b', 'c', 'd'])}
+
+  log("pd.DataFrame(d)", pd.DataFrame(d))
+  log("pd.DataFrame(d, index=['d', 'b', 'a'])", pd.DataFrame(d, index=['d', 'b', 'a']))
+  log("pd.DataFrame(d, index=['d', 'b', 'a'], columns=['two', 'three'])",
+      pd.DataFrame(d, index=['d', 'b', 'a'], columns=['two', 'three']))
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  d = {'one' : [1, 2, 3, 4],
+       'two' : [21, 22, 23, 24]}
+
+  log("pd.DataFrame(d)", pd.DataFrame(d))
+  log("pd.DataFrame(d, index=['a', 'b', 'c', 'd'])", pd.DataFrame(d, index=['a', 'b', 'c', 'd']))
+#+END_SRC
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df = pd.DataFrame({
+                    'A': 1,
+                    'B': pd.Timestamp('20160301'),
+                    'C': range(4),
+                    'D': np.arange(5, 9),
+                    'E': 'text',
+                    'F': ['AA', 'BB', 'CC', 'DD']})
+  log("df", df)
+#+END_SRC
+
+
+**** 从结构化数据列表创建
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  data = [(1, 2.2, 'Hello'), (2, 3., "World")]
+
+  log("pd.DataFrame(data)", pd.DataFrame(data))
+  log("pd.DataFrame(data, index=['first', 'second'], columns=['A', 'B', 'C'])",
+      pd.DataFrame(data, index=['first', 'second'], columns=['A', 'B', 'C']))
+#+END_SRC
+
+
+**** 从字典列表创建
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  data = [{'a': 1, 'b': 2}, {'a': 5, 'b': 10, 'c': 20}]
+
+  log("pd.DataFrame(data)", pd.DataFrame(data))
+  log("pd.DataFrame(data, index=['first', 'second'])",
+      pd.DataFrame(data, index=['first', 'second']))
+  log("pd.DataFrame(data, columns=['a', 'b'])",
+      pd.DataFrame(data, columns=['a', 'b']))
+
+#+END_SRC
+
+
+**** 从元组字典创建
+
+实际应用中，会通过数据清洗的方式，把数据整理成方便 Pandas 导入且可读性好的格式。
+然后再通过 *reindex/groupby* 等方式转换成复杂数据结构。
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  d = {('a', 'b'): {('A', 'B'): 1, ('A', 'C'): 2},
+       ('a', 'a'): {('A', 'C'): 3, ('A', 'B'): 4},
+       ('a', 'c'): {('A', 'B'): 5, ('A', 'C'): 6},
+       ('b', 'a'): {('A', 'C'): 7, ('A', 'B'): 8},
+       ('b', 'b'): {('A', 'D'): 9, ('A', 'B'): 10}}
+
+  # 多级标签
+  log("pd.DataFrame(d)", pd.DataFrame(d))
+#+END_SRC
+
+
+**** 从 Series 创建
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series(np.random.randn(5), index=['a', 'b', 'c', 'd', 'e'])
+  log("pd.DataFrame(s)", pd.DataFrame(s))
+  log("pd.DataFrame(s, index=['a', 'c', 'd'])",
+      pd.DataFrame(s, index=['a', 'c', 'd']))
+  log("pd.DataFrame(s, index=['a', 'c', 'd'], columns=['A'])",
+      pd.DataFrame(s, index=['a', 'c', 'd'], columns=['A']))
+#+END_SRC
+
+
+**** 指定行列索引创建
+
+#+BEGIN_SRC ipython :session :results output :exports both
+  dates = pd.date_range('20160301', periods=6)
+  log("dates", dates)
+
+  df = pd.DataFrame(np.random.randn(6,4), index=dates, columns=list('ABCD'))
+  log("df", df)
+#+END_SRC
+
+
+*** 数据操作
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df = pd.DataFrame(np.random.randn(6, 4),
+                    index=list('ABCDEF'),
+                    columns=['one', 'two', 'three', 'four'])
+  log("df", df)
+#+END_SRC
+
+**** 列选择(Series)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df['one']", df['one'])
+  log("df.one", df.one)
+#+END_SRC
+
+
+**** 列选择(DataFrame)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.loc[:, ['one', 'two']]", df.loc[:, ['one', 'two']])
+  log("df.iloc[:, 0:1]", df.iloc[:, 0:1])
+  log("df.filter(regex=r'^t.*$')", df.filter(regex=r'^t.*$'))
+#+END_SRC
+
+
+**** 列赋值
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df['three'] = df['one'] + df['two']
+  log("df", df)
+#+END_SRC
+
+
+**** 列改名
+
+#+BEGIN_SRC ipython :session :var path="img/fig469813VI.png"
+  df.rename(columns={'three': 'san'}, inplace=True)
+  show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig469813VI.png
+#+CAPTION: 列改名
+[[file:img/fig469813VI.png]]
+
+
+
+**** 列删除
+
+#+BEGIN_SRC ipython :session :var path="img/fig46981RqU.png"
+  del df['san']
+  s = df.pop('four')
+  result = df.drop(['one', 'two'], axis='columns') # df 不变
+  show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig46981RqU.png
+#+CAPTION: 删除列
+[[file:img/fig46981RqU.png]]
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s", s)
+#+END_SRC
+
+
+**** 增加列
+
+***** 添加到最后
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df['flag'] = df['one'] > 0
+  df['five'] = 5
+  df['one_trunc'] = df['one'][:2]
+  log("df", df)
+#+END_SRC
+
+***** 指定位置添加
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df.insert(1, 'bar', df.one + df.two)
+  log("df", df)
+#+END_SRC
+
+
+***** assign()
+
+assign 方法并不会 inplace 地改变原来的 dataframe ，
+该方法的 *优势* 在于可以对 dataframe 对象使用链式操作。
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df1 = df.assign(Ratio=df.one/df.two)
+  log("df1", df1)
+  log("df", df)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.assign(Ratio=lambda x: x.one - x.two)",
+      df.assign(Ratio=lambda x: x.one - x.two))
+
+  log("df.assign(ABRatio=df.one/df.two).assign(BarValue=lambda x: x.ABRatio*x.bar)",
+      df.assign(ABRatio=df.one/df.two).assign(BarValue=lambda x: x.ABRatio*x.bar))
+
+#+END_SRC
+
+
+**** 行选择(Series)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.loc['A']", df.loc['A'])  # 行标签方式
+  log("df.iloc[0]", df.iloc[0])    # 行位置方式
+#+END_SRC
+
+
+**** 行选择(DataFrame)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+   log("df[2:4]", df[2:4])
+   log("df['A':'C']", df['A':'C'])
+   log("df.iloc[2:4]", df.iloc[2:4])         # 效率高
+   log("df[df.one > 0.5]", df[df.one > 0.5])  # 布尔方式
+   log("df[df > 0]", df[df > 0])             # 布尔方式
+   log("df[[False, True, True, False, True, False]]",
+       df[[False, True, True, False, True, False]])  # 布尔方式
+   log("df.sample(frac=0.5)", df.sample(frac=0.5))  # Randomly
+   log("df.sample(n=3)", df.sample(n=3))  # Randomly
+
+#+END_SRC
+
+
+**** 行改名
+
+#+BEGIN_SRC ipython :session :var path="img/fig46981r-g.png"
+    df.rename(index={'C': 'ccc'}, inplace=True)
+    show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig46981r-g.png
+#+CAPTION: 行改名
+[[file:img/fig46981r-g.png]]
+
+**** 行删除
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result = df.drop('A')           # result 是一份新的数据拷贝
+  log("result", result)
+#+END_SRC
+
+
+**** 增加行
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020vuz.png"
+  s = pd.Series([7, 7, 7, True, 7, 7], index=list(df.columns))
+  appended = df.append(s, ignore_index=True)
+  show_dataframe(appended)
+#+END_SRC
+
+#+NAME: img/fig37020vuz.png
+#+CAPTION: append
+[[file:img/fig37020vuz.png]]
+
+
+**** 行与列选择
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.loc['A':'B', ['one', 'two']]", df.loc['A':'B', ['one', 'two']])
+  log("df.iloc[0:2, 0:3]", df.iloc[0:2, 0:3])
+#+END_SRC
+
+
+**** 选择指定坐标
+
+#+BEGIN_SRC ipython :session :results output :exports both
+  log("df.loc['A', 'one']", df.loc['A', 'one'])
+  log("df.at['A', 'one']", df.at['A', 'one'])
+  log("df.iloc[1, 1]", df.iloc[1, 1])
+  log("df.iat[1, 1]", df.iat[1, 1])
+#+END_SRC
+
+
+**** 数据对齐
+
+DataFrame 在进行数据计算时， *会自动按行和列进行数据对齐* 。
+最终的计算结果会合并两个 DataFrame 。
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df1 = pd.DataFrame(np.random.randn(10, 4),
+                     index=list('abcdefghij'),
+                     columns=['A', 'B', 'C', 'D'])
+
+  df2 = pd.DataFrame(np.random.randn(7, 3),
+                     index=list('cdefghi'),
+                     columns=['A', 'B', 'C'])
+
+  log("df1", df1)
+  log("df2", df2)
+
+  log("df1 + df2", df1 + df2)
+  log("df1 - df1.iloc[0]", df1 - df1.iloc[0])
+#+END_SRC
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df3 = df2.loc[:, ['B', 'C']].copy()
+  log("df3 (before)", df3)
+  df3[df3 > 0] = -df3
+  log("df3 (after)", df3)
+#+END_SRC
+
+
+**** 使用 numpy 函数
+
+因为从本质上讲，DataFrame 内部用的数据结构就是 numpy 的 ndarray 。
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df = pd.DataFrame(np.random.randn(10, 4), columns=['one', 'two', 'three', 'four'])
+  log("np.exp(df)", np.exp(df))
+  log("np.sin(df)", np.sin(df))
+#+END_SRC
+
+***** DataFrame 转换为 ndarray 对象
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  ary = np.asarray(df)
+  log("ary", ary)
+  log("ary == df.values", ary == df.values)
+  log("ary == df", ary == df)
+#+END_SRC
+
+
+
+
+**** concat
+
+#+NAME: concat
+#+CAPTION: concat
+[[file:img/pandas_concat.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig370207Fb.png"
+    origin_df = pd.DataFrame(np.random.randn(10, 4), columns=list('ABCD'))
+    concatted = pd.concat([origin_df.iloc[:3],
+                           origin_df.iloc[3:7],
+                           origin_df.iloc[7:]])
+    show_dataframe(concatted)  # (concatted == origin_df).all().all(): True
+#+END_SRC
+
+#+NAME: img/fig370207Fb.png
+#+CAPTION: cat
+[[file:img/fig370207Fb.png]]
+
+
+**** 合并(merge/join)
+
+#+BEGIN_SRC ipython
+  pd.merge(left, right, how='inner', on='id')
+#+END_SRC
+
+Ignores index, *unless on=None*.
+Use *on* if merging on same column in both DataFrames, otherwise use *left_on*, *right_on*.
+
+#+NAME: merge
+#+CAPTION: merge 原理
+[[file:img/pandas_merge.png]]
+
+#+NAME: merge2
+#+CAPTION: merge 原理
+[[file:img/pandas_merge2.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020Van.png"
+  left = pd.DataFrame({'key': ['foo', 'foo'], 'lval': [1, 2]})
+  right = pd.DataFrame({'key': ['foo', 'foo'], 'rval': [4, 5]})
+
+  # SELECT * FROM left INNER JOIN right ON left.key = right.key;
+  merged = pd.merge(left, right, on='key')
+  show_dataframe(merged)
+#+END_SRC
+
+#+NAME: img/fig37020Van.png
+#+CAPTION: merge
+[[file:img/fig37020Van.png]]
+
+***** join on index
+
+=df.join(other)=
+
+*Merge* DataFrames *on index*.
+
+Set *on=keys* to join on index of =df= and on *keys* of *other*.
+
+*Join uses pd.merge under the covers.*
+
+
+
+
+* 函数应用
+
+** pipe
+
+- =df.pipe(df_to_df_func) -> DataFrame=
+- =df.pipe(df_to_series_func) -> Series=
+- =df.pipe(df_to_value_func) -> Value=
+
+
+** 将数据按行或列进行计算(apply)
+
+- Series ::
+
+  =s.apply(value_to_value_func) -> Series=
+
+- DataFrame ::
+
+  =df.apply(series_to_series_func) -> DataFrame=
+  =df.apply(series_to_value_func) -> Series=
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df = pd.DataFrame(np.arange(12).reshape(4, 3),
+                    index=['one', 'two', 'three', 'four'],
+                    columns=list('ABC'))
+
+  log("df", df)
+#+END_SRC
+
+**** 按列进行运算
+
+每一列作为一个 Series 作为参数传递给 lambda 函数
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result = df.apply(lambda x: x.max() - x.min())
+  log("result", result)
+#+END_SRC
+
+**** 按行进行运算
+
+每一行作为一个 Series 作为参数传递给 lambda 函数
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result = df.apply(lambda x: x.max() - x.min(), axis=1)
+  log("result", result)
+#+END_SRC
+
+**** 返回多个值组成的 Series
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  def min_max(x):
+      return pd.Series([x.min(), x.max()], index=['min', 'max'])
+  result = df.apply(min_max, axis=1)
+  log("result", result)
+#+END_SRC
+
+
+** 逐元素运算(applymap)
+
+- =df.applymap(value_to_value_func) -> DataFrame=
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df = pd.DataFrame(np.random.randn(4, 3),
+                    index=['one', 'two', 'three', 'four'],
+                    columns=list('ABC'))
+
+  log("df", df)
+#+END_SRC
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  # x 表示 dataframe 中的每个元素
+  result = df.applymap(lambda x: '{0:.03f}'.format(x))
+  log("result", result)
+#+END_SRC
+
+
+** 排序(sort_values)
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df = pd.DataFrame(np.random.randint(1, 10, (4, 3)),
+                    index=list('ABCD'),
+                    columns=['one', 'two', 'three'])
+
+  log("df", df)
+#+END_SRC
+
+
+*** 按列排序
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result = df.sort_values(by='two', ascending=False)
+  log("result", result)
+#+END_SRC
+
+*** 按行排序
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result = df.sort_values(by='C', axis=1, ascending=False)
+  log("result", result)
+#+END_SRC
+
+
+** 索引排序(sort_index)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df = pd.DataFrame(np.random.randint(1, 10, (4, 3)),
+                    index=list('ABCD'),
+                    columns=['one', 'two', 'three'])
+
+  log("df", df)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  col_sort = df.sort_index(axis=1, ascending=False)
+  row_sort = df.sort_index(ascending=False)
+
+  log("col_sort", col_sort)
+  log("row_sort", row_sort)
+
+#+END_SRC
+
+
+** 排名(rank)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series([3, 6, 2, 6, 4])
+  df = pd.DataFrame(np.random.randint(1, 10, (4, 3)),
+                    index=list('ABCD'),
+                    columns=['one', 'two', 'three'])
+
+  log("s", s)
+  log("df", df)
+#+END_SRC
+
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s_result = s.rank(method='first', ascending=False)
+  log("s_result", s_result)
+#+END_SRC
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df_result = df.rank(method='first')
+  log("df_result", df_result)
+#+END_SRC
+
+
+** Series 元素统计
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series(list('abbcdabacad'))
+  log("s", s)
+#+END_SRC
+
+*** 个数统计(value_counts)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s.value_counts()", s.value_counts())
+#+END_SRC
+
+
+*** 唯一性统计(uniq)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s.unique()", s.unique())
+#+END_SRC
+
+
+*** 成员资格统计(isin)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s.isin(['a', 'b', 'c'])", s.isin(['a', 'b', 'c']))
+#+END_SRC
+
+
+
+
+
+
+** 出现最频繁值的统计(mode)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series([1, 1, 2, 3, 4, 5])
+  log("s.mode()", s.mode())
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020hxO.png"
+  df = pd.DataFrame({'data1': ['a', 'a', 'b', 'b', 'a'],
+                     'data2': ['one', 'one', 'one', 'two', 'two'],
+                     'data3': [1, 2, 3, 5, 5],
+                     'data4': [6, 7, 8, 8, 9]})
+  show_dataframe(df.mode())
+#+END_SRC
+
+#+NAME: img/fig37020hxO.png
+#+CAPTION: 频繁值统计
+[[file:img/fig37020hxO.png]]
+
+
+
+
+
+** 行列索引转换(stack/unstack)
+
+#+NAME: stack
+#+CAPTION: stack / unstack
+[[file:img/pandad_stack.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020uCJ.png"
+  tuples = list(zip(*[['bar', 'bar', 'baz', 'baz',
+                       'foo', 'foo', 'qux', 'qux'],
+                      ['one', 'two', 'one', 'two',
+                       'one', 'two', 'one', 'two']]))
+  index = pd.MultiIndex.from_tuples(tuples, names=['first', 'second'])
+  df = pd.DataFrame(np.random.randn(8, 2), index=index, columns=['A', 'B'])
+  show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig37020uCJ.png
+#+CAPTION: 示例数据
+[[file:img/fig37020uCJ.png]]
+
+*** 将列索引变为行索引 (stack)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  stacked = df.stack()
+  log("stacked", stacked)
+  log("type(stacked)", type(stacked))
+  log("stacked.index", stacked.index)
+#+END_SRC
+
+
+*** 将行索引变为列索引 (unstack)
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020IXV.png"
+  show_dataframe(stacked.unstack())
+#+END_SRC
+
+#+NAME: img/fig37020IXV.png
+#+CAPTION: unstack
+[[file:img/fig37020IXV.png]]
+
+
+** 透视图（pivot_table）
+
+用于观察 data frame 中一部分数据
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020irh.png"
+  df = pd.DataFrame({'A' : ['one', 'one', 'two', 'three'] * 3,
+                     'B' : ['A', 'B', 'C'] * 4,
+                     'C' : ['foo', 'foo', 'foo', 'bar', 'bar', 'bar'] * 2,
+                     'D' : np.random.randn(12),
+                     'E' : np.random.randn(12)})
+
+  show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig37020irh.png
+#+CAPTION: 示例数据
+[[file:img/fig37020irh.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig370208_t.png"
+  result = pd.pivot_table(df, values='D', index=['A', 'B'], columns=['C'])
+  show_dataframe(result)
+#+END_SRC
+
+#+NAME: img/fig370208_t.png
+#+CAPTION: 以 A ，B 为行索引，以 C 为列索引的，针对 D 的数据
+[[file:img/fig370208_t.png]]
+
+
+*当透视表结果为多个值的时候，默认返回平均值* ：
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig370207TD.png"
+  result = pd.pivot_table(df, values=['E'], index=['A'], columns=['C'])
+  show_dataframe(result)
+#+END_SRC
+
+#+NAME: img/fig370207TD.png
+#+CAPTION: 默认计算平均值
+[[file:img/fig370207TD.png]]
+
+针对 A 为 one 的那行数据，其计算过程相当于：
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  result = df[df.A=='one'].groupby('C')['E'].mean()
+  log("result", result)
+#+END_SRC
+
+
+
+** melt
+
+#+NAME: melt
+#+CAPTION: melt 原理
+[[file:img/pandas_melt.png]]
+
+** 数据分类(astype('category'))
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020v8b.png"
+  df = pd.DataFrame({"id":[1,2,3,4,5,6], "raw_grade":['a', 'b', 'b', 'a', 'a', 'e']})
+  df["grade"] = df["raw_grade"].astype("category")
+  show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig37020v8b.png
+#+CAPTION: 示例数据
+[[file:img/fig37020v8b.png]]
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.grade", df.grade)
+  log("df.grade.cat.categories", df.grade.cat.categories)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020JRo.png"
+  df.grade.cat.categories = ['very good', 'good', 'bad']
+  sort_result = df.sort_values(by='grade', ascending=False)
+  show_dataframe(sort_result)
+#+END_SRC
+
+#+NAME: img/fig37020JRo.png
+#+CAPTION: 以 raw_grade 列为排序标准
+[[file:img/fig37020JRo.png]]
+
+
+* 索引
+
+** 重新索引
+
+即把索引值进行重新赋值， *以增加一些行的数据* 。
+
+*** Series
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series([1, 3, 5, 6, 8], index=list('acefh'))
+  log("s", s)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s.reindex(list('abcdefgh'))",
+      s.reindex(list('abcdefgh')))
+#+END_SRC
+
+
+***** 填充默认值
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s.reindex(list('abcdefgh'), fill_value=0)",
+      s.reindex(list('abcdefgh'), fill_value=0))
+#+END_SRC
+
+***** 往前填充
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s.reindex(list('abcdefgh'), method='ffill')",
+      s.reindex(list('abcdefgh'), method='ffill'))
+#+END_SRC
+
+
+***** 往后填充
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s.reindex(list('abcdefgh'), method='bfill')",
+      s.reindex(list('abcdefgh'), method='bfill'))
+#+END_SRC
+
+
+*** DataFrame
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df = pd.DataFrame(np.random.randn(4, 6),
+                    index=list('ADFH'),
+                    columns=['one', 'two', 'three', 'four', 'five', 'six'])
+  log("df", df)
+#+END_SRC
+
+***** 对行重新索引
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.reindex(index=list('ABCDEFGH'))",
+      df.reindex(index=list('ABCDEFGH')))
+#+END_SRC
+
+****** 向前填充
+
+*fill method 只对行重新索引有效，不适用列*
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.reindex(index=list('ABCDEFGH'), method='ffill')",
+      df.reindex(index=list('ABCDEFGH'), method='ffill'))
+#+END_SRC
+
+***** 对列重新索引
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.reindex(columns=['one', 'three', 'five', 'seven'], fill_value=0)",
+      df.reindex(columns=['one', 'three', 'five', 'seven'], fill_value=0))
+#+END_SRC
+
+
+
+
+
+** 索引命名
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series(np.random.rand(5), index=list('abcde'))
+  df = pd.DataFrame(np.random.randn(4, 3), columns=['one', 'two', 'three'])
+
+  log("s", s)
+  log("df", df)
+
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s.index", s.index)
+  s.index.name = 'alpha'
+  log("s", s)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.index", df.index)
+  log("df.columns", df.columns)
+
+  df.index.name = 'row'
+  df.columns.name = 'col'
+
+  log("df", df)
+#+END_SRC
+
+
+** 重复索引
+
+索引值有重复项的索引
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series(np.arange(6), index=list('abcbda'))
+  log("s", s)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s['a']", s['a'])
+  log("s.index.is_unique", s.index.is_unique)
+#+END_SRC
+
+
+*** 对重复索引的处理（清洗）
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  sum_result = s.groupby(s.index).sum()  # 对重复索引内容进行求和
+  log("sum_result", sum_result)
+
+  first_result = s.groupby(s.index).first()  # 对重复索引内容只取第一项
+  log("first_result", first_result)
+
+  avg_result = s.groupby(s.index).mean()  # 对重复索引内容取平均值
+  log("avg_result", avg_result)
+#+END_SRC
+
+
+** 多级索引
+
+*用二维的数据表达更高维度的数据* ，使数据组织方式更清晰，它使用 =pd.MultiIndex= 类来表示。
+
+*** 层次化索引的作用
+
+比如在分析股票数据：
+- 一级行索引可以是日期
+- 二级行索引可以是股票代码
+- 列索引可以是股票的交易量，开盘价，收盘价等等
+
+这样就可以把多个股票放在同一个时间维度下进行考察和分析。
+
+
+*** Series 多级索引
+
+
+**** 创建
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  a = [['a', 'a', 'a', 'b', 'b', 'c', 'c'], [1, 2, 3, 1, 2, 2, 3]]
+  tuples = list(zip(*a))
+  log("tuples", tuples)
+  index = pd.MultiIndex.from_tuples(tuples, names=['first', 'second'])
+  log("index", index)
+  s = pd.Series(np.random.randn(7), index=index)
+  log("s", s)
+  log("s.index", s.index)
+  log("s.index.levels[1]", s.index.levels[1])
+#+END_SRC
+
+**** 选取
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("s['b']", s['b'])
+  log("s['b':'c']", s['b':'c'])
+  log("s[['b', 'a']]", s[['b', 'a']])
+  log("s['b', 1]", s['b', 1])
+  log("s[:, 2]", s[:, 2])
+#+END_SRC
+
+*** DataFrame 多级索引
+
+**** 创建
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428gsV.png"
+  df = pd.DataFrame(np.random.randint(1, 10, (4, 3)),  # 1-10 之间的随机数，4 行 3 列
+                    index=[['a', 'a', 'b', 'b'], [1, 2, 1, 2]],
+                    columns=[['one', 'one', 'two'], ['blue', 'red', 'blue']])
+  df.index.names = ['row-1', 'row-2']
+  df.columns.names = ['col-1', 'col-2']
+  show_dataframe(df)
+#+END_SRC
+
+[[file:img/fig75428gsV.png]]
+
+**** 选取
+
+#+BEGIN_SRC ipython :session :var path="img/fig754286Ai.png"
+  show_dataframe(df.loc['a'])
+#+END_SRC
+
+[[file:img/fig754286Ai.png]]
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.loc['a', 1]", df.loc['a', 1])
+#+END_SRC
+
+
+**** 多级索引交换
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428UVu.png"
+  df2 = df.swaplevel('row-1', 'row-2')
+  show_dataframe(df2)
+#+END_SRC
+
+[[file:img/fig75428UVu.png]]
+
+
+**** 多级索引排序
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428TpD.png"
+  show_dataframe(df2.sortlevel(0))  # 0 表示根据一级索引进行排序
+#+END_SRC
+
+[[file:img/fig75428TpD.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428t9P.png"
+  show_dataframe(df2.sortlevel(1))  # 根据二级索引进行排序
+#+END_SRC
+
+[[file:img/fig75428t9P.png]]
+
+
+**** 多级索引统计
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428HSc.png"
+  show_dataframe(df.sum(level=0))
+#+END_SRC
+
+[[file:img/fig75428HSc.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428hmo.png"
+  show_dataframe(df.sum(level=1))
+#+END_SRC
+
+[[file:img/fig75428hmo.png]]
+
+
+**** 列与索引的转换
+
+创建多级索引比较复杂，一般情况下会从文件中读取一个 DataFrame ，
+然后将其中某个列转换为多级索引，最终得到一个基于多级索引的 DataFrame 。
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428760.png"
+  df = pd.DataFrame({
+      'a': range(7),
+      'b': range(7, 0, -1),
+      'c': ['one', 'one', 'one', 'two', 'two', 'two', 'two'],
+      'd': [0, 1, 2, 0, 1, 2, 3]
+  })
+  show_dataframe(df)
+#+END_SRC
+
+[[file:img/fig75428760.png]]
+
+***** 列转换为索引
+
+#+BEGIN_SRC ipython :session :var path="img/fig754286OK.png"
+  show_dataframe(df.set_index('c'))
+#+END_SRC
+
+[[file:img/fig754286OK.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428UjW.png"
+  df2 = df.set_index(['c', 'd'])
+  show_dataframe(df2)
+#+END_SRC
+
+[[file:img/fig75428UjW.png]]
+
+
+
+***** 索引转换为列
+
+将所有索引转换为列
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428u3i.png"
+  show_dataframe(df2.reset_index().sort_index('columns'))
+#+END_SRC
+
+[[file:img/fig75428u3i.png]]
+
+
+
+
+
+* 分组与聚合
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428IMv.png"
+  df = pd.DataFrame({'key1': ['a', 'a', 'b', 'b', 'a'],
+                     'key2': ['one', 'two', 'one', 'two', 'one'],
+                     'data1': np.random.randint(1, 10, 5),
+                     'data2': np.random.randint(1, 10, 5)})
+
+  show_dataframe(df)
+#+END_SRC
+
+[[file:img/fig75428IMv.png]]
+
+** 原理
+
+三步曲：
+
+1. 拆分：根据什么进行分组
+2. 应用：每个分组进行什么样的计算（每个组应用一个 *计算规则* ，输出一个结果）
+3. 聚合：把每个分组的计算结果合并起来，构成最终输出
+
+
+** 分组
+
+*** 对 Series 进行分组
+
+通过索引对齐关联起来
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  grouped = df['data1'].groupby(df['key1'])
+  log("grouped", grouped)         # groupby 对象
+  log("grouped.mean()", grouped.mean())
+  key = [1, 2, 1, 2, 1]
+  log("df['data1'].groupby(key)", df['data1'].groupby(key))
+
+#+END_SRC
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df['data1'].groupby([df['key1'], df['key2']]).mean()",
+      df['data1'].groupby([df['key1'], df['key2']]).mean())
+  log("df['data1'].groupby([df['key1'], df['key2']]).size()",
+      df['data1'].groupby([df['key1'], df['key2']]).size())
+#+END_SRC
+
+
+*** 对 DataFrame 进行分组（默认按行分组）
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428HgE.png"
+  show_dataframe(df.groupby('key1').mean())
+#+END_SRC
+
+[[file:img/fig75428HgE.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428h0Q.png"
+  df1 = df.groupby(['key1', 'key2']).mean()
+  show_dataframe(df1)
+#+END_SRC
+
+[[file:img/fig75428h0Q.png]]
+
+
+*** 对分组对象进行迭代
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  for name, group in df.groupby('key1'):
+      print(name)
+      print(group)
+
+  print('='*80)
+
+  for name, group in df.groupby(['key1', 'key2']):
+      print(name)
+      print(group)
+#+END_SRC
+
+
+*** 通过字典进行分组
+
+#+BEGIN_SRC ipython :session :var path="img/fig754287Id.png"
+  df = pd.DataFrame(np.random.randint(1, 10, (5, 5)),
+                    columns=['a', 'b', 'c', 'd', 'e'],
+                    index=['Alice', 'Bob', 'Candy', 'Dark', 'Emily'])
+  df.iloc[1, 1:3] = np.NaN
+  show_dataframe(df)
+#+END_SRC
+
+[[file:img/fig754287Id.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428Vdp.png"
+  mapping = {'a': 'red', 'b': 'red', 'c': 'blue', 'd': 'orange', 'e': 'blue'}
+  grouped = df.groupby(mapping, axis=1)  # 按列分组
+  show_dataframe(grouped.sum())
+#+END_SRC
+
+[[file:img/fig75428Vdp.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428uFL.png"
+  show_dataframe(grouped.count())
+#+END_SRC
+
+[[file:img/fig75428uFL.png]]
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("grouped.size()", grouped.size())
+#+END_SRC
+
+
+*** 通过函数分组
+
+当函数作为分组依据时，数据表里的每个索引（可以是行索引，也可以是列索引）都会调用一次函数，
+*函数的返回值作为分组的索引* ，即相同的返回值分在同一组。
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428iuj.png"
+  df = pd.DataFrame(np.random.randint(1, 10, (5, 5)),
+                    columns=['a', 'b', 'c', 'd', 'e'],
+                    index=['Alice', 'Bob', 'Candy', 'Dark', 'Emily'])
+  show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig75428iuj.png
+#+CAPTION: 示例数据
+[[file:img/fig75428iuj.png]]
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  def _dummy_group(idx):
+      print("idx:", idx)
+      return idx
+
+  print("axis=0")
+  df.groupby(_dummy_group)
+  print("axis=1")
+  df.groupby(_dummy_group, axis=1)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :var path="img/fig754288Cw.png"
+  grouped = df.groupby(len)
+  show_dataframe(grouped.sum())
+#+END_SRC
+
+[[file:img/fig754288Cw.png]]
+
+
+*** 多级索引数据根据索引级别来分组
+
+#+BEGIN_SRC ipython :session :var path="img/fig754287WF.png"
+  columns = pd.MultiIndex.from_arrays([['China', 'USA', 'China', 'USA', 'China'],
+                                       ['A', 'A', 'B', 'C', 'B']], names=['country', 'index'])
+  df = pd.DataFrame(np.random.randint(1, 10, (5, 5)), columns=columns)
+  show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig754287WF.png
+#+CAPTION: 示例数据
+[[file:img/fig754287WF.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428VrR.png"
+  show_dataframe(df.groupby(level='country', axis=1).count())
+#+END_SRC
+
+[[file:img/fig75428VrR.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig3702047R.png"
+  show_dataframe(df.groupby(level='country', axis=1).sum())
+#+END_SRC
+
+[[file:img/fig3702047R.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020FNM.png"
+  show_dataframe(df.groupby(level='index', axis=1).count())
+#+END_SRC
+
+
+[[file:img/fig37020FNM.png]]
+
+
+** 数据聚合
+
+#+NAME: agg
+#+CAPTION: 聚合操作
+[[file:img/pandas_agg.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020fhY.png"
+  df = pd.DataFrame({'key1': ['a', 'a', 'b', 'b', 'a'],
+                     'key2': ['one', 'two', 'one', 'two', 'one'],
+                     'data1': np.random.randint(1, 10, 5),
+                     'data2': np.random.randint(1, 10, 5),
+                     'data3': np.random.randint(1, 10, 5)})
+  show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig37020fhY.png
+#+CAPTION: 示例数据
+[[file:img/fig37020fhY.png]]
+
+*** 内置聚合函数
+
+**** sum
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020TKx.png"
+  show_dataframe(df.groupby('key1').sum())
+#+END_SRC
+
+#+NAME: img/fig37020TKx.png
+#+CAPTION: sum
+[[file:img/fig37020TKx.png]]
+
+**** mean
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020SeG.png"
+  show_dataframe(df.groupby('key1').mean())
+#+END_SRC
+
+#+NAME: img/fig37020SeG.png
+#+CAPTION: mean
+[[file:img/fig37020SeG.png]]
+
+**** size
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df.groupby('key1').size()", df.groupby('key1').size())
+#+END_SRC
+
+**** count
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020GHf.png"
+  show_dataframe(df.groupby('key1').count())
+#+END_SRC
+
+#+NAME: img/fig37020GHf.png
+#+CAPTION: count
+[[file:img/fig37020GHf.png]]
+
+**** min/max
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020gbr.png"
+  show_dataframe(df.groupby('key1').min())
+#+END_SRC
+
+#+NAME: img/fig37020gbr.png
+#+CAPTION: min
+[[file:img/fig37020gbr.png]]
+
+**** describe
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020fvA.png"
+  show_dataframe(df.groupby('key1').describe())
+#+END_SRC
+
+#+NAME: img/fig37020fvA.png
+#+CAPTION: describe
+[[file:img/fig37020fvA.png]]
+
+
+*** 自定义聚合函数
+
+自定义聚合函数时，需使用 =agg()= 或 =aggregate()= 函数。
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  def peak_range(s):
+      print(s)
+      print(type(s))
+      print('=====')
+      return s.max() - s.min()
+
+  grouped = df.groupby('key1')
+  result = grouped.agg(peak_range)
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :var path="img/fig3702051k.png"
+  show_dataframe(result)
+#+END_SRC
+
+[[file:img/fig3702051k.png]]
+
+
+*** 应用多个聚合函数
+
+#+BEGIN_SRC ipython :session :var path="img/fig370205DN.png"
+  show_dataframe(grouped.agg(['std', 'mean', peak_range]))
+#+END_SRC
+
+#+NAME: img/fig370205DN.png
+#+CAPTION: 多个聚合函数
+[[file:img/fig370205DN.png]]
+
+
+*** 给聚合后的列起别名
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020TYZ.png"
+  show_dataframe(grouped.agg(['std', 'mean', ('high-low', peak_range)]))
+#+END_SRC
+
+#+NAME: img/fig37020TYZ.png
+#+CAPTION: 别名
+[[file:img/fig37020TYZ.png]]
+
+
+*** 自定义需要显示的列
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020tsl.png"
+  show_dataframe(grouped.sum())
+#+END_SRC
+
+#+NAME: img/fig37020tsl.png
+#+CAPTION: 所有列
+[[file:img/fig37020tsl.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020HBy.png"
+  show_dataframe(grouped['data1', 'data3'].sum())
+#+END_SRC
+
+#+NAME: img/fig37020HBy.png
+#+CAPTION: 自定义后的列
+[[file:img/fig37020HBy.png]]
+
+
+
+*** 给不同的列应用不同的聚合函数
+
+使用 dict 作为参数来实现，此方法也能实现自定义需要显示的列。
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020GVH.png"
+  d = {'data1': ['mean', peak_range, 'max', 'min'],
+       'data2': 'sum'}
+  show_dataframe(grouped.agg(d))
+#+END_SRC
+
+#+NAME: img/fig37020GVH.png
+#+CAPTION: 不同的聚合函数
+[[file:img/fig37020GVH.png]]
+
+
+*** 索引重置
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020gpT.png"
+  # 等效于 df.groupby('key1', as_index=False).agg(d)
+  show_dataframe(grouped.agg(d).reset_index())
+#+END_SRC
+
+#+NAME: img/fig37020gpT.png
+#+CAPTION: reset_index 效果
+[[file:img/fig37020gpT.png]]
+
+
+
+
+
+*** filter
+
+#+NAME: filter
+#+CAPTION: filter 原理
+[[file:img/pandas_filter.png]]
+
+*** transform
+
+#+NAME: transform
+#+CAPTION: transform 原理
+[[file:img/pandas_transform.png]]
+
+**** 案例一（给每行都添加一个分组后的平均值）
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020USs.png"
+  df = pd.DataFrame({'key1': ['a', 'a', 'b', 'b', 'a'],
+                     'key2': ['one', 'two', 'one', 'two', 'one'],
+                     'data1': np.random.randint(1, 10, 5),
+                     'data2': np.random.randint(1, 10, 5)})
+  show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig37020USs.png
+#+CAPTION: 示例数据
+[[file:img/fig37020USs.png]]
+
+***** 使用 merge 实现
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020TmB.png"
+  k1_mean = df.groupby('key1').mean().add_prefix('mean_')
+  show_dataframe(k1_mean)
+#+END_SRC
+
+#+NAME: img/fig37020TmB.png
+#+CAPTION: 先求平均值
+[[file:img/fig37020TmB.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020t6N.png"
+  show_dataframe(pd.merge(df, k1_mean, left_on='key1', right_index=True))
+#+END_SRC
+
+#+NAME: img/fig37020t6N.png
+#+CAPTION: 使用 merge
+[[file:img/fig37020t6N.png]]
+
+
+***** 使用 transform 实现
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020HPa.png"
+  k1_mean = df.groupby('key1').transform(np.mean).add_prefix('mean_')
+  show_dataframe(k1_mean)
+#+END_SRC
+
+#+NAME: img/fig37020HPa.png
+#+CAPTION: 使用 transform 计算平均值
+[[file:img/fig37020HPa.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020hjm.png"
+  df[k1_mean.columns] = k1_mean
+  show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig37020hjm.png
+#+CAPTION: 将 k1_mean 附加到原 dataframe 中
+[[file:img/fig37020hjm.png]]
+
+
+**** 案例二（计算分组后每个值与平均值的差异）
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig3702073y.png"
+  df = pd.DataFrame(np.random.randint(1, 10, (5, 5)),
+                    columns=['a', 'b', 'c', 'd', 'e'],
+                    index=['Alice', 'Bob', 'Candy', 'Dark', 'Emily'])
+  show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig3702073y.png
+#+CAPTION: 示例数据
+[[file:img/fig3702073y.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig370206LI.png"
+  def demean(s):
+      return s - s.mean()
+
+  key = ['one', 'one', 'two', 'one', 'two']
+  demeaned = df.groupby(key).transform(demean)
+  show_dataframe(demeaned)
+#+END_SRC
+
+#+NAME: img/fig370206LI.png
+#+CAPTION: 均值差
+[[file:img/fig370206LI.png]]
+
+
+*** apply
+
+*DataFrame 的 apply 函数是逐行或逐列来处理数据。GroupBy 的 apply 函数对每个分组进行计算。*
+
+*apply_func 作用的是分组后每个 group 对象。*
+
+#+NAME: apply
+#+CAPTION: apply 原理
+file:img/pandas_apply.png
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020UgU.png"
+  df = pd.DataFrame({'key1': ['a', 'a', 'b', 'b', 'a', 'a', 'a', 'b', 'b', 'a'],
+                    'key2': ['one', 'two', 'one', 'two', 'one', 'one', 'two', 'one', 'two', 'one'],
+                    'data1': np.random.randint(1, 10, 10),
+                    'data2': np.random.randint(1, 10, 10)})
+  show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig37020UgU.png
+#+CAPTION: 示例数据
+[[file:img/fig37020UgU.png]]
+
+**** 案例一（根据 column 排序，输出其最大的 n 行数据）
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020u0g.png"
+  def top(df, n=2, column='data1'):
+      return df.sort_values(by=column, ascending=False)[:n]
+
+  show_dataframe(df.groupby('key1').apply(top))
+  # 可以传递参数：df.groupby('key1').apply(top, n=3, column='data2')
+#+END_SRC
+
+#+NAME: img/fig37020u0g.png
+#+CAPTION: 输出 n 行
+[[file:img/fig37020u0g.png]]
+
+
+禁用分组键：
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020IJt.png"
+  show_dataframe(df.groupby('key1', group_keys=False).apply(top))
+#+END_SRC
+
+#+NAME: img/fig37020IJt.png
+#+CAPTION: 禁用分组键
+[[file:img/fig37020IJt.png]]
+
+
+
+**** 案例二（用不同的分组平均值填充空缺数据）
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  states = ['Ohio', 'New York', 'Vermont', 'Florida',
+            'Oregon', 'Nevada', 'California', 'Idaho']
+  group_key = ['East'] * 4 + ['West'] * 4
+  data = pd.Series(np.random.randn(8), index=states)
+  data[['Vermont', 'Nevada', 'Idaho']] = np.nan
+  log("data", data)
+
+  fill_mean = lambda g: g.fillna(g.mean())
+  result = data.groupby(group_key).apply(fill_mean)
+  log("result", result)
+#+END_SRC
+
+
+* 处理丢失数据
+
+#+NAME: missing data
+#+CAPTION: nan
+[[file:img/pandas_nan.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig46981FTt.png"
+  dates = pd.date_range('20160301', periods=6)
+  df_with_nan = pd.DataFrame(data=np.random.randn(6, 4), index=dates, columns=list('ABCD'))
+  df_with_nan = df_with_nan.reindex(index=dates[0:4], columns=list(df_with_nan.columns) + ['E'])
+  df_with_nan.loc[dates[1:3], 'E'] = 1
+  show_dataframe(df_with_nan)
+#+END_SRC
+
+#+NAME: img/fig46981FTt.png
+#+CAPTION: 示例
+[[file:img/fig46981FTt.png]]
+
+** 用默认值替换 NaN
+
+=df.fillna(value=5)=
+
+
+** 判断数据集是否包含 NaN
+
+- =s_or_df.isnull()= / =pd.isnull(s_or_df)=
+- =s_or_df.notnull()= / =pd.notnull(s_or_df)=
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("pd.isnull(df_with_nan)", pd.isnull(df_with_nan))
+  log("pd.isnull(df_with_nan).any()", pd.isnull(df_with_nan).any())
+  log("pd.isnull(df_with_nan).any().any()", pd.isnull(df_with_nan).any().any())
+#+END_SRC
+
+
+** NaN 不参与运算
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df_with_nan.mean()", df_with_nan.mean())
+  log("df_with_nan.mean(axis=1)", df_with_nan.mean(axis=1))
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  log("df_with_nan.sum()", df_with_nan.sum())
+  log("df_with_nan.sum(axis=1)", df_with_nan.sum(axis=1))
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  s = pd.Series([1,3,5,np.nan,6,8], index=dates).shift(2)
+  log("s", s)
+  log("df_with_nan", df_with_nan)
+  log("df_with_nan.sub(s, axis='index')", df_with_nan.sub(s, axis='index'))
+#+END_SRC
 
 
 
@@ -317,3 +2087,786 @@ Possible values of parse_dates:
   pd.read_csv('xxx.csv', index_col='xxx',
               parse_dates=True, date_parser=date_parser)
 #+END_SRC
+
+
+* 可视化
+
+** 线形图
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428HE0.png"
+  ts = pd.Series(np.random.randn(1000), index=pd.date_range('20000101', periods=1000))
+  ts = ts.cumsum()
+  ts.plot()
+  plot()
+#+END_SRC
+
+#+NAME: img/fig75428HE0.png
+#+CAPTION: 单个线形图
+[[file:img/fig75428HE0.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020k7X.png"
+  ts.plot(title='cumsum', style='r-', ylim=[-30, 50], figsize=(4, 3));
+  plot()
+#+END_SRC
+
+#+NAME: img/fig37020k7X.png
+#+CAPTION: 自定义线形图
+[[file:img/fig37020k7X.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig47069XEp.png"
+  df = pd.DataFrame(np.random.randn(1000, 4), index=ts.index, columns=list('ABCD'))
+  df = df.cumsum()
+  df.plot()
+  plot()
+#+END_SRC
+
+#+NAME: img/fig47069XEp.png
+#+CAPTION: 多个线形图组合
+[[file:img/fig47069XEp.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig47069xY1.png"
+  df.plot(title='DataFrame cumsum',
+          figsize=(6, 12),
+          subplots=True, sharex=True, sharey=True)
+  plot()
+#+END_SRC
+
+#+NAME: img/fig47069xY1.png
+#+CAPTION: subplot
+[[file:img/fig47069xY1.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig47069wsK.png"
+  df['I'] = np.arange(len(df))
+  df.plot(x='I', y=['A', 'C'])
+  plot()
+#+END_SRC
+
+#+NAME: img/fig47069wsK.png
+#+CAPTION: 自定义坐标
+[[file:img/fig47069wsK.png]]
+
+
+** 柱状图
+
+#+BEGIN_SRC ipython :session :var path="img/fig6529276K.png"
+  df = pd.DataFrame(np.random.rand(10, 4), columns=['A', 'B', 'C', 'D'])
+  show_dataframe(df)
+#+END_SRC
+
+#+NAME: img/fig6529276K.png
+#+CAPTION: 示例数据
+[[file:img/fig6529276K.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig65292iSp.png"
+  df.iloc[1].plot(kind='bar')
+  plot()
+#+END_SRC
+
+#+NAME: img/fig65292iSp.png
+#+CAPTION: 单个柱状图
+[[file:img/fig65292iSp.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig652928m1.png"
+  df.plot.bar()
+  plot()
+#+END_SRC
+
+#+NAME: img/fig652928m1.png
+#+CAPTION: 多个柱状图组合
+[[file:img/fig652928m1.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig65292VPX.png"
+  df.plot.bar(stacked=True)
+  plot()
+#+END_SRC
+
+#+NAME: img/fig65292VPX.png
+#+CAPTION: stacked
+[[file:img/fig65292VPX.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig65292vjj.png"
+  df.plot.barh(stacked=True)
+  plot()
+#+END_SRC
+
+#+NAME: img/fig65292vjj.png
+#+CAPTION: 水平柱状图
+[[file:img/fig65292vjj.png]]
+
+
+** 直方图
+
+直方图是一种对值频率进行离散化的柱状图。
+数据点被分到离散的，间隔均匀的区间中，绘制各个区间中数据点的数据。
+
+#+BEGIN_SRC ipython :session :var path="img/fig65292J4v.png"
+  df = pd.DataFrame({'a': np.random.randn(1000) + 1, 'b': np.random.randn(1000),
+                     'c': np.random.randn(1000) - 1}, columns=['a', 'b', 'c'])
+  show_dataframe(df.head())
+#+END_SRC
+
+#+NAME: img/fig65292J4v.png
+#+CAPTION: 示例数据
+[[file:img/fig65292J4v.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig65292IMF.png"
+  df['a'].plot.hist(bins=20)
+  plot()
+#+END_SRC
+
+#+NAME: img/fig65292IMF.png
+#+CAPTION: 单个直方图
+[[file:img/fig65292IMF.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig65292igR.png"
+  df.plot.hist(subplots=True, sharex=True, sharey=True, bins=20)
+  plot()
+#+END_SRC
+
+#+NAME: img/fig65292igR.png
+#+CAPTION: subplot
+[[file:img/fig65292igR.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig6529280d.png"
+  df.plot.hist(alpha=0.5)
+  plot()
+#+END_SRC
+
+#+NAME: img/fig6529280d.png
+#+CAPTION: 透明度
+[[file:img/fig6529280d.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig65292WJq.png"
+  df.plot.hist(stacked=True, bins=20, grid=True)
+  plot()
+#+END_SRC
+
+#+NAME: img/fig65292WJq.png
+#+CAPTION: stack
+[[file:img/fig65292WJq.png]]
+
+*** 密度图
+
+正态分布（高斯分布）就是一种自然界中广泛存在密度图。
+
+#+BEGIN_SRC ipython :session :var path="img/fig92800jqp.png"
+  df['a'].plot.kde()
+  plot()
+#+END_SRC
+
+#+NAME: img/fig92800jqp.png
+#+CAPTION: 单个密度图
+[[file:img/fig92800jqp.png]]
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig928009-1.png"
+  df.plot.kde()
+  plot()
+#+END_SRC
+
+#+NAME: img/fig928009-1.png
+#+CAPTION: 多个密度图组合
+[[file:img/fig928009-1.png]]
+
+
+*** 带密度估计的直方图
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  n1 = np.random.normal(0, 1, size=200) # N(0, 1)
+  n2 = np.random.normal(10, 2, size=200) # N(10, 4)
+  s = pd.Series(np.concatenate([n1, n2]))
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :var path="img/fig928008SL.png"
+  s.plot.hist(bins=100, alpha=0.5, normed=True)
+  s.plot.kde(style='r-')
+  plot()
+#+END_SRC
+
+#+NAME: img/fig928008SL.png
+#+CAPTION: 密度估计&直方图
+[[file:img/fig928008SL.png]]
+
+
+** 散布图
+
+散布图是把所有的点画在同一个坐标轴上的图像。是观察两个一维数据之间关系的有效的手段。
+
+#+BEGIN_SRC ipython :session :var path="img/fig92800w7j.png"
+  df = pd.DataFrame({'a': np.concatenate([np.random.normal(0, 1, 200),
+                                          np.random.normal(6, 1, 200)]),
+                     'b': np.concatenate([np.random.normal(10, 2, 200),
+                                          np.random.normal(0, 2, 200)]),
+                     'c': np.concatenate([np.random.normal(10, 4, 200),
+                                          np.random.normal(0, 4, 200)])})
+  df.plot.scatter(x='a', y='b')
+  plot()
+#+END_SRC
+
+#+NAME: img/fig92800w7j.png
+#+CAPTION: 散布图
+[[file:img/fig92800w7j.png]]
+
+
+** 饼图
+
+#+BEGIN_SRC ipython :session :var path="img/fig92800WnX.png"
+  s = pd.Series(3 * np.random.rand(4), index=['a', 'b', 'c', 'd'], name='series')
+  s.plot.pie(figsize=(6,6))
+  plot()
+#+END_SRC
+
+#+NAME: img/fig92800WnX.png
+#+CAPTION: 饼图
+[[file:img/fig92800WnX.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig92800KQw.png"
+  s.plot.pie(labels=['AA', 'BB', 'CC', 'DD'],
+             colors=['r', 'g', 'b', 'c'],
+             autopct='%.2f', fontsize=20, figsize=(6, 6))
+  plot()
+#+END_SRC
+
+#+NAME: img/fig92800KQw.png
+#+CAPTION: 自定义
+[[file:img/fig92800KQw.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig92800JkF.png"
+  df = pd.DataFrame(3 * np.random.rand(4, 2),
+                    index=['a', 'b', 'c', 'd'],
+                    columns=['x', 'y'])
+  df.plot.pie(subplots=True, figsize=(9, 4))
+  plot()
+#+END_SRC
+
+#+NAME: img/fig92800JkF.png
+#+CAPTION: 多个饼图组合
+[[file:img/fig92800JkF.png]]
+
+
+** 高级绘图函数
+
+各种高级绘图函数在 =pandas.tools.plotting= 包里
+
+#+BEGIN_SRC ipython :session :var path="img/fig92800j4R.png"
+  from pandas.tools.plotting import scatter_matrix
+  df = pd.DataFrame(np.random.randn(1000, 4), columns=['a', 'b', 'c', 'd'])
+  scatter_matrix(df, alpha=0.2, figsize=(6, 6), diagonal='kde')
+  plot()
+#+END_SRC
+
+#+NAME: img/fig92800j4R.png
+#+CAPTION: scatter matrix
+[[file:img/fig92800j4R.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig928009Me.png"
+  from pandas.tools.plotting import lag_plot
+  s = pd.Series(0.1 * np.random.rand(1000) +
+                0.9 * np.sin(np.linspace(-99 * np.pi, 99 * np.pi, num=1000)))
+  lag_plot(s)
+  plot()
+#+END_SRC
+
+#+NAME: img/fig928009Me.png
+#+CAPTION: lag
+[[file:img/fig928009Me.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig92800Xhq.png"
+  from pandas.tools.plotting import autocorrelation_plot
+  s = pd.Series(0.7 * np.random.rand(1000) +
+                0.3 * np.sin(np.linspace(-9 * np.pi, 9 * np.pi, num=1000)))
+  autocorrelation_plot(s)
+  plot()
+#+END_SRC
+
+#+NAME: img/fig92800Xhq.png
+#+CAPTION: auto correlation
+[[file:img/fig92800Xhq.png]]
+
+
+* 导入导出
+
+** 读入 csv
+
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020jl0.png"
+  show_dataframe(pd.read_csv('data/ex1.csv'))
+#+END_SRC
+
+#+NAME: img/fig37020jl0.png
+#+CAPTION: 读入 csv
+[[file:img/fig37020jl0.png]]
+
+*** 处理列名缺失
+
+#+BEGIN_SRC ipython :session :var path="img/fig370208NW.png"
+  show_dataframe(pd.read_csv('data/ex2.csv',
+                             header=None,
+                             names=['a', 'b', 'c', 'd', 'msg']))
+#+END_SRC
+
+#+NAME: img/fig370208NW.png
+#+CAPTION: 列名缺失
+[[file:img/fig370208NW.png]]
+
+
+*** 指定某一列作为行索引
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020Wii.png"
+  show_dataframe(pd.read_csv('data/ex2.csv',
+                             header=None,
+                             names=['a', 'b', 'c', 'd', 'msg'],
+                             index_col='msg'))  # 多级行索引：index_col=['msg', 'a']
+
+#+END_SRC
+
+#+NAME: img/fig37020Wii.png
+#+CAPTION: 指定行索引
+[[file:img/fig37020Wii.png]]
+
+
+*** 处理不规则分隔符
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020w2u.png"
+  show_dataframe(pd.read_table('data/ex3.csv', sep='\s+'))
+#+END_SRC
+
+#+NAME: img/fig37020w2u.png
+#+CAPTION: 处理不规则分隔符
+[[file:img/fig37020w2u.png]]
+
+
+*** 处理缺失值
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020vKE.png"
+  show_dataframe(pd.read_csv('data/ex5.csv'))
+#+END_SRC
+
+#+NAME: img/fig37020vKE.png
+#+CAPTION: 缺失值默认处理
+[[file:img/fig37020vKE.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020JfQ.png"
+  show_dataframe(pd.read_csv('data/ex5.csv', na_values=['NA', 'NULL', 'foo']))
+#+END_SRC
+
+#+NAME: img/fig37020JfQ.png
+#+CAPTION: 指定缺失值
+[[file:img/fig37020JfQ.png]]
+
+#+BEGIN_SRC ipython :session :var path="img/fig37020jzc.png"
+  show_dataframe(pd.read_csv('data/ex5.csv',
+                             na_values={'message': ['foo', 'NA'],
+                                        'something': ['two']}))
+#+END_SRC
+
+#+NAME: img/fig37020jzc.png
+#+CAPTION: 根据列指定缺失值
+[[file:img/fig37020jzc.png]]
+
+
+*** 逐块读取
+
+**** 按行读取
+
+#+BEGIN_SRC ipython :session :var path="img/fig370209Hp.png"
+  show_dataframe(pd.read_csv('data/ex6.csv', skiprows=10, nrows=10))
+#+END_SRC
+
+#+NAME: img/fig370209Hp.png
+#+CAPTION: 指定读取几行
+[[file:img/fig370209Hp.png]]
+
+
+**** 按 chunk 读取
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  dfs = pd.read_csv('data/ex6.csv', chunksize=1000)
+  key_count = pd.Series([])
+  for df in dfs:
+      key_count = key_count.add(df['key'].value_counts(), fill_value=0)
+
+  key_count = key_count.sort_values(ascending=False)
+  log("key_count[:3]", key_count[:3])
+#+END_SRC
+
+
+
+** 导出 csv
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df = pd.read_csv('data/ex5.csv')
+#+END_SRC
+
+*** 不导出索引（推荐）
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df.to_csv('/tmp/ex5_out.csv', index=False)
+#+END_SRC
+
+
+*** 不导出列名
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df.to_csv('/tmp/ex5_out_noheader.csv', index=False, header=None)
+#+END_SRC
+
+
+*** 指定分隔符
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df.to_csv('/tmp/ex5_out_sep.csv', index=False, sep='|')
+#+END_SRC
+
+
+*** 导出部分列
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  df.to_csv('/tmp/ex5_out_col.csv', index=False, columns=['a', 'b', 'message'])
+#+END_SRC
+
+
+** 其他格式
+
+- HDF5 ::
+  HDF5 是个 C 语言实现的库，可以高效地读取磁盘上的二进制存储的科学数据
+- Excel ::
+  =pd.read_excel=, =pd.ExcelFile=, =pd.ExcelWriter=
+- JSON ::
+  通过 json 模块转换为字典，再转换为 DataFrame
+- SQL 数据库 ::
+  通过 =pd.io.sql= 模块来从数据库读取数据
+- NoSQL 数据库 ::
+  需要结合相应的数据库模块，如 pymongo 。通过游标把数据读出来，再转换为 DataFrame
+
+
+* 示例工程
+
+** 电影数据分析
+
+*** 数据读取
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  user_names = ['user_id', 'gender', 'age', 'occupation', 'zip']
+  users = pd.read_table('data/ml-1m/users.dat', sep='::',
+                        header=None, names=user_names, engine='python')
+
+  rating_names = ['user_id', 'movie_id', 'rating', 'timestamp']
+  ratings = pd.read_table('data/ml-1m/ratings.dat', sep='::',
+                          header=None, names=rating_names, engine='python')
+
+  movie_names = ['movie_id', 'title', 'genres']
+  movies = pd.read_table('data/ml-1m/movies.dat', sep='::',
+                         header=None, names=movie_names, engine='python')
+
+  log("users.head()", users.head())
+  log("ratings.head()", ratings.head())
+  log("movies.head()", movies.head())
+#+END_SRC
+
+*** 数据合并 (merge)
+
+在 pandas 中，数据只有合并后才能进行分析
+
+#+BEGIN_SRC ipython :session :var path="img/fig75428GYJ.png"
+  data = pd.merge(pd.merge(users, ratings), movies)
+  show_dataframe(data.head())
+#+END_SRC
+
+[[file:img/fig75428GYJ.png]]
+
+*** 按性别查看各个电影的平均评分 (pivot_table)
+
+*关心的值* 是 rating ，以 title 作为 *行索引* ，gender 作为 *列索引*
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  mean_ratings_gender = data.pivot_table(values='rating', index='title',
+                                         columns='gender', aggfunc='mean')
+  log("mean_ratings_gender.head()", mean_ratings_gender.head())
+
+#+END_SRC
+
+*** 男女意见想差最大的电影 (sort_values)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  mean_ratings_gender['diff'] = mean_ratings_gender.F - mean_ratings_gender.M
+  result = mean_ratings_gender.sort_values(by='diff', ascending=True)
+  log("result.head()", result.head())
+#+END_SRC
+
+*** 参与评分人数最多 (group_by)
+
+#+BEGIN_SRC ipython :session :exports both :results output
+
+  ratings_by_movie_title = data.groupby('title').size()
+  top_ratings = ratings_by_movie_title[ratings_by_movie_title > 1000]
+  top_10_ratings = top_ratings.sort_values(ascending=False).head()
+  log("top_10_ratings", top_10_ratings)
+#+END_SRC
+
+
+*** 活跃度超过 1000 的高分电影
+
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  mean_ratings = data.pivot_table(values='rating', index='title', aggfunc='mean')
+  top_10_movies = mean_ratings.loc[top_ratings.index].sort_values(by='rating',
+                                                                  ascending=False).head(10)
+  # 把平均评分和热度综合起来
+  df_top_10_movies = pd.DataFrame(top_10_movies)
+  df_top_10_movies['hot'] = top_ratings.loc[top_10_movies.index]
+  log("df_top_10_movies", df_top_10_movies)
+
+#+END_SRC
+
+
+** 股票数据分析
+
+*** 导入数据
+
+#+BEGIN_SRC ipython :session :var path="img/fig92800x12.png"
+  data = pd.read_csv('data/600690.csv', index_col='Date', parse_dates=True)
+  show_dataframe(data.head())
+#+END_SRC
+
+#+NAME: img/fig92800x12.png
+#+CAPTION: 股票数据
+[[file:img/fig92800x12.png]]
+
+
+*** 分析波动幅度
+
+**** 针对复权收盘价进行重采样
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  adj_price = data['Adj Close']
+  log("adj_price.head()", adj_price.head())
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :var path="img/fig92800wJM.png"
+  resampled = adj_price.resample('m', how='ohlc')
+  show_dataframe(resampled.head())
+#+END_SRC
+
+#+NAME: img/fig92800wJM.png
+#+CAPTION: 按月份进行重采样
+[[file:img/fig92800wJM.png]]
+
+**** 计算平均波动幅度
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  ripple = (resampled.high - resampled.low) / resampled.low
+  log("平均波动幅度(%)", ripple.mean()*100)
+#+END_SRC
+
+*** 分析价格变化
+
+#+BEGIN_SRC ipython :session :var path="img/fig92800KeY.png"
+  adj_price.plot(figsize=(8, 6))
+  plot()
+#+END_SRC
+
+#+NAME: img/fig92800KeY.png
+#+CAPTION: 价格变化曲线
+[[file:img/fig92800KeY.png]]
+
+
+*** 最大年均复合增长率
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  total_max_growth = adj_price.max() / adj_price.min()
+  old_date = adj_price.index[-1]
+  today = adj_price.index[0]
+  years = (today.year - old_date.year)
+  years = years if years > 0 else 1
+  max_growth_per_year = total_max_growth ** (1.0 / years)
+  log("最大年均复合增长率(%)", (max_growth_per_year-1)*100)
+#+END_SRC
+
+*** 当前年均复合增长率
+
+一开始就买，现在还没卖的情况
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  total_growth = adj_price.iloc[0] / adj_price.iloc[-1]
+  old_date = adj_price.index[-1]
+  today = adj_price.index[0]
+  years = (today.year - old_date.year)
+  years = years if years > 0 else 1
+  growth_per_year = total_growth ** (1.0 / years)
+  log("年均复合增长率(%)", (growth_per_year-1)*100)
+#+END_SRC
+
+
+*** 平均年化增长率
+
+计算每年的增长率，然后再求平均值。
+
+也可以计算每月的增长率，再求平均值，可以看到更短的一些周期变化。
+
+这里的关键点在于：计算年化收益率时，应该要除以前一年的价格，
+即在前一年的价格的基础上上涨了多少，而不是在当前年的价格。
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  # first 表示那年第一天的数据
+  price_in_years = adj_price.to_period(freq='A').groupby(level=0).first()
+  log("price_in_years.head()", price_in_years.head())
+  diff = price_in_years.diff()
+  log("diff.head()", diff.head())
+  rate_in_years =  diff / (price_in_years - diff)
+  log("rate_in_years.head()", rate_in_years.head())
+  log("平均年化(%)", rate_in_years.mean()*100)
+
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :var path="img/fig92800kyk.png"
+  (rate_in_years*100).plot(kind='bar', figsize=(8,6))
+  X = [0, len(rate_in_years)]
+  Y = [0, 0]
+  plt.plot(X, Y, color='red', linestyle='-')
+  plot()
+#+END_SRC
+
+#+NAME: img/fig92800kyk.png
+#+CAPTION: 增长率图
+[[file:img/fig92800kyk.png]]
+
+
+** 小市值策略分析
+
+*** 导入数据
+
+|----------+----------+--------+----------+----------------+------------+------------|
+| 交易日期 | 股票代码 | 总市值 | 是否交易 | 最后一天涨跌幅 | 交易天数   | 下月涨幅   |
+|----------+----------+--------+----------+----------------+------------+------------|
+| date     | code     | mktcap | tradable | ld_pchange     | trade_days | nm_pchange |
+|----------+----------+--------+----------+----------------+------------+------------|
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig73568kg2.png"
+  cols = ['date', 'code', 'mktcap', 'tradable', 'ld_pchange',
+          'trade_days', 'nm_pchange']
+  df = pd.read_csv('data/stock_data.csv',
+                   parse_dates=['交易日期'],
+                   encoding='gbk')
+  df.columns = cols
+  show_dataframe(df.head())
+#+END_SRC
+
+#+NAME: img/fig73568kg2.png
+#+CAPTION: 原始数据
+[[file:img/fig73568kg2.png]]
+
+*** 按照交易日期，股票代码排序
+
+#+BEGIN_SRC ipython :session :var path="img/fig73568j0L.png"
+  df = df.sort_values(by=['date', 'code'])
+  show_dataframe(df.head())
+#+END_SRC
+
+#+NAME: img/fig73568j0L.png
+#+CAPTION: 按交易日期，股票代码排序
+[[file:img/fig73568j0L.png]]
+
+
+*** 设定分析起始日期
+
+#+BEGIN_SRC ipython :session :var path="img/fig735689IY.png"
+  date_filter = df.date > pd.to_datetime('20060101')
+  df = df[date_filter]
+  show_dataframe(df.head())
+#+END_SRC
+
+#+NAME: img/fig735689IY.png
+#+CAPTION: 设定开始时间
+[[file:img/fig735689IY.png]]
+
+*** 过滤不符合分析要求的股票
+
+
+#+BEGIN_SRC ipython :session :var path="img/fig73568Xdk.png"
+  # 过滤无法交易的股票
+  tradable_filter = df.tradable == 1
+  df = df[tradable_filter]
+
+  # 过滤交易时间过短的股票
+  trade_days_filter = df.trade_days > 10
+  df = df[trade_days_filter]
+
+  # 过滤涨停股
+  ld_pchange_filter = df.ld_pchange <= 0.097
+  df = df[ld_pchange_filter]
+
+  show_dataframe(df.head())
+#+END_SRC
+
+#+NAME: img/fig73568Xdk.png
+#+CAPTION: 过滤无用数据
+[[file:img/fig73568Xdk.png]]
+
+*** 计算所有股票平均涨幅
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  all_mean = df.groupby('date')['nm_pchange'].mean()
+  log("all_mean.head()", all_mean.head())
+#+END_SRC
+
+*** 选取低市值股票
+
+**** 计算每月市值排名
+
+#+BEGIN_SRC ipython :session :var path="img/fig73568xxw.png"
+  r = df.groupby('date')['mktcap'].rank()
+  df['m_rank'] = r
+  show_dataframe(df.head(10))
+#+END_SRC
+
+#+NAME: img/fig73568xxw.png
+#+CAPTION: 每月排名
+[[file:img/fig73568xxw.png]]
+
+**** 选取市值排名前十低的股票
+
+#+BEGIN_SRC ipython :session :var path="img/fig73568wFG.png"
+  df = df[df.m_rank <= 10]
+  show_dataframe(df.head(20))
+#+END_SRC
+
+#+NAME: img/fig73568wFG.png
+#+CAPTION: 市值前十低
+[[file:img/fig73568wFG.png]]
+
+*** 计算低市值股票平均涨幅
+
+#+BEGIN_SRC ipython :session :exports both :results output
+  select_mean = df.groupby('date')['nm_pchange'].mean()
+  log("select_mean.head()", select_mean.head())
+#+END_SRC
+
+*** 统计绘图
+
+#+BEGIN_SRC ipython :session :var path="img/fig73568KaS.png"
+  all_cum = (all_mean + 1).cumprod()
+  select_cum = (select_mean + 1).cumprod()
+
+  result = pd.DataFrame()
+  result['overall'] = all_cum
+  result['selected'] = select_cum
+  result.plot()
+  plot()
+#+END_SRC
+
+#+NAME: img/fig73568KaS.png
+#+CAPTION: 对比
+[[file:img/fig73568KaS.png]]
+
+
+* 参考资料
