@@ -4273,7 +4273,7 @@ Sun Yes     0.160542  0.186240  0.171123  0.013436   10
 : 2  Sun    Yes      18.880  3.29  3.333333  0.171123
 
 
-*** apply
+*** GroupBy.apply
 
 =GroupBy.agg= 方法将一个函数使用在一个数列上，然后返回一个标量的值。即每次传入的是一列数据，对其聚合后返回标量。
 
@@ -4373,7 +4373,7 @@ b    8    b  two      7      1
 #+end_example
 
 
-*** transform
+*** GroupBy.transform
 
 
 =GroupBy.transform= 传递一个函数 =f(x)= ，
@@ -4383,6 +4383,116 @@ b    8    b  two      7      1
 
 [[file:img/pandas_transform.png]]
 
+
+
+*** 时间分组重采样(resample)
+
+对时间序列数据而言， =resample= 方法从语义上讲可以认为也是分组操作。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  N=15
+  times = pd.date_range('2017-05-20 00:00', freq='1min', periods=N)
+  df = pd.DataFrame({'time': times,
+                     'value': np.arange(N)})
+  log("df", df)
+  log("df.set_index('time').resample('5min').count()", df.set_index('time').resample('5min').count())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+================================================ df ================================================
+                  time  value
+0  2017-05-20 00:00:00      0
+1  2017-05-20 00:01:00      1
+2  2017-05-20 00:02:00      2
+3  2017-05-20 00:03:00      3
+4  2017-05-20 00:04:00      4
+5  2017-05-20 00:05:00      5
+6  2017-05-20 00:06:00      6
+7  2017-05-20 00:07:00      7
+8  2017-05-20 00:08:00      8
+9  2017-05-20 00:09:00      9
+10 2017-05-20 00:10:00     10
+11 2017-05-20 00:11:00     11
+12 2017-05-20 00:12:00     12
+13 2017-05-20 00:13:00     13
+14 2017-05-20 00:14:00     14
+========================== df.set_index('time').resample('5min').count() ===========================
+                     value
+time
+2017-05-20 00:00:00      5
+2017-05-20 00:05:00      5
+2017-05-20 00:10:00      5
+#+end_example
+
+**** TimeGrouper 对象
+
+使用 TimeGrouper 对象 _必须保证_ 'time' 是 Series 或 DataFrame 的索引。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df2 = pd.DataFrame({'time': times.repeat(3),
+                     'key': np.tile(['a', 'b', 'c'], N),
+                     'value': np.arange(N * 3.)})
+  log("df2.head()", df2.head(20))
+
+  # 对 'key' 列做时间重采样
+  time_key = pd.Grouper(freq='5min')
+  log("time_key", time_key)
+  resampled = df2.set_index('time').groupby(['key', time_key]).sum()
+  log("resampled", resampled)
+  log("resampled.reset_index()", resampled.reset_index())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+============================================ df2.head() ============================================
+                  time key  value
+0  2017-05-20 00:00:00   a    0.0
+1  2017-05-20 00:00:00   b    1.0
+2  2017-05-20 00:00:00   c    2.0
+3  2017-05-20 00:01:00   a    3.0
+4  2017-05-20 00:01:00   b    4.0
+5  2017-05-20 00:01:00   c    5.0
+6  2017-05-20 00:02:00   a    6.0
+7  2017-05-20 00:02:00   b    7.0
+8  2017-05-20 00:02:00   c    8.0
+9  2017-05-20 00:03:00   a    9.0
+10 2017-05-20 00:03:00   b   10.0
+11 2017-05-20 00:03:00   c   11.0
+12 2017-05-20 00:04:00   a   12.0
+13 2017-05-20 00:04:00   b   13.0
+14 2017-05-20 00:04:00   c   14.0
+15 2017-05-20 00:05:00   a   15.0
+16 2017-05-20 00:05:00   b   16.0
+17 2017-05-20 00:05:00   c   17.0
+18 2017-05-20 00:06:00   a   18.0
+19 2017-05-20 00:06:00   b   19.0
+============================================= time_key =============================================
+TimeGrouper(freq=<5 * Minutes>, axis=0, sort=True, closed='left', label='left', how='mean', convention='e', base=0)
+============================================ resampled =============================================
+                         value
+key time
+a   2017-05-20 00:00:00   30.0
+    2017-05-20 00:05:00  105.0
+    2017-05-20 00:10:00  180.0
+b   2017-05-20 00:00:00   35.0
+    2017-05-20 00:05:00  110.0
+    2017-05-20 00:10:00  185.0
+c   2017-05-20 00:00:00   40.0
+    2017-05-20 00:05:00  115.0
+    2017-05-20 00:10:00  190.0
+===================================== resampled.reset_index() ======================================
+  key                time  value
+0   a 2017-05-20 00:00:00   30.0
+1   a 2017-05-20 00:05:00  105.0
+2   a 2017-05-20 00:10:00  180.0
+3   b 2017-05-20 00:00:00   35.0
+4   b 2017-05-20 00:05:00  110.0
+5   b 2017-05-20 00:10:00  185.0
+6   c 2017-05-20 00:00:00   40.0
+7   c 2017-05-20 00:05:00  115.0
+8   c 2017-05-20 00:10:00  190.0
+#+end_example
 
 
 ** 透视表(pivot_table)
@@ -4720,3 +4830,64 @@ Categories (4, object): [Q1 < Q2 < Q3 < Q4]
 #+RESULTS:
 : CPU times: user 470 ms, sys: 50.2 ms, total: 521 ms
 : Wall time: 518 ms
+
+
+
+* 实用方法
+
+** 链式操作
+
+*** DataFrame.assign
+
+=assign= 方法是 =df[k] = v= 的链式表达方式。
+
+
+#+BEGIN_SRC ipython
+  df2 = df.copy()
+  df['k'] = v
+#+END_SRC
+
+等效于：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df2 = df.assign(k=v)
+#+END_SRC
+
+
+
+#+BEGIN_SRC ipython
+  df = load_data()
+  df2 = df[df['col2'] < 0]
+  df2['col1_demeaned'] = df2.col1 - df2.col1.mean()
+#+END_SRC
+
+等效于：
+
+#+BEGIN_SRC ipython
+  df2 = (load_data()
+         [lambda x: x.col2 < 0]
+         .assign(col1_demeaned=lambda x: x.col1 - x.col1.mean()))
+#+END_SRC
+
+这种方式就不需要引用中间变量 =df= 了。
+
+
+
+*** pd.pipe
+
+当使用函数处理 Series 或 DataFrame ，处理结果也是 Series 或 DataFrame 类型时，
+可以使用 =pipe= 完成链式操作：
+
+#+BEGIN_SRC ipython
+  a = f(df, arg1=v1)
+  b = g(a, v2, arg3=v3)
+  c = h(b, arg4=v4)
+#+END_SRC
+
+等效于：
+
+#+BEGIN_SRC ipython
+  result = (df.pipe(f, arg1=v1)
+            .pipe(g, v2, arg3=v3)
+            .pipe(h, arg4=v4))
+#+END_SRC
