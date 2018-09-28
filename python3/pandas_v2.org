@@ -36,11 +36,11 @@
 
   def log(title0, value):
       title1 = ' ' + title0 + ' '
-      print("{}\n{}".format(title1.center(100, '='), value))
+      print("{}\n{}".format(title1.center(80, '='), value))
 #+END_SRC
 
 #+RESULTS:
-: # Out[1]:
+: # Out[81]:
 
 
 * 核心数据结构创建与基本操作
@@ -4891,3 +4891,274 @@ Categories (4, object): [Q1 < Q2 < Q3 < Q4]
             .pipe(g, v2, arg3=v3)
             .pipe(h, arg4=v4))
 #+END_SRC
+
+
+
+
+* 时间序列
+
+** 时间选择
+
+*** 使用能解释为日期的字符串
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from datetime import datetime
+  dates = [datetime(2011, 1, 2), datetime(2011, 1, 5),
+           datetime(2011, 1, 7), datetime(2011, 1, 8),
+           datetime(2011, 1, 10), datetime(2011, 1, 12)]
+  ts = pd.Series(np.random.randn(6), index=dates)
+  log("ts", ts)
+#+END_SRC
+
+#+RESULTS:
+: ====================================== ts ======================================
+: 2011-01-02    0.488675
+: 2011-01-05   -0.178098
+: 2011-01-07    2.122315
+: 2011-01-08    0.061192
+: 2011-01-10    0.884111
+: 2011-01-12   -0.608506
+: dtype: float64
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("ts['1/10/2011']", ts['1/10/2011'])
+  log("ts['20110110']", ts['20110110'])
+#+END_SRC
+
+#+RESULTS:
+: =============================== ts['1/10/2011'] ================================
+: 0.8841108212188903
+: ================================ ts['20110110'] ================================
+: 0.8841108212188903
+
+
+*** 使用年份或月份选择数据切片
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  longer_ts = pd.Series(np.random.randn(1000),
+                        index=pd.date_range('1/1/2000', periods=1000))
+  log("longer_ts.head()", longer_ts.head())
+#+END_SRC
+
+#+RESULTS:
+: =============================== longer_ts.head() ===============================
+: 2000-01-01   -0.072052
+: 2000-01-02    0.544066
+: 2000-01-03    0.323886
+: 2000-01-04   -1.683325
+: 2000-01-05    0.526860
+: Freq: D, dtype: float64
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("longer_ts['2001'].head()", longer_ts['2001'].head())
+  log("longer_ts['2001-05'].head()", longer_ts['2001-05'].head())
+  log("ts[datetime(2011, 1, 7):]", ts[datetime(2011, 1, 7):])
+  # 可以使用不包含在时间序列中的时间戳进行切片
+  log("ts['1/6/2011':'1/11/2011']", ts['1/6/2011':'1/11/2011'])
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+=========================== longer_ts['2001'].head() ===========================
+2001-01-01   -0.171724
+2001-01-02   -0.827840
+2001-01-03    0.370548
+2001-01-04   -0.674167
+2001-01-05   -1.712340
+Freq: D, dtype: float64
+========================= longer_ts['2001-05'].head() ==========================
+2001-05-01    0.251343
+2001-05-02    1.624623
+2001-05-03   -0.240567
+2001-05-04    0.163052
+2001-05-05   -0.586669
+Freq: D, dtype: float64
+========================== ts[datetime(2011, 1, 7):] ===========================
+2011-01-07    2.122315
+2011-01-08    0.061192
+2011-01-10    0.884111
+2011-01-12   -0.608506
+dtype: float64
+========================== ts['1/6/2011':'1/11/2011'] ==========================
+2011-01-07    2.122315
+2011-01-08    0.061192
+2011-01-10    0.884111
+dtype: float64
+#+end_example
+
+
+** 日期范围，频率，偏移
+
+*** 生成范围
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("pd.date_range('2012-04-01', '2012-04-20')", pd.date_range('2012-04-01', '2012-04-20'))
+  log("pd.date_range(start='2012-04-01', periods=20)", pd.date_range(start='2012-04-01', periods=20))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+================== pd.date_range('2012-04-01', '2012-04-20') ===================
+DatetimeIndex(['2012-04-01', '2012-04-02', '2012-04-03', '2012-04-04',
+               '2012-04-05', '2012-04-06', '2012-04-07', '2012-04-08',
+               '2012-04-09', '2012-04-10', '2012-04-11', '2012-04-12',
+               '2012-04-13', '2012-04-14', '2012-04-15', '2012-04-16',
+               '2012-04-17', '2012-04-18', '2012-04-19', '2012-04-20'],
+              dtype='datetime64[ns]', freq='D')
+================ pd.date_range(start='2012-04-01', periods=20) =================
+DatetimeIndex(['2012-04-01', '2012-04-02', '2012-04-03', '2012-04-04',
+               '2012-04-05', '2012-04-06', '2012-04-07', '2012-04-08',
+               '2012-04-09', '2012-04-10', '2012-04-11', '2012-04-12',
+               '2012-04-13', '2012-04-14', '2012-04-15', '2012-04-16',
+               '2012-04-17', '2012-04-18', '2012-04-19', '2012-04-20'],
+              dtype='datetime64[ns]', freq='D')
+============= pd.date_range('2000-01-01', '2000-12-01', freq='BM') =============
+DatetimeIndex(['2000-01-31', '2000-02-29', '2000-03-31', '2000-04-28',
+               '2000-05-31', '2000-06-30', '2000-07-31', '2000-08-31',
+               '2000-09-29', '2000-10-31', '2000-11-30'],
+              dtype='datetime64[ns]', freq='BM')
+#+end_example
+
+
+*** 日期频率
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("pd.date_range('2000-01-01', '2000-12-01', freq='BM')", pd.date_range('2000-01-01', '2000-12-01', freq='BM'))
+  log("pd.date_range('2000-01-01', periods=10, freq='1h30min')", pd.date_range('2000-01-01', periods=10, freq='1h30min'))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+============= pd.date_range('2000-01-01', '2000-12-01', freq='BM') =============
+DatetimeIndex(['2000-01-31', '2000-02-29', '2000-03-31', '2000-04-28',
+               '2000-05-31', '2000-06-30', '2000-07-31', '2000-08-31',
+               '2000-09-29', '2000-10-31', '2000-11-30'],
+              dtype='datetime64[ns]', freq='BM')
+=========== pd.date_range('2000-01-01', periods=10, freq='1h30min') ============
+DatetimeIndex(['2000-01-01 00:00:00', '2000-01-01 01:30:00',
+               '2000-01-01 03:00:00', '2000-01-01 04:30:00',
+               '2000-01-01 06:00:00', '2000-01-01 07:30:00',
+               '2000-01-01 09:00:00', '2000-01-01 10:30:00',
+               '2000-01-01 12:00:00', '2000-01-01 13:30:00'],
+              dtype='datetime64[ns]', freq='90T')
+#+end_example
+
+**** 月中某星期
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("list(pd.date_range('2012-01-01', '2012-06-01', freq='WOM-3FRI'))", list(pd.date_range('2012-01-01', '2012-06-01', freq='WOM-3FRI')))
+#+END_SRC
+
+#+RESULTS:
+: ======= list(pd.date_range('2012-01-01', '2012-06-01', freq='WOM-3FRI')) =======
+: [Timestamp('2012-01-20 00:00:00', freq='WOM-3FRI'),
+:  Timestamp('2012-02-17 00:00:00', freq='WOM-3FRI'),
+:  Timestamp('2012-03-16 00:00:00', freq='WOM-3FRI'),
+:  Timestamp('2012-04-20 00:00:00', freq='WOM-3FRI'),
+:  Timestamp('2012-05-18 00:00:00', freq='WOM-3FRI')]
+
+
+*** 日期偏移
+
+**** 推移数据不改变时间戳
+
+Series 和 DataFrame 都有一个 =shift= 方法用于进行简单的前向或后向移位，而 *不改变索引* ：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  ts = pd.Series(np.random.randn(4),
+                 index=pd.date_range('1/1/2000', periods=4, freq='M'))
+  log("ts", ts)
+  log("ts.shift(2)", ts.shift(2))
+  log("ts.shift(-2)", ts.shift(-2))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== ts ======================================
+2000-01-31    2.001614
+2000-02-29    1.385914
+2000-03-31   -1.104685
+2000-04-30    0.677098
+Freq: M, dtype: float64
+================================= ts.shift(2) ==================================
+2000-01-31         NaN
+2000-02-29         NaN
+2000-03-31    2.001614
+2000-04-30    1.385914
+Freq: M, dtype: float64
+================================= ts.shift(-2) =================================
+2000-01-31   -1.104685
+2000-02-29    0.677098
+2000-03-31         NaN
+2000-04-30         NaN
+Freq: M, dtype: float64
+#+end_example
+
+=shift= 常用来计算 *百分比变化* ：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("ts", ts)
+  log("ts.shift(1)", ts.shift(1))
+  log("ts / ts.shift(1) - 1", ts / ts.shift(1) - 1)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== ts ======================================
+2000-01-31    2.001614
+2000-02-29    1.385914
+2000-03-31   -1.104685
+2000-04-30    0.677098
+Freq: M, dtype: float64
+================================= ts.shift(1) ==================================
+2000-01-31         NaN
+2000-02-29    2.001614
+2000-03-31    1.385914
+2000-04-30   -1.104685
+Freq: M, dtype: float64
+============================= ts / ts.shift(1) - 1 =============================
+2000-01-31         NaN
+2000-02-29   -0.307602
+2000-03-31   -1.797080
+2000-04-30   -1.612933
+Freq: M, dtype: float64
+#+end_example
+
+**** 推移数据不改变时间戳
+
+传递一个频率参数
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("ts", ts)
+  log("ts.shift(2, freq='M')", ts.shift(2, freq='M'))
+  log("ts.shift(3, freq='D')", ts.shift(3, freq='D'))
+  log("ts.shift(1, freq='90T')", ts.shift(1, freq='90T'))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== ts ======================================
+2000-01-31    2.001614
+2000-02-29    1.385914
+2000-03-31   -1.104685
+2000-04-30    0.677098
+Freq: M, dtype: float64
+============================ ts.shift(2, freq='M') =============================
+2000-03-31    2.001614
+2000-04-30    1.385914
+2000-05-31   -1.104685
+2000-06-30    0.677098
+Freq: M, dtype: float64
+============================ ts.shift(3, freq='D') =============================
+2000-02-03    2.001614
+2000-03-03    1.385914
+2000-04-03   -1.104685
+2000-05-03    0.677098
+dtype: float64
+=========================== ts.shift(1, freq='90T') ============================
+2000-01-31 01:30:00    2.001614
+2000-02-29 01:30:00    1.385914
+2000-03-31 01:30:00   -1.104685
+2000-04-30 01:30:00    0.677098
+Freq: M, dtype: float64
+#+end_example
