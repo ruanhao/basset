@@ -34,13 +34,19 @@
           raise Exception('exit code %s' % proc.returncode)
       return stdout, stderr
 
+  def plot():
+      global path
+      plt.legend()
+      plt.savefig(path)
+      plt.clf()
+
   def log(title0, value):
       title1 = ' ' + title0 + ' '
       print("{}\n{}".format(title1.center(80, '='), value))
 #+END_SRC
 
 #+RESULTS:
-: # Out[81]:
+: # Out[39]:
 
 
 * 核心数据结构创建与基本操作
@@ -5161,4 +5167,410 @@ dtype: float64
 2000-03-31 01:30:00   -1.104685
 2000-04-30 01:30:00    0.677098
 Freq: M, dtype: float64
+#+end_example
+
+
+** 重采样(resample)
+
+=resample= 有和 =groupby= 相似的 API ：调用 =resample= 对数据分组，再使用聚合函数。
+
+*** 下采样
+
+
+**** 半开区间
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  rng = pd.date_range('2000-01-01', periods=12, freq='T')
+  ts = pd.Series(np.arange(12), index=rng)
+  log("ts", ts)
+  log("ts.resample('5min').sum()", ts.resample('5min').sum()) # close='left' : [left, right)
+  log("ts.resample('5min', closed='right').sum()", ts.resample('5min', closed='right').sum()) # (left, right]
+
+  # 默认 index 是使用左区间的 label
+  log("ts.resample('5min', closed='right', label='right', loffset='-1s').sum()",
+      ts.resample('5min', closed='right', label='right', loffset='-1s').sum()) # 也可使用 shift 实现此功能
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== ts ======================================
+2000-01-01 00:00:00     0
+2000-01-01 00:01:00     1
+2000-01-01 00:02:00     2
+2000-01-01 00:03:00     3
+2000-01-01 00:04:00     4
+2000-01-01 00:05:00     5
+2000-01-01 00:06:00     6
+2000-01-01 00:07:00     7
+2000-01-01 00:08:00     8
+2000-01-01 00:09:00     9
+2000-01-01 00:10:00    10
+2000-01-01 00:11:00    11
+Freq: T, dtype: int64
+========================== ts.resample('5min').sum() ===========================
+2000-01-01 00:00:00    10
+2000-01-01 00:05:00    35
+2000-01-01 00:10:00    21
+Freq: 5T, dtype: int64
+================== ts.resample('5min', closed='right').sum() ===================
+1999-12-31 23:55:00     0
+2000-01-01 00:00:00    15
+2000-01-01 00:05:00    40
+2000-01-01 00:10:00    11
+Freq: 5T, dtype: int64
+=== ts.resample('5min', closed='right', label='right', loffset='-1s').sum() ====
+1999-12-31 23:59:59     0
+2000-01-01 00:04:59    15
+2000-01-01 00:09:59    40
+2000-01-01 00:14:59    11
+Freq: 5T, dtype: int64
+#+end_example
+
+
+**** OHLC 重采样
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("ts", ts)
+  log("ts.resample('5min').ohlc()", ts.resample('5min').ohlc())
+  log("ts.resample('5min', closed='right').ohlc()", ts.resample('5min', closed='right').ohlc())
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== ts ======================================
+2000-01-01 00:00:00     0
+2000-01-01 00:01:00     1
+2000-01-01 00:02:00     2
+2000-01-01 00:03:00     3
+2000-01-01 00:04:00     4
+2000-01-01 00:05:00     5
+2000-01-01 00:06:00     6
+2000-01-01 00:07:00     7
+2000-01-01 00:08:00     8
+2000-01-01 00:09:00     9
+2000-01-01 00:10:00    10
+2000-01-01 00:11:00    11
+Freq: T, dtype: int64
+========================== ts.resample('5min').ohlc() ==========================
+                     open  high  low  close
+2000-01-01 00:00:00     0     4    0      4
+2000-01-01 00:05:00     5     9    5      9
+2000-01-01 00:10:00    10    11   10     11
+================== ts.resample('5min', closed='right').ohlc() ==================
+                     open  high  low  close
+1999-12-31 23:55:00     0     0    0      0
+2000-01-01 00:00:00     1     5    1      5
+2000-01-01 00:05:00     6    10    6     10
+2000-01-01 00:10:00    11    11   11     11
+#+end_example
+
+
+*** 上采样与插值
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  frame = pd.DataFrame(np.random.randn(2, 4),
+                       index=pd.date_range('1/1/2000', periods=2, freq='W-WED'),
+                       columns=['Colorado', 'Texas', 'New York', 'Ohio'])
+  log("frame", frame)
+  log("frame.resample('D').asfreq()", frame.resample('D').asfreq())
+  log("frame.resample('D').ffill()", frame.resample('D').ffill())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+==================================== frame =====================================
+            Colorado     Texas  New York      Ohio
+2000-01-05 -0.179199  0.929787 -0.046577  0.028099
+2000-01-12 -0.196553  0.334500  0.171028  1.063931
+========================= frame.resample('D').asfreq() =========================
+            Colorado     Texas  New York      Ohio
+2000-01-05 -0.179199  0.929787 -0.046577  0.028099
+2000-01-06       NaN       NaN       NaN       NaN
+2000-01-07       NaN       NaN       NaN       NaN
+2000-01-08       NaN       NaN       NaN       NaN
+2000-01-09       NaN       NaN       NaN       NaN
+2000-01-10       NaN       NaN       NaN       NaN
+2000-01-11       NaN       NaN       NaN       NaN
+2000-01-12 -0.196553  0.334500  0.171028  1.063931
+========================= frame.resample('D').ffill() ==========================
+            Colorado     Texas  New York      Ohio
+2000-01-05 -0.179199  0.929787 -0.046577  0.028099
+2000-01-06 -0.179199  0.929787 -0.046577  0.028099
+2000-01-07 -0.179199  0.929787 -0.046577  0.028099
+2000-01-08 -0.179199  0.929787 -0.046577  0.028099
+2000-01-09 -0.179199  0.929787 -0.046577  0.028099
+2000-01-10 -0.179199  0.929787 -0.046577  0.028099
+2000-01-11 -0.179199  0.929787 -0.046577  0.028099
+2000-01-12 -0.196553  0.334500  0.171028  1.063931
+#+end_example
+
+
+
+
+* 移动窗口函数
+
+** rolling
+
+*** 按长度确定窗口
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export :var path="img/fig_rolling.png"
+  s = pd.Series(range(10))
+  log("s", s)
+  log("s.rolling(3).mean()", s.rolling(3).mean())
+  log("s.rolling(3, min_periods=2).mean()", s.rolling(3, min_periods=2).mean())
+  s.rolling(3).mean().plot()
+  plot()
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== s =======================================
+0    0
+1    1
+2    2
+3    3
+4    4
+5    5
+6    6
+7    7
+8    8
+9    9
+dtype: int64
+============================= s.rolling(3).mean() ==============================
+0    NaN
+1    NaN
+2    1.0
+3    2.0
+4    3.0
+5    4.0
+6    5.0
+7    6.0
+8    7.0
+9    8.0
+dtype: float64
+====================== s.rolling(3, min_periods=2).mean() ======================
+0    NaN
+1    0.5
+2    1.0
+3    2.0
+4    3.0
+5    4.0
+6    5.0
+7    6.0
+8    7.0
+9    8.0
+dtype: float64
+#+end_example
+
+
+file:img/fig_rolling.png
+
+
+
+
+*** 按时间确定窗口
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  close_px_all = pd.read_csv('data/stock_px_2.csv', parse_dates=True, index_col=0)
+  close_px = close_px_all[['AAPL', 'MSFT', 'XOM']]
+  log("close_px.head()", close_px.head())
+  log("close_px.rolling('20D').mean().head()", close_px.rolling('20D').mean().head()) # 无需指定 min_periods ？
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+=============================== close_px.head() ================================
+            AAPL   MSFT    XOM
+2003-01-02  7.40  21.11  29.22
+2003-01-03  7.45  21.14  29.24
+2003-01-06  7.45  21.52  29.96
+2003-01-07  7.43  21.93  28.95
+2003-01-08  7.28  21.31  28.83
+==================== close_px.rolling('20D').mean().head() =====================
+                AAPL       MSFT        XOM
+2003-01-02  7.400000  21.110000  29.220000
+2003-01-03  7.425000  21.125000  29.230000
+2003-01-06  7.433333  21.256667  29.473333
+2003-01-07  7.432500  21.425000  29.342500
+2003-01-08  7.402000  21.402000  29.240000
+#+end_example
+
+
+** expanding
+
+窗口从小到大增长，直到整个序列长度。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export :var path="img/fig_expanding.png"
+  s = pd.Series(range(10))
+  log("s", s)
+  log("s.expanding().mean()", s.expanding().mean())
+  s.plot()
+  plot()
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== s =======================================
+0    0
+1    1
+2    2
+3    3
+4    4
+5    5
+6    6
+7    7
+8    8
+9    9
+dtype: int64
+============================= s.expanding().mean() =============================
+0    0.0
+1    0.5
+2    1.0
+3    1.5
+4    2.0
+5    2.5
+6    3.0
+7    3.5
+8    4.0
+9    4.5
+dtype: float64
+#+end_example
+
+file:img/fig_expanding.png
+
+
+
+
+** ewm
+
+通过 =span= 指定一个固定衰减因子，赋予 *最近观察值* 更多的权重。
+
+[[https://blog.csdn.net/mzpmzk/article/details/80085929][传送门]]
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series(range(10))
+  log("s", s)
+  log("s.rolling(3).mean()", s.rolling(3).mean())
+  log("s.ewm(span=3).mean()", s.ewm(span=3).mean())
+  log("s.ewm(span=5).mean()", s.ewm(span=5).mean())
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== s =======================================
+0    0
+1    1
+2    2
+3    3
+4    4
+5    5
+6    6
+7    7
+8    8
+9    9
+dtype: int64
+============================= s.rolling(3).mean() ==============================
+0    NaN
+1    NaN
+2    1.0
+3    2.0
+4    3.0
+5    4.0
+6    5.0
+7    6.0
+8    7.0
+9    8.0
+dtype: float64
+============================= s.ewm(span=3).mean() =============================
+0    0.000000
+1    0.666667
+2    1.428571
+3    2.266667
+4    3.161290
+5    4.095238
+6    5.055118
+7    6.031373
+8    7.017613
+9    8.009775
+dtype: float64
+============================= s.ewm(span=5).mean() =============================
+0    0.000000
+1    0.600000
+2    1.263158
+3    1.984615
+4    2.758294
+5    3.577444
+6    4.435163
+7    5.324822
+8    6.240363
+9    7.176476
+dtype: float64
+#+end_example
+
+
+#+BEGIN_SRC ipython :session :var path="img/figbgl8w4.png" :exports both :results output :eval never-export
+  aapl_px = close_px.AAPL['2006':'2007']
+  ma30 = aapl_px.rolling(30, min_periods=20).mean()
+  ma50 = aapl_px.rolling(30, min_periods=20).mean()
+  ewma10 = aapl_px.ewm(span=10).mean()
+  ewma30 = aapl_px.ewm(span=30).mean()
+  ewma50 = aapl_px.ewm(span=50).mean()
+  ewma100 = aapl_px.ewm(span=100).mean()
+  aapl_px.plot(label='aapl_px', style='k--')
+  ma30.plot(label='ma30')
+  ma50.plot(label='ma50')
+  ewma10.plot(label='ewma10')
+  ewma30.plot(label='ewma30')
+  ewma50.plot(label='ewma50')
+  ewma100.plot(label='ewma100')
+  plot()
+
+#+END_SRC
+
+#+RESULTS:
+
+[[file:img/figbgl8w4.png]]
+
+** 二元窗口函数
+
+*** corr
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series(range(10))
+  log("s", s)
+  log("s.corr(s)", s.corr(s))
+  log("s.rolling(3).corr(s)", s.rolling(3).corr(s))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================================== s =======================================
+0    0
+1    1
+2    2
+3    3
+4    4
+5    5
+6    6
+7    7
+8    8
+9    9
+dtype: int64
+================================== s.corr(s) ===================================
+0.9999999999999999
+============================= s.rolling(3).corr(s) =============================
+0    NaN
+1    1.0
+2    1.0
+3    1.0
+4    1.0
+5    1.0
+6    1.0
+7    1.0
+8    1.0
+9    1.0
+dtype: float64
 #+end_example
