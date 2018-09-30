@@ -5599,3 +5599,54 @@ dtype: float64
 : SPX     2214 non-null float64
 : dtypes: float64(4)
 : memory usage: 86.5 KB
+
+
+** 排序
+
+*** 找出插入值应处位置(searchsorted)
+
+=Series.searchsorted(value)=
+
+*** nlargest(n)/nsmallest(n)
+
+*** 排序并输出对应索引(Series.argsort)
+
+序列中的元素从小到大排列，提取其对应的 index
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("np.array([1,4,3,-1,6,9]).argsort()", np.array([1,4,3,-1,6,9]).argsort())
+  log("pd.Series(np.array([1,4,3,-1,6,9])).argsort()", pd.Series(np.array([1,4,3,-1,6,9])).argsort())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+====================== np.array([1,4,3,-1,6,9]).argsort() ======================
+[3 0 2 1 4 5]
+================ pd.Series(np.array([1,4,3,-1,6,9])).argsort() =================
+0    3
+1    0
+2    2
+3    1
+4    4
+5    5
+dtype: int64
+#+end_example
+
+** 列操作
+
+*** np.where
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  s = pd.Series(range(10))
+  s2 = np.where(s % 2 == 0, 'Even', 'Odd')
+  s3 = np.where(s > 5, 'Bigger', 'Smaller')
+  log("s2", s2)
+  log("s3", s3)
+#+END_SRC
+
+#+RESULTS:
+: ====================================== s2 ======================================
+: ['Even' 'Odd' 'Even' 'Odd' 'Even' 'Odd' 'Even' 'Odd' 'Even' 'Odd']
+: ====================================== s3 ======================================
+: ['Smaller' 'Smaller' 'Smaller' 'Smaller' 'Smaller' 'Smaller' 'Bigger'
+:  'Bigger' 'Bigger' 'Bigger']
