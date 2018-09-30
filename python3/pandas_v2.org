@@ -24,6 +24,10 @@
   import matplotlib.pyplot as plt
   import subprocess
 
+  pd.options.display.max_rows = 20
+  plt.rc('figure', figsize=(16, 12))
+  # plt.rc('figure', dpi=100)
+
   def run_script(script):
       """Returns (stdout, stderr), raises error on non-zero return code"""
       proc = subprocess.Popen(['bash', '-c', script],
@@ -46,7 +50,7 @@
 #+END_SRC
 
 #+RESULTS:
-: # Out[39]:
+: # Out[7]:
 
 
 * 核心数据结构创建与基本操作
@@ -4333,6 +4337,8 @@ b    8    b  two      9      1
 
 *** 禁用分组键(group_keys=False)
 
+当返回结果集中不需要体现分组信息时，可以使用该参数。
+
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   df = pd.DataFrame({'key1': ['a', 'a', 'b', 'b', 'a', 'a', 'a', 'b', 'b', 'a'],
                       'key2': ['one', 'two', 'one', 'two', 'one', 'one', 'two', 'one', 'two', 'one'],
@@ -4836,67 +4842,6 @@ Categories (4, object): [Q1 < Q2 < Q3 < Q4]
 #+RESULTS:
 : CPU times: user 470 ms, sys: 50.2 ms, total: 521 ms
 : Wall time: 518 ms
-
-
-
-* 实用方法
-
-** 链式操作
-
-*** DataFrame.assign
-
-=assign= 方法是 =df[k] = v= 的链式表达方式。
-
-
-#+BEGIN_SRC ipython
-  df2 = df.copy()
-  df['k'] = v
-#+END_SRC
-
-等效于：
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  df2 = df.assign(k=v)
-#+END_SRC
-
-
-
-#+BEGIN_SRC ipython
-  df = load_data()
-  df2 = df[df['col2'] < 0]
-  df2['col1_demeaned'] = df2.col1 - df2.col1.mean()
-#+END_SRC
-
-等效于：
-
-#+BEGIN_SRC ipython
-  df2 = (load_data()
-         [lambda x: x.col2 < 0]
-         .assign(col1_demeaned=lambda x: x.col1 - x.col1.mean()))
-#+END_SRC
-
-这种方式就不需要引用中间变量 =df= 了。
-
-
-
-*** pd.pipe
-
-当使用函数处理 Series 或 DataFrame ，处理结果也是 Series 或 DataFrame 类型时，
-可以使用 =pipe= 完成链式操作：
-
-#+BEGIN_SRC ipython
-  a = f(df, arg1=v1)
-  b = g(a, v2, arg3=v3)
-  c = h(b, arg4=v4)
-#+END_SRC
-
-等效于：
-
-#+BEGIN_SRC ipython
-  result = (df.pipe(f, arg1=v1)
-            .pipe(g, v2, arg3=v3)
-            .pipe(h, arg4=v4))
-#+END_SRC
 
 
 
@@ -5574,3 +5519,83 @@ dtype: int64
 9    1.0
 dtype: float64
 #+end_example
+
+
+* 实用方法
+
+** 链式操作
+
+*** DataFrame.assign
+
+=assign= 方法是 =df[k] = v= 的链式表达方式。
+
+
+#+BEGIN_SRC ipython
+  df2 = df.copy()
+  df['k'] = v
+#+END_SRC
+
+等效于：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  df2 = df.assign(k=v)
+#+END_SRC
+
+
+
+#+BEGIN_SRC ipython
+  df = load_data()
+  df2 = df[df['col2'] < 0]
+  df2['col1_demeaned'] = df2.col1 - df2.col1.mean()
+#+END_SRC
+
+等效于：
+
+#+BEGIN_SRC ipython
+  df2 = (load_data()
+         [lambda x: x.col2 < 0]
+         .assign(col1_demeaned=lambda x: x.col1 - x.col1.mean()))
+#+END_SRC
+
+这种方式就不需要引用中间变量 =df= 了。
+
+
+
+*** pd.pipe
+
+当使用函数处理 Series 或 DataFrame ，处理结果也是 Series 或 DataFrame 类型时，
+可以使用 =pipe= 完成链式操作：
+
+#+BEGIN_SRC ipython
+  a = f(df, arg1=v1)
+  b = g(a, v2, arg3=v3)
+  c = h(b, arg4=v4)
+#+END_SRC
+
+等效于：
+
+#+BEGIN_SRC ipython
+  result = (df.pipe(f, arg1=v1)
+            .pipe(g, v2, arg3=v3)
+            .pipe(h, arg4=v4))
+#+END_SRC
+
+
+** 查看 DataFrame 信息
+
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  close_px = pd.read_csv('data/stock_px_2.csv', parse_dates=True, index_col=0)
+  close_px.info()
+#+END_SRC
+
+#+RESULTS:
+: <class 'pandas.core.frame.DataFrame'>
+: DatetimeIndex: 2214 entries, 2003-01-02 to 2011-10-14
+: Data columns (total 4 columns):
+: AAPL    2214 non-null float64
+: MSFT    2214 non-null float64
+: XOM     2214 non-null float64
+: SPX     2214 non-null float64
+: dtypes: float64(4)
+: memory usage: 86.5 KB
