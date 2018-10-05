@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- 2018-10-04 Thu 17:55 -->
+<!-- 2018-10-05 Fri 14:16 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pandas V2</title>
@@ -234,296 +234,299 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org9f3e474">1. 核心数据结构创建与基本操作</a>
+<li><a href="#orge665278">1. 核心数据结构创建与基本操作</a>
 <ul>
-<li><a href="#orgfdbf123">1.1. 索引对象</a></li>
-<li><a href="#orged6734c">1.2. Panel</a></li>
-<li><a href="#org7f09cef">1.3. Series</a>
+<li><a href="#orgc8f0088">1.1. 索引对象</a></li>
+<li><a href="#org64781c2">1.2. Panel</a></li>
+<li><a href="#org4c58297">1.3. Series</a>
 <ul>
-<li><a href="#orgae4d4ae">1.3.1. 创建</a>
+<li><a href="#org3fa3c7e">1.3.1. 创建</a>
 <ul>
-<li><a href="#org9c1d0d1">1.3.1.1. 从 ndarray 创建</a></li>
-<li><a href="#org753e654">1.3.1.2. 从字典创建</a></li>
-<li><a href="#orgbc27852">1.3.1.3. 从标量创建</a></li>
+<li><a href="#org58074b3">1.3.1.1. 从 ndarray 创建</a></li>
+<li><a href="#orga57b7cd">1.3.1.2. 从字典创建</a></li>
+<li><a href="#org53bea81">1.3.1.3. 从标量创建</a></li>
 </ul>
 </li>
-<li><a href="#org906a97c">1.3.2. 基本操作</a>
+<li><a href="#org9b32649">1.3.2. 基本操作</a>
 <ul>
-<li><a href="#orgdecadd7">1.3.2.1. 赋值</a></li>
-<li><a href="#org42f424b">1.3.2.2. 与标量相乘</a></li>
-<li><a href="#org04bbdae">1.3.2.3. 应用数学函数</a></li>
-<li><a href="#org452e62c">1.3.2.4. 映射 (apply)</a></li>
-<li><a href="#org3ca91ad">1.3.2.5. 排序(sort_index/sort_values)</a></li>
-<li><a href="#org1206b79">1.3.2.6. 唯一值，计数和成员(unique/count/isin)</a></li>
-<li><a href="#org8a08b0f">1.3.2.7. 排名(rank)</a></li>
-<li><a href="#org6e03173">1.3.2.8. 在字典上下文中使用</a></li>
-<li><a href="#org69b5c50">1.3.2.9. 检查缺失数据</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#orgdc2d6b0">1.4. DataFrame</a>
-<ul>
-<li><a href="#orgd7b83ea">1.4.1. 创建</a>
-<ul>
-<li><a href="#org2a24ea1">1.4.1.1. 从字典创建</a></li>
-<li><a href="#org1f7b26d">1.4.1.2. 从结构化数据列表创建</a></li>
-<li><a href="#org9f27038">1.4.1.3. 从字典列表创建</a></li>
-<li><a href="#org8443d0b">1.4.1.4. 从元组字典创建</a></li>
-<li><a href="#org5e9a03f">1.4.1.5. 从 Series 创建</a></li>
-<li><a href="#org558760d">1.4.1.6. 指定行列索引创建</a></li>
-</ul>
-</li>
-<li><a href="#orgc408d5d">1.4.2. 基本操作</a>
-<ul>
-<li><a href="#org1acc4bd">1.4.2.1. 转置</a></li>
-<li><a href="#org2644f94">1.4.2.2. 算数运算填充</a></li>
-<li><a href="#org995650d">1.4.2.3. 和 Series 之间的运算（广播机制）</a></li>
-<li><a href="#org1dc3c38">1.4.2.4. 应用函数</a></li>
-<li><a href="#org3155d0f">1.4.2.5. 行/列映射 (apply)</a></li>
-<li><a href="#orgc071c1b">1.4.2.6. 逐元素映射 (applymap)</a></li>
-<li><a href="#org8a226d2">1.4.2.7. 排序(sort_index/sort_values)</a></li>
-<li><a href="#orga9a08d4">1.4.2.8. 排名(rank)</a></li>
-<li><a href="#orgce9d4b5">1.4.2.9. 转换为 ndarray 对象</a></li>
-<li><a href="#org67999d6">1.4.2.10. 统计</a></li>
+<li><a href="#org41bcc27">1.3.2.1. 赋值</a></li>
+<li><a href="#orgd05900a">1.3.2.2. 与标量相乘</a></li>
+<li><a href="#orgc298272">1.3.2.3. 应用数学函数</a></li>
+<li><a href="#orgda0d4d0">1.3.2.4. 映射 (apply)</a></li>
+<li><a href="#orgc88ae32">1.3.2.5. 排序(sort_index/sort_values)</a></li>
+<li><a href="#org8e9f963">1.3.2.6. 唯一值，计数和成员(unique/count/isin)</a></li>
+<li><a href="#org460f1ab">1.3.2.7. 排名(rank)</a></li>
+<li><a href="#orge5e9930">1.3.2.8. 在字典上下文中使用</a></li>
+<li><a href="#org5dbd9ee">1.3.2.9. 检查缺失数据</a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li><a href="#org73acf34">1.4. DataFrame</a>
+<ul>
+<li><a href="#org7f6e788">1.4.1. 创建</a>
+<ul>
+<li><a href="#org92b42b3">1.4.1.1. 从字典创建</a></li>
+<li><a href="#org101f92e">1.4.1.2. 从结构化数据列表创建</a></li>
+<li><a href="#org60b3cd0">1.4.1.3. 从字典列表创建</a></li>
+<li><a href="#org0695934">1.4.1.4. 从元组字典创建</a></li>
+<li><a href="#orgd132ac9">1.4.1.5. 从 Series 创建</a></li>
+<li><a href="#org8fbe1c1">1.4.1.6. 指定行列索引创建</a></li>
 </ul>
 </li>
-<li><a href="#orgde15ec3">2. 索引</a>
+<li><a href="#org6950ecf">1.4.2. 基本操作</a>
 <ul>
-<li><a href="#orgabe086f">2.1. Series</a>
-<ul>
-<li><a href="#org6a816d1">2.1.1. 设置对象自身和索引的 name 属性</a></li>
-<li><a href="#org2c52a9d">2.1.2. 获取值和索引</a></li>
-<li><a href="#org0499f7b">2.1.3. 索引对齐</a></li>
-<li><a href="#org9023b13">2.1.4. 重建索引</a></li>
-<li><a href="#orgd1156ef">2.1.5. 删除索引</a></li>
-<li><a href="#org2d9e73a">2.1.6. 标签索引</a></li>
-<li><a href="#org22ff5be">2.1.7. 布尔索引</a></li>
-</ul>
-</li>
-<li><a href="#org09a9123">2.2. DataFrame</a>
-<ul>
-<li><a href="#orgdd1ba34">2.2.1. 设置行/列索引的 name 属性</a></li>
-<li><a href="#org3e92db6">2.2.2. 重建索引</a></li>
-<li><a href="#org6f6eca8">2.2.3. 索引对齐</a></li>
-<li><a href="#org0624290">2.2.4. 列赋值</a></li>
-<li><a href="#org96f72d3">2.2.5. 删除行/列</a></li>
-<li><a href="#orgacc4e2d">2.2.6. 标签索引</a></li>
-<li><a href="#orgc4be1f6">2.2.7. 正则索引</a></li>
-<li><a href="#orgae688f1">2.2.8. 整数索引</a></li>
-<li><a href="#orgb1932b1">2.2.9. 布尔索引</a></li>
-<li><a href="#org443b8f7">2.2.10. loc 索引</a></li>
-<li><a href="#org7254ae7">2.2.11. iloc 索引</a></li>
-<li><a href="#org967807b">2.2.12. at 索引</a></li>
-<li><a href="#org8e9d725">2.2.13. 随机索引</a></li>
-<li><a href="#org848073b">2.2.14. 重命名行/列</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#org65cd7c6">3. 数据清洗</a>
-<ul>
-<li><a href="#org137614d">3.1. 处理缺失值</a>
-<ul>
-<li><a href="#orgfe0289f">3.1.1. 过滤缺失值(dropna)</a></li>
-<li><a href="#org9cb8555">3.1.2. 补全缺失值(fillna)</a></li>
-</ul>
-</li>
-<li><a href="#orgf4f3346">3.2. 数据转换</a>
-<ul>
-<li><a href="#org3371302">3.2.1. 删除重复值</a></li>
-<li><a href="#orgf49e508">3.2.2. 使用函数或映射进行数据转换</a></li>
-<li><a href="#orgb242ffc">3.2.3. 替代值(replace)</a></li>
-<li><a href="#org4e19336">3.2.4. 重命名索引</a></li>
-<li><a href="#org4c19865">3.2.5. 离散化和分箱(cut/qcut)</a></li>
-<li><a href="#orgeaa7330">3.2.6. 检测异常值(any)</a></li>
-<li><a href="#org66d94dd">3.2.7. 随机重排序(sample/take)</a>
-<ul>
-<li><a href="#org35cde56">3.2.7.1. 使用 take 优化内存 </a></li>
-</ul>
-</li>
-<li><a href="#orgc77b511">3.2.8. 指标矩阵(get_dummies)</a></li>
-<li><a href="#org65334c9">3.2.9. 向量化函数</a>
-<ul>
-<li><a href="#orgd07270f">3.2.9.1. str</a></li>
-<li><a href="#org4f80a83">3.2.9.2. dt</a></li>
+<li><a href="#orga580996">1.4.2.1. 转置</a></li>
+<li><a href="#orge1a7778">1.4.2.2. 算数运算填充</a></li>
+<li><a href="#orga1e0eeb">1.4.2.3. 和 Series 之间的运算（广播机制）</a></li>
+<li><a href="#org0398910">1.4.2.4. 应用函数</a></li>
+<li><a href="#orgb6eed22">1.4.2.5. 行/列映射 (apply)</a></li>
+<li><a href="#org3cc6a79">1.4.2.6. 逐元素映射 (applymap)</a></li>
+<li><a href="#orgf6318b1">1.4.2.7. 排序(sort_index/sort_values)</a></li>
+<li><a href="#org4ecc8d5">1.4.2.8. 排名(rank)</a></li>
+<li><a href="#org419c86e">1.4.2.9. 转换为 ndarray 对象</a></li>
+<li><a href="#org1085211">1.4.2.10. 统计</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org2081ff1">4. 数据规整：连接，联合，重塑</a>
+<li><a href="#org3b85a64">2. 索引</a>
 <ul>
-<li><a href="#orgdfb5622">4.1. 分层索引</a>
+<li><a href="#org11d3388">2.1. Series</a>
 <ul>
-<li><a href="#orgfbe0316">4.1.1. 层级交换(swaplevel)与排序(sort_index)</a></li>
-<li><a href="#org433d7cb">4.1.2. 列索引转为行索引 (set_index)</a></li>
-<li><a href="#org9ca4fd6">4.1.3. 行索引转为列索引 (reset_index)</a></li>
+<li><a href="#orgc66e10d">2.1.1. 设置对象自身和索引的 name 属性</a></li>
+<li><a href="#orgc33a1da">2.1.2. 获取值和索引</a></li>
+<li><a href="#org0623515">2.1.3. 索引对齐</a></li>
+<li><a href="#org8396e84">2.1.4. 重建索引</a></li>
+<li><a href="#orgcba1694">2.1.5. 删除索引</a></li>
+<li><a href="#org96ae81f">2.1.6. 标签索引</a></li>
+<li><a href="#org59276b6">2.1.7. 布尔索引</a></li>
 </ul>
 </li>
-<li><a href="#orgdfc3b6e">4.2. 连接与合并</a>
+<li><a href="#org547b9e5">2.2. DataFrame</a>
 <ul>
-<li><a href="#orgbabfe66">4.2.1. merge</a>
-<ul>
-<li><a href="#org4ad3ccb">4.2.1.1. 基本用法</a></li>
-<li><a href="#org4a0390e">4.2.1.2. 合并类型(inner,outer,left,right)</a></li>
-<li><a href="#org5a44995">4.2.1.3. 按索引合并</a></li>
-<li><a href="#orgdd59081">4.2.1.4. join</a></li>
-</ul>
-</li>
-<li><a href="#org2bbb0b7">4.2.2. concat</a>
-<ul>
-<li><a href="#orgd121107">4.2.2.1. join_axes</a></li>
-<li><a href="#org493af5b">4.2.2.2. 区分拼接在一起的各部分</a></li>
-<li><a href="#org5def81a">4.2.2.3. ignore_index</a></li>
-</ul>
-</li>
-<li><a href="#org40670d6">4.2.3. combine_first</a></li>
-</ul>
-</li>
-<li><a href="#org823bd43">4.3. 重排列表格型数据</a>
-<ul>
-<li><a href="#org9835d4f">4.3.1. 使用多层索引进行重塑(stack/unstack)</a></li>
-<li><a href="#org4ad92ca">4.3.2. 将列的值转换为列索引(pivot)</a></li>
-<li><a href="#org4c280b5">4.3.3. 将列索引转换为列的值(melt)</a>
-<ul>
-<li><a href="#org4ac4ceb">4.3.3.1. 使用pivot将数据重塑会原先的布局</a></li>
-<li><a href="#org04f3d5f">4.3.3.2. 指定列的子集作为值列</a></li>
-<li><a href="#orgbb7c7db">4.3.3.3. 不指定分组指标</a></li>
+<li><a href="#org6aac104">2.2.1. 设置行/列索引的 name 属性</a></li>
+<li><a href="#org4aa88ed">2.2.2. 重建索引</a></li>
+<li><a href="#org5e68c5e">2.2.3. 索引对齐</a></li>
+<li><a href="#orgf7a52ac">2.2.4. 列赋值</a></li>
+<li><a href="#orgd5bcb56">2.2.5. 删除行/列</a></li>
+<li><a href="#orgfb4cdaf">2.2.6. 标签索引</a></li>
+<li><a href="#org7535e0e">2.2.7. 正则索引</a></li>
+<li><a href="#org6475858">2.2.8. 整数索引</a></li>
+<li><a href="#orgc9dbc63">2.2.9. 布尔索引</a></li>
+<li><a href="#org27ea4b6">2.2.10. loc 索引</a></li>
+<li><a href="#orgd53848d">2.2.11. iloc 索引</a></li>
+<li><a href="#orge99125e">2.2.12. at 索引</a></li>
+<li><a href="#orgce60ef9">2.2.13. 随机索引</a></li>
+<li><a href="#org88ee57b">2.2.14. 重命名行/列</a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li><a href="#org2c55905">3. 数据清洗</a>
+<ul>
+<li><a href="#org6600e17">3.1. 处理缺失值</a>
+<ul>
+<li><a href="#org042fcc4">3.1.1. 过滤缺失值(dropna)</a></li>
+<li><a href="#org57fe1bb">3.1.2. 补全缺失值(fillna)</a></li>
 </ul>
 </li>
-<li><a href="#orgc175106">5. 聚合与分组操作</a>
+<li><a href="#org053b3d2">3.2. 数据转换</a>
 <ul>
-<li><a href="#orgf75ab84">5.1. GroupBy 对象</a>
+<li><a href="#org5019b75">3.2.1. 删除重复值</a></li>
+<li><a href="#orgf6652c2">3.2.2. 使用函数或映射进行数据转换</a></li>
+<li><a href="#orga16160f">3.2.3. 替代值(replace)</a></li>
+<li><a href="#org5b47ca2">3.2.4. 重命名索引</a></li>
+<li><a href="#org3a60ac6">3.2.5. 离散化和分箱(cut/qcut)</a></li>
+<li><a href="#orgf8f6763">3.2.6. 检测异常值(any)</a></li>
+<li><a href="#orgded3b72">3.2.7. 随机重排序(sample/take)</a>
 <ul>
-<li><a href="#org2ca80de">5.1.1. GroupBy 对象的列索引</a></li>
-<li><a href="#org2bc3a26">5.1.2. 使用字典和Series分组</a></li>
-<li><a href="#org94e16fa">5.1.3. 使用函数分组</a>
-<ul>
-<li><a href="#org086d57c">5.1.3.1. 与其他分组键混合</a></li>
+<li><a href="#org95ca39e">3.2.7.1. 使用 take 优化内存 </a></li>
 </ul>
 </li>
-<li><a href="#orgfbf5768">5.1.4. 根据索引层级分组</a></li>
-</ul>
-</li>
-<li><a href="#orga2fc2d8">5.2. 数据聚合</a>
+<li><a href="#org59e18ec">3.2.8. 指标矩阵(get_dummies)</a></li>
+<li><a href="#org815de93">3.2.9. 向量化函数</a>
 <ul>
-<li><a href="#org720b038">5.2.1. 对GroupBy对象调用聚合方法</a></li>
-<li><a href="#orga30e0e7">5.2.2. 逐列与多函数应用</a>
-<ul>
-<li><a href="#orgf06ba54">5.2.2.1. 各列同时使用多个函数聚合</a></li>
-<li><a href="#org259b2a1">5.2.2.2. 使用不同的函数对多个列聚合</a></li>
-</ul>
-</li>
-<li><a href="#org8fe8ad7">5.2.3. 返回不含行索引的聚合数据</a></li>
-<li><a href="#orgb2f8002">5.2.4. GroupBy.apply</a></li>
-<li><a href="#org1e97349">5.2.5. 禁用分组键(group_keys=False)</a></li>
-<li><a href="#org471c29a">5.2.6. GroupBy.transform</a></li>
-<li><a href="#org6e0247b">5.2.7. 时间分组重采样(resample)</a>
-<ul>
-<li><a href="#org76338cf">5.2.7.1. TimeGrouper 对象</a></li>
+<li><a href="#orgc76a2da">3.2.9.1. str</a></li>
+<li><a href="#org8c1698c">3.2.9.2. dt</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orga58e174">5.3. 透视表(pivot_table)</a></li>
-<li><a href="#org02e7d4d">5.4. 交叉表(cross_table)</a></li>
-<li><a href="#org5490c35">5.5. Categorial 类型数据</a>
+</ul>
+</li>
+<li><a href="#org85f8594">4. 数据规整：连接，联合，重塑</a>
 <ul>
-<li><a href="#org82fbd0d">5.5.1. 直接创建 Categorical 对象</a></li>
-<li><a href="#org35f8fdb">5.5.2. Categorical 对象排序规则</a></li>
-<li><a href="#org091218a">5.5.3. 使用 Categorical 对象进行分箱统计</a></li>
-<li><a href="#org4409cac">5.5.4. 使用 Categorical 对象的性能优势</a></li>
+<li><a href="#orgb13ca18">4.1. 分层索引</a>
+<ul>
+<li><a href="#orgde62afb">4.1.1. 层级交换(swaplevel)与排序(sort_index)</a></li>
+<li><a href="#org9da3325">4.1.2. 列索引转为行索引 (set_index)</a></li>
+<li><a href="#org9877fb9">4.1.3. 行索引转为列索引 (reset_index)</a></li>
+</ul>
+</li>
+<li><a href="#org39bd5c7">4.2. 连接与合并</a>
+<ul>
+<li><a href="#orga38b562">4.2.1. merge</a>
+<ul>
+<li><a href="#org4d0cb6e">4.2.1.1. 基本用法</a></li>
+<li><a href="#org4cb09ef">4.2.1.2. 合并类型(inner,outer,left,right)</a></li>
+<li><a href="#orgee9b641">4.2.1.3. 按索引合并</a></li>
+<li><a href="#org29e158b">4.2.1.4. join</a></li>
+</ul>
+</li>
+<li><a href="#org20c78c6">4.2.2. concat</a>
+<ul>
+<li><a href="#org8e83fb2">4.2.2.1. join_axes</a></li>
+<li><a href="#org10fa929">4.2.2.2. 区分拼接在一起的各部分</a></li>
+<li><a href="#org1a89b63">4.2.2.3. ignore_index</a></li>
+</ul>
+</li>
+<li><a href="#orge3fcae6">4.2.3. combine_first</a></li>
+</ul>
+</li>
+<li><a href="#org0c1736d">4.3. 重排列表格型数据</a>
+<ul>
+<li><a href="#orgf6a442d">4.3.1. 使用多层索引进行重塑(stack/unstack)</a></li>
+<li><a href="#orgc030043">4.3.2. 将列的值转换为列索引(pivot)</a></li>
+<li><a href="#orgb3ad0ff">4.3.3. 将列索引转换为列的值(melt)</a>
+<ul>
+<li><a href="#orgbf41c70">4.3.3.1. 使用pivot将数据重塑会原先的布局</a></li>
+<li><a href="#org1073df7">4.3.3.2. 指定列的子集作为值列</a></li>
+<li><a href="#org1bca7ce">4.3.3.3. 不指定分组指标</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org51638e2">6. 时间序列</a>
-<ul>
-<li><a href="#org0fdd00f">6.1. 时间选择</a>
-<ul>
-<li><a href="#orga8a406b">6.1.1. 使用能解释为日期的字符串</a></li>
-<li><a href="#orgbdfb05e">6.1.2. 使用年份或月份选择数据切片</a></li>
 </ul>
 </li>
-<li><a href="#org06e48fc">6.2. 日期范围，频率，偏移</a>
+<li><a href="#org3bbbc12">5. 聚合与分组操作</a>
 <ul>
-<li><a href="#orgc1c0201">6.2.1. 生成范围</a></li>
-<li><a href="#org3d1c7b2">6.2.2. 日期频率</a>
+<li><a href="#org72c9349">5.1. GroupBy 对象</a>
 <ul>
-<li><a href="#orgcfdd24c">6.2.2.1. 月中某星期</a></li>
+<li><a href="#org5c13718">5.1.1. 获取某个 Group (get_group)</a></li>
+<li><a href="#org3b78027">5.1.2. GroupBy 对象的列索引</a></li>
+<li><a href="#org8afee18">5.1.3. 使用字典和Series分组</a></li>
+<li><a href="#orgb653410">5.1.4. 使用函数分组</a>
+<ul>
+<li><a href="#orgb131d54">5.1.4.1. 与其他分组键混合</a></li>
 </ul>
 </li>
-<li><a href="#org28eca29">6.2.3. 日期偏移</a>
-<ul>
-<li><a href="#org982cf69">6.2.3.1. 推移数据不改变时间戳</a></li>
-<li><a href="#org1172fbb">6.2.3.2. 推移数据不改变时间戳</a></li>
+<li><a href="#org7658ffb">5.1.5. 根据索引层级分组</a></li>
 </ul>
 </li>
+<li><a href="#org262febb">5.2. 数据聚合</a>
+<ul>
+<li><a href="#orgc7f7e9a">5.2.1. 对GroupBy对象调用聚合方法</a></li>
+<li><a href="#orgfd803db">5.2.2. 逐列与多函数应用</a>
+<ul>
+<li><a href="#orgd450f30">5.2.2.1. 各列同时使用多个函数聚合</a></li>
+<li><a href="#orge9e559c">5.2.2.2. 使用不同的函数对多个列聚合</a></li>
 </ul>
 </li>
-<li><a href="#org2f72f6a">6.3. 重采样(resample)</a>
+<li><a href="#org4337650">5.2.3. 返回不含行索引的聚合数据</a></li>
+<li><a href="#orgf3f5272">5.2.4. GroupBy.apply</a></li>
+<li><a href="#orgb20e452">5.2.5. 禁用分组键(group_keys=False)</a></li>
+<li><a href="#orgdbab16b">5.2.6. GroupBy.transform</a></li>
+<li><a href="#org7491191">5.2.7. 时间分组重采样(resample)</a>
 <ul>
-<li><a href="#org4d5006d">6.3.1. 下采样</a>
-<ul>
-<li><a href="#org9279d79">6.3.1.1. 半开区间</a></li>
-<li><a href="#org9a5e994">6.3.1.2. OHLC 重采样</a></li>
-</ul>
-</li>
-<li><a href="#org8a7a544">6.3.2. 上采样与插值</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#orgea518cf">7. 移动窗口函数</a>
-<ul>
-<li><a href="#orgf8bb87a">7.1. rolling</a>
-<ul>
-<li><a href="#org30ada83">7.1.1. 按长度确定窗口</a></li>
-<li><a href="#orgff22fab">7.1.2. 按时间确定窗口</a></li>
-</ul>
-</li>
-<li><a href="#org15b0cc4">7.2. expanding</a></li>
-<li><a href="#org6dbabb2">7.3. ewm</a></li>
-<li><a href="#org18afad4">7.4. 二元窗口函数</a>
-<ul>
-<li><a href="#org1ba942f">7.4.1. corr</a></li>
+<li><a href="#org7b53d24">5.2.7.1. TimeGrouper 对象</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org6ca2023">8. 实用方法</a>
+<li><a href="#orgb208f97">5.3. 透视表(pivot_table)</a></li>
+<li><a href="#orgdc82581">5.4. 交叉表(cross_table)</a></li>
+<li><a href="#org745789b">5.5. Categorial 类型数据</a>
 <ul>
-<li><a href="#orgeb3895a">8.1. 链式操作</a>
-<ul>
-<li><a href="#org8aa06da">8.1.1. DataFrame.assign</a></li>
-<li><a href="#org129a847">8.1.2. pd.pipe</a></li>
+<li><a href="#orga3e1a15">5.5.1. 直接创建 Categorical 对象</a></li>
+<li><a href="#org4a5eb17">5.5.2. Categorical 对象排序规则</a></li>
+<li><a href="#org2c55124">5.5.3. 使用 Categorical 对象进行分箱统计</a></li>
+<li><a href="#orgceb66ea">5.5.4. 使用 Categorical 对象的性能优势</a></li>
 </ul>
 </li>
-<li><a href="#orgfd44053">8.2. 查看 DataFrame 信息</a></li>
-<li><a href="#org791243c">8.3. 排序</a>
-<ul>
-<li><a href="#org9e303f3">8.3.1. 找出插入值应处位置(searchsorted)</a></li>
-<li><a href="#org10fa7cc">8.3.2. nlargest(n)/nsmallest(n)</a></li>
-<li><a href="#org1a36681">8.3.3. 排序并输出对应索引(Series.argsort)</a></li>
 </ul>
 </li>
-<li><a href="#orgde4f4fc">8.4. 列操作</a>
+<li><a href="#org8ecbcde">6. 时间序列</a>
 <ul>
-<li><a href="#orgde8fc63">8.4.1. 数据增长值(diff)</a></li>
-<li><a href="#org2b5cdd3">8.4.2. 数据增长率(pct_change)</a></li>
-<li><a href="#orgf44990c">8.4.3. 累加值(cumsum)</a></li>
-<li><a href="#orgcd30f39">8.4.4. 资金曲线(cumprod)</a></li>
-<li><a href="#orgb80a5a2">8.4.5. np.where</a></li>
+<li><a href="#org4e52f7d">6.1. 时间选择</a>
+<ul>
+<li><a href="#org414d4cf">6.1.1. 使用能解释为日期的字符串</a></li>
+<li><a href="#org409ce9c">6.1.2. 使用年份或月份选择数据切片</a></li>
+</ul>
+</li>
+<li><a href="#orge3f6438">6.2. 日期范围，频率，偏移</a>
+<ul>
+<li><a href="#orgfa856c7">6.2.1. 生成范围</a></li>
+<li><a href="#orgb349c07">6.2.2. 日期频率</a>
+<ul>
+<li><a href="#org09ede7e">6.2.2.1. 月中某星期</a></li>
+</ul>
+</li>
+<li><a href="#org5ee9a09">6.2.3. 日期偏移</a>
+<ul>
+<li><a href="#org093d5e1">6.2.3.1. 推移数据不改变时间戳</a></li>
+<li><a href="#org85af320">6.2.3.2. 推移数据不改变时间戳</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org0baa236">6.3. 重采样(resample)</a>
+<ul>
+<li><a href="#org294fe02">6.3.1. 下采样</a>
+<ul>
+<li><a href="#orge5102d2">6.3.1.1. 采样时间基数(base)</a></li>
+<li><a href="#orgd29a3cf">6.3.1.2. 半开区间</a></li>
+<li><a href="#org2eb0592">6.3.1.3. OHLC 重采样</a></li>
+<li><a href="#org9d94ab2">6.3.1.4. 采样后对各列聚合(agg)</a></li>
+</ul>
+</li>
+<li><a href="#org0e5cbb1">6.3.2. 上采样与插值</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org52890b4">7. 移动窗口函数</a>
+<ul>
+<li><a href="#org27487af">7.1. rolling</a>
+<ul>
+<li><a href="#orgf154868">7.1.1. 按长度确定窗口</a></li>
+<li><a href="#org98d683a">7.1.2. 按时间确定窗口</a></li>
+</ul>
+</li>
+<li><a href="#orgbea6cab">7.2. expanding</a></li>
+<li><a href="#org9317781">7.3. ewm</a></li>
+<li><a href="#org2f1004d">7.4. 二元窗口函数</a>
+<ul>
+<li><a href="#org1f91c14">7.4.1. corr</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgb1c9fb4">8. 实用方法</a>
+<ul>
+<li><a href="#org71410ab">8.1. 链式操作</a>
+<ul>
+<li><a href="#orgd2f599d">8.1.1. DataFrame.assign</a></li>
+<li><a href="#orgcdbf795">8.1.2. pd.pipe</a></li>
+</ul>
+</li>
+<li><a href="#org21f9f22">8.2. 查看 DataFrame 信息</a></li>
+<li><a href="#org945eb9e">8.3. 排序</a>
+<ul>
+<li><a href="#orgde4b36e">8.3.1. 找出插入值应处位置(searchsorted)</a></li>
+<li><a href="#org188350d">8.3.2. nlargest(n)/nsmallest(n)</a></li>
+<li><a href="#orgf060184">8.3.3. 排序并输出对应索引(Series.argsort)</a></li>
+</ul>
+</li>
+<li><a href="#org9f75248">8.4. 列操作</a>
+<ul>
+<li><a href="#org399ab16">8.4.1. 数据增长值(diff)</a></li>
+<li><a href="#org3c50753">8.4.2. 数据增长率(pct_change)</a></li>
+<li><a href="#org58a50a8">8.4.3. 累加值(cumsum)</a></li>
+<li><a href="#org68dd460">8.4.4. 资金曲线(cumprod)</a></li>
+<li><a href="#orgc6c3b97">8.4.5. np.where</a></li>
 </ul>
 </li>
 </ul>
@@ -535,296 +538,299 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org9f3e474">1. 核心数据结构创建与基本操作</a>
+<li><a href="#orge665278">1. 核心数据结构创建与基本操作</a>
 <ul>
-<li><a href="#orgfdbf123">1.1. 索引对象</a></li>
-<li><a href="#orged6734c">1.2. Panel</a></li>
-<li><a href="#org7f09cef">1.3. Series</a>
+<li><a href="#orgc8f0088">1.1. 索引对象</a></li>
+<li><a href="#org64781c2">1.2. Panel</a></li>
+<li><a href="#org4c58297">1.3. Series</a>
 <ul>
-<li><a href="#orgae4d4ae">1.3.1. 创建</a>
+<li><a href="#org3fa3c7e">1.3.1. 创建</a>
 <ul>
-<li><a href="#org9c1d0d1">1.3.1.1. 从 ndarray 创建</a></li>
-<li><a href="#org753e654">1.3.1.2. 从字典创建</a></li>
-<li><a href="#orgbc27852">1.3.1.3. 从标量创建</a></li>
+<li><a href="#org58074b3">1.3.1.1. 从 ndarray 创建</a></li>
+<li><a href="#orga57b7cd">1.3.1.2. 从字典创建</a></li>
+<li><a href="#org53bea81">1.3.1.3. 从标量创建</a></li>
 </ul>
 </li>
-<li><a href="#org906a97c">1.3.2. 基本操作</a>
+<li><a href="#org9b32649">1.3.2. 基本操作</a>
 <ul>
-<li><a href="#orgdecadd7">1.3.2.1. 赋值</a></li>
-<li><a href="#org42f424b">1.3.2.2. 与标量相乘</a></li>
-<li><a href="#org04bbdae">1.3.2.3. 应用数学函数</a></li>
-<li><a href="#org452e62c">1.3.2.4. 映射 (apply)</a></li>
-<li><a href="#org3ca91ad">1.3.2.5. 排序(sort_index/sort_values)</a></li>
-<li><a href="#org1206b79">1.3.2.6. 唯一值，计数和成员(unique/count/isin)</a></li>
-<li><a href="#org8a08b0f">1.3.2.7. 排名(rank)</a></li>
-<li><a href="#org6e03173">1.3.2.8. 在字典上下文中使用</a></li>
-<li><a href="#org69b5c50">1.3.2.9. 检查缺失数据</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#orgdc2d6b0">1.4. DataFrame</a>
-<ul>
-<li><a href="#orgd7b83ea">1.4.1. 创建</a>
-<ul>
-<li><a href="#org2a24ea1">1.4.1.1. 从字典创建</a></li>
-<li><a href="#org1f7b26d">1.4.1.2. 从结构化数据列表创建</a></li>
-<li><a href="#org9f27038">1.4.1.3. 从字典列表创建</a></li>
-<li><a href="#org8443d0b">1.4.1.4. 从元组字典创建</a></li>
-<li><a href="#org5e9a03f">1.4.1.5. 从 Series 创建</a></li>
-<li><a href="#org558760d">1.4.1.6. 指定行列索引创建</a></li>
-</ul>
-</li>
-<li><a href="#orgc408d5d">1.4.2. 基本操作</a>
-<ul>
-<li><a href="#org1acc4bd">1.4.2.1. 转置</a></li>
-<li><a href="#org2644f94">1.4.2.2. 算数运算填充</a></li>
-<li><a href="#org995650d">1.4.2.3. 和 Series 之间的运算（广播机制）</a></li>
-<li><a href="#org1dc3c38">1.4.2.4. 应用函数</a></li>
-<li><a href="#org3155d0f">1.4.2.5. 行/列映射 (apply)</a></li>
-<li><a href="#orgc071c1b">1.4.2.6. 逐元素映射 (applymap)</a></li>
-<li><a href="#org8a226d2">1.4.2.7. 排序(sort_index/sort_values)</a></li>
-<li><a href="#orga9a08d4">1.4.2.8. 排名(rank)</a></li>
-<li><a href="#orgce9d4b5">1.4.2.9. 转换为 ndarray 对象</a></li>
-<li><a href="#org67999d6">1.4.2.10. 统计</a></li>
+<li><a href="#org41bcc27">1.3.2.1. 赋值</a></li>
+<li><a href="#orgd05900a">1.3.2.2. 与标量相乘</a></li>
+<li><a href="#orgc298272">1.3.2.3. 应用数学函数</a></li>
+<li><a href="#orgda0d4d0">1.3.2.4. 映射 (apply)</a></li>
+<li><a href="#orgc88ae32">1.3.2.5. 排序(sort_index/sort_values)</a></li>
+<li><a href="#org8e9f963">1.3.2.6. 唯一值，计数和成员(unique/count/isin)</a></li>
+<li><a href="#org460f1ab">1.3.2.7. 排名(rank)</a></li>
+<li><a href="#orge5e9930">1.3.2.8. 在字典上下文中使用</a></li>
+<li><a href="#org5dbd9ee">1.3.2.9. 检查缺失数据</a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li><a href="#org73acf34">1.4. DataFrame</a>
+<ul>
+<li><a href="#org7f6e788">1.4.1. 创建</a>
+<ul>
+<li><a href="#org92b42b3">1.4.1.1. 从字典创建</a></li>
+<li><a href="#org101f92e">1.4.1.2. 从结构化数据列表创建</a></li>
+<li><a href="#org60b3cd0">1.4.1.3. 从字典列表创建</a></li>
+<li><a href="#org0695934">1.4.1.4. 从元组字典创建</a></li>
+<li><a href="#orgd132ac9">1.4.1.5. 从 Series 创建</a></li>
+<li><a href="#org8fbe1c1">1.4.1.6. 指定行列索引创建</a></li>
 </ul>
 </li>
-<li><a href="#orgde15ec3">2. 索引</a>
+<li><a href="#org6950ecf">1.4.2. 基本操作</a>
 <ul>
-<li><a href="#orgabe086f">2.1. Series</a>
-<ul>
-<li><a href="#org6a816d1">2.1.1. 设置对象自身和索引的 name 属性</a></li>
-<li><a href="#org2c52a9d">2.1.2. 获取值和索引</a></li>
-<li><a href="#org0499f7b">2.1.3. 索引对齐</a></li>
-<li><a href="#org9023b13">2.1.4. 重建索引</a></li>
-<li><a href="#orgd1156ef">2.1.5. 删除索引</a></li>
-<li><a href="#org2d9e73a">2.1.6. 标签索引</a></li>
-<li><a href="#org22ff5be">2.1.7. 布尔索引</a></li>
-</ul>
-</li>
-<li><a href="#org09a9123">2.2. DataFrame</a>
-<ul>
-<li><a href="#orgdd1ba34">2.2.1. 设置行/列索引的 name 属性</a></li>
-<li><a href="#org3e92db6">2.2.2. 重建索引</a></li>
-<li><a href="#org6f6eca8">2.2.3. 索引对齐</a></li>
-<li><a href="#org0624290">2.2.4. 列赋值</a></li>
-<li><a href="#org96f72d3">2.2.5. 删除行/列</a></li>
-<li><a href="#orgacc4e2d">2.2.6. 标签索引</a></li>
-<li><a href="#orgc4be1f6">2.2.7. 正则索引</a></li>
-<li><a href="#orgae688f1">2.2.8. 整数索引</a></li>
-<li><a href="#orgb1932b1">2.2.9. 布尔索引</a></li>
-<li><a href="#org443b8f7">2.2.10. loc 索引</a></li>
-<li><a href="#org7254ae7">2.2.11. iloc 索引</a></li>
-<li><a href="#org967807b">2.2.12. at 索引</a></li>
-<li><a href="#org8e9d725">2.2.13. 随机索引</a></li>
-<li><a href="#org848073b">2.2.14. 重命名行/列</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#org65cd7c6">3. 数据清洗</a>
-<ul>
-<li><a href="#org137614d">3.1. 处理缺失值</a>
-<ul>
-<li><a href="#orgfe0289f">3.1.1. 过滤缺失值(dropna)</a></li>
-<li><a href="#org9cb8555">3.1.2. 补全缺失值(fillna)</a></li>
-</ul>
-</li>
-<li><a href="#orgf4f3346">3.2. 数据转换</a>
-<ul>
-<li><a href="#org3371302">3.2.1. 删除重复值</a></li>
-<li><a href="#orgf49e508">3.2.2. 使用函数或映射进行数据转换</a></li>
-<li><a href="#orgb242ffc">3.2.3. 替代值(replace)</a></li>
-<li><a href="#org4e19336">3.2.4. 重命名索引</a></li>
-<li><a href="#org4c19865">3.2.5. 离散化和分箱(cut/qcut)</a></li>
-<li><a href="#orgeaa7330">3.2.6. 检测异常值(any)</a></li>
-<li><a href="#org66d94dd">3.2.7. 随机重排序(sample/take)</a>
-<ul>
-<li><a href="#org35cde56">3.2.7.1. 使用 take 优化内存 </a></li>
-</ul>
-</li>
-<li><a href="#orgc77b511">3.2.8. 指标矩阵(get_dummies)</a></li>
-<li><a href="#org65334c9">3.2.9. 向量化函数</a>
-<ul>
-<li><a href="#orgd07270f">3.2.9.1. str</a></li>
-<li><a href="#org4f80a83">3.2.9.2. dt</a></li>
+<li><a href="#orga580996">1.4.2.1. 转置</a></li>
+<li><a href="#orge1a7778">1.4.2.2. 算数运算填充</a></li>
+<li><a href="#orga1e0eeb">1.4.2.3. 和 Series 之间的运算（广播机制）</a></li>
+<li><a href="#org0398910">1.4.2.4. 应用函数</a></li>
+<li><a href="#orgb6eed22">1.4.2.5. 行/列映射 (apply)</a></li>
+<li><a href="#org3cc6a79">1.4.2.6. 逐元素映射 (applymap)</a></li>
+<li><a href="#orgf6318b1">1.4.2.7. 排序(sort_index/sort_values)</a></li>
+<li><a href="#org4ecc8d5">1.4.2.8. 排名(rank)</a></li>
+<li><a href="#org419c86e">1.4.2.9. 转换为 ndarray 对象</a></li>
+<li><a href="#org1085211">1.4.2.10. 统计</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org2081ff1">4. 数据规整：连接，联合，重塑</a>
+<li><a href="#org3b85a64">2. 索引</a>
 <ul>
-<li><a href="#orgdfb5622">4.1. 分层索引</a>
+<li><a href="#org11d3388">2.1. Series</a>
 <ul>
-<li><a href="#orgfbe0316">4.1.1. 层级交换(swaplevel)与排序(sort_index)</a></li>
-<li><a href="#org433d7cb">4.1.2. 列索引转为行索引 (set_index)</a></li>
-<li><a href="#org9ca4fd6">4.1.3. 行索引转为列索引 (reset_index)</a></li>
+<li><a href="#orgc66e10d">2.1.1. 设置对象自身和索引的 name 属性</a></li>
+<li><a href="#orgc33a1da">2.1.2. 获取值和索引</a></li>
+<li><a href="#org0623515">2.1.3. 索引对齐</a></li>
+<li><a href="#org8396e84">2.1.4. 重建索引</a></li>
+<li><a href="#orgcba1694">2.1.5. 删除索引</a></li>
+<li><a href="#org96ae81f">2.1.6. 标签索引</a></li>
+<li><a href="#org59276b6">2.1.7. 布尔索引</a></li>
 </ul>
 </li>
-<li><a href="#orgdfc3b6e">4.2. 连接与合并</a>
+<li><a href="#org547b9e5">2.2. DataFrame</a>
 <ul>
-<li><a href="#orgbabfe66">4.2.1. merge</a>
-<ul>
-<li><a href="#org4ad3ccb">4.2.1.1. 基本用法</a></li>
-<li><a href="#org4a0390e">4.2.1.2. 合并类型(inner,outer,left,right)</a></li>
-<li><a href="#org5a44995">4.2.1.3. 按索引合并</a></li>
-<li><a href="#orgdd59081">4.2.1.4. join</a></li>
-</ul>
-</li>
-<li><a href="#org2bbb0b7">4.2.2. concat</a>
-<ul>
-<li><a href="#orgd121107">4.2.2.1. join_axes</a></li>
-<li><a href="#org493af5b">4.2.2.2. 区分拼接在一起的各部分</a></li>
-<li><a href="#org5def81a">4.2.2.3. ignore_index</a></li>
-</ul>
-</li>
-<li><a href="#org40670d6">4.2.3. combine_first</a></li>
-</ul>
-</li>
-<li><a href="#org823bd43">4.3. 重排列表格型数据</a>
-<ul>
-<li><a href="#org9835d4f">4.3.1. 使用多层索引进行重塑(stack/unstack)</a></li>
-<li><a href="#org4ad92ca">4.3.2. 将列的值转换为列索引(pivot)</a></li>
-<li><a href="#org4c280b5">4.3.3. 将列索引转换为列的值(melt)</a>
-<ul>
-<li><a href="#org4ac4ceb">4.3.3.1. 使用pivot将数据重塑会原先的布局</a></li>
-<li><a href="#org04f3d5f">4.3.3.2. 指定列的子集作为值列</a></li>
-<li><a href="#orgbb7c7db">4.3.3.3. 不指定分组指标</a></li>
+<li><a href="#org6aac104">2.2.1. 设置行/列索引的 name 属性</a></li>
+<li><a href="#org4aa88ed">2.2.2. 重建索引</a></li>
+<li><a href="#org5e68c5e">2.2.3. 索引对齐</a></li>
+<li><a href="#orgf7a52ac">2.2.4. 列赋值</a></li>
+<li><a href="#orgd5bcb56">2.2.5. 删除行/列</a></li>
+<li><a href="#orgfb4cdaf">2.2.6. 标签索引</a></li>
+<li><a href="#org7535e0e">2.2.7. 正则索引</a></li>
+<li><a href="#org6475858">2.2.8. 整数索引</a></li>
+<li><a href="#orgc9dbc63">2.2.9. 布尔索引</a></li>
+<li><a href="#org27ea4b6">2.2.10. loc 索引</a></li>
+<li><a href="#orgd53848d">2.2.11. iloc 索引</a></li>
+<li><a href="#orge99125e">2.2.12. at 索引</a></li>
+<li><a href="#orgce60ef9">2.2.13. 随机索引</a></li>
+<li><a href="#org88ee57b">2.2.14. 重命名行/列</a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li><a href="#org2c55905">3. 数据清洗</a>
+<ul>
+<li><a href="#org6600e17">3.1. 处理缺失值</a>
+<ul>
+<li><a href="#org042fcc4">3.1.1. 过滤缺失值(dropna)</a></li>
+<li><a href="#org57fe1bb">3.1.2. 补全缺失值(fillna)</a></li>
 </ul>
 </li>
-<li><a href="#orgc175106">5. 聚合与分组操作</a>
+<li><a href="#org053b3d2">3.2. 数据转换</a>
 <ul>
-<li><a href="#orgf75ab84">5.1. GroupBy 对象</a>
+<li><a href="#org5019b75">3.2.1. 删除重复值</a></li>
+<li><a href="#orgf6652c2">3.2.2. 使用函数或映射进行数据转换</a></li>
+<li><a href="#orga16160f">3.2.3. 替代值(replace)</a></li>
+<li><a href="#org5b47ca2">3.2.4. 重命名索引</a></li>
+<li><a href="#org3a60ac6">3.2.5. 离散化和分箱(cut/qcut)</a></li>
+<li><a href="#orgf8f6763">3.2.6. 检测异常值(any)</a></li>
+<li><a href="#orgded3b72">3.2.7. 随机重排序(sample/take)</a>
 <ul>
-<li><a href="#org2ca80de">5.1.1. GroupBy 对象的列索引</a></li>
-<li><a href="#org2bc3a26">5.1.2. 使用字典和Series分组</a></li>
-<li><a href="#org94e16fa">5.1.3. 使用函数分组</a>
-<ul>
-<li><a href="#org086d57c">5.1.3.1. 与其他分组键混合</a></li>
+<li><a href="#org95ca39e">3.2.7.1. 使用 take 优化内存 </a></li>
 </ul>
 </li>
-<li><a href="#orgfbf5768">5.1.4. 根据索引层级分组</a></li>
-</ul>
-</li>
-<li><a href="#orga2fc2d8">5.2. 数据聚合</a>
+<li><a href="#org59e18ec">3.2.8. 指标矩阵(get_dummies)</a></li>
+<li><a href="#org815de93">3.2.9. 向量化函数</a>
 <ul>
-<li><a href="#org720b038">5.2.1. 对GroupBy对象调用聚合方法</a></li>
-<li><a href="#orga30e0e7">5.2.2. 逐列与多函数应用</a>
-<ul>
-<li><a href="#orgf06ba54">5.2.2.1. 各列同时使用多个函数聚合</a></li>
-<li><a href="#org259b2a1">5.2.2.2. 使用不同的函数对多个列聚合</a></li>
-</ul>
-</li>
-<li><a href="#org8fe8ad7">5.2.3. 返回不含行索引的聚合数据</a></li>
-<li><a href="#orgb2f8002">5.2.4. GroupBy.apply</a></li>
-<li><a href="#org1e97349">5.2.5. 禁用分组键(group_keys=False)</a></li>
-<li><a href="#org471c29a">5.2.6. GroupBy.transform</a></li>
-<li><a href="#org6e0247b">5.2.7. 时间分组重采样(resample)</a>
-<ul>
-<li><a href="#org76338cf">5.2.7.1. TimeGrouper 对象</a></li>
+<li><a href="#orgc76a2da">3.2.9.1. str</a></li>
+<li><a href="#org8c1698c">3.2.9.2. dt</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orga58e174">5.3. 透视表(pivot_table)</a></li>
-<li><a href="#org02e7d4d">5.4. 交叉表(cross_table)</a></li>
-<li><a href="#org5490c35">5.5. Categorial 类型数据</a>
+</ul>
+</li>
+<li><a href="#org85f8594">4. 数据规整：连接，联合，重塑</a>
 <ul>
-<li><a href="#org82fbd0d">5.5.1. 直接创建 Categorical 对象</a></li>
-<li><a href="#org35f8fdb">5.5.2. Categorical 对象排序规则</a></li>
-<li><a href="#org091218a">5.5.3. 使用 Categorical 对象进行分箱统计</a></li>
-<li><a href="#org4409cac">5.5.4. 使用 Categorical 对象的性能优势</a></li>
+<li><a href="#orgb13ca18">4.1. 分层索引</a>
+<ul>
+<li><a href="#orgde62afb">4.1.1. 层级交换(swaplevel)与排序(sort_index)</a></li>
+<li><a href="#org9da3325">4.1.2. 列索引转为行索引 (set_index)</a></li>
+<li><a href="#org9877fb9">4.1.3. 行索引转为列索引 (reset_index)</a></li>
+</ul>
+</li>
+<li><a href="#org39bd5c7">4.2. 连接与合并</a>
+<ul>
+<li><a href="#orga38b562">4.2.1. merge</a>
+<ul>
+<li><a href="#org4d0cb6e">4.2.1.1. 基本用法</a></li>
+<li><a href="#org4cb09ef">4.2.1.2. 合并类型(inner,outer,left,right)</a></li>
+<li><a href="#orgee9b641">4.2.1.3. 按索引合并</a></li>
+<li><a href="#org29e158b">4.2.1.4. join</a></li>
+</ul>
+</li>
+<li><a href="#org20c78c6">4.2.2. concat</a>
+<ul>
+<li><a href="#org8e83fb2">4.2.2.1. join_axes</a></li>
+<li><a href="#org10fa929">4.2.2.2. 区分拼接在一起的各部分</a></li>
+<li><a href="#org1a89b63">4.2.2.3. ignore_index</a></li>
+</ul>
+</li>
+<li><a href="#orge3fcae6">4.2.3. combine_first</a></li>
+</ul>
+</li>
+<li><a href="#org0c1736d">4.3. 重排列表格型数据</a>
+<ul>
+<li><a href="#orgf6a442d">4.3.1. 使用多层索引进行重塑(stack/unstack)</a></li>
+<li><a href="#orgc030043">4.3.2. 将列的值转换为列索引(pivot)</a></li>
+<li><a href="#orgb3ad0ff">4.3.3. 将列索引转换为列的值(melt)</a>
+<ul>
+<li><a href="#orgbf41c70">4.3.3.1. 使用pivot将数据重塑会原先的布局</a></li>
+<li><a href="#org1073df7">4.3.3.2. 指定列的子集作为值列</a></li>
+<li><a href="#org1bca7ce">4.3.3.3. 不指定分组指标</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org51638e2">6. 时间序列</a>
-<ul>
-<li><a href="#org0fdd00f">6.1. 时间选择</a>
-<ul>
-<li><a href="#orga8a406b">6.1.1. 使用能解释为日期的字符串</a></li>
-<li><a href="#orgbdfb05e">6.1.2. 使用年份或月份选择数据切片</a></li>
 </ul>
 </li>
-<li><a href="#org06e48fc">6.2. 日期范围，频率，偏移</a>
+<li><a href="#org3bbbc12">5. 聚合与分组操作</a>
 <ul>
-<li><a href="#orgc1c0201">6.2.1. 生成范围</a></li>
-<li><a href="#org3d1c7b2">6.2.2. 日期频率</a>
+<li><a href="#org72c9349">5.1. GroupBy 对象</a>
 <ul>
-<li><a href="#orgcfdd24c">6.2.2.1. 月中某星期</a></li>
+<li><a href="#org5c13718">5.1.1. 获取某个 Group (get_group)</a></li>
+<li><a href="#org3b78027">5.1.2. GroupBy 对象的列索引</a></li>
+<li><a href="#org8afee18">5.1.3. 使用字典和Series分组</a></li>
+<li><a href="#orgb653410">5.1.4. 使用函数分组</a>
+<ul>
+<li><a href="#orgb131d54">5.1.4.1. 与其他分组键混合</a></li>
 </ul>
 </li>
-<li><a href="#org28eca29">6.2.3. 日期偏移</a>
-<ul>
-<li><a href="#org982cf69">6.2.3.1. 推移数据不改变时间戳</a></li>
-<li><a href="#org1172fbb">6.2.3.2. 推移数据不改变时间戳</a></li>
+<li><a href="#org7658ffb">5.1.5. 根据索引层级分组</a></li>
 </ul>
 </li>
+<li><a href="#org262febb">5.2. 数据聚合</a>
+<ul>
+<li><a href="#orgc7f7e9a">5.2.1. 对GroupBy对象调用聚合方法</a></li>
+<li><a href="#orgfd803db">5.2.2. 逐列与多函数应用</a>
+<ul>
+<li><a href="#orgd450f30">5.2.2.1. 各列同时使用多个函数聚合</a></li>
+<li><a href="#orge9e559c">5.2.2.2. 使用不同的函数对多个列聚合</a></li>
 </ul>
 </li>
-<li><a href="#org2f72f6a">6.3. 重采样(resample)</a>
+<li><a href="#org4337650">5.2.3. 返回不含行索引的聚合数据</a></li>
+<li><a href="#orgf3f5272">5.2.4. GroupBy.apply</a></li>
+<li><a href="#orgb20e452">5.2.5. 禁用分组键(group_keys=False)</a></li>
+<li><a href="#orgdbab16b">5.2.6. GroupBy.transform</a></li>
+<li><a href="#org7491191">5.2.7. 时间分组重采样(resample)</a>
 <ul>
-<li><a href="#org4d5006d">6.3.1. 下采样</a>
-<ul>
-<li><a href="#org9279d79">6.3.1.1. 半开区间</a></li>
-<li><a href="#org9a5e994">6.3.1.2. OHLC 重采样</a></li>
-</ul>
-</li>
-<li><a href="#org8a7a544">6.3.2. 上采样与插值</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#orgea518cf">7. 移动窗口函数</a>
-<ul>
-<li><a href="#orgf8bb87a">7.1. rolling</a>
-<ul>
-<li><a href="#org30ada83">7.1.1. 按长度确定窗口</a></li>
-<li><a href="#orgff22fab">7.1.2. 按时间确定窗口</a></li>
-</ul>
-</li>
-<li><a href="#org15b0cc4">7.2. expanding</a></li>
-<li><a href="#org6dbabb2">7.3. ewm</a></li>
-<li><a href="#org18afad4">7.4. 二元窗口函数</a>
-<ul>
-<li><a href="#org1ba942f">7.4.1. corr</a></li>
+<li><a href="#org7b53d24">5.2.7.1. TimeGrouper 对象</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org6ca2023">8. 实用方法</a>
+<li><a href="#orgb208f97">5.3. 透视表(pivot_table)</a></li>
+<li><a href="#orgdc82581">5.4. 交叉表(cross_table)</a></li>
+<li><a href="#org745789b">5.5. Categorial 类型数据</a>
 <ul>
-<li><a href="#orgeb3895a">8.1. 链式操作</a>
-<ul>
-<li><a href="#org8aa06da">8.1.1. DataFrame.assign</a></li>
-<li><a href="#org129a847">8.1.2. pd.pipe</a></li>
+<li><a href="#orga3e1a15">5.5.1. 直接创建 Categorical 对象</a></li>
+<li><a href="#org4a5eb17">5.5.2. Categorical 对象排序规则</a></li>
+<li><a href="#org2c55124">5.5.3. 使用 Categorical 对象进行分箱统计</a></li>
+<li><a href="#orgceb66ea">5.5.4. 使用 Categorical 对象的性能优势</a></li>
 </ul>
 </li>
-<li><a href="#orgfd44053">8.2. 查看 DataFrame 信息</a></li>
-<li><a href="#org791243c">8.3. 排序</a>
-<ul>
-<li><a href="#org9e303f3">8.3.1. 找出插入值应处位置(searchsorted)</a></li>
-<li><a href="#org10fa7cc">8.3.2. nlargest(n)/nsmallest(n)</a></li>
-<li><a href="#org1a36681">8.3.3. 排序并输出对应索引(Series.argsort)</a></li>
 </ul>
 </li>
-<li><a href="#orgde4f4fc">8.4. 列操作</a>
+<li><a href="#org8ecbcde">6. 时间序列</a>
 <ul>
-<li><a href="#orgde8fc63">8.4.1. 数据增长值(diff)</a></li>
-<li><a href="#org2b5cdd3">8.4.2. 数据增长率(pct_change)</a></li>
-<li><a href="#orgf44990c">8.4.3. 累加值(cumsum)</a></li>
-<li><a href="#orgcd30f39">8.4.4. 资金曲线(cumprod)</a></li>
-<li><a href="#orgb80a5a2">8.4.5. np.where</a></li>
+<li><a href="#org4e52f7d">6.1. 时间选择</a>
+<ul>
+<li><a href="#org414d4cf">6.1.1. 使用能解释为日期的字符串</a></li>
+<li><a href="#org409ce9c">6.1.2. 使用年份或月份选择数据切片</a></li>
+</ul>
+</li>
+<li><a href="#orge3f6438">6.2. 日期范围，频率，偏移</a>
+<ul>
+<li><a href="#orgfa856c7">6.2.1. 生成范围</a></li>
+<li><a href="#orgb349c07">6.2.2. 日期频率</a>
+<ul>
+<li><a href="#org09ede7e">6.2.2.1. 月中某星期</a></li>
+</ul>
+</li>
+<li><a href="#org5ee9a09">6.2.3. 日期偏移</a>
+<ul>
+<li><a href="#org093d5e1">6.2.3.1. 推移数据不改变时间戳</a></li>
+<li><a href="#org85af320">6.2.3.2. 推移数据不改变时间戳</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org0baa236">6.3. 重采样(resample)</a>
+<ul>
+<li><a href="#org294fe02">6.3.1. 下采样</a>
+<ul>
+<li><a href="#orge5102d2">6.3.1.1. 采样时间基数(base)</a></li>
+<li><a href="#orgd29a3cf">6.3.1.2. 半开区间</a></li>
+<li><a href="#org2eb0592">6.3.1.3. OHLC 重采样</a></li>
+<li><a href="#org9d94ab2">6.3.1.4. 采样后对各列聚合(agg)</a></li>
+</ul>
+</li>
+<li><a href="#org0e5cbb1">6.3.2. 上采样与插值</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org52890b4">7. 移动窗口函数</a>
+<ul>
+<li><a href="#org27487af">7.1. rolling</a>
+<ul>
+<li><a href="#orgf154868">7.1.1. 按长度确定窗口</a></li>
+<li><a href="#org98d683a">7.1.2. 按时间确定窗口</a></li>
+</ul>
+</li>
+<li><a href="#orgbea6cab">7.2. expanding</a></li>
+<li><a href="#org9317781">7.3. ewm</a></li>
+<li><a href="#org2f1004d">7.4. 二元窗口函数</a>
+<ul>
+<li><a href="#org1f91c14">7.4.1. corr</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgb1c9fb4">8. 实用方法</a>
+<ul>
+<li><a href="#org71410ab">8.1. 链式操作</a>
+<ul>
+<li><a href="#orgd2f599d">8.1.1. DataFrame.assign</a></li>
+<li><a href="#orgcdbf795">8.1.2. pd.pipe</a></li>
+</ul>
+</li>
+<li><a href="#org21f9f22">8.2. 查看 DataFrame 信息</a></li>
+<li><a href="#org945eb9e">8.3. 排序</a>
+<ul>
+<li><a href="#orgde4b36e">8.3.1. 找出插入值应处位置(searchsorted)</a></li>
+<li><a href="#org188350d">8.3.2. nlargest(n)/nsmallest(n)</a></li>
+<li><a href="#orgf060184">8.3.3. 排序并输出对应索引(Series.argsort)</a></li>
+</ul>
+</li>
+<li><a href="#org9f75248">8.4. 列操作</a>
+<ul>
+<li><a href="#org399ab16">8.4.1. 数据增长值(diff)</a></li>
+<li><a href="#org3c50753">8.4.2. 数据增长率(pct_change)</a></li>
+<li><a href="#org58a50a8">8.4.3. 累加值(cumsum)</a></li>
+<li><a href="#org68dd460">8.4.4. 资金曲线(cumprod)</a></li>
+<li><a href="#orgc6c3b97">8.4.5. np.where</a></li>
 </ul>
 </li>
 </ul>
@@ -849,18 +855,18 @@ for the JavaScript code in this tag.
 
 <tr>
 <td class="org-left">Date</td>
-<td class="org-left">2018-10-04 17:55:34</td>
+<td class="org-left">2018-10-05 14:16:32</td>
 </tr>
 </tbody>
 </table>
 </div>
 
-<div id="outline-container-org9f3e474" class="outline-2">
-<h2 id="org9f3e474"><span class="section-number-2">1</span> 核心数据结构创建与基本操作</h2>
+<div id="outline-container-orge665278" class="outline-2">
+<h2 id="orge665278"><span class="section-number-2">1</span> 核心数据结构创建与基本操作</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgfdbf123" class="outline-3">
-<h3 id="orgfdbf123"><span class="section-number-3">1.1</span> 索引对象</h3>
+<div id="outline-container-orgc8f0088" class="outline-3">
+<h3 id="orgc8f0088"><span class="section-number-3">1.1</span> 索引对象</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 Pandas 中的索引对象适用于存储标签和其他元数据的。
@@ -897,8 +903,8 @@ Index does not support mutable operations
 
 
 
-<div id="outline-container-orged6734c" class="outline-3">
-<h3 id="orged6734c"><span class="section-number-3">1.2</span> Panel</h3>
+<div id="outline-container-org64781c2" class="outline-3">
+<h3 id="org64781c2"><span class="section-number-3">1.2</span> Panel</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 Panel 是三维带标签的数组。
@@ -918,8 +924,8 @@ Panel 由三个标签组成：
 
 
 
-<div id="outline-container-org7f09cef" class="outline-3">
-<h3 id="org7f09cef"><span class="section-number-3">1.3</span> Series</h3>
+<div id="outline-container-org4c58297" class="outline-3">
+<h3 id="org4c58297"><span class="section-number-3">1.3</span> Series</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 Series 是一维带标签的数组，数组里可以放任意的数据（整数，浮点数，字符串，Python Object）。
@@ -941,12 +947,12 @@ Series 是一维带标签的数组，数组里可以放任意的数据（整数�
 </div>
 
 
-<div id="outline-container-orgae4d4ae" class="outline-4">
-<h4 id="orgae4d4ae"><span class="section-number-4">1.3.1</span> 创建</h4>
+<div id="outline-container-org3fa3c7e" class="outline-4">
+<h4 id="org3fa3c7e"><span class="section-number-4">1.3.1</span> 创建</h4>
 <div class="outline-text-4" id="text-1-3-1">
 </div>
-<div id="outline-container-org9c1d0d1" class="outline-5">
-<h5 id="org9c1d0d1"><span class="section-number-5">1.3.1.1</span> 从 ndarray 创建</h5>
+<div id="outline-container-org58074b3" class="outline-5">
+<h5 id="org58074b3"><span class="section-number-5">1.3.1.1</span> 从 ndarray 创建</h5>
 <div class="outline-text-5" id="text-1-3-1-1">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">s</span> = pd.Series(np.random.randn(5), index=[<span style="color: #e6db74;">'a'</span>, <span style="color: #e6db74;">'b'</span>, <span style="color: #e6db74;">'c'</span>, <span style="color: #e6db74;">'d'</span>, <span style="color: #e6db74;">'e'</span>])
@@ -982,8 +988,8 @@ RangeIndex(start=0, stop=5, step=1)
 </div>
 
 
-<div id="outline-container-org753e654" class="outline-5">
-<h5 id="org753e654"><span class="section-number-5">1.3.1.2</span> 从字典创建</h5>
+<div id="outline-container-orga57b7cd" class="outline-5">
+<h5 id="orga57b7cd"><span class="section-number-5">1.3.1.2</span> 从字典创建</h5>
 <div class="outline-text-5" id="text-1-3-1-2">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">d</span> = {<span style="color: #e6db74;">'a'</span> : 0., <span style="color: #e6db74;">'b'</span> : 1., <span style="color: #e6db74;">'d'</span> : 3}
@@ -1005,8 +1011,8 @@ dtype: float64
 </div>
 
 
-<div id="outline-container-orgbc27852" class="outline-5">
-<h5 id="orgbc27852"><span class="section-number-5">1.3.1.3</span> 从标量创建</h5>
+<div id="outline-container-org53bea81" class="outline-5">
+<h5 id="org53bea81"><span class="section-number-5">1.3.1.3</span> 从标量创建</h5>
 <div class="outline-text-5" id="text-1-3-1-3">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">s</span> = pd.Series(3, index=<span style="color: #a6e22e;">list</span>(<span style="color: #e6db74;">'abcde'</span>))
@@ -1029,12 +1035,12 @@ dtype: int64
 </div>
 
 
-<div id="outline-container-org906a97c" class="outline-4">
-<h4 id="org906a97c"><span class="section-number-4">1.3.2</span> 基本操作</h4>
+<div id="outline-container-org9b32649" class="outline-4">
+<h4 id="org9b32649"><span class="section-number-4">1.3.2</span> 基本操作</h4>
 <div class="outline-text-4" id="text-1-3-2">
 </div>
-<div id="outline-container-orgdecadd7" class="outline-5">
-<h5 id="orgdecadd7"><span class="section-number-5">1.3.2.1</span> 赋值</h5>
+<div id="outline-container-org41bcc27" class="outline-5">
+<h5 id="org41bcc27"><span class="section-number-5">1.3.2.1</span> 赋值</h5>
 <div class="outline-text-5" id="text-1-3-2-1">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">s</span> = pd.Series([4, 7, -5, 3], index=[<span style="color: #e6db74;">'d'</span>, <span style="color: #e6db74;">'b'</span>, <span style="color: #e6db74;">'a'</span>, <span style="color: #e6db74;">'c'</span>])
@@ -1062,8 +1068,8 @@ dtype: int64
 </div>
 
 
-<div id="outline-container-org42f424b" class="outline-5">
-<h5 id="org42f424b"><span class="section-number-5">1.3.2.2</span> 与标量相乘</h5>
+<div id="outline-container-orgd05900a" class="outline-5">
+<h5 id="orgd05900a"><span class="section-number-5">1.3.2.2</span> 与标量相乘</h5>
 <div class="outline-text-5" id="text-1-3-2-2">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">s</span> = pd.Series([4, 7, -5, 3], index=[<span style="color: #e6db74;">'d'</span>, <span style="color: #e6db74;">'b'</span>, <span style="color: #e6db74;">'a'</span>, <span style="color: #e6db74;">'c'</span>])
@@ -1085,8 +1091,8 @@ dtype: int64
 
 
 
-<div id="outline-container-org04bbdae" class="outline-5">
-<h5 id="org04bbdae"><span class="section-number-5">1.3.2.3</span> 应用数学函数</h5>
+<div id="outline-container-orgc298272" class="outline-5">
+<h5 id="orgc298272"><span class="section-number-5">1.3.2.3</span> 应用数学函数</h5>
 <div class="outline-text-5" id="text-1-3-2-3">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">s</span> = pd.Series([4, 7, -5, 3], index=[<span style="color: #e6db74;">'d'</span>, <span style="color: #e6db74;">'b'</span>, <span style="color: #e6db74;">'a'</span>, <span style="color: #e6db74;">'c'</span>])
@@ -1107,8 +1113,8 @@ dtype: float64
 </div>
 
 
-<div id="outline-container-org452e62c" class="outline-5">
-<h5 id="org452e62c"><span class="section-number-5">1.3.2.4</span> 映射 (apply)</h5>
+<div id="outline-container-orgda0d4d0" class="outline-5">
+<h5 id="orgda0d4d0"><span class="section-number-5">1.3.2.4</span> 映射 (apply)</h5>
 <div class="outline-text-5" id="text-1-3-2-4">
 <p>
 <code>s.apply(value_to_value_func) -&gt; Series</code>
@@ -1117,8 +1123,8 @@ dtype: float64
 </div>
 
 
-<div id="outline-container-org3ca91ad" class="outline-5">
-<h5 id="org3ca91ad"><span class="section-number-5">1.3.2.5</span> 排序(sort_index/sort_values)</h5>
+<div id="outline-container-orgc88ae32" class="outline-5">
+<h5 id="orgc88ae32"><span class="section-number-5">1.3.2.5</span> 排序(sort_index/sort_values)</h5>
 <div class="outline-text-5" id="text-1-3-2-5">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">s</span> = pd.Series(<span style="color: #a6e22e;">range</span>(4), index=<span style="color: #a6e22e;">list</span>(<span style="color: #e6db74;">'dabc'</span>))
@@ -1145,8 +1151,8 @@ dtype: int64
 </div>
 
 
-<div id="outline-container-org1206b79" class="outline-5">
-<h5 id="org1206b79"><span class="section-number-5">1.3.2.6</span> 唯一值，计数和成员(unique/count/isin)</h5>
+<div id="outline-container-org8e9f963" class="outline-5">
+<h5 id="org8e9f963"><span class="section-number-5">1.3.2.6</span> 唯一值，计数和成员(unique/count/isin)</h5>
 <div class="outline-text-5" id="text-1-3-2-6">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">s</span> = pd.Series(<span style="color: #a6e22e;">list</span>(<span style="color: #e6db74;">'cadaabbcc'</span>))
@@ -1159,8 +1165,8 @@ log(<span style="color: #e6db74;">"s.isin(['b', 'c'])"</span>, s.isin([<span sty
 </div>
 
 
-<div id="outline-container-org8a08b0f" class="outline-5">
-<h5 id="org8a08b0f"><span class="section-number-5">1.3.2.7</span> 排名(rank)</h5>
+<div id="outline-container-org460f1ab" class="outline-5">
+<h5 id="org460f1ab"><span class="section-number-5">1.3.2.7</span> 排名(rank)</h5>
 <div class="outline-text-5" id="text-1-3-2-7">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">s</span> = pd.Series([7, -5, 7, 4, 2, 0, 4])
@@ -1204,8 +1210,8 @@ dtype: float64
 </div>
 
 
-<div id="outline-container-org6e03173" class="outline-5">
-<h5 id="org6e03173"><span class="section-number-5">1.3.2.8</span> 在字典上下文中使用</h5>
+<div id="outline-container-orge5e9930" class="outline-5">
+<h5 id="orge5e9930"><span class="section-number-5">1.3.2.8</span> 在字典上下文中使用</h5>
 <div class="outline-text-5" id="text-1-3-2-8">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">s</span> = pd.Series([4, 7, -5, 3], index=[<span style="color: #e6db74;">'d'</span>, <span style="color: #e6db74;">'b'</span>, <span style="color: #e6db74;">'a'</span>, <span style="color: #e6db74;">'c'</span>])
@@ -1227,8 +1233,8 @@ log(<span style="color: #e6db74;">"7 in s"</span>, 7 <span style="color: #f92672
 </div>
 
 
-<div id="outline-container-org69b5c50" class="outline-5">
-<h5 id="org69b5c50"><span class="section-number-5">1.3.2.9</span> 检查缺失数据</h5>
+<div id="outline-container-org5dbd9ee" class="outline-5">
+<h5 id="org5dbd9ee"><span class="section-number-5">1.3.2.9</span> 检查缺失数据</h5>
 <div class="outline-text-5" id="text-1-3-2-9">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">data</span> = {<span style="color: #e6db74;">'Ohio'</span>: 35000, <span style="color: #e6db74;">'Texas'</span>: 71000, <span style="color: #e6db74;">'Oregon'</span>: 16000, <span style="color: #e6db74;">'Utah'</span>: 5000}
@@ -1269,8 +1275,8 @@ dtype: bool
 
 
 
-<div id="outline-container-orgdc2d6b0" class="outline-3">
-<h3 id="orgdc2d6b0"><span class="section-number-3">1.4</span> DataFrame</h3>
+<div id="outline-container-org73acf34" class="outline-3">
+<h3 id="org73acf34"><span class="section-number-3">1.4</span> DataFrame</h3>
 <div class="outline-text-3" id="text-1-4">
 <p>
 DataFrame 是 <b>二维带行索引和列索引的矩阵</b> 。
@@ -1302,12 +1308,12 @@ DataFrame 是 <b>二维带行索引和列索引的矩阵</b> 。
 </div>
 
 
-<div id="outline-container-orgd7b83ea" class="outline-4">
-<h4 id="orgd7b83ea"><span class="section-number-4">1.4.1</span> 创建</h4>
+<div id="outline-container-org7f6e788" class="outline-4">
+<h4 id="org7f6e788"><span class="section-number-4">1.4.1</span> 创建</h4>
 <div class="outline-text-4" id="text-1-4-1">
 </div>
-<div id="outline-container-org2a24ea1" class="outline-5">
-<h5 id="org2a24ea1"><span class="section-number-5">1.4.1.1</span> 从字典创建</h5>
+<div id="outline-container-org92b42b3" class="outline-5">
+<h5 id="org92b42b3"><span class="section-number-5">1.4.1.1</span> 从字典创建</h5>
 <div class="outline-text-5" id="text-1-4-1-1">
 <p>
 <code>key</code> 为 DataFrame 的列； <code>value</code> 为对应列下的值
@@ -1393,8 +1399,8 @@ log(<span style="color: #e6db74;">"df"</span>, df)
 </div>
 
 
-<div id="outline-container-org1f7b26d" class="outline-5">
-<h5 id="org1f7b26d"><span class="section-number-5">1.4.1.2</span> 从结构化数据列表创建</h5>
+<div id="outline-container-org101f92e" class="outline-5">
+<h5 id="org101f92e"><span class="section-number-5">1.4.1.2</span> 从结构化数据列表创建</h5>
 <div class="outline-text-5" id="text-1-4-1-2">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">data</span> = [(1, 2.2, <span style="color: #e6db74;">'Hello'</span>), (2, 3., <span style="color: #e6db74;">"World"</span>)]
@@ -1420,8 +1426,8 @@ second  2  3.0  World
 </div>
 
 
-<div id="outline-container-org9f27038" class="outline-5">
-<h5 id="org9f27038"><span class="section-number-5">1.4.1.3</span> 从字典列表创建</h5>
+<div id="outline-container-org60b3cd0" class="outline-5">
+<h5 id="org60b3cd0"><span class="section-number-5">1.4.1.3</span> 从字典列表创建</h5>
 <div class="outline-text-5" id="text-1-4-1-3">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">data</span> = [{<span style="color: #e6db74;">'a'</span>: 1, <span style="color: #e6db74;">'b'</span>: 2}, {<span style="color: #e6db74;">'a'</span>: 5, <span style="color: #e6db74;">'b'</span>: 10, <span style="color: #e6db74;">'c'</span>: 20}]
@@ -1455,8 +1461,8 @@ second  5  10  20.0
 
 
 
-<div id="outline-container-org8443d0b" class="outline-5">
-<h5 id="org8443d0b"><span class="section-number-5">1.4.1.4</span> 从元组字典创建</h5>
+<div id="outline-container-org0695934" class="outline-5">
+<h5 id="org0695934"><span class="section-number-5">1.4.1.4</span> 从元组字典创建</h5>
 <div class="outline-text-5" id="text-1-4-1-4">
 <p>
 实际应用中，会通过数据清洗的方式，把数据整理成方便 Pandas 导入且可读性好的格式。
@@ -1489,8 +1495,8 @@ A B  1.0  4.0  5.0  8.0  10.0
 
 
 
-<div id="outline-container-org5e9a03f" class="outline-5">
-<h5 id="org5e9a03f"><span class="section-number-5">1.4.1.5</span> 从 Series 创建</h5>
+<div id="outline-container-orgd132ac9" class="outline-5">
+<h5 id="orgd132ac9"><span class="section-number-5">1.4.1.5</span> 从 Series 创建</h5>
 <div class="outline-text-5" id="text-1-4-1-5">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">s</span> = pd.Series(np.random.randn(5), index=[<span style="color: #e6db74;">'a'</span>, <span style="color: #e6db74;">'b'</span>, <span style="color: #e6db74;">'c'</span>, <span style="color: #e6db74;">'d'</span>, <span style="color: #e6db74;">'e'</span>])
@@ -1526,8 +1532,8 @@ d -0.946448
 
 
 
-<div id="outline-container-org558760d" class="outline-5">
-<h5 id="org558760d"><span class="section-number-5">1.4.1.6</span> 指定行列索引创建</h5>
+<div id="outline-container-org8fbe1c1" class="outline-5">
+<h5 id="org8fbe1c1"><span class="section-number-5">1.4.1.6</span> 指定行列索引创建</h5>
 <div class="outline-text-5" id="text-1-4-1-6">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">dates</span> = pd.date_range(<span style="color: #e6db74;">'20160301'</span>, periods=6)
@@ -1557,12 +1563,12 @@ DatetimeIndex(['2016-03-01', '2016-03-02', '2016-03-03', '2016-03-04',
 </div>
 
 
-<div id="outline-container-orgc408d5d" class="outline-4">
-<h4 id="orgc408d5d"><span class="section-number-4">1.4.2</span> 基本操作</h4>
+<div id="outline-container-org6950ecf" class="outline-4">
+<h4 id="org6950ecf"><span class="section-number-4">1.4.2</span> 基本操作</h4>
 <div class="outline-text-4" id="text-1-4-2">
 </div>
-<div id="outline-container-org1acc4bd" class="outline-5">
-<h5 id="org1acc4bd"><span class="section-number-5">1.4.2.1</span> 转置</h5>
+<div id="outline-container-orga580996" class="outline-5">
+<h5 id="orga580996"><span class="section-number-5">1.4.2.1</span> 转置</h5>
 <div class="outline-text-5" id="text-1-4-2-1">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">data</span> = {<span style="color: #e6db74;">'Nevada'</span>: {2001: 2.4, 2002: 2.9},
@@ -1589,8 +1595,8 @@ Ohio     1.7   3.6
 
 
 
-<div id="outline-container-org2644f94" class="outline-5">
-<h5 id="org2644f94"><span class="section-number-5">1.4.2.2</span> 算数运算填充</h5>
+<div id="outline-container-orge1a7778" class="outline-5">
+<h5 id="orge1a7778"><span class="section-number-5">1.4.2.2</span> 算数运算填充</h5>
 <div class="outline-text-5" id="text-1-4-2-2">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">df1</span> = pd.DataFrame(np.arange(12.).reshape((3, 4)),
@@ -1636,8 +1642,8 @@ log(<span style="color: #e6db74;">"df1.add(df2, fill_value=0)"</span>, df1.add(d
 
 
 
-<div id="outline-container-org995650d" class="outline-5">
-<h5 id="org995650d"><span class="section-number-5">1.4.2.3</span> 和 Series 之间的运算（广播机制）</h5>
+<div id="outline-container-orga1e0eeb" class="outline-5">
+<h5 id="orga1e0eeb"><span class="section-number-5">1.4.2.3</span> 和 Series 之间的运算（广播机制）</h5>
 <div class="outline-text-5" id="text-1-4-2-3">
 <p>
 默认会将 Series 的索引与 DataFrame 的列进行匹配，并广播到各行：
@@ -1705,8 +1711,8 @@ Oregon -1.0  0.0  1.0
 </div>
 
 
-<div id="outline-container-org1dc3c38" class="outline-5">
-<h5 id="org1dc3c38"><span class="section-number-5">1.4.2.4</span> 应用函数</h5>
+<div id="outline-container-org0398910" class="outline-5">
+<h5 id="org0398910"><span class="section-number-5">1.4.2.4</span> 应用函数</h5>
 <div class="outline-text-5" id="text-1-4-2-4">
 <p>
 从本质上讲，DataFrame 内部用的数据结构就是 numpy 的 ndarray 。
@@ -1762,8 +1768,8 @@ log(<span style="color: #e6db74;">"np.sin(df)"</span>, np.sin(df))
 </div>
 
 
-<div id="outline-container-org3155d0f" class="outline-5">
-<h5 id="org3155d0f"><span class="section-number-5">1.4.2.5</span> 行/列映射 (apply)</h5>
+<div id="outline-container-orgb6eed22" class="outline-5">
+<h5 id="orgb6eed22"><span class="section-number-5">1.4.2.5</span> 行/列映射 (apply)</h5>
 <div class="outline-text-5" id="text-1-4-2-5">
 <p>
 <code>df.apply(series_to_series_func) -&gt; DataFrame</code>
@@ -1815,8 +1821,8 @@ four     9   11
 </div>
 
 
-<div id="outline-container-orgc071c1b" class="outline-5">
-<h5 id="orgc071c1b"><span class="section-number-5">1.4.2.6</span> 逐元素映射 (applymap)</h5>
+<div id="outline-container-org3cc6a79" class="outline-5">
+<h5 id="org3cc6a79"><span class="section-number-5">1.4.2.6</span> 逐元素映射 (applymap)</h5>
 <div class="outline-text-5" id="text-1-4-2-6">
 <p>
 <code>df.applymap(value_to_value_func) -&gt; DataFrame</code>
@@ -1835,8 +1841,8 @@ log(<span style="color: #e6db74;">"df.applymap(lambda x: '{0:.03f}'.format(x))"<
 </div>
 
 
-<div id="outline-container-org8a226d2" class="outline-5">
-<h5 id="org8a226d2"><span class="section-number-5">1.4.2.7</span> 排序(sort_index/sort_values)</h5>
+<div id="outline-container-orgf6318b1" class="outline-5">
+<h5 id="orgf6318b1"><span class="section-number-5">1.4.2.7</span> 排序(sort_index/sort_values)</h5>
 <div class="outline-text-5" id="text-1-4-2-7">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">df</span> = pd.DataFrame(np.arange(8).reshape((2, 4)),
@@ -1876,8 +1882,8 @@ one    4  5  6  7
 </div>
 
 
-<div id="outline-container-orga9a08d4" class="outline-5">
-<h5 id="orga9a08d4"><span class="section-number-5">1.4.2.8</span> 排名(rank)</h5>
+<div id="outline-container-org4ecc8d5" class="outline-5">
+<h5 id="org4ecc8d5"><span class="section-number-5">1.4.2.8</span> 排名(rank)</h5>
 <div class="outline-text-5" id="text-1-4-2-8">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">df</span> = pd.DataFrame({<span style="color: #e6db74;">'b'</span>: [4.3, 7, -3, 2], <span style="color: #e6db74;">'a'</span>: [0, 1, 0, 1], <span style="color: #e6db74;">'c'</span>: [-2, 5, 8, -2.5]})
@@ -1904,8 +1910,8 @@ log(<span style="color: #e6db74;">"df.rank(axis='columns')"</span>, df.rank(axis
 </div>
 
 
-<div id="outline-container-orgce9d4b5" class="outline-5">
-<h5 id="orgce9d4b5"><span class="section-number-5">1.4.2.9</span> 转换为 ndarray 对象</h5>
+<div id="outline-container-org419c86e" class="outline-5">
+<h5 id="org419c86e"><span class="section-number-5">1.4.2.9</span> 转换为 ndarray 对象</h5>
 <div class="outline-text-5" id="text-1-4-2-9">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">df</span> = pd.DataFrame(np.random.randn(10, 4), columns=[<span style="color: #e6db74;">'one'</span>, <span style="color: #e6db74;">'two'</span>, <span style="color: #e6db74;">'three'</span>, <span style="color: #e6db74;">'four'</span>])
@@ -1957,8 +1963,8 @@ log(<span style="color: #e6db74;">"ary == df"</span>, ary == df)
 
 
 
-<div id="outline-container-org67999d6" class="outline-5">
-<h5 id="org67999d6"><span class="section-number-5">1.4.2.10</span> 统计</h5>
+<div id="outline-container-org1085211" class="outline-5">
+<h5 id="org1085211"><span class="section-number-5">1.4.2.10</span> 统计</h5>
 <div class="outline-text-5" id="text-1-4-2-10">
 <ul class="org-ul">
 <li>count
@@ -2008,16 +2014,16 @@ log(<span style="color: #e6db74;">"ary == df"</span>, ary == df)
 
 
 
-<div id="outline-container-orgde15ec3" class="outline-2">
-<h2 id="orgde15ec3"><span class="section-number-2">2</span> 索引</h2>
+<div id="outline-container-org3b85a64" class="outline-2">
+<h2 id="org3b85a64"><span class="section-number-2">2</span> 索引</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orgabe086f" class="outline-3">
-<h3 id="orgabe086f"><span class="section-number-3">2.1</span> Series</h3>
+<div id="outline-container-org11d3388" class="outline-3">
+<h3 id="org11d3388"><span class="section-number-3">2.1</span> Series</h3>
 <div class="outline-text-3" id="text-2-1">
 </div>
-<div id="outline-container-org6a816d1" class="outline-4">
-<h4 id="org6a816d1"><span class="section-number-4">2.1.1</span> 设置对象自身和索引的 name 属性</h4>
+<div id="outline-container-orgc66e10d" class="outline-4">
+<h4 id="orgc66e10d"><span class="section-number-4">2.1.1</span> 设置对象自身和索引的 name 属性</h4>
 <div class="outline-text-4" id="text-2-1-1">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">data</span> = {<span style="color: #e6db74;">'Ohio'</span>: 35000, <span style="color: #e6db74;">'Texas'</span>: 71000, <span style="color: #e6db74;">'Oregon'</span>: 16000, <span style="color: #e6db74;">'Utah'</span>: 5000}
@@ -2043,8 +2049,8 @@ Name: population, dtype: float64
 </div>
 
 
-<div id="outline-container-org2c52a9d" class="outline-4">
-<h4 id="org2c52a9d"><span class="section-number-4">2.1.2</span> 获取值和索引</h4>
+<div id="outline-container-orgc33a1da" class="outline-4">
+<h4 id="orgc33a1da"><span class="section-number-4">2.1.2</span> 获取值和索引</h4>
 <div class="outline-text-4" id="text-2-1-2">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">s</span> = pd.Series(np.random.randn(5), index=[<span style="color: #e6db74;">'a'</span>, <span style="color: #e6db74;">'b'</span>, <span style="color: #e6db74;">'c'</span>, <span style="color: #e6db74;">'d'</span>, <span style="color: #e6db74;">'e'</span>])
@@ -2071,8 +2077,8 @@ Index(['a', 'b', 'c', 'd', 'e'], dtype='object')
 </div>
 
 
-<div id="outline-container-org0499f7b" class="outline-4">
-<h4 id="org0499f7b"><span class="section-number-4">2.1.3</span> 索引对齐</h4>
+<div id="outline-container-org0623515" class="outline-4">
+<h4 id="org0623515"><span class="section-number-4">2.1.3</span> 索引对齐</h4>
 <div class="outline-text-4" id="text-2-1-3">
 <p>
 相同索引值才进行操作
@@ -2109,8 +2115,8 @@ dtype: float64
 </div>
 
 
-<div id="outline-container-org9023b13" class="outline-4">
-<h4 id="org9023b13"><span class="section-number-4">2.1.4</span> 重建索引</h4>
+<div id="outline-container-org8396e84" class="outline-4">
+<h4 id="org8396e84"><span class="section-number-4">2.1.4</span> 重建索引</h4>
 <div class="outline-text-4" id="text-2-1-4">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">s</span> = pd.Series([4.5, 7.2, -5.3, 3.6], index=[<span style="color: #e6db74;">'d'</span>, <span style="color: #e6db74;">'b'</span>, <span style="color: #e6db74;">'a'</span>, <span style="color: #e6db74;">'c'</span>])
@@ -2166,8 +2172,8 @@ dtype: object
 
 
 
-<div id="outline-container-orgd1156ef" class="outline-4">
-<h4 id="orgd1156ef"><span class="section-number-4">2.1.5</span> 删除索引</h4>
+<div id="outline-container-orgcba1694" class="outline-4">
+<h4 id="orgcba1694"><span class="section-number-4">2.1.5</span> 删除索引</h4>
 <div class="outline-text-4" id="text-2-1-5">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">s</span> = pd.Series(np.arange(5.), index=<span style="color: #a6e22e;">list</span>(<span style="color: #e6db74;">'abcde'</span>))
@@ -2201,8 +2207,8 @@ dtype: float64
 </div>
 
 
-<div id="outline-container-org2d9e73a" class="outline-4">
-<h4 id="org2d9e73a"><span class="section-number-4">2.1.6</span> 标签索引</h4>
+<div id="outline-container-org96ae81f" class="outline-4">
+<h4 id="org96ae81f"><span class="section-number-4">2.1.6</span> 标签索引</h4>
 <div class="outline-text-4" id="text-2-1-6">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">s</span> = pd.Series([4, 7, -5, 3], index=[<span style="color: #e6db74;">'a'</span>, <span style="color: #e6db74;">'b'</span>, <span style="color: #e6db74;">'c'</span>, <span style="color: #e6db74;">'d'</span>])
@@ -2241,8 +2247,8 @@ dtype: int64
 
 
 
-<div id="outline-container-org22ff5be" class="outline-4">
-<h4 id="org22ff5be"><span class="section-number-4">2.1.7</span> 布尔索引</h4>
+<div id="outline-container-org59276b6" class="outline-4">
+<h4 id="org59276b6"><span class="section-number-4">2.1.7</span> 布尔索引</h4>
 <div class="outline-text-4" id="text-2-1-7">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">s</span> = pd.Series([4, 7, -5, 3], index=[<span style="color: #e6db74;">'d'</span>, <span style="color: #e6db74;">'b'</span>, <span style="color: #e6db74;">'a'</span>, <span style="color: #e6db74;">'c'</span>])
@@ -2267,12 +2273,12 @@ dtype: int64
 
 
 
-<div id="outline-container-org09a9123" class="outline-3">
-<h3 id="org09a9123"><span class="section-number-3">2.2</span> DataFrame</h3>
+<div id="outline-container-org547b9e5" class="outline-3">
+<h3 id="org547b9e5"><span class="section-number-3">2.2</span> DataFrame</h3>
 <div class="outline-text-3" id="text-2-2">
 </div>
-<div id="outline-container-orgdd1ba34" class="outline-4">
-<h4 id="orgdd1ba34"><span class="section-number-4">2.2.1</span> 设置行/列索引的 name 属性</h4>
+<div id="outline-container-org6aac104" class="outline-4">
+<h4 id="org6aac104"><span class="section-number-4">2.2.1</span> 设置行/列索引的 name 属性</h4>
 <div class="outline-text-4" id="text-2-2-1">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">data</span> = {<span style="color: #e6db74;">'Nevada'</span>: {2001: 2.4, 2002: 2.9},
@@ -2296,8 +2302,8 @@ year
 </div>
 
 
-<div id="outline-container-org3e92db6" class="outline-4">
-<h4 id="org3e92db6"><span class="section-number-4">2.2.2</span> 重建索引</h4>
+<div id="outline-container-org4aa88ed" class="outline-4">
+<h4 id="org4aa88ed"><span class="section-number-4">2.2.2</span> 重建索引</h4>
 <div class="outline-text-4" id="text-2-2-2">
 <p>
 在 DataFrame 中， <code>reindex</code> 可以改变行索引，列索引，也可以同时改变两者。
@@ -2342,8 +2348,8 @@ d      7   NaN           8
 </div>
 
 
-<div id="outline-container-org6f6eca8" class="outline-4">
-<h4 id="org6f6eca8"><span class="section-number-4">2.2.3</span> 索引对齐</h4>
+<div id="outline-container-org5e68c5e" class="outline-4">
+<h4 id="org5e68c5e"><span class="section-number-4">2.2.3</span> 索引对齐</h4>
 <div class="outline-text-4" id="text-2-2-3">
 <p>
 DataFrame 在进行数据计算时， <b>会自动按行和列进行数据对齐</b> 。
@@ -2368,8 +2374,8 @@ log(<span style="color: #e6db74;">"df1 + df2"</span>, df1 + df2)
 </div>
 
 
-<div id="outline-container-org0624290" class="outline-4">
-<h4 id="org0624290"><span class="section-number-4">2.2.4</span> 列赋值</h4>
+<div id="outline-container-orgf7a52ac" class="outline-4">
+<h4 id="orgf7a52ac"><span class="section-number-4">2.2.4</span> 列赋值</h4>
 <div class="outline-text-4" id="text-2-2-4">
 <p>
 当将列表或数组赋值给一个列时，长度必须和 DataFrame 的长度相匹配。
@@ -2428,8 +2434,8 @@ six    2003  Nevada  3.2   NaN     5.0
 
 
 
-<div id="outline-container-org96f72d3" class="outline-4">
-<h4 id="org96f72d3"><span class="section-number-4">2.2.5</span> 删除行/列</h4>
+<div id="outline-container-orgd5bcb56" class="outline-4">
+<h4 id="orgd5bcb56"><span class="section-number-4">2.2.5</span> 删除行/列</h4>
 <div class="outline-text-4" id="text-2-2-5">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">data</span> = {<span style="color: #e6db74;">'state'</span>: [<span style="color: #e6db74;">'Ohio'</span>, <span style="color: #e6db74;">'Ohio'</span>, <span style="color: #e6db74;">'Ohio'</span>, <span style="color: #e6db74;">'Nevada'</span>, <span style="color: #e6db74;">'Nevada'</span>, <span style="color: #e6db74;">'Nevada'</span>],
@@ -2487,8 +2493,8 @@ New York   12     14    15
 
 
 
-<div id="outline-container-orgacc4e2d" class="outline-4">
-<h4 id="orgacc4e2d"><span class="section-number-4">2.2.6</span> 标签索引</h4>
+<div id="outline-container-orgfb4cdaf" class="outline-4">
+<h4 id="orgfb4cdaf"><span class="section-number-4">2.2.6</span> 标签索引</h4>
 <div class="outline-text-4" id="text-2-2-6">
 <p>
 从 DataFrame 中玄虚的列是数据的 <span class="underline">视图</span> ，而不是拷贝。
@@ -2550,8 +2556,8 @@ Name: year, dtype: int64
 </div>
 
 
-<div id="outline-container-orgc4be1f6" class="outline-4">
-<h4 id="orgc4be1f6"><span class="section-number-4">2.2.7</span> 正则索引</h4>
+<div id="outline-container-org7535e0e" class="outline-4">
+<h4 id="org7535e0e"><span class="section-number-4">2.2.7</span> 正则索引</h4>
 <div class="outline-text-4" id="text-2-2-7">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">df</span> = pd.DataFrame(np.random.randn(6, 4),
@@ -2584,8 +2590,8 @@ F -0.725380  0.062327
 </div>
 
 
-<div id="outline-container-orgae688f1" class="outline-4">
-<h4 id="orgae688f1"><span class="section-number-4">2.2.8</span> 整数索引</h4>
+<div id="outline-container-org6475858" class="outline-4">
+<h4 id="org6475858"><span class="section-number-4">2.2.8</span> 整数索引</h4>
 <div class="outline-text-4" id="text-2-2-8">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">df</span> = pd.DataFrame(np.arange(16).reshape((4, 4)),
@@ -2612,8 +2618,8 @@ Colorado    4    5      6     7
 </div>
 
 
-<div id="outline-container-orgb1932b1" class="outline-4">
-<h4 id="orgb1932b1"><span class="section-number-4">2.2.9</span> 布尔索引</h4>
+<div id="outline-container-orgc9dbc63" class="outline-4">
+<h4 id="orgc9dbc63"><span class="section-number-4">2.2.9</span> 布尔索引</h4>
 <div class="outline-text-4" id="text-2-2-9">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">df</span> = pd.DataFrame(np.arange(16).reshape((4, 4)),
@@ -2641,8 +2647,8 @@ New York   12   13     14    15
 </div>
 
 
-<div id="outline-container-org443b8f7" class="outline-4">
-<h4 id="org443b8f7"><span class="section-number-4">2.2.10</span> loc 索引</h4>
+<div id="outline-container-org27ea4b6" class="outline-4">
+<h4 id="org27ea4b6"><span class="section-number-4">2.2.10</span> loc 索引</h4>
 <div class="outline-text-4" id="text-2-2-10">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">df</span> = pd.DataFrame(np.arange(16).reshape((4, 4)),
@@ -2675,8 +2681,8 @@ Name: two, dtype: int64
 </div>
 
 
-<div id="outline-container-org7254ae7" class="outline-4">
-<h4 id="org7254ae7"><span class="section-number-4">2.2.11</span> iloc 索引</h4>
+<div id="outline-container-orgd53848d" class="outline-4">
+<h4 id="orgd53848d"><span class="section-number-4">2.2.11</span> iloc 索引</h4>
 <div class="outline-text-4" id="text-2-2-11">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">df</span> = pd.DataFrame(np.arange(16).reshape((4, 4)),
@@ -2715,8 +2721,8 @@ New York   12   13     14
 </div>
 
 
-<div id="outline-container-org967807b" class="outline-4">
-<h4 id="org967807b"><span class="section-number-4">2.2.12</span> at 索引</h4>
+<div id="outline-container-orge99125e" class="outline-4">
+<h4 id="orge99125e"><span class="section-number-4">2.2.12</span> at 索引</h4>
 <div class="outline-text-4" id="text-2-2-12">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">df</span> = pd.DataFrame(np.random.randn(6, 4),
@@ -2730,8 +2736,8 @@ log(<span style="color: #e6db74;">"df.at['A', 'one']"</span>, df.at[<span style=
 </div>
 
 
-<div id="outline-container-org8e9d725" class="outline-4">
-<h4 id="org8e9d725"><span class="section-number-4">2.2.13</span> 随机索引</h4>
+<div id="outline-container-orgce60ef9" class="outline-4">
+<h4 id="orgce60ef9"><span class="section-number-4">2.2.13</span> 随机索引</h4>
 <div class="outline-text-4" id="text-2-2-13">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">df</span> = pd.DataFrame(np.arange(16).reshape((4, 4)),
@@ -2764,8 +2770,8 @@ Utah        8    9     10    11
 </div>
 
 
-<div id="outline-container-org848073b" class="outline-4">
-<h4 id="org848073b"><span class="section-number-4">2.2.14</span> 重命名行/列</h4>
+<div id="outline-container-org88ee57b" class="outline-4">
+<h4 id="org88ee57b"><span class="section-number-4">2.2.14</span> 重命名行/列</h4>
 <div class="outline-text-4" id="text-2-2-14">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">df</span> = pd.DataFrame(np.random.randn(6, 4),
@@ -2811,12 +2817,12 @@ F    1.028409  1.627355 -1.264463 -0.109870
 </div>
 
 
-<div id="outline-container-org65cd7c6" class="outline-2">
-<h2 id="org65cd7c6"><span class="section-number-2">3</span> 数据清洗</h2>
+<div id="outline-container-org2c55905" class="outline-2">
+<h2 id="org2c55905"><span class="section-number-2">3</span> 数据清洗</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org137614d" class="outline-3">
-<h3 id="org137614d"><span class="section-number-3">3.1</span> 处理缺失值</h3>
+<div id="outline-container-org6600e17" class="outline-3">
+<h3 id="org6600e17"><span class="section-number-3">3.1</span> 处理缺失值</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 pandas 对象的所有统计信息默认情况下是 <span class="underline">排除</span> 缺失值的。
@@ -2833,8 +2839,8 @@ Python 内建的 None 值也被当做 NA 处理。
 </div>
 </div>
 
-<div id="outline-container-orgfe0289f" class="outline-4">
-<h4 id="orgfe0289f"><span class="section-number-4">3.1.1</span> 过滤缺失值(dropna)</h4>
+<div id="outline-container-org042fcc4" class="outline-4">
+<h4 id="org042fcc4"><span class="section-number-4">3.1.1</span> 过滤缺失值(dropna)</h4>
 <div class="outline-text-4" id="text-3-1-1">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">s</span> = pd.Series([1, np.nan, 3.5, np.nan, 7])
@@ -2932,8 +2938,8 @@ log(<span style="color: #e6db74;">"df.dropna(thresh=2)"</span>, df.dropna(thresh
 </div>
 </div>
 
-<div id="outline-container-org9cb8555" class="outline-4">
-<h4 id="org9cb8555"><span class="section-number-4">3.1.2</span> 补全缺失值(fillna)</h4>
+<div id="outline-container-org57fe1bb" class="outline-4">
+<h4 id="org57fe1bb"><span class="section-number-4">3.1.2</span> 补全缺失值(fillna)</h4>
 <div class="outline-text-4" id="text-3-1-2">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">df</span> = pd.DataFrame(np.random.randn(7, 3))
@@ -3033,12 +3039,12 @@ log(<span style="color: #e6db74;">"df.fillna(method='ffill', limit=2)"</span>, d
 
 
 
-<div id="outline-container-orgf4f3346" class="outline-3">
-<h3 id="orgf4f3346"><span class="section-number-3">3.2</span> 数据转换</h3>
+<div id="outline-container-org053b3d2" class="outline-3">
+<h3 id="org053b3d2"><span class="section-number-3">3.2</span> 数据转换</h3>
 <div class="outline-text-3" id="text-3-2">
 </div>
-<div id="outline-container-org3371302" class="outline-4">
-<h4 id="org3371302"><span class="section-number-4">3.2.1</span> 删除重复值</h4>
+<div id="outline-container-org5019b75" class="outline-4">
+<h4 id="org5019b75"><span class="section-number-4">3.2.1</span> 删除重复值</h4>
 <div class="outline-text-4" id="text-3-2-1">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">df</span> = pd.DataFrame(
@@ -3144,8 +3150,8 @@ log(<span style="color: #e6db74;">"df.drop_duplicates(['k1'])"</span>, df.drop_d
 </div>
 </div>
 
-<div id="outline-container-orgf49e508" class="outline-4">
-<h4 id="orgf49e508"><span class="section-number-4">3.2.2</span> 使用函数或映射进行数据转换</h4>
+<div id="outline-container-orgf6652c2" class="outline-4">
+<h4 id="orgf6652c2"><span class="section-number-4">3.2.2</span> 使用函数或映射进行数据转换</h4>
 <div class="outline-text-4" id="text-3-2-2">
 <div class="org-src-container">
 <pre class="src src-ipython">  <span style="color: #fd971f;">df</span> = pd.DataFrame(
@@ -3220,8 +3226,8 @@ Name: food, dtype: object
 </div>
 </div>
 
-<div id="outline-container-orgb242ffc" class="outline-4">
-<h4 id="orgb242ffc"><span class="section-number-4">3.2.3</span> 替代值(replace)</h4>
+<div id="outline-container-orga16160f" class="outline-4">
+<h4 id="orga16160f"><span class="section-number-4">3.2.3</span> 替代值(replace)</h4>
 <div class="outline-text-4" id="text-3-2-3">
 <p>
 使用 <code>fillna()</code> 是通用值替换的特殊案例。
@@ -3309,8 +3315,8 @@ dtype: float64
 </div>
 </div>
 
-<div id="outline-container-org4e19336" class="outline-4">
-<h4 id="org4e19336"><span class="section-number-4">3.2.4</span> 重命名索引</h4>
+<div id="outline-container-org5b47ca2" class="outline-4">
+<h4 id="org5b47ca2"><span class="section-number-4">3.2.4</span> 重命名索引</h4>
 <div class="outline-text-4" id="text-3-2-4">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">df</span> = pd.DataFrame(np.arange(12).reshape((3,4)),
@@ -3345,8 +3351,8 @@ NEW        8    9        10    11
 </div>
 
 
-<div id="outline-container-org4c19865" class="outline-4">
-<h4 id="org4c19865"><span class="section-number-4">3.2.5</span> 离散化和分箱(cut/qcut)</h4>
+<div id="outline-container-org3a60ac6" class="outline-4">
+<h4 id="org3a60ac6"><span class="section-number-4">3.2.5</span> 离散化和分箱(cut/qcut)</h4>
 <div class="outline-text-4" id="text-3-2-5">
 <p>
 连续值经常需要离散化，或者分离成 <span class="underline">箱子</span> 进行分析。
@@ -3469,8 +3475,8 @@ dtype: int64
 </div>
 
 
-<div id="outline-container-orgeaa7330" class="outline-4">
-<h4 id="orgeaa7330"><span class="section-number-4">3.2.6</span> 检测异常值(any)</h4>
+<div id="outline-container-orgf8f6763" class="outline-4">
+<h4 id="orgf8f6763"><span class="section-number-4">3.2.6</span> 检测异常值(any)</h4>
 <div class="outline-text-4" id="text-3-2-6">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">df</span> = pd.DataFrame(np.random.randn(5, 4))
@@ -3517,8 +3523,8 @@ True
 </div>
 
 
-<div id="outline-container-org66d94dd" class="outline-4">
-<h4 id="org66d94dd"><span class="section-number-4">3.2.7</span> 随机重排序(sample/take)</h4>
+<div id="outline-container-orgded3b72" class="outline-4">
+<h4 id="orgded3b72"><span class="section-number-4">3.2.7</span> 随机重排序(sample/take)</h4>
 <div class="outline-text-4" id="text-3-2-7">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">df</span> = pd.DataFrame(np.arange(5*4).reshape((5, 4)))
@@ -3563,8 +3569,8 @@ log(<span style="color: #e6db74;">"df.sample(3, replace=True)"</span>, df.sample
 </div>
 
 
-<div id="outline-container-org35cde56" class="outline-5">
-<h5 id="org35cde56"><span class="section-number-5">3.2.7.1</span> 使用 take 优化内存 <a id="org588133e"></a></h5>
+<div id="outline-container-org95ca39e" class="outline-5">
+<h5 id="org95ca39e"><span class="section-number-5">3.2.7.1</span> 使用 take 优化内存 <a id="org05a02ee"></a></h5>
 <div class="outline-text-5" id="text-3-2-7-1">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">values</span> = pd.Series([0, 1, 0, 0] * 2)
@@ -3607,8 +3613,8 @@ dtype: object
 
 
 
-<div id="outline-container-orgc77b511" class="outline-4">
-<h4 id="orgc77b511"><span class="section-number-4">3.2.8</span> 指标矩阵(get_dummies)</h4>
+<div id="outline-container-org59e18ec" class="outline-4">
+<h4 id="org59e18ec"><span class="section-number-4">3.2.8</span> 指标矩阵(get_dummies)</h4>
 <div class="outline-text-4" id="text-3-2-8">
 <p>
 如果一列有 k 个不同的值，可以衍生一个k 列的，值为 0 或 1 的矩阵。
@@ -3707,12 +3713,12 @@ log(<span style="color: #e6db74;">"pd.get_dummies(pd.cut(values, bins))"</span>,
 
 
 
-<div id="outline-container-org65334c9" class="outline-4">
-<h4 id="org65334c9"><span class="section-number-4">3.2.9</span> 向量化函数</h4>
+<div id="outline-container-org815de93" class="outline-4">
+<h4 id="org815de93"><span class="section-number-4">3.2.9</span> 向量化函数</h4>
 <div class="outline-text-4" id="text-3-2-9">
 </div>
-<div id="outline-container-orgd07270f" class="outline-5">
-<h5 id="orgd07270f"><span class="section-number-5">3.2.9.1</span> str</h5>
+<div id="outline-container-orgc76a2da" class="outline-5">
+<h5 id="orgc76a2da"><span class="section-number-5">3.2.9.1</span> str</h5>
 <div class="outline-text-5" id="text-3-2-9-1">
 <p>
 为序列添加字符串操作方法，并能跳过 NA
@@ -3749,8 +3755,8 @@ dtype: object
 </div>
 
 
-<div id="outline-container-org4f80a83" class="outline-5">
-<h5 id="org4f80a83"><span class="section-number-5">3.2.9.2</span> dt</h5>
+<div id="outline-container-org8c1698c" class="outline-5">
+<h5 id="org8c1698c"><span class="section-number-5">3.2.9.2</span> dt</h5>
 <div class="outline-text-5" id="text-3-2-9-2">
 <p>
 为序列添加时间操作方法
@@ -3862,12 +3868,12 @@ dtype: bool
 </div>
 </div>
 
-<div id="outline-container-org2081ff1" class="outline-2">
-<h2 id="org2081ff1"><span class="section-number-2">4</span> 数据规整：连接，联合，重塑</h2>
+<div id="outline-container-org85f8594" class="outline-2">
+<h2 id="org85f8594"><span class="section-number-2">4</span> 数据规整：连接，联合，重塑</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-orgdfb5622" class="outline-3">
-<h3 id="orgdfb5622"><span class="section-number-3">4.1</span> 分层索引</h3>
+<div id="outline-container-orgb13ca18" class="outline-3">
+<h3 id="orgb13ca18"><span class="section-number-3">4.1</span> 分层索引</h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 分层索引提供了一种在 <b>低维度的形式中处理高维度数据</b> 的方式，它使用 <code>pd.MultiIndex</code> 类来表示。
@@ -3950,8 +3956,8 @@ dtype: float64
 </pre>
 </div>
 
-<div id="outline-container-orgfbe0316" class="outline-4">
-<h4 id="orgfbe0316"><span class="section-number-4">4.1.1</span> 层级交换(swaplevel)与排序(sort_index)</h4>
+<div id="outline-container-orgde62afb" class="outline-4">
+<h4 id="orgde62afb"><span class="section-number-4">4.1.1</span> 层级交换(swaplevel)与排序(sort_index)</h4>
 <div class="outline-text-4" id="text-4-1-1">
 <p>
 <code>swaplevel</code> 接收两个层级序号或层级名称，返回一个进行了层级变更的新对象， <span class="underline">数据是不变的</span> 。
@@ -4026,8 +4032,8 @@ key2 key1
 </div>
 
 
-<div id="outline-container-org433d7cb" class="outline-4">
-<h4 id="org433d7cb"><span class="section-number-4">4.1.2</span> 列索引转为行索引 (set_index)</h4>
+<div id="outline-container-org9da3325" class="outline-4">
+<h4 id="org9da3325"><span class="section-number-4">4.1.2</span> 列索引转为行索引 (set_index)</h4>
 <div class="outline-text-4" id="text-4-1-2">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">df</span> = pd.DataFrame({
@@ -4088,8 +4094,8 @@ two 0  3  4  two  0
 </div>
 
 
-<div id="outline-container-org9ca4fd6" class="outline-4">
-<h4 id="org9ca4fd6"><span class="section-number-4">4.1.3</span> 行索引转为列索引 (reset_index)</h4>
+<div id="outline-container-org9877fb9" class="outline-4">
+<h4 id="org9877fb9"><span class="section-number-4">4.1.3</span> 行索引转为列索引 (reset_index)</h4>
 <div class="outline-text-4" id="text-4-1-3">
 <p>
 <code>reset_index</code> 是 <code>set_index</code> 的 <b>反操作</b> ，分层索引的行索引层级会被移动为列索引。
@@ -4144,16 +4150,16 @@ two 0  3  4
 </div>
 
 
-<div id="outline-container-orgdfc3b6e" class="outline-3">
-<h3 id="orgdfc3b6e"><span class="section-number-3">4.2</span> 连接与合并</h3>
+<div id="outline-container-org39bd5c7" class="outline-3">
+<h3 id="org39bd5c7"><span class="section-number-3">4.2</span> 连接与合并</h3>
 <div class="outline-text-3" id="text-4-2">
 </div>
-<div id="outline-container-orgbabfe66" class="outline-4">
-<h4 id="orgbabfe66"><span class="section-number-4">4.2.1</span> merge</h4>
+<div id="outline-container-orga38b562" class="outline-4">
+<h4 id="orga38b562"><span class="section-number-4">4.2.1</span> merge</h4>
 <div class="outline-text-4" id="text-4-2-1">
 </div>
-<div id="outline-container-org4ad3ccb" class="outline-5">
-<h5 id="org4ad3ccb"><span class="section-number-5">4.2.1.1</span> 基本用法</h5>
+<div id="outline-container-org4d0cb6e" class="outline-5">
+<h5 id="org4d0cb6e"><span class="section-number-5">4.2.1.1</span> 基本用法</h5>
 <div class="outline-text-5" id="text-4-2-1-1">
 <p>
 合并或连接操作是通过一个或多个键，连接行来联合数据集。
@@ -4275,8 +4281,8 @@ log(<span style="color: #e6db74;">"pd.merge(df1, df2, left_on='lkey', right_on='
 </div>
 
 
-<div id="outline-container-org4a0390e" class="outline-5">
-<h5 id="org4a0390e"><span class="section-number-5">4.2.1.2</span> 合并类型(inner,outer,left,right)</h5>
+<div id="outline-container-org4cb09ef" class="outline-5">
+<h5 id="org4cb09ef"><span class="section-number-5">4.2.1.2</span> 合并类型(inner,outer,left,right)</h5>
 <div class="outline-text-5" id="text-4-2-1-2">
 <p>
 默认情况下， <code>merge</code> 做的是内连接。
@@ -4343,8 +4349,8 @@ six     b      5
 
 
 
-<div id="outline-container-org5a44995" class="outline-5">
-<h5 id="org5a44995"><span class="section-number-5">4.2.1.3</span> 按索引合并<a id="org87ac442"></a></h5>
+<div id="outline-container-orgee9b641" class="outline-5">
+<h5 id="orgee9b641"><span class="section-number-5">4.2.1.3</span> 按索引合并<a id="org8a8d1c2"></a></h5>
 <div class="outline-text-5" id="text-4-2-1-3">
 <div class="org-src-container">
 <pre class="src src-ipython">  <span style="color: #fd971f;">left1</span> = pd.DataFrame({
@@ -4482,8 +4488,8 @@ e   5.0     6.0      13.0     14.0
 </div>
 
 
-<div id="outline-container-orgdd59081" class="outline-5">
-<h5 id="orgdd59081"><span class="section-number-5">4.2.1.4</span> join</h5>
+<div id="outline-container-org29e158b" class="outline-5">
+<h5 id="org29e158b"><span class="section-number-5">4.2.1.4</span> join</h5>
 <div class="outline-text-5" id="text-4-2-1-4">
 <p>
 DataFrame 有一个方便的 <code>join</code> 方法，底层仍然是使用 <code>merge</code> ，用于 <b>按照索引合并</b> 。(_默认是左连接_)
@@ -4626,11 +4632,11 @@ e     5       6      13.0     14.0        11      12
 </div>
 
 
-<div id="outline-container-org2bbb0b7" class="outline-4">
-<h4 id="org2bbb0b7"><span class="section-number-4">4.2.2</span> concat</h4>
+<div id="outline-container-org20c78c6" class="outline-4">
+<h4 id="org20c78c6"><span class="section-number-4">4.2.2</span> concat</h4>
 <div class="outline-text-4" id="text-4-2-2">
 <p>
-<code>concat</code> 方法本质其实就是<a href="#org87ac442">按索引合并</a> ，默认情况下 <code>concat</code> 方法是沿着 <code>axis = 0</code> 的轴向生效的，
+<code>concat</code> 方法本质其实就是<a href="#org8a8d1c2">按索引合并</a> ，默认情况下 <code>concat</code> 方法是沿着 <code>axis = 0</code> 的轴向生效的，
 <b>生成另一个 Series</b> ；如传递 <code>axis = 1</code> ， <b>返回的结果则是 DataFrame</b> 。
 </p>
 
@@ -4719,8 +4725,8 @@ b  1  1
 </div>
 
 
-<div id="outline-container-orgd121107" class="outline-5">
-<h5 id="orgd121107"><span class="section-number-5">4.2.2.1</span> join_axes</h5>
+<div id="outline-container-org8e83fb2" class="outline-5">
+<h5 id="org8e83fb2"><span class="section-number-5">4.2.2.1</span> join_axes</h5>
 <div class="outline-text-5" id="text-4-2-2-1">
 <p>
 可以使用 <code>join_axes</code> 来指定其他轴向的轴：
@@ -4744,8 +4750,8 @@ e  NaN  NaN
 </div>
 
 
-<div id="outline-container-org493af5b" class="outline-5">
-<h5 id="org493af5b"><span class="section-number-5">4.2.2.2</span> 区分拼接在一起的各部分</h5>
+<div id="outline-container-org10fa929" class="outline-5">
+<h5 id="org10fa929"><span class="section-number-5">4.2.2.2</span> 区分拼接在一起的各部分</h5>
 <div class="outline-text-5" id="text-4-2-2-2">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">result</span> = pd.concat([s1, s2, s3], keys=[<span style="color: #e6db74;">'one'</span>, <span style="color: #e6db74;">'two'</span>, <span style="color: #e6db74;">'three'</span>])
@@ -4853,8 +4859,8 @@ c      4   5    7.0  8.0
 </div>
 
 
-<div id="outline-container-org5def81a" class="outline-5">
-<h5 id="org5def81a"><span class="section-number-5">4.2.2.3</span> ignore_index</h5>
+<div id="outline-container-org1a89b63" class="outline-5">
+<h5 id="org1a89b63"><span class="section-number-5">4.2.2.3</span> ignore_index</h5>
 <div class="outline-text-5" id="text-4-2-2-3">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">df1</span> = pd.DataFrame(np.random.randn(3, 4), columns=<span style="color: #a6e22e;">list</span>(<span style="color: #e6db74;">'abcd'</span>))
@@ -4899,8 +4905,8 @@ log(<span style="color: #e6db74;">"pd.concat([df1, df2], ignore_index=True)"</sp
 
 
 
-<div id="outline-container-org40670d6" class="outline-4">
-<h4 id="org40670d6"><span class="section-number-4">4.2.3</span> combine_first</h4>
+<div id="outline-container-orge3fcae6" class="outline-4">
+<h4 id="orge3fcae6"><span class="section-number-4">4.2.3</span> combine_first</h4>
 <div class="outline-text-4" id="text-4-2-3">
 <p>
 <code>combine_first</code> 既不是合并操作，也不是连接操作，它是用来填补调用对象的缺失值：
@@ -4999,12 +5005,12 @@ log(<span style="color: #e6db74;">"df1.combine_first(df2)"</span>, df1.combine_f
 </div>
 
 
-<div id="outline-container-org823bd43" class="outline-3">
-<h3 id="org823bd43"><span class="section-number-3">4.3</span> 重排列表格型数据</h3>
+<div id="outline-container-org0c1736d" class="outline-3">
+<h3 id="org0c1736d"><span class="section-number-3">4.3</span> 重排列表格型数据</h3>
 <div class="outline-text-3" id="text-4-3">
 </div>
-<div id="outline-container-org9835d4f" class="outline-4">
-<h4 id="org9835d4f"><span class="section-number-4">4.3.1</span> 使用多层索引进行重塑(stack/unstack)</h4>
+<div id="outline-container-orgf6a442d" class="outline-4">
+<h4 id="orgf6a442d"><span class="section-number-4">4.3.1</span> 使用多层索引进行重塑(stack/unstack)</h4>
 <div class="outline-text-4" id="text-4-3-1">
 <ul class="org-ul">
 <li><p>
@@ -5145,8 +5151,8 @@ dtype: float64
 </div>
 
 
-<div id="outline-container-org4ad92ca" class="outline-4">
-<h4 id="org4ad92ca"><span class="section-number-4">4.3.2</span> 将列的值转换为列索引(pivot)</h4>
+<div id="outline-container-orgc030043" class="outline-4">
+<h4 id="orgc030043"><span class="section-number-4">4.3.2</span> 将列的值转换为列索引(pivot)</h4>
 <div class="outline-text-4" id="text-4-3-2">
 <p>
 <code>pivot(&lt;用作行索引的列&gt;, &lt;用作列索引的列&gt;, &lt;可选的数值列&gt;)</code>
@@ -5258,8 +5264,8 @@ date
 
 
 
-<div id="outline-container-org4c280b5" class="outline-4">
-<h4 id="org4c280b5"><span class="section-number-4">4.3.3</span> 将列索引转换为列的值(melt)</h4>
+<div id="outline-container-orgb3ad0ff" class="outline-4">
+<h4 id="orgb3ad0ff"><span class="section-number-4">4.3.3</span> 将列索引转换为列的值(melt)</h4>
 <div class="outline-text-4" id="text-4-3-3">
 
 <div class="figure">
@@ -5310,8 +5316,8 @@ log(<span style="color: #e6db74;">"pd.melt(df, ['key'])"</span>, pd.melt(df, [<s
 </pre>
 </div>
 
-<div id="outline-container-org4ac4ceb" class="outline-5">
-<h5 id="org4ac4ceb"><span class="section-number-5">4.3.3.1</span> 使用pivot将数据重塑会原先的布局</h5>
+<div id="outline-container-orgbf41c70" class="outline-5">
+<h5 id="orgbf41c70"><span class="section-number-5">4.3.3.1</span> 使用pivot将数据重塑会原先的布局</h5>
 <div class="outline-text-5" id="text-4-3-3-1">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">reshaped</span> = pd.melt(df, [<span style="color: #e6db74;">'key'</span>]).pivot(<span style="color: #e6db74;">'key'</span>, <span style="color: #e6db74;">'variable'</span>, <span style="color: #e6db74;">'value'</span>)
@@ -5337,8 +5343,8 @@ variable  key  A  B  C
 </div>
 
 
-<div id="outline-container-org04f3d5f" class="outline-5">
-<h5 id="org04f3d5f"><span class="section-number-5">4.3.3.2</span> 指定列的子集作为值列</h5>
+<div id="outline-container-org1073df7" class="outline-5">
+<h5 id="org1073df7"><span class="section-number-5">4.3.3.2</span> 指定列的子集作为值列</h5>
 <div class="outline-text-5" id="text-4-3-3-2">
 <div class="org-src-container">
 <pre class="src src-ipython">log(<span style="color: #e6db74;">"pd.melt(df, id_vars=['key'], value_vars=['A', 'B'])"</span>, pd.melt(df, id_vars=[<span style="color: #e6db74;">'key'</span>], value_vars=[<span style="color: #e6db74;">'A'</span>, <span style="color: #e6db74;">'B'</span>]))
@@ -5361,8 +5367,8 @@ variable  key  A  B  C
 
 
 
-<div id="outline-container-orgbb7c7db" class="outline-5">
-<h5 id="orgbb7c7db"><span class="section-number-5">4.3.3.3</span> 不指定分组指标</h5>
+<div id="outline-container-org1bca7ce" class="outline-5">
+<h5 id="org1bca7ce"><span class="section-number-5">4.3.3.3</span> 不指定分组指标</h5>
 <div class="outline-text-5" id="text-4-3-3-3">
 <div class="org-src-container">
 <pre class="src src-ipython">log(<span style="color: #e6db74;">"df"</span>, df)
@@ -5408,12 +5414,12 @@ log(<span style="color: #e6db74;">"pd.melt(df, value_vars=['key', 'A', 'C'])"</s
 
 
 
-<div id="outline-container-orgc175106" class="outline-2">
-<h2 id="orgc175106"><span class="section-number-2">5</span> 聚合与分组操作</h2>
+<div id="outline-container-org3bbbc12" class="outline-2">
+<h2 id="org3bbbc12"><span class="section-number-2">5</span> 聚合与分组操作</h2>
 <div class="outline-text-2" id="text-5">
 </div>
-<div id="outline-container-orgf75ab84" class="outline-3">
-<h3 id="orgf75ab84"><span class="section-number-3">5.1</span> GroupBy 对象</h3>
+<div id="outline-container-org72c9349" class="outline-3">
+<h3 id="org72c9349"><span class="section-number-3">5.1</span> GroupBy 对象</h3>
 <div class="outline-text-3" id="text-5-1">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">df</span> = pd.DataFrame({<span style="color: #e6db74;">'key1'</span> : [<span style="color: #e6db74;">'a'</span>, <span style="color: #e6db74;">'a'</span>, <span style="color: #e6db74;">'b'</span>, <span style="color: #e6db74;">'b'</span>, <span style="color: #e6db74;">'a'</span>],
@@ -5431,25 +5437,50 @@ log(<span style="color: #e6db74;">"dict(list(grouped))['a']"</span>, <span style
 <pre class="example">
 ====================================== df ======================================
   key1 key2     data1     data2
-0    a  one -0.199651 -0.279757
-1    a  two -1.053575  0.356160
-2    b  one  2.185409  1.448519
-3    b  two -0.701065  1.565013
-4    a  one  0.666953  0.000710
+0    a  one  0.560161  0.462387
+1    a  two -0.815368 -0.866780
+2    b  one  1.004914  0.653270
+3    b  two  0.361801 -1.956438
+4    a  one -0.340487 -0.128474
 =================================== grouped ====================================
-&lt;pandas.core.groupby.groupby.DataFrameGroupBy object at 0x1110303c8&gt;
+&lt;pandas.core.groupby.groupby.DataFrameGroupBy object at 0x11ac212b0&gt;
 =========================== dict(list(grouped))['a'] ===========================
   key1 key2     data1     data2
-0    a  one -0.199651 -0.279757
-1    a  two -1.053575  0.356160
-4    a  one  0.666953  0.000710
+0    a  one  0.560161  0.462387
+1    a  two -0.815368 -0.866780
+4    a  one -0.340487 -0.128474
 </pre>
 </div>
 
-
-<div id="outline-container-org2ca80de" class="outline-4">
-<h4 id="org2ca80de"><span class="section-number-4">5.1.1</span> GroupBy 对象的列索引</h4>
+<div id="outline-container-org5c13718" class="outline-4">
+<h4 id="org5c13718"><span class="section-number-4">5.1.1</span> 获取某个 Group (get_group)</h4>
 <div class="outline-text-4" id="text-5-1-1">
+<div class="org-src-container">
+<pre class="src src-ipython">log(<span style="color: #e6db74;">"df"</span>, df)
+log(<span style="color: #e6db74;">"df.groupby('key1').get_group('a')"</span>, df.groupby(<span style="color: #e6db74;">'key1'</span>).get_group(<span style="color: #e6db74;">'a'</span>))
+</pre>
+</div>
+
+<pre class="example">
+====================================== df ======================================
+  key1 key2     data1     data2
+0    a  one  0.560161  0.462387
+1    a  two -0.815368 -0.866780
+2    b  one  1.004914  0.653270
+3    b  two  0.361801 -1.956438
+4    a  one -0.340487 -0.128474
+====================== df.groupby('key1').get_group('a') =======================
+  key1 key2     data1     data2
+0    a  one  0.560161  0.462387
+1    a  two -0.815368 -0.866780
+4    a  one -0.340487 -0.128474
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org3b78027" class="outline-4">
+<h4 id="org3b78027"><span class="section-number-4">5.1.2</span> GroupBy 对象的列索引</h4>
+<div class="outline-text-4" id="text-5-1-2">
 <p>
 对 <code>GroupBy</code> 对象进行列索引，等效于对该列或列的子集做聚合。
 </p>
@@ -5532,9 +5563,9 @@ Name: data2, dtype: float64
 </div>
 
 
-<div id="outline-container-org2bc3a26" class="outline-4">
-<h4 id="org2bc3a26"><span class="section-number-4">5.1.2</span> 使用字典和Series分组</h4>
-<div class="outline-text-4" id="text-5-1-2">
+<div id="outline-container-org8afee18" class="outline-4">
+<h4 id="org8afee18"><span class="section-number-4">5.1.3</span> 使用字典和Series分组</h4>
+<div class="outline-text-4" id="text-5-1-3">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">people</span> = pd.DataFrame(np.random.randn(5, 5),
                       columns=<span style="color: #a6e22e;">list</span>(<span style="color: #e6db74;">'abcde'</span>),
@@ -5600,9 +5631,9 @@ Travis     2    3
 </div>
 
 
-<div id="outline-container-org94e16fa" class="outline-4">
-<h4 id="org94e16fa"><span class="section-number-4">5.1.3</span> 使用函数分组</h4>
-<div class="outline-text-4" id="text-5-1-3">
+<div id="outline-container-orgb653410" class="outline-4">
+<h4 id="orgb653410"><span class="section-number-4">5.1.4</span> 使用函数分组</h4>
+<div class="outline-text-4" id="text-5-1-4">
 <p>
 使用函数定义分组关系是一种更为通用的方式，
 作为分组键传递的函数将会按照每个索引值调用一次，返回值会被用作分组名称。
@@ -5631,9 +5662,9 @@ Travis  0.381503  0.533020  0.446621  1.446923 -0.279701
 </div>
 
 
-<div id="outline-container-org086d57c" class="outline-5">
-<h5 id="org086d57c"><span class="section-number-5">5.1.3.1</span> 与其他分组键混合</h5>
-<div class="outline-text-5" id="text-5-1-3-1">
+<div id="outline-container-orgb131d54" class="outline-5">
+<h5 id="orgb131d54"><span class="section-number-5">5.1.4.1</span> 与其他分组键混合</h5>
+<div class="outline-text-5" id="text-5-1-4-1">
 <p>
 <span class="underline">所有的对象都会在内部转换为数组</span>
 </p>
@@ -5665,9 +5696,9 @@ Travis  0.381503  0.533020  0.446621  1.446923 -0.279701
 </div>
 
 
-<div id="outline-container-orgfbf5768" class="outline-4">
-<h4 id="orgfbf5768"><span class="section-number-4">5.1.4</span> 根据索引层级分组</h4>
-<div class="outline-text-4" id="text-5-1-4">
+<div id="outline-container-org7658ffb" class="outline-4">
+<h4 id="org7658ffb"><span class="section-number-4">5.1.5</span> 根据索引层级分组</h4>
+<div class="outline-text-4" id="text-5-1-5">
 <p>
 能够在轴索引的某个层级上进行聚合。
 </p>
@@ -5710,8 +5741,8 @@ cty  JP  US
 
 
 
-<div id="outline-container-orga2fc2d8" class="outline-3">
-<h3 id="orga2fc2d8"><span class="section-number-3">5.2</span> 数据聚合</h3>
+<div id="outline-container-org262febb" class="outline-3">
+<h3 id="org262febb"><span class="section-number-3">5.2</span> 数据聚合</h3>
 <div class="outline-text-3" id="text-5-2">
 
 <div class="figure">
@@ -5722,8 +5753,8 @@ cty  JP  US
 
 
 
-<div id="outline-container-org720b038" class="outline-4">
-<h4 id="org720b038"><span class="section-number-4">5.2.1</span> 对GroupBy对象调用聚合方法</h4>
+<div id="outline-container-orgc7f7e9a" class="outline-4">
+<h4 id="orgc7f7e9a"><span class="section-number-4">5.2.1</span> 对GroupBy对象调用聚合方法</h4>
 <div class="outline-text-4" id="text-5-2-1">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">df</span> = pd.DataFrame({<span style="color: #e6db74;">'key1'</span> : [<span style="color: #e6db74;">'a'</span>, <span style="color: #e6db74;">'a'</span>, <span style="color: #e6db74;">'b'</span>, <span style="color: #e6db74;">'b'</span>, <span style="color: #e6db74;">'a'</span>],
@@ -5776,12 +5807,12 @@ b     1.205490  0.138605
 
 
 
-<div id="outline-container-orga30e0e7" class="outline-4">
-<h4 id="orga30e0e7"><span class="section-number-4">5.2.2</span> 逐列与多函数应用</h4>
+<div id="outline-container-orgfd803db" class="outline-4">
+<h4 id="orgfd803db"><span class="section-number-4">5.2.2</span> 逐列与多函数应用</h4>
 <div class="outline-text-4" id="text-5-2-2">
 </div>
-<div id="outline-container-orgf06ba54" class="outline-5">
-<h5 id="orgf06ba54"><span class="section-number-5">5.2.2.1</span> 各列同时使用多个函数聚合</h5>
+<div id="outline-container-orgd450f30" class="outline-5">
+<h5 id="orgd450f30"><span class="section-number-5">5.2.2.1</span> 各列同时使用多个函数聚合</h5>
 <div class="outline-text-5" id="text-5-2-2-1">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">data</span> = [
@@ -5844,8 +5875,8 @@ Sun Yes     0.171123  0.013436
 </div>
 </div>
 
-<div id="outline-container-org259b2a1" class="outline-5">
-<h5 id="org259b2a1"><span class="section-number-5">5.2.2.2</span> 使用不同的函数对多个列聚合</h5>
+<div id="outline-container-orge9e559c" class="outline-5">
+<h5 id="orge9e559c"><span class="section-number-5">5.2.2.2</span> 使用不同的函数对多个列聚合</h5>
 <div class="outline-text-5" id="text-5-2-2-2">
 <p>
 只有多个函数应用于至少一个列时，DataFrame 才具有分层列。
@@ -5880,8 +5911,8 @@ Sun Yes     0.160542  0.186240  0.171123  0.013436   10
 
 
 
-<div id="outline-container-org8fe8ad7" class="outline-4">
-<h4 id="org8fe8ad7"><span class="section-number-4">5.2.3</span> 返回不含行索引的聚合数据</h4>
+<div id="outline-container-org4337650" class="outline-4">
+<h4 id="org4337650"><span class="section-number-4">5.2.3</span> 返回不含行索引的聚合数据</h4>
 <div class="outline-text-4" id="text-5-2-3">
 <p>
 通过向 <code>groupby</code> 传递 <code>as_index = False</code> 来禁用分组键作为索引的行为：
@@ -5906,8 +5937,8 @@ Sun Yes     0.160542  0.186240  0.171123  0.013436   10
 </div>
 
 
-<div id="outline-container-orgb2f8002" class="outline-4">
-<h4 id="orgb2f8002"><span class="section-number-4">5.2.4</span> GroupBy.apply</h4>
+<div id="outline-container-orgf3f5272" class="outline-4">
+<h4 id="orgf3f5272"><span class="section-number-4">5.2.4</span> GroupBy.apply</h4>
 <div class="outline-text-4" id="text-5-2-4">
 <p>
 <code>GroupBy.agg</code> 方法将一个函数使用在一个数列上，然后返回一个标量的值。即每次传入的是一列数据，对其聚合后返回标量。
@@ -5968,8 +5999,8 @@ b    8    b  two      9      1
 </div>
 
 
-<div id="outline-container-org1e97349" class="outline-4">
-<h4 id="org1e97349"><span class="section-number-4">5.2.5</span> 禁用分组键(group_keys=False)</h4>
+<div id="outline-container-orgb20e452" class="outline-4">
+<h4 id="orgb20e452"><span class="section-number-4">5.2.5</span> 禁用分组键(group_keys=False)</h4>
 <div class="outline-text-4" id="text-5-2-5">
 <p>
 当返回结果集中不需要体现分组信息时，可以使用该参数。
@@ -6023,8 +6054,8 @@ b    8    b  two      7      1
 </div>
 
 
-<div id="outline-container-org471c29a" class="outline-4">
-<h4 id="org471c29a"><span class="section-number-4">5.2.6</span> GroupBy.transform</h4>
+<div id="outline-container-orgdbab16b" class="outline-4">
+<h4 id="orgdbab16b"><span class="section-number-4">5.2.6</span> GroupBy.transform</h4>
 <div class="outline-text-4" id="text-5-2-6">
 <p>
 <code>GroupBy.transform</code> 传递一个函数 <code>f(x)</code> ，
@@ -6045,8 +6076,8 @@ b    8    b  two      7      1
 
 
 
-<div id="outline-container-org6e0247b" class="outline-4">
-<h4 id="org6e0247b"><span class="section-number-4">5.2.7</span> 时间分组重采样(resample)</h4>
+<div id="outline-container-org7491191" class="outline-4">
+<h4 id="org7491191"><span class="section-number-4">5.2.7</span> 时间分组重采样(resample)</h4>
 <div class="outline-text-4" id="text-5-2-7">
 <p>
 对时间序列数据而言， <code>resample</code> 方法从语义上讲可以认为也是分组操作。
@@ -6089,8 +6120,8 @@ time
 </pre>
 </div>
 
-<div id="outline-container-org76338cf" class="outline-5">
-<h5 id="org76338cf"><span class="section-number-5">5.2.7.1</span> TimeGrouper 对象</h5>
+<div id="outline-container-org7b53d24" class="outline-5">
+<h5 id="org7b53d24"><span class="section-number-5">5.2.7.1</span> TimeGrouper 对象</h5>
 <div class="outline-text-5" id="text-5-2-7-1">
 <p>
 使用 TimeGrouper 对象 <span class="underline">必须保证</span> 'time' 是 Series 或 DataFrame 的索引。
@@ -6166,8 +6197,8 @@ c   2017-05-20 00:00:00   40.0
 </div>
 
 
-<div id="outline-container-orga58e174" class="outline-3">
-<h3 id="orga58e174"><span class="section-number-3">5.3</span> 透视表(pivot_table)</h3>
+<div id="outline-container-orgb208f97" class="outline-3">
+<h3 id="orgb208f97"><span class="section-number-3">5.3</span> 透视表(pivot_table)</h3>
 <div class="outline-text-3" id="text-5-3">
 <p>
 透视表是通过 <code>groupby</code> 以及使用分层索引的重塑操作实现的。
@@ -6264,8 +6295,8 @@ All      11   8  11  31  28  31
 </div>
 
 
-<div id="outline-container-org02e7d4d" class="outline-3">
-<h3 id="org02e7d4d"><span class="section-number-3">5.4</span> 交叉表(cross_table)</h3>
+<div id="outline-container-orgdc82581" class="outline-3">
+<h3 id="orgdc82581"><span class="section-number-3">5.4</span> 交叉表(cross_table)</h3>
 <div class="outline-text-3" id="text-5-4">
 <p>
 交叉表是透视表的一个特殊情况， <span class="underline">计算的是分组中的频率</span> 。
@@ -6323,11 +6354,11 @@ All                   3            7  10
 </div>
 
 
-<div id="outline-container-org5490c35" class="outline-3">
-<h3 id="org5490c35"><span class="section-number-3">5.5</span> Categorial 类型数据</h3>
+<div id="outline-container-org745789b" class="outline-3">
+<h3 id="org745789b"><span class="section-number-3">5.5</span> Categorial 类型数据</h3>
 <div class="outline-text-3" id="text-5-5">
 <p>
-在<a href="#org588133e">使用 take 优化内存</a>的例子中，使用整数数组 (<code>values</code>) 的表达方式被称为 <span class="underline">categorical</span> 表示法，
+在<a href="#org05a02ee">使用 take 优化内存</a>的例子中，使用整数数组 (<code>values</code>) 的表达方式被称为 <span class="underline">categorical</span> 表示法，
 <code>values</code> 被称为 <span class="underline">codes</span> ， <code>dim</code> 被称为 <span class="underline">categories</span> 。
 </p>
 
@@ -6414,8 +6445,8 @@ Index(['apple', 'orange'], dtype='object')
 </div>
 
 
-<div id="outline-container-org82fbd0d" class="outline-4">
-<h4 id="org82fbd0d"><span class="section-number-4">5.5.1</span> 直接创建 Categorical 对象</h4>
+<div id="outline-container-orga3e1a15" class="outline-4">
+<h4 id="orga3e1a15"><span class="section-number-4">5.5.1</span> 直接创建 Categorical 对象</h4>
 <div class="outline-text-4" id="text-5-5-1">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">my_categories</span> = pd.Categorical([<span style="color: #e6db74;">'foo'</span>, <span style="color: #e6db74;">'bar'</span>, <span style="color: #e6db74;">'baz'</span>, <span style="color: #e6db74;">'foo'</span>, <span style="color: #e6db74;">'bar'</span>])
@@ -6442,8 +6473,8 @@ Categories (3, object): [foo, bar, baz]
 </div>
 
 
-<div id="outline-container-org35f8fdb" class="outline-4">
-<h4 id="org35f8fdb"><span class="section-number-4">5.5.2</span> Categorical 对象排序规则</h4>
+<div id="outline-container-org4a5eb17" class="outline-4">
+<h4 id="org4a5eb17"><span class="section-number-4">5.5.2</span> Categorical 对象排序规则</h4>
 <div class="outline-text-4" id="text-5-5-2">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">ordered_cat</span> = pd.Categorical.from_codes(codes, categories, ordered=<span style="color: #ae81ff;">True</span>)
@@ -6471,8 +6502,8 @@ Categories (3, object): [foo &lt; bar &lt; baz]
 </div>
 
 
-<div id="outline-container-org091218a" class="outline-4">
-<h4 id="org091218a"><span class="section-number-4">5.5.3</span> 使用 Categorical 对象进行分箱统计</h4>
+<div id="outline-container-org2c55124" class="outline-4">
+<h4 id="org2c55124"><span class="section-number-4">5.5.3</span> 使用 Categorical 对象进行分箱统计</h4>
 <div class="outline-text-4" id="text-5-5-3">
 <div class="org-src-container">
 <pre class="src src-ipython">np.random.seed(12345)
@@ -6515,8 +6546,8 @@ Categories (4, object): [Q1 &lt; Q2 &lt; Q3 &lt; Q4]
 </div>
 
 
-<div id="outline-container-org4409cac" class="outline-4">
-<h4 id="org4409cac"><span class="section-number-4">5.5.4</span> 使用 Categorical 对象的性能优势</h4>
+<div id="outline-container-orgceb66ea" class="outline-4">
+<h4 id="orgceb66ea"><span class="section-number-4">5.5.4</span> 使用 Categorical 对象的性能优势</h4>
 <div class="outline-text-4" id="text-5-5-4">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">N</span> = 10000000
@@ -6557,16 +6588,16 @@ Wall time: 518 ms
 
 
 
-<div id="outline-container-org51638e2" class="outline-2">
-<h2 id="org51638e2"><span class="section-number-2">6</span> 时间序列</h2>
+<div id="outline-container-org8ecbcde" class="outline-2">
+<h2 id="org8ecbcde"><span class="section-number-2">6</span> 时间序列</h2>
 <div class="outline-text-2" id="text-6">
 </div>
-<div id="outline-container-org0fdd00f" class="outline-3">
-<h3 id="org0fdd00f"><span class="section-number-3">6.1</span> 时间选择</h3>
+<div id="outline-container-org4e52f7d" class="outline-3">
+<h3 id="org4e52f7d"><span class="section-number-3">6.1</span> 时间选择</h3>
 <div class="outline-text-3" id="text-6-1">
 </div>
-<div id="outline-container-orga8a406b" class="outline-4">
-<h4 id="orga8a406b"><span class="section-number-4">6.1.1</span> 使用能解释为日期的字符串</h4>
+<div id="outline-container-org414d4cf" class="outline-4">
+<h4 id="org414d4cf"><span class="section-number-4">6.1.1</span> 使用能解释为日期的字符串</h4>
 <div class="outline-text-4" id="text-6-1-1">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #f92672; font-weight: bold;">from</span> datetime <span style="color: #f92672; font-weight: bold;">import</span> datetime
@@ -6607,8 +6638,8 @@ log(<span style="color: #e6db74;">"ts['20110110']"</span>, ts[<span style="color
 </div>
 
 
-<div id="outline-container-orgbdfb05e" class="outline-4">
-<h4 id="orgbdfb05e"><span class="section-number-4">6.1.2</span> 使用年份或月份选择数据切片</h4>
+<div id="outline-container-org409ce9c" class="outline-4">
+<h4 id="org409ce9c"><span class="section-number-4">6.1.2</span> 使用年份或月份选择数据切片</h4>
 <div class="outline-text-4" id="text-6-1-2">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">longer_ts</span> = pd.Series(np.random.randn(1000),
@@ -6669,12 +6700,12 @@ dtype: float64
 </div>
 
 
-<div id="outline-container-org06e48fc" class="outline-3">
-<h3 id="org06e48fc"><span class="section-number-3">6.2</span> 日期范围，频率，偏移</h3>
+<div id="outline-container-orge3f6438" class="outline-3">
+<h3 id="orge3f6438"><span class="section-number-3">6.2</span> 日期范围，频率，偏移</h3>
 <div class="outline-text-3" id="text-6-2">
 </div>
-<div id="outline-container-orgc1c0201" class="outline-4">
-<h4 id="orgc1c0201"><span class="section-number-4">6.2.1</span> 生成范围</h4>
+<div id="outline-container-orgfa856c7" class="outline-4">
+<h4 id="orgfa856c7"><span class="section-number-4">6.2.1</span> 生成范围</h4>
 <div class="outline-text-4" id="text-6-2-1">
 <div class="org-src-container">
 <pre class="src src-ipython">log(<span style="color: #e6db74;">"pd.date_range('2012-04-01', '2012-04-20')"</span>, pd.date_range(<span style="color: #e6db74;">'2012-04-01'</span>, <span style="color: #e6db74;">'2012-04-20'</span>))
@@ -6707,8 +6738,8 @@ DatetimeIndex(['2000-01-31', '2000-02-29', '2000-03-31', '2000-04-28',
 </div>
 
 
-<div id="outline-container-org3d1c7b2" class="outline-4">
-<h4 id="org3d1c7b2"><span class="section-number-4">6.2.2</span> 日期频率</h4>
+<div id="outline-container-orgb349c07" class="outline-4">
+<h4 id="orgb349c07"><span class="section-number-4">6.2.2</span> 日期频率</h4>
 <div class="outline-text-4" id="text-6-2-2">
 <div class="org-src-container">
 <pre class="src src-ipython">log(<span style="color: #e6db74;">"pd.date_range('2000-01-01', '2000-12-01', freq='BM')"</span>, pd.date_range(<span style="color: #e6db74;">'2000-01-01'</span>, <span style="color: #e6db74;">'2000-12-01'</span>, freq=<span style="color: #e6db74;">'BM'</span>))
@@ -6732,8 +6763,8 @@ DatetimeIndex(['2000-01-01 00:00:00', '2000-01-01 01:30:00',
 </pre>
 </div>
 
-<div id="outline-container-orgcfdd24c" class="outline-5">
-<h5 id="orgcfdd24c"><span class="section-number-5">6.2.2.1</span> 月中某星期</h5>
+<div id="outline-container-org09ede7e" class="outline-5">
+<h5 id="org09ede7e"><span class="section-number-5">6.2.2.1</span> 月中某星期</h5>
 <div class="outline-text-5" id="text-6-2-2-1">
 <div class="org-src-container">
 <pre class="src src-ipython">log(<span style="color: #e6db74;">"list(pd.date_range('2012-01-01', '2012-06-01', freq='WOM-3FRI'))"</span>, <span style="color: #a6e22e;">list</span>(pd.date_range(<span style="color: #e6db74;">'2012-01-01'</span>, <span style="color: #e6db74;">'2012-06-01'</span>, freq=<span style="color: #e6db74;">'WOM-3FRI'</span>)))
@@ -6754,12 +6785,12 @@ DatetimeIndex(['2000-01-01 00:00:00', '2000-01-01 01:30:00',
 </div>
 
 
-<div id="outline-container-org28eca29" class="outline-4">
-<h4 id="org28eca29"><span class="section-number-4">6.2.3</span> 日期偏移</h4>
+<div id="outline-container-org5ee9a09" class="outline-4">
+<h4 id="org5ee9a09"><span class="section-number-4">6.2.3</span> 日期偏移</h4>
 <div class="outline-text-4" id="text-6-2-3">
 </div>
-<div id="outline-container-org982cf69" class="outline-5">
-<h5 id="org982cf69"><span class="section-number-5">6.2.3.1</span> 推移数据不改变时间戳</h5>
+<div id="outline-container-org093d5e1" class="outline-5">
+<h5 id="org093d5e1"><span class="section-number-5">6.2.3.1</span> 推移数据不改变时间戳</h5>
 <div class="outline-text-5" id="text-6-2-3-1">
 <p>
 Series 和 DataFrame 都有一个 <code>shift</code> 方法用于进行简单的前向或后向移位，而 <b>不改变索引</b> ：
@@ -6829,8 +6860,8 @@ Freq: M, dtype: float64
 </div>
 </div>
 
-<div id="outline-container-org1172fbb" class="outline-5">
-<h5 id="org1172fbb"><span class="section-number-5">6.2.3.2</span> 推移数据不改变时间戳</h5>
+<div id="outline-container-org85af320" class="outline-5">
+<h5 id="org85af320"><span class="section-number-5">6.2.3.2</span> 推移数据不改变时间戳</h5>
 <div class="outline-text-5" id="text-6-2-3-2">
 <p>
 传递一个频率参数
@@ -6876,21 +6907,57 @@ Freq: M, dtype: float64
 </div>
 
 
-<div id="outline-container-org2f72f6a" class="outline-3">
-<h3 id="org2f72f6a"><span class="section-number-3">6.3</span> 重采样(resample)</h3>
+<div id="outline-container-org0baa236" class="outline-3">
+<h3 id="org0baa236"><span class="section-number-3">6.3</span> 重采样(resample)</h3>
 <div class="outline-text-3" id="text-6-3">
 <p>
 <code>resample</code> 有和 <code>groupby</code> 相似的 API ：调用 <code>resample</code> 对数据分组，再使用聚合函数。
 </p>
 </div>
 
-<div id="outline-container-org4d5006d" class="outline-4">
-<h4 id="org4d5006d"><span class="section-number-4">6.3.1</span> 下采样</h4>
+<div id="outline-container-org294fe02" class="outline-4">
+<h4 id="org294fe02"><span class="section-number-4">6.3.1</span> 下采样</h4>
 <div class="outline-text-4" id="text-6-3-1">
 </div>
-<div id="outline-container-org9279d79" class="outline-5">
-<h5 id="org9279d79"><span class="section-number-5">6.3.1.1</span> 半开区间</h5>
+<div id="outline-container-orge5102d2" class="outline-5">
+<h5 id="orge5102d2"><span class="section-number-5">6.3.1.1</span> 采样时间基数(base)</h5>
 <div class="outline-text-5" id="text-6-3-1-1">
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #fd971f;">rng</span> = pd.date_range(<span style="color: #e6db74;">'2000-01-01'</span>, periods=12, freq=<span style="color: #e6db74;">'T'</span>)
+<span style="color: #fd971f;">ts</span> = pd.Series(np.arange(12), index=rng)
+log(<span style="color: #e6db74;">"ts"</span>, ts)
+log(<span style="color: #e6db74;">"ts.resample('5min', base=3).sum()"</span>, ts.resample(<span style="color: #e6db74;">'5min'</span>, base=3).<span style="color: #a6e22e;">sum</span>())
+</pre>
+</div>
+
+<pre class="example">
+====================================== ts ======================================
+2000-01-01 00:00:00     0
+2000-01-01 00:01:00     1
+2000-01-01 00:02:00     2
+2000-01-01 00:03:00     3
+2000-01-01 00:04:00     4
+2000-01-01 00:05:00     5
+2000-01-01 00:06:00     6
+2000-01-01 00:07:00     7
+2000-01-01 00:08:00     8
+2000-01-01 00:09:00     9
+2000-01-01 00:10:00    10
+2000-01-01 00:11:00    11
+Freq: T, dtype: int64
+====================== ts.resample('5min', base=3).sum() =======================
+1999-12-31 23:58:00     3
+2000-01-01 00:03:00    25
+2000-01-01 00:08:00    38
+Freq: 5T, dtype: int64
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-orgd29a3cf" class="outline-5">
+<h5 id="orgd29a3cf"><span class="section-number-5">6.3.1.2</span> 半开区间</h5>
+<div class="outline-text-5" id="text-6-3-1-2">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">rng</span> = pd.date_range(<span style="color: #e6db74;">'2000-01-01'</span>, periods=12, freq=<span style="color: #e6db74;">'T'</span>)
 <span style="color: #fd971f;">ts</span> = pd.Series(np.arange(12), index=rng)
@@ -6942,9 +7009,9 @@ Freq: 5T, dtype: int64
 </div>
 
 
-<div id="outline-container-org9a5e994" class="outline-5">
-<h5 id="org9a5e994"><span class="section-number-5">6.3.1.2</span> OHLC 重采样</h5>
-<div class="outline-text-5" id="text-6-3-1-2">
+<div id="outline-container-org2eb0592" class="outline-5">
+<h5 id="org2eb0592"><span class="section-number-5">6.3.1.3</span> OHLC 重采样</h5>
+<div class="outline-text-5" id="text-6-3-1-3">
 <div class="org-src-container">
 <pre class="src src-ipython">log(<span style="color: #e6db74;">"ts"</span>, ts)
 log(<span style="color: #e6db74;">"ts.resample('5min').ohlc()"</span>, ts.resample(<span style="color: #e6db74;">'5min'</span>).ohlc())
@@ -6982,11 +7049,71 @@ Freq: T, dtype: int64
 </pre>
 </div>
 </div>
+
+
+<div id="outline-container-org9d94ab2" class="outline-5">
+<h5 id="org9d94ab2"><span class="section-number-5">6.3.1.4</span> 采样后对各列聚合(agg)</h5>
+<div class="outline-text-5" id="text-6-3-1-4">
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #fd971f;">data</span> = {
+    <span style="color: #e6db74;">'time'</span>: pd.date_range(<span style="color: #e6db74;">'2000-01-01'</span>, periods=100, freq=<span style="color: #e6db74;">'1min'</span>),
+    <span style="color: #e6db74;">'open'</span>: np.random.randn(100) + 10,
+    <span style="color: #e6db74;">'close'</span>: np.random.randn(100) + 10,
+    <span style="color: #e6db74;">'high'</span>: np.random.randn(100) + 12,
+    <span style="color: #e6db74;">'low'</span>: np.random.randn(100) + 8,
+}
+<span style="color: #fd971f;">df</span> = pd.DataFrame(data)
+log(<span style="color: #e6db74;">"df"</span>, df)
+<span style="color: #fd971f;">resampled</span> = df.resample(rule=<span style="color: #e6db74;">'5T'</span>, on=<span style="color: #e6db74;">'time'</span>).agg(
+    {<span style="color: #e6db74;">'open'</span>: <span style="color: #e6db74;">'first'</span>,
+     <span style="color: #e6db74;">'close'</span>: <span style="color: #e6db74;">'last'</span>,
+     <span style="color: #e6db74;">'high'</span>: <span style="color: #e6db74;">'max'</span>,
+     <span style="color: #e6db74;">'low'</span>: <span style="color: #e6db74;">'min'</span>})
+log(<span style="color: #e6db74;">"aggregated after resampled"</span>, resampled.head())
+</pre>
 </div>
 
+<pre class="example">
+====================================== df ======================================
+                  time       open      close       high        low
+0  2000-01-01 00:00:00   9.146496   7.799578  11.566872   6.147550
+1  2000-01-01 00:01:00  10.942898   9.102747  12.169999   6.921685
+2  2000-01-01 00:02:00  11.233265  11.075704  11.652242   9.802494
+3  2000-01-01 00:03:00  10.358937   9.731845  11.896843   8.311956
+4  2000-01-01 00:04:00  10.267060  10.398771  12.488892   7.368275
+5  2000-01-01 00:05:00   9.548366   8.764407  12.788982   5.971080
+6  2000-01-01 00:06:00   9.519593   8.772265  11.671427   8.057322
+7  2000-01-01 00:07:00  10.298557   9.803158  13.715465   8.899711
+8  2000-01-01 00:08:00  12.245758   8.803445  10.832485   7.200835
+9  2000-01-01 00:09:00  10.296126  10.564759  10.889865  10.642973
+..                 ...        ...        ...        ...        ...
+90 2000-01-01 01:30:00   9.939802   9.796771  11.179146   9.376557
+91 2000-01-01 01:31:00  10.358026  11.978796  10.431962   7.741090
+92 2000-01-01 01:32:00   8.650781  11.865760  10.669237   8.229553
+93 2000-01-01 01:33:00   9.484083  11.292325  10.172697   9.119062
+94 2000-01-01 01:34:00  10.070030   8.810089  11.381976   8.951942
+95 2000-01-01 01:35:00  10.954768  10.365418  13.230260   8.477060
+96 2000-01-01 01:36:00   9.680781  11.158734  11.163112   8.644006
+97 2000-01-01 01:37:00   8.930861   8.888258  11.162988   7.966417
+98 2000-01-01 01:38:00  10.486624   9.810581  10.677597   8.644281
+99 2000-01-01 01:39:00  11.173694   9.248305  13.195259   8.077134
 
-<div id="outline-container-org8a7a544" class="outline-4">
-<h4 id="org8a7a544"><span class="section-number-4">6.3.2</span> 上采样与插值</h4>
+[100 rows x 5 columns]
+========================== aggregated after resampled ==========================
+                          open      close       high       low
+time
+2000-01-01 00:00:00   9.146496  10.398771  12.488892  6.147550
+2000-01-01 00:05:00   9.548366  10.564759  13.715465  5.971080
+2000-01-01 00:10:00  10.600710   9.367298  13.748761  7.213590
+2000-01-01 00:15:00   9.727514  11.136785  13.202317  7.542435
+2000-01-01 00:20:00  10.725193  10.636551  13.756371  6.362015
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0e5cbb1" class="outline-4">
+<h4 id="org0e5cbb1"><span class="section-number-4">6.3.2</span> 上采样与插值</h4>
 <div class="outline-text-4" id="text-6-3-2">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">frame</span> = pd.DataFrame(np.random.randn(2, 4),
@@ -7032,16 +7159,16 @@ log(<span style="color: #e6db74;">"frame.resample('D').ffill()"</span>, frame.re
 
 
 
-<div id="outline-container-orgea518cf" class="outline-2">
-<h2 id="orgea518cf"><span class="section-number-2">7</span> 移动窗口函数</h2>
+<div id="outline-container-org52890b4" class="outline-2">
+<h2 id="org52890b4"><span class="section-number-2">7</span> 移动窗口函数</h2>
 <div class="outline-text-2" id="text-7">
 </div>
-<div id="outline-container-orgf8bb87a" class="outline-3">
-<h3 id="orgf8bb87a"><span class="section-number-3">7.1</span> rolling</h3>
+<div id="outline-container-org27487af" class="outline-3">
+<h3 id="org27487af"><span class="section-number-3">7.1</span> rolling</h3>
 <div class="outline-text-3" id="text-7-1">
 </div>
-<div id="outline-container-org30ada83" class="outline-4">
-<h4 id="org30ada83"><span class="section-number-4">7.1.1</span> 按长度确定窗口</h4>
+<div id="outline-container-orgf154868" class="outline-4">
+<h4 id="orgf154868"><span class="section-number-4">7.1.1</span> 按长度确定窗口</h4>
 <div class="outline-text-4" id="text-7-1-1">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">s</span> = pd.Series(<span style="color: #a6e22e;">range</span>(10))
@@ -7104,8 +7231,8 @@ dtype: float64
 
 
 
-<div id="outline-container-orgff22fab" class="outline-4">
-<h4 id="orgff22fab"><span class="section-number-4">7.1.2</span> 按时间确定窗口</h4>
+<div id="outline-container-org98d683a" class="outline-4">
+<h4 id="org98d683a"><span class="section-number-4">7.1.2</span> 按时间确定窗口</h4>
 <div class="outline-text-4" id="text-7-1-2">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">close_px_all</span> = pd.read_csv(<span style="color: #e6db74;">'data/stock_px_2.csv'</span>, parse_dates=<span style="color: #ae81ff;">True</span>, index_col=0)
@@ -7136,8 +7263,8 @@ log(<span style="color: #e6db74;">"close_px.rolling('20D').mean().head()"</span>
 </div>
 
 
-<div id="outline-container-org15b0cc4" class="outline-3">
-<h3 id="org15b0cc4"><span class="section-number-3">7.2</span> expanding</h3>
+<div id="outline-container-orgbea6cab" class="outline-3">
+<h3 id="orgbea6cab"><span class="section-number-3">7.2</span> expanding</h3>
 <div class="outline-text-3" id="text-7-2">
 <p>
 窗口从小到大增长，直到整个序列长度。
@@ -7190,8 +7317,8 @@ dtype: float64
 
 
 
-<div id="outline-container-org6dbabb2" class="outline-3">
-<h3 id="org6dbabb2"><span class="section-number-3">7.3</span> ewm</h3>
+<div id="outline-container-org9317781" class="outline-3">
+<h3 id="org9317781"><span class="section-number-3">7.3</span> ewm</h3>
 <div class="outline-text-3" id="text-7-3">
 <p>
 通过 <code>span</code> 指定一个固定衰减因子，赋予 <b>最近观察值</b> 更多的权重。
@@ -7291,12 +7418,12 @@ plot()
 </div>
 </div>
 
-<div id="outline-container-org18afad4" class="outline-3">
-<h3 id="org18afad4"><span class="section-number-3">7.4</span> 二元窗口函数</h3>
+<div id="outline-container-org2f1004d" class="outline-3">
+<h3 id="org2f1004d"><span class="section-number-3">7.4</span> 二元窗口函数</h3>
 <div class="outline-text-3" id="text-7-4">
 </div>
-<div id="outline-container-org1ba942f" class="outline-4">
-<h4 id="org1ba942f"><span class="section-number-4">7.4.1</span> corr</h4>
+<div id="outline-container-org1f91c14" class="outline-4">
+<h4 id="org1f91c14"><span class="section-number-4">7.4.1</span> corr</h4>
 <div class="outline-text-4" id="text-7-4-1">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">s</span> = pd.Series(<span style="color: #a6e22e;">range</span>(10))
@@ -7340,16 +7467,16 @@ dtype: float64
 </div>
 
 
-<div id="outline-container-org6ca2023" class="outline-2">
-<h2 id="org6ca2023"><span class="section-number-2">8</span> 实用方法</h2>
+<div id="outline-container-orgb1c9fb4" class="outline-2">
+<h2 id="orgb1c9fb4"><span class="section-number-2">8</span> 实用方法</h2>
 <div class="outline-text-2" id="text-8">
 </div>
-<div id="outline-container-orgeb3895a" class="outline-3">
-<h3 id="orgeb3895a"><span class="section-number-3">8.1</span> 链式操作</h3>
+<div id="outline-container-org71410ab" class="outline-3">
+<h3 id="org71410ab"><span class="section-number-3">8.1</span> 链式操作</h3>
 <div class="outline-text-3" id="text-8-1">
 </div>
-<div id="outline-container-org8aa06da" class="outline-4">
-<h4 id="org8aa06da"><span class="section-number-4">8.1.1</span> DataFrame.assign</h4>
+<div id="outline-container-orgd2f599d" class="outline-4">
+<h4 id="orgd2f599d"><span class="section-number-4">8.1.1</span> DataFrame.assign</h4>
 <div class="outline-text-4" id="text-8-1-1">
 <p>
 <code>assign</code> 方法是 <code>df[k] = v</code> 的链式表达方式。
@@ -7399,8 +7526,8 @@ dtype: float64
 
 
 
-<div id="outline-container-org129a847" class="outline-4">
-<h4 id="org129a847"><span class="section-number-4">8.1.2</span> pd.pipe</h4>
+<div id="outline-container-orgcdbf795" class="outline-4">
+<h4 id="orgcdbf795"><span class="section-number-4">8.1.2</span> pd.pipe</h4>
 <div class="outline-text-4" id="text-8-1-2">
 <p>
 当使用函数处理 Series 或 DataFrame ，处理结果也是 Series 或 DataFrame 类型时，
@@ -7429,8 +7556,8 @@ dtype: float64
 </div>
 
 
-<div id="outline-container-orgfd44053" class="outline-3">
-<h3 id="orgfd44053"><span class="section-number-3">8.2</span> 查看 DataFrame 信息</h3>
+<div id="outline-container-org21f9f22" class="outline-3">
+<h3 id="org21f9f22"><span class="section-number-3">8.2</span> 查看 DataFrame 信息</h3>
 <div class="outline-text-3" id="text-8-2">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">close_px</span> = pd.read_csv(<span style="color: #e6db74;">'data/stock_px_2.csv'</span>, parse_dates=<span style="color: #ae81ff;">True</span>, index_col=0)
@@ -7454,12 +7581,12 @@ memory usage: 86.5 KB
 </div>
 
 
-<div id="outline-container-org791243c" class="outline-3">
-<h3 id="org791243c"><span class="section-number-3">8.3</span> 排序</h3>
+<div id="outline-container-org945eb9e" class="outline-3">
+<h3 id="org945eb9e"><span class="section-number-3">8.3</span> 排序</h3>
 <div class="outline-text-3" id="text-8-3">
 </div>
-<div id="outline-container-org9e303f3" class="outline-4">
-<h4 id="org9e303f3"><span class="section-number-4">8.3.1</span> 找出插入值应处位置(searchsorted)</h4>
+<div id="outline-container-orgde4b36e" class="outline-4">
+<h4 id="orgde4b36e"><span class="section-number-4">8.3.1</span> 找出插入值应处位置(searchsorted)</h4>
 <div class="outline-text-4" id="text-8-3-1">
 <p>
 <code>Series.searchsorted(value)</code>
@@ -7467,12 +7594,12 @@ memory usage: 86.5 KB
 </div>
 </div>
 
-<div id="outline-container-org10fa7cc" class="outline-4">
-<h4 id="org10fa7cc"><span class="section-number-4">8.3.2</span> nlargest(n)/nsmallest(n)</h4>
+<div id="outline-container-org188350d" class="outline-4">
+<h4 id="org188350d"><span class="section-number-4">8.3.2</span> nlargest(n)/nsmallest(n)</h4>
 </div>
 
-<div id="outline-container-org1a36681" class="outline-4">
-<h4 id="org1a36681"><span class="section-number-4">8.3.3</span> 排序并输出对应索引(Series.argsort)</h4>
+<div id="outline-container-orgf060184" class="outline-4">
+<h4 id="orgf060184"><span class="section-number-4">8.3.3</span> 排序并输出对应索引(Series.argsort)</h4>
 <div class="outline-text-4" id="text-8-3-3">
 <p>
 序列中的元素从小到大排列，提取其对应的 index
@@ -7500,12 +7627,12 @@ dtype: int64
 </div>
 </div>
 
-<div id="outline-container-orgde4f4fc" class="outline-3">
-<h3 id="orgde4f4fc"><span class="section-number-3">8.4</span> 列操作</h3>
+<div id="outline-container-org9f75248" class="outline-3">
+<h3 id="org9f75248"><span class="section-number-3">8.4</span> 列操作</h3>
 <div class="outline-text-3" id="text-8-4">
 </div>
-<div id="outline-container-orgde8fc63" class="outline-4">
-<h4 id="orgde8fc63"><span class="section-number-4">8.4.1</span> 数据增长值(diff)</h4>
+<div id="outline-container-org399ab16" class="outline-4">
+<h4 id="org399ab16"><span class="section-number-4">8.4.1</span> 数据增长值(diff)</h4>
 <div class="outline-text-4" id="text-8-4-1">
 <p>
 用于计算数据之间的差值
@@ -7545,8 +7672,8 @@ log(<span style="color: #e6db74;">"df.assign(diff=df.open.diff(1))"</span>, df.a
 </div>
 </div>
 
-<div id="outline-container-org2b5cdd3" class="outline-4">
-<h4 id="org2b5cdd3"><span class="section-number-4">8.4.2</span> 数据增长率(pct_change)</h4>
+<div id="outline-container-org3c50753" class="outline-4">
+<h4 id="org3c50753"><span class="section-number-4">8.4.2</span> 数据增长率(pct_change)</h4>
 <div class="outline-text-4" id="text-8-4-2">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">data</span> = {
@@ -7576,8 +7703,8 @@ log(<span style="color: #e6db74;">"df.assign(pct=df.open.pct_change(1))"</span>,
 </div>
 
 
-<div id="outline-container-orgf44990c" class="outline-4">
-<h4 id="orgf44990c"><span class="section-number-4">8.4.3</span> 累加值(cumsum)</h4>
+<div id="outline-container-org58a50a8" class="outline-4">
+<h4 id="org58a50a8"><span class="section-number-4">8.4.3</span> 累加值(cumsum)</h4>
 <div class="outline-text-4" id="text-8-4-3">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">data</span> = {
@@ -7607,8 +7734,8 @@ Freq: D, Name: open, dtype: int64
 </div>
 
 
-<div id="outline-container-orgcd30f39" class="outline-4">
-<h4 id="orgcd30f39"><span class="section-number-4">8.4.4</span> 资金曲线(cumprod)</h4>
+<div id="outline-container-org68dd460" class="outline-4">
+<h4 id="org68dd460"><span class="section-number-4">8.4.4</span> 资金曲线(cumprod)</h4>
 <div class="outline-text-4" id="text-8-4-4">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">data</span> = {
@@ -7639,8 +7766,8 @@ Freq: D, Name: pct, dtype: float64
 </div>
 
 
-<div id="outline-container-orgb80a5a2" class="outline-4">
-<h4 id="orgb80a5a2"><span class="section-number-4">8.4.5</span> np.where</h4>
+<div id="outline-container-orgc6c3b97" class="outline-4">
+<h4 id="orgc6c3b97"><span class="section-number-4">8.4.5</span> np.where</h4>
 <div class="outline-text-4" id="text-8-4-5">
 <div class="org-src-container">
 <pre class="src src-ipython"><span style="color: #fd971f;">s</span> = pd.Series(<span style="color: #a6e22e;">range</span>(10))
