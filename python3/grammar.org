@@ -610,9 +610,58 @@ deque([3, 4, 5, 6, 7, 8, 9, 11, 22, 33], maxlen=10)
 *生成器用于生成供迭代的数据，而协程是数据的消费者，协程与迭代无关。*
 
 
+
 ** 字典
 
-*** 广义映射类型
+#+BEGIN_SRC plantuml :file img/map_vs_mutable.png :eval never-export
+  class Container {
+      __contains__();
+  }
+
+  class Iterable {
+      __iter__();
+  }
+
+  class Sized {
+      __len__();
+  }
+
+  class Mapping {
+      __getitem__();
+      __contains__();
+      __eq__();
+      __ne__();
+      get();
+      items();
+      keys();
+      values();
+  }
+
+  class MutableSequence {
+      __setitem__();
+      __delitem__();
+      clear();
+      pop();
+      popitem();
+      setdefault();
+      update();
+  }
+
+  Container <|-- Mapping
+  Iterable <|-- Mapping
+  Sized <|-- Mapping
+
+  Mapping <|-right- MutableMapping
+#+END_SRC
+
+#+RESULTS:
+#+CAPTION: =collections.abc= 中的 MutableMapping 和它的超类
+[[file:img/map_vs_mutable.png]]
+
+
+非抽象映射类型一般不会直接继承 =collections.abc= 中的抽象基类，
+而是直接对 =dict= 或是 =collections.UserDict= 进行扩展。
+这些抽象基类的主要作用是 _形式化文档_ ，可以和 =isinstance= 一起被用来判定某个数据是不是 *广义上的映射类型* ：
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from collections import abc
@@ -624,37 +673,6 @@ deque([3, 4, 5, 6, 7, 8, 9, 11, 22, 33], maxlen=10)
 : True
 
 
-*** 字典构造
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  a = dict(one=1, two=2, three=3)
-  b = {'one': 1, 'two': 2, 'three': 3}
-  c = dict(zip(['one', 'two', 'three'], [1, 2, 3]))
-  d = dict([('two', 2), ('one', 1), ('three', 3)])
-  e = dict({'three': 3, 'one': 1, 'two': 2})
-  print(a == b == c == d == e)
-#+END_SRC
-
-#+RESULTS:
-: True
-
-
-*** 字典推导
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  CODES = [
-      (86, 'China'),
-      (91, 'India'),
-      (1, 'USA')
-  ]
-  print({country: code for code, country in CODES})
-
-#+END_SRC
-
-#+RESULTS:
-: {'China': 86, 'India': 91, 'USA': 1}
-
-
 *** =__missing__= 方法
 
 映射类型在处理找不到的键的时候，都会涉及 =__missing__= 方法。
@@ -664,40 +682,24 @@ deque([3, 4, 5, 6, 7, 8, 9, 11, 22, 33], maxlen=10)
 *__missing__ 方法只会被__getitem__调用（即使用表达式 d[k] ）*
 
 
+*** 散列表
+
+散列表是一个 _稀疏数组_ (总是有空白元素的数组称为稀疏数组)。散列表中的单元叫做 *bucket* 。
+每个 bucket 分为两部分，一个是键的引用，一个是值的引用。
+
+Python 会设法保证大概还有三分之一的 bucket 是空的，所以在快要到达这个阈值的时候，
+_原有的散列表会被复制到一个更大的空间里面_ 。
 
 
+**** 加盐
+
+=str=, =bytes= 和 =datetime= 对象的散列值计算过程中多了 _随机加盐_ 这一步。
+
+所加盐值是进程中一个常量，每次启动解释器都会生成一个不同的盐值。
+随机盐值的加入是为了防止 DOS 攻击而采取的一种安全措施。
 
 
-
-** 集合
-
-*** 创建
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  s = {1, 2, 3, 1, 2, 3}
-  print(s)
-  s = set()  # 空集须写成 set()
-  print(s)
-  s = frozenset(range(10))
-  print(s)
-  s = { c for c in 'helloworld'}
-  print(s)
-#+END_SRC
-
-#+RESULTS:
-: {1, 2, 3}
-: set()
-: frozenset({0, 1, 2, 3, 4, 5, 6, 7, 8, 9})
-: {'o', 'e', 'h', 'r', 'l', 'd', 'w'}
-
-*** 合集，交集，差集
-
-- 合集： =a | b=
-- 交集： =a & b=
-- 差集： =a - b=
-
-
-*** Hash 算法
+**** 散列表算法
 
 #+BEGIN_SRC plantuml :file img/p3_hash.png :eval never-export
   :计算键的散列值;
@@ -717,12 +719,76 @@ deque([3, 4, 5, 6, 7, 8, 9, 11, 22, 33], maxlen=10)
 #+RESULTS:
 [[file:img/p3_hash.png]]
 
+**** 可散列对象必须满足的条件
 
-如果实现了一个类的 =__eq__= 方法，并且希望它是可散列的，
-则一定需要有一个恰当的 =__hash__= 方法，保证在 a == b 为真的情况下 hash(a)==hash(b) 也必定为真。
+1. 支持 =hash()= 函数，并且通过 =__hash()__= 方法所得到的散列值是不变的
+2. 支持通过 =__eq__()= 方法来检测相等性
+3. 若 =a == b= 为真，则 =hash(a) == hash(b)= 也为真
+
 
 如果一个含有自定义 =__eq__= 方法的类处于可变的状态，就不要在这个类中实现 =__hash__= 方法，
 因为它的实例是不可散列的。
+
+
+
+** 集合
+
+#+BEGIN_SRC plantuml :file img/set_vs_mutable.png :eval never-export
+  class Container {
+      __contains__();
+  }
+
+  class Iterable {
+      __iter__();
+  }
+
+  class Sized {
+      __len__();
+  }
+
+  class Set {
+      isdisjoint();
+      __le__();
+      __lt__();
+      __gt__();
+      __ge__();
+      __eq__();
+      __ne__();
+      __and__();
+      __or__();
+      __sub__();
+      __xor__();
+  }
+
+  class MutableSet {
+      and();
+      discard();
+      remove();
+      pop();
+      clear();
+      __ior__();
+      __iand__();
+      __ixor__();
+      __isub__();
+  }
+
+  Container <|-- Set
+  Iterable <|-- Set
+  Sized <|-- Set
+
+  Set <|-right- MutableSet
+#+END_SRC
+
+#+RESULTS:
+#+CAPTION: =collections.abc= 中的 MutableSet 和它的超类
+[[file:img/set_vs_mutable.png]]
+
+*** 合集，交集，差集
+
+- 合集： =a | b=
+- 交集： =a & b=
+- 差集： =a - b=
+
 
 
 
