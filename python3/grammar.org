@@ -32,8 +32,8 @@ Python 标准库使用 C 实现了丰富的序列类型，如：
 
 - 扁平序列 (存放一种类型的数据 _值_)
 
+  str, bytes, bytearray, memoryview, array.array
 
-可变序列 MutableSequence 和不可变序列 Sequence 的差异：（两个都是 =collection.abc= 中的类）
 
 #+BEGIN_SRC plantuml :file img/seq_vs_mutable.png :eval never-export
   class Container {
@@ -77,6 +77,7 @@ Python 标准库使用 C 实现了丰富的序列类型，如：
 #+END_SRC
 
 #+RESULTS:
+#+CAPTION: 可变序列 MutableSequence 和不可变序列 Sequence 的差异：（两个都是 =collection.abc= 中的类）
 [[file:img/seq_vs_mutable.png]]
 
 
@@ -622,6 +623,7 @@ deque([3, 4, 5, 6, 7, 8, 9, 11, 22, 33], maxlen=10)
 #+RESULTS:
 : True
 
+
 *** 字典构造
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
@@ -652,27 +654,8 @@ deque([3, 4, 5, 6, 7, 8, 9, 11, 22, 33], maxlen=10)
 #+RESULTS:
 : {'China': 86, 'India': 91, 'USA': 1}
 
-*** 弹性键查询
 
-**** defaultdict
-
-在实例化一个 defaultdict 的时候，需要给构造方法提供一个可调用对象，
-这个可调用对象会在 =__getitem__= 找不到键的时候被调用，以便 =__getitem__= 返回默认值。
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  import collections
-  d = collections.defaultdict(list)
-  d['a'].append('b')
-  d['c'].append('d')
-  log("d", d)
-#+END_SRC
-
-#+RESULTS:
-: ============= d ==============
-: defaultdict(<class 'list'>, {'a': ['b'], 'c': ['d']})
-
-
-**** =__missing__=
+*** =__missing__= 方法
 
 映射类型在处理找不到的键的时候，都会涉及 =__missing__= 方法。
 虽然基类 dict 没有定义这个方法，但是如果一个类继承了 dict ，然后提供了 =__missing__= 方法，
@@ -682,121 +665,7 @@ deque([3, 4, 5, 6, 7, 8, 9, 11, 22, 33], maxlen=10)
 
 
 
-*** OrderedDict
 
-这个类型在添加键的时候会保持顺序，因此键的迭代次序总是一致的。
-
-OrderedDict 的 popitem 方法默认删除并返回字典里最后一个元素，
-但是如果调用 =popitem(last=False)= ，则删除并返回第一个被添加进去的元素。
-
-
-*** ChainMap
-
-该类型可以容纳多个不同的映射对象，在进行键查找操作时，会逐个查找这些映射对象，直到键被找到为止。
-
-这个功能在给有嵌套作用域的语言做解释器的时候很有用，可以用一个映射对象来代表一个作用域上下文。
-
-#+BEGIN_SRC ipython :eval never-export
-  import builtins
-  from collections import ChainMap
-  pylookup = ChainMap(locals(), globals(), vars(builtins))
-
-#+END_SRC
-
-
-*** Counter
-
-这个映射类型会给键准备一个整数计数器，每次更新一个键的时候会增加这个计数器。
-
-Counter 实现了 + 和 - 运算符来合并记录。 =most_common([n])= 方法会返回最常见的 n 个键和它们的计数。
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  from collections import Counter
-  ct = Counter('abracadabra')
-  print(ct)
-  ct.update('aaaaazzz')
-  print('after update'.center(30, '='))
-  print(ct)
-  print(ct.most_common(2))
-#+END_SRC
-
-#+RESULTS:
-: Counter({'a': 5, 'b': 2, 'r': 2, 'c': 1, 'd': 1})
-: =========after update=========
-: Counter({'a': 10, 'z': 3, 'b': 2, 'r': 2, 'c': 1, 'd': 1})
-: [('a', 10), ('z', 3)]
-
-
-*** UserDict
-
-这个类其实是把标准 dict 用纯 Python 又实现了一遍，主要的用途是让用户继承写子类的。
-
-更倾向于从 UserDict 而不是从 dict 继承的主要原因是后者有时会在某些方法的实现上走一些捷径，
-导致不得不在子类中重写这些方法（比如 dict 的子类实现的 =__getitem__= 方法不会被 get() 方法所调用），
-但是 UserDict 就不会有这个问题。
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  class MyDict(dict):
-      def __setitem__(self, key, value):
-          super().__setitem__(key, value*2)
-
-  d = MyDict(one=1)
-  print(d)
-
-  d['two'] = 2
-  print(d)
-#+END_SRC
-
-#+RESULTS:
-: {'one': 1}
-: {'one': 1, 'two': 4}
-
-
-继承自 dict 的 =__init__= 方法忽略了子类的 =__setitem__= 方法。
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  d.update(three=3)
-  print(d)
-#+END_SRC
-
-#+RESULTS:
-: {'one': 1, 'two': 4, 'three': 3}
-
-继承自 dict 的 update 方法也忽略了子类的 =__setitem__= 方法。
-
-另外一个值得注意的地方是，UserDict 并不是 dict 的子类。
-UserDict 有一个 data 属性，是 dict 的实例，这个属性实际上是 UserDict 最终存储数据的地方。
-
-
-*** 不可变映射类型
-
-types.MappingProxyType 会返回一个只读的映射视图。
-虽然是只读视图，但是它是动态的，如果对原映射做出改动，
-通过这个视图可以观察到，但是无法通过这个视图对原映射做出修改。
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  from types import MappingProxyType
-  d = {1: 'A'}
-  d_proxy = MappingProxyType(d)
-  print(d_proxy)
-
-  log("d_proxy[1]", d_proxy[1])
-
-  try:
-      d_proxy[2] = 'x'
-  except Exception as e:
-      print(e)
-
-  d[2] = 'B'
-  print(d_proxy)
-#+END_SRC
-
-#+RESULTS:
-: {1: 'A'}
-: ========= d_proxy[1] =========
-: A
-: 'mappingproxy' object does not support item assignment
-: {1: 'A', 2: 'B'}
 
 
 
@@ -2747,6 +2616,148 @@ haystack ->  1  4  5  6  8 12 15 20 21 23 23 26 29 30
 :  7 -> [0, 6, 7, 8, 10]
 :  2 -> [0, 2, 6, 7, 8, 10]
 : 10 -> [0, 2, 6, 7, 8, 10, 10]
+
+
+
+** 字典操作
+
+*** defaultdict
+
+在实例化一个 defaultdict 的时候，需要给构造方法提供一个可调用对象，
+这个可调用对象会在 =__getitem__= 找不到键的时候被调用，返回默认值。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import collections
+  d = collections.defaultdict(list)
+  d['a'].append('b')
+  d['c'].append('d')
+  log("d", d)
+#+END_SRC
+
+#+RESULTS:
+: ============= d ==============
+: defaultdict(<class 'list'>, {'a': ['b'], 'c': ['d']})
+
+
+
+*** OrderedDict
+
+这个类型在添加键的时候会保持顺序，因此键的迭代次序总是一致的。
+
+OrderedDict 的 popitem 方法默认删除并返回字典里最后一个元素，
+但是如果调用 =popitem(last=False)= ，则删除并返回第一个被添加进去的元素。
+
+
+
+*** ChainMap
+
+该类型可以容纳多个不同的映射对象，在进行键查找操作时，会逐个查找这些映射对象，直到键被找到为止。
+
+这个功能在给有嵌套作用域的语言做解释器的时候很有用，可以用一个映射对象来代表一个作用域上下文。
+
+#+BEGIN_SRC ipython :eval never-export
+  import builtins
+  from collections import ChainMap
+  pylookup = ChainMap(locals(), globals(), vars(builtins))
+
+#+END_SRC
+
+
+*** Counter
+
+这个映射类型会给键准备一个整数计数器，每次更新一个键的时候会增加这个计数器。
+
+Counter 实现了 + 和 - 运算符来合并记录。 =most_common([n])= 方法会返回最常见的 n 个键和它们的计数。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from collections import Counter
+  ct = Counter('abracadabra')
+  print(ct)
+  ct.update('aaaaazzz')
+  print('after update'.center(30, '='))
+  print(ct)
+  print(ct.most_common(2))
+#+END_SRC
+
+#+RESULTS:
+: Counter({'a': 5, 'b': 2, 'r': 2, 'c': 1, 'd': 1})
+: =========after update=========
+: Counter({'a': 10, 'z': 3, 'b': 2, 'r': 2, 'c': 1, 'd': 1})
+: [('a', 10), ('z', 3)]
+
+
+*** UserDict
+
+这个类其实是把标准 dict 用纯 Python 又实现了一遍，主要的用途是让用户继承写子类的。
+
+更倾向于从 UserDict 而不是从 dict 继承的主要原因是后者有时会在某些方法的实现上走一些捷径，
+导致不得不在子类中重写这些方法，但是 UserDict 就不会有这个问题。
+
+继承自 dict 的 =__init__= 方法忽略了子类的 =__setitem__= 方法：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  class MyDict(dict):
+      def __setitem__(self, key, value):
+          super().__setitem__(key, value*2)
+
+  d = MyDict(one=1)
+  print(d)
+
+  d['two'] = 2
+  print(d)
+#+END_SRC
+
+#+RESULTS:
+: {'one': 1}
+: {'one': 1, 'two': 4}
+
+
+继承自 dict 的 update 方法也忽略了子类的 =__setitem__= 方法：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  d.update(three=3)
+  print(d)
+#+END_SRC
+
+#+RESULTS:
+: {'one': 1, 'two': 4, 'three': 3}
+
+
+另外一个值得注意的地方是， *UserDict 并不是 dict 的子类* 。
+UserDict 有一个 =data= 属性，是 dict 的实例，这个属性实际上是 UserDict *最终存储数据的地方* 。
+
+
+*** 不可变映射类型(MappingProxyType)
+
+types.MappingProxyType 会返回一个只读的映射视图。
+虽然是只读视图，但是它是动态的，如果对原映射做出改动，
+通过这个视图可以观察到，但是无法通过这个视图对原映射做出修改。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from types import MappingProxyType
+  d = {1: 'A'}
+  d_proxy = MappingProxyType(d)
+  print(d_proxy)
+
+  log("d_proxy[1]", d_proxy[1])
+
+  try:
+      d_proxy[2] = 'x'
+  except Exception as e:
+      print(e)
+
+  d[2] = 'B'
+  print(d_proxy)
+#+END_SRC
+
+#+RESULTS:
+: {1: 'A'}
+: ========= d_proxy[1] =========
+: A
+: 'mappingproxy' object does not support item assignment
+: {1: 'A', 2: 'B'}
+
+
 
 
 
