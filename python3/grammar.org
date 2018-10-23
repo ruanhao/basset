@@ -17,7 +17,7 @@
 #+END_SRC
 
 #+RESULTS:
-: # Out[18]:
+: # Out[8]:
 
 
 * 数据结构
@@ -789,6 +789,20 @@ _原有的散列表会被复制到一个更大的空间里面_ 。
 - 交集： =a & b=
 - 差集： =a - b=
 
+
+
+
+** Unicode
+
+*** 字符编码的工作方式
+
+在计算机内存中，统一使用 Unicode 编码，当需要保存到硬盘或者需要传输的时候，就转换为 UTF-8 编码。
+
+*Python 的字符串在内存中以 Unicode 表示* ，一个字符对应若干个字节。
+如果要在网络上传输，或者保存到磁盘上， *就需要把字符串变为以字节为单位的 bytes* 。
+
+
+#+HTML: <img src="https://images2017.cnblogs.com/blog/1209144/201802/1209144-20180202194520750-1805054812.png"/>
 
 
 
@@ -2444,67 +2458,14 @@ Python3 引入了特殊方法 =__prepare__= ，这个特殊方法只在元类中
 
 
 
-* Unicode
-
-** 字符编码工作方式
-
-在计算机内存中，统一使用 Unicode 编码，当需要保存到硬盘或者需要传输的时候，就转换为 UTF-8 编码。
-
-*Python 的字符串在内存中以 Unicode 表示* ，一个字符对应若干个字节。
-如果要在网络上传输，或者保存到磁盘上， *就需要把字符串变为以字节为单位的 bytes* 。
-
-
-#+BEGIN_EXAMPLE
-  +---------------------------------------+
-  |            Memory (Unicode)           |
-  +-----------+----------------^----------+
-              |                |
-              |                |
-  +-----------v----------------+----------+
-  |            File (UTF-8)               |
-  +---------------------------------------+
-#+END_EXAMPLE
-
-
-** Code Point 转换
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  print(ord('A'))
-  print(ord('中'))
-  print(chr(66))
-  print(chr(25991))
-#+END_SRC
-
-#+RESULTS:
-: 65
-: 20013
-: B
-: 文
-
-
-** 编解码
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  print('ABC'.encode('ascii'))
-  print('中文'.encode('utf-8'))
-  print(b'ABC'.decode('ascii'))
-  print(b'\xe4\xb8\xad\xe6\x96\x87'.decode('utf-8'))
-#+END_SRC
-
-#+RESULTS:
-: b'ABC'
-: b'\xe4\xb8\xad\xe6\x96\x87'
-: ABC
-: 中文
-
-
-
 
 * 实用代码
 
-** 序列操作
+** 数据结构
 
-*** 使用 ‘*’ 处理元组拆包
+*** 序列操作
+
+**** 使用 ‘*’ 处理元组拆包
 
 ‘*’ 前缀只能用在 *一个* 变量名前面，但是这个变量可以出现在赋值表达式的任意位置。
 
@@ -2542,7 +2503,7 @@ Python3 引入了特殊方法 =__prepare__= ，这个特殊方法只在元类中
 
 
 
-*** 给切片赋值
+**** 给切片赋值
 
 如果赋值的对象是一个切片， *赋值语句的右侧必须是个可迭代对象* 。
 
@@ -2585,9 +2546,10 @@ can only assign an iterable
 #+end_example
 
 
-*** 使用 bisect 管理已排序序列
+**** 使用 bisect 管理已排序序列
 
-**** 使用 bisect 搜索
+
+***** 使用 bisect 搜索
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import bisect
@@ -2644,7 +2606,7 @@ haystack ->  1  4  5  6  8 12 15 20 21 23 23 26 29 30
 
 
 
-**** 使用 bisect 建立查询表格
+***** 使用 bisect 建立查询表格
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   def grade(score, breakpoints=[60, 70, 80, 90], grades='FDCBA'):
@@ -2660,7 +2622,7 @@ haystack ->  1  4  5  6  8 12 15 20 21 23 23 26 29 30
 : ['F', 'A', 'C', 'C', 'B', 'A', 'A']
 
 
-**** 使用 bisect.insort 插入新元素
+***** 使用 bisect.insort 插入新元素
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import bisect
@@ -2685,9 +2647,9 @@ haystack ->  1  4  5  6  8 12 15 20 21 23 23 26 29 30
 
 
 
-** 字典操作
+*** 字典操作
 
-*** defaultdict
+**** defaultdict
 
 在实例化一个 defaultdict 的时候，需要给构造方法提供一个可调用对象，
 这个可调用对象会在 =__getitem__= 找不到键的时候被调用，返回默认值。
@@ -2706,7 +2668,7 @@ haystack ->  1  4  5  6  8 12 15 20 21 23 23 26 29 30
 
 
 
-*** OrderedDict
+**** OrderedDict
 
 这个类型在添加键的时候会保持顺序，因此键的迭代次序总是一致的。
 
@@ -2715,7 +2677,7 @@ OrderedDict 的 popitem 方法默认删除并返回字典里最后一个元素�
 
 
 
-*** ChainMap
+**** ChainMap
 
 该类型可以容纳多个不同的映射对象，在进行键查找操作时，会逐个查找这些映射对象，直到键被找到为止。
 
@@ -2729,7 +2691,7 @@ OrderedDict 的 popitem 方法默认删除并返回字典里最后一个元素�
 #+END_SRC
 
 
-*** Counter
+**** Counter
 
 这个映射类型会给键准备一个整数计数器，每次更新一个键的时候会增加这个计数器。
 
@@ -2752,7 +2714,7 @@ Counter 实现了 + 和 - 运算符来合并记录。 =most_common([n])= 方法�
 : [('a', 10), ('z', 3)]
 
 
-*** UserDict
+**** UserDict
 
 这个类其实是把标准 dict 用纯 Python 又实现了一遍，主要的用途是让用户继承写子类的。
 
@@ -2793,7 +2755,7 @@ Counter 实现了 + 和 - 运算符来合并记录。 =most_common([n])= 方法�
 UserDict 有一个 =data= 属性，是 dict 的实例，这个属性实际上是 UserDict *最终存储数据的地方* 。
 
 
-*** 不可变映射类型(MappingProxyType)
+**** 不可变映射类型(MappingProxyType)
 
 types.MappingProxyType 会返回一个只读的映射视图。
 虽然是只读视图，但是它是动态的，如果对原映射做出改动，
@@ -2824,6 +2786,61 @@ types.MappingProxyType 会返回一个只读的映射视图。
 : {1: 'A', 2: 'B'}
 
 
+
+
+
+*** 文本操作
+
+**** 获取 Unicode 字符名称([[https://docs.python.org/3/library/unicodedata.html][unicodedata]])
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from unicodedata import name
+
+  for i in range(250, 256):
+      print(chr(i), ":", name(chr(i), ''))
+#+END_SRC
+
+#+RESULTS:
+: ú : LATIN SMALL LETTER U WITH ACUTE
+: û : LATIN SMALL LETTER U WITH CIRCUMFLEX
+: ü : LATIN SMALL LETTER U WITH DIAERESIS
+: ý : LATIN SMALL LETTER Y WITH ACUTE
+: þ : LATIN SMALL LETTER THORN
+: ÿ : LATIN SMALL LETTER Y WITH DIAERESIS
+
+
+**** 字符编码侦测([[https://pypi.python.org/pypi/chardet][Chardet]])
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+! chardetect ~/test.org
+#+END_SRC
+
+#+RESULTS:
+: /Users/ruan/test.org: ascii with confidence 1.0
+
+
+*** 字节操作
+
+**** 将字节序列转换成不同类型字段组成的元组([[https://docs.python.org/3/library/struct.html][struct]])
+
+=struct= 模块能处理 =bytes=, =bytearray= 和 =memoryview= 对象。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import struct
+  fmt = '<1s3sHHH'
+  with open('img/p3_hash.png', 'rb') as fp:
+      img = memoryview(fp.read())
+
+  header = img[:10]
+  log("bytes(header)", bytes(header))
+  log("struct.unpack(fmt, header)", struct.unpack(fmt, header))
+#+END_SRC
+
+#+RESULTS:
+: ================================ bytes(header) =================================
+: b'\x89PNG\r\n\x1a\n\x00\x00'
+: ========================== struct.unpack(fmt, header) ==========================
+: (b'\x89', b'PNG', 2573, 2586, 0)
 
 
 
