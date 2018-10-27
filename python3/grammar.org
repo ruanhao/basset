@@ -17,7 +17,7 @@
 #+END_SRC
 
 #+RESULTS:
-: # Out[8]:
+: # Out[3]:
 
 
 * 数据结构
@@ -530,10 +530,38 @@ _原有的散列表会被复制到一个更大的空间里面_ 。
 
 
 
+** 局部变量作用域规则
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  b = 6
+  def f(a):
+      print(a)
+      print(b)
+      b = 9
+
+  try:
+     f(3)
+  except Exception as e:
+      print("Exception:", e)
+
+
+#+END_SRC
+
+#+RESULTS:
+: 3
+: Exception: local variable 'b' referenced before assignment
+
+编译函数定义体时，由于在函数中对 =b= 进行了赋值，因此 Python 判定 =b= 为局部变量。
+当函数被调用时，Python 尝试获取局部变量 =b= 时，发现 =b= 没有绑定值，于是报错。
+
+这是 Python 的 _设计选择_ ：不要求声明变量，但是假定 *在函数定义体中赋值的变量是局部变量* 。
+
+
+
 ** 闭包
 
-闭包是一种函数，它会保留定义函数时存在的 *自由变量(free variable)* 的绑定，
-这样调用函数时，虽然定义作用域不可用了，但是仍能使用那些绑定。
+闭包指的是延伸了作用域的 _函数_ ，其中包含函数定义体中引用了，
+但是不在定义体中定义的 *非全局变量* （自由变量）。
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   def make_averager():
@@ -547,39 +575,95 @@ _原有的散列表会被复制到一个更大的空间里面_ 。
       return averager
 
   avg = make_averager()
-  avg(10)
-  avg(11)
-  avg(12)
+  print(avg(10))
+  print(avg(11))
+  print(avg(12))
+  #+END_SRC
 
+#+RESULTS:
+: 10.0
+: 10.5
+: 11.0
+
+*** 自由变量定义
+
+自由变量指的是未在 =local= 作用域中绑定的变量。
+
+[[file:img/python3_free_variable.png]]
+
+
+*** 闭包元信息(=__code__=, =__closure__=)
+
+局部变量和自由变量的名称保存在 =__code__= 属性中：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   log("avg.__code__.co_varnames", avg.__code__.co_varnames)
-
   log("avg.__code__.co_freevars", avg.__code__.co_freevars)
 #+END_SRC
 
 #+RESULTS:
-: == avg.__code__.co_varnames ==
+: =========================== avg.__code__.co_varnames ===========================
 : ('new_value', 'total')
-: == avg.__code__.co_freevars ==
+: =========================== avg.__code__.co_freevars ===========================
 : ('series',)
 
-=__closure__= 中的各个元素对应于 =__code__.co_freevars= 中的一个名称：
+
+自由变量的绑定值保存在 =__closure__= 属性中：
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   log("avg.__closure__", avg.__closure__)
-
-  log("avg.__closure__[0].cell_contents",
-      avg.__closure__[0].cell_contents)
 #+END_SRC
 
 #+RESULTS:
-: ====== avg.__closure__ =======
-: (<cell at 0x10697bac8: list object at 0x1068a41c8>,)
-:  avg.__closure__[0].cell_contents
+: =============================== avg.__closure__ ================================
+: (<cell at 0x111aff978: list object at 0x111954dc8>,)
+
+=__closure__= 中的各个元素对应于 =__code__.co_freevars= 中的一个名称。
+这些元素是 =cell= 对象，该对象的 =cell_contents= 属性保存着真正的值：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("avg.__closure__[0].cell_contents", avg.__closure__[0].cell_contents)
+#+END_SRC
+
+#+RESULTS:
+: ======================= avg.__closure__[0].cell_contents =======================
 : [10, 11, 12]
+
+
 
 *** nonlocal
 
-nonlocal 的作用是把变量标记为自由变量。
+
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  def make_averager():
+      count = 0
+      total = 0
+
+      def averager(new_value):
+          count += 1
+          total += new_value
+          return total / count
+
+      return averager
+
+  avg = make_averager()
+  try:
+      print(avg(10))
+  except Exception as e:
+      print(e)
+
+#+END_SRC
+
+#+RESULTS:
+: local variable 'count' referenced before assignment
+
+造成上述错误的原因在于，如果 _尝试重新绑定_ ，例如 =count = count + 1= ，
+其实会 _隐式创建局部变量_ =count= ，从而导致错误。
+同时，这样一来， =count= 就不可能是自由变量了，不会保存在闭包中。
+
+
+Python 3 引入了=nonlocal= 声明，它的作用是 _把变量标记为自由变量_ ：
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   def make_averager():
@@ -595,16 +679,19 @@ nonlocal 的作用是把变量标记为自由变量。
       return averager
 
   avg = make_averager()
-  avg(1)
-  avg(2)
-  print(avg(3))
+  try:
+      print(avg(10))
+  except Exception as e:
+      print(e)
 #+END_SRC
 
 #+RESULTS:
-: 2.0
+: 10.0
 
 
 *** 闭包的陷阱
+
+*闭包中不要引用任何可能会变化的变量* ：
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   def count():
@@ -624,7 +711,7 @@ nonlocal 的作用是把变量标记为自由变量。
 #+RESULTS:
 : 9 9 9
 
-需注意： *闭包中不要引用任何可能会变化的变量。* 如果一定要引用会变化的变量，可以再创建一个函数：
+如果一定要引用会变化的变量，可以再创建一个函数：
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   def count():
@@ -645,187 +732,17 @@ nonlocal 的作用是把变量标记为自由变量。
 : 1 4 9
 
 
-** 装饰器
+** 参数化装饰器
 
-*** functool.wraps
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  import functools
-  import time
-
-  def clock(func):
-      @functools.wraps(func)
-      def wrapper(*args, **kw):
-          t0 = time.perf_counter()
-          result = func(*args, **kw)
-          elapsed = time.perf_counter() - t0
-          name = func.__name__
-          arg_lst = []
-          if args:
-              arg_lst.append(', '.join(repr(arg) for arg in args))
-          if kw:
-              pairs = ['{}={}'.format(k, w) for k, w in sorted(kw.items())]
-              arg_lst.append(', '.join(pairs))
-          arg_str = ', '.join(arg_lst)
-          print("[{:0.8f}] {}({}) -> {}".format(elapsed, name, arg_str, result))
-          return result
-      return wrapper
-
-  @clock
-  def snooze():
-      time.sleep(1)
-
-  snooze()
-#+END_SRC
-
-#+RESULTS:
-: [1.00478457] snooze() -> None
-
-
-*** functools.lru_cache
-
-这是一项优化技术，它把耗时的函数的结果缓存起来，避免传入相同的参数时重复计算。
-lru_cache 可以使用两个可选的参数来配置：
-
-*functools.lru_cache(maxsize=128, typed=False)*
-
-maxsize 指定存储多少个调用的结果。缓存满了之后，旧的结果会被删除，腾出空间。
-为了得到最佳性能，maxsize 应设为 2 的幂。
-typed 参数如果设为 True ，把不同参数类型得到的结果分开保存，
-即把通常认为相等的浮点数和整数参数(如 1 和 1.0)区分开。
-
-因为 lru_cache 使用字典存储结果，而且键根据调用时传入的定位参数和关键字参数创建，
-因此被 lru_cache 装饰的函数，它的所有参数必须是可散列的。
+参数化装饰器本质上是一个 _装饰器工厂函数_ ：把参数化传给它，返回一个装饰器，
+然后再把这个装饰器应用到要装饰的函数上：
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  @clock
-  def fib(n):
-      if n < 2: return n
-      return fib(n-2) + fib(n-1)
-
-  print("result: ", fib(6))
+  def decorator(*args, **kwargs):
+      def decorate(func):
+          pass
+      return decorate
 #+END_SRC
-
-#+RESULTS:
-#+begin_example
-[0.00000045] fib(0) -> 0
-[0.00000053] fib(1) -> 1
-[0.00029566] fib(2) -> 1
-[0.00000040] fib(1) -> 1
-[0.00000035] fib(0) -> 0
-[0.00000041] fib(1) -> 1
-[0.00005358] fib(2) -> 1
-[0.00010595] fib(3) -> 2
-[0.00048775] fib(4) -> 3
-[0.00000033] fib(1) -> 1
-[0.00000032] fib(0) -> 0
-[0.00000110] fib(1) -> 1
-[0.00010550] fib(2) -> 1
-[0.00015888] fib(3) -> 2
-[0.00000056] fib(0) -> 0
-[0.00000050] fib(1) -> 1
-[0.00012996] fib(2) -> 1
-[0.00000042] fib(1) -> 1
-[0.00000048] fib(0) -> 0
-[0.00000041] fib(1) -> 1
-[0.00005725] fib(2) -> 1
-[0.00025901] fib(3) -> 2
-[0.00050781] fib(4) -> 3
-[0.00088358] fib(5) -> 5
-[0.00145318] fib(6) -> 8
-result:  8
-#+end_example
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  import functools
-
-  @functools.lru_cache()
-  @clock
-  def fib(n):
-      if n < 2:
-          return n
-      return fib(n-2) + fib(n-1)
-
-  print("result:", fib(6))
-#+END_SRC
-
-#+RESULTS:
-: [0.00000047] fib(0) -> 0
-: [0.00000077] fib(1) -> 1
-: [0.00021293] fib(2) -> 1
-: [0.00000149] fib(3) -> 2
-: [0.00030547] fib(4) -> 3
-: [0.00000166] fib(5) -> 5
-: [0.00044729] fib(6) -> 8
-: result: 8
-
-*** functools.singledispatch
-
-使用 @singledispatch 装饰的普通函数会变成分派函数，
-或称为泛函数 (generic function) ： *根据第一个参数的类型，选择对应的函数。*
-
-分派函数：
-
-#+BEGIN_SRC ipython :eval never-export
-  def handle_value(value):
-      if isinstance(value, int):
-          handle_value_int(value)
-      elif isinstance(value, str):
-          handle_value_str(value)
-      else:
-          handle_value_defalut(value)
-#+END_SRC
-
-
-@singledispatch 的优点是支持模块化扩展：各个模块可以为它支持的各个类型注册一个专门的函数。
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  from functools import singledispatch
-  from collections import abc
-  import numbers
-
-  @singledispatch
-  def fun(arg, verbose=False):
-      if verbose:
-          print("Let me just say,", end=" ")
-      print(arg)
-
-  @fun.register(numbers.Integral)
-  def _(arg, verbose=False):  # 函数名称无关紧要
-      if verbose:
-          print("Strength in numbers, eh?", end=" ")
-      print(arg)
-
-  @fun.register(abc.MutableSequence)
-  @fun.register(tuple)  # 可以叠放多个 register 装饰器，以支持不同的类型
-  def handle_seq(arg, verbose=False):
-      if verbose:
-          print("Enumerate this:")
-      for i, elem in enumerate(arg):
-          print(i, elem)
-
-  fun("3", True)
-  fun(3, True)
-  fun((3,), True)
-
-  log("fun.dispatch(tuple)", fun.dispatch(tuple))
-  log("fun.registry.keys()", fun.registry.keys())
-#+END_SRC
-
-#+RESULTS:
-: Let me just say, 3
-: Strength in numbers, eh? 3
-: Enumerate this:
-: 0 3
-: ==== fun.dispatch(tuple) =====
-: <function handle_seq at 0x106aa5620>
-: ==== fun.registry.keys() =====
-: dict_keys([<class 'object'>, <class 'numbers.Integral'>, <class 'tuple'>, <class 'collections.abc.MutableSequence'>])
-
-
-注册的专门函数应该处理抽象基类 (如 numbers.Integral 和 abc.MutableSequence) ，
-不要处理具体实现 (如 int 和 list) ，这样，代码支持的兼容类型更广泛。
-
 
 
 * 生成器
@@ -2380,7 +2297,7 @@ Python3 引入了特殊方法 =__prepare__= ，这个特殊方法只在元类中
 
 
 
-* 实用代码
+* Gists
 
 ** 数据结构
 
@@ -2953,6 +2870,194 @@ Metropolis(name='Tokyo', cc='JP', pop=36.933, coord=LatLong(lat=35.689722, long=
 : ===================== methodcaller('replace', ' ', '-')(s) =====================
 : hello-world
 
+
+
+*** 使用装饰器
+
+**** 记录函数运行时间
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import functools
+  import time
+
+  def clock(func):
+      @functools.wraps(func)
+      def wrapper(*args, **kw):
+          t0 = time.perf_counter()
+          result = func(*args, **kw)
+          elapsed = time.perf_counter() - t0
+          name = func.__name__
+          arg_lst = []
+          if args:
+              arg_lst.append(', '.join(repr(arg) for arg in args))
+          if kw:
+              pairs = ['{}={}'.format(k, w) for k, w in sorted(kw.items())]
+              arg_lst.append(', '.join(pairs))
+          arg_str = ', '.join(arg_lst)
+          print("[{:0.8f}] {}({}) -> {}".format(elapsed, name, arg_str, result))
+          return result
+      return wrapper
+
+  @clock
+  def snooze(t):
+      time.sleep(t)
+
+  snooze(0.1)
+  snooze(0.2)
+  snooze(0.3)
+#+END_SRC
+
+#+RESULTS:
+: [0.10157284] snooze(0.1) -> None
+: [0.20283653] snooze(0.2) -> None
+: [0.30416814] snooze(0.3) -> None
+
+
+**** 缓存函数返回值(functools.lru_cache)
+
+它把耗时的函数的结果缓存起来，避免传入相同的参数时重复计算，可以使用两个可选的参数来配置：
+
+- =maxsize=
+
+  指定存储多少个调用的结果。缓存满了之后，旧的结果会被删除，腾出空间。
+为了得到最佳性能，=maxsize= 应设为 2 的幂。
+
+- =typed=
+
+  如果设为 True ，把不同参数类型得到的结果分开保存，
+  即把通常认为相等的浮点数和整数参数(如 1 和 1.0)区分开。
+
+因为 =lru_cache= 使用字典存储结果，而且键根据调用时传入的定位参数和关键字参数创建，
+因此被 =lru_cache= 装饰的函数， _它的所有参数必须是可散列的_ 。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  @clock
+  def fib(n):
+      if n < 2: return n
+      return fib(n-2) + fib(n-1)
+
+  print("result: ", fib(6))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+[0.00000045] fib(0) -> 0
+[0.00000053] fib(1) -> 1
+[0.00029566] fib(2) -> 1
+[0.00000040] fib(1) -> 1
+[0.00000035] fib(0) -> 0
+[0.00000041] fib(1) -> 1
+[0.00005358] fib(2) -> 1
+[0.00010595] fib(3) -> 2
+[0.00048775] fib(4) -> 3
+[0.00000033] fib(1) -> 1
+[0.00000032] fib(0) -> 0
+[0.00000110] fib(1) -> 1
+[0.00010550] fib(2) -> 1
+[0.00015888] fib(3) -> 2
+[0.00000056] fib(0) -> 0
+[0.00000050] fib(1) -> 1
+[0.00012996] fib(2) -> 1
+[0.00000042] fib(1) -> 1
+[0.00000048] fib(0) -> 0
+[0.00000041] fib(1) -> 1
+[0.00005725] fib(2) -> 1
+[0.00025901] fib(3) -> 2
+[0.00050781] fib(4) -> 3
+[0.00088358] fib(5) -> 5
+[0.00145318] fib(6) -> 8
+result:  8
+#+end_example
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import functools
+
+  @functools.lru_cache()
+  @clock
+  def fib(n):
+      if n < 2:
+          return n
+      return fib(n-2) + fib(n-1)
+
+  print("result:", fib(6))
+#+END_SRC
+
+#+RESULTS:
+: [0.00000047] fib(0) -> 0
+: [0.00000077] fib(1) -> 1
+: [0.00021293] fib(2) -> 1
+: [0.00000149] fib(3) -> 2
+: [0.00030547] fib(4) -> 3
+: [0.00000166] fib(5) -> 5
+: [0.00044729] fib(6) -> 8
+: result: 8
+
+
+
+
+
+**** 单分派泛函(functools.singledispatch)
+
+使用 =singledispatch= 装饰的普通函数会变成分派泛函：
+根据 *第一个参数的类型* ，执行具体的操作。
+（正是因为根据第一个参数的类型，所以称为单分派，
+若根据多个参数选择 _专门的函数_ ，那就是多分派了）
+
+专门的函数 _应该处理抽象基类_ ，如 =numbers.Integral=, =abc.MutableSequence= ，
+不要处理具体实现，如 =int=, =list= 。这样，代码支持的兼容类型才能更广泛。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from functools import singledispatch
+  from collections import abc
+  import numbers
+  import html
+
+  @singledispatch
+  def htmlize(obj):
+      content = html.escape(repr(obj))
+      return '<pre>{}</pre>'.format(content)
+
+  @htmlize.register(str)
+  def _(text):
+      content = html.escape(text).replace('\n', '<br>\n')
+      return '<p>{0}</p>'.format(content)
+
+  @htmlize.register(numbers.Integral)
+  def _(n):
+      return '<pre>{0} (0x{0:x})</pre>'.format(n)
+
+  @htmlize.register(tuple)
+  @htmlize.register(abc.MutableSequence)
+  def _(seq):
+      inner = '</li>\n<li>'.join(htmlize(item) for item in seq)
+      return '<ul>\n<li>' + inner + '</li>\n</ul>'
+
+
+  log("htmlize({1, 2, 3})", htmlize({1, 2, 3}))
+  log("htmlize(abs)", htmlize(abs))
+  log("htmlize('helloworld')", htmlize('helloworld'))
+  log("htmlize(42)", htmlize(42))
+  log("htmlize([1, 2, 3])", htmlize([1, 2, 3]))
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+============================== htmlize({1, 2, 3}) ==============================
+<pre>{1, 2, 3}</pre>
+================================= htmlize(abs) =================================
+<pre>&lt;built-in function abs&gt;</pre>
+============================ htmlize('helloworld') =============================
+<p>helloworld</p>
+================================= htmlize(42) ==================================
+<pre>42 (0x2a)</pre>
+============================== htmlize([1, 2, 3]) ==============================
+<ul>
+<li><pre>1 (0x1)</pre></li>
+<li><pre>2 (0x2)</pre></li>
+<li><pre>3 (0x3)</pre></li>
+</ul>
+#+end_example
 
 * 参考文档
 
