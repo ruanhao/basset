@@ -342,7 +342,7 @@ _原有的散列表会被复制到一个更大的空间里面_ 。
 
 1. 支持 =hash()= 函数，并且通过 =__hash()__= 方法所得到的散列值是不变的
 2. 支持通过 =__eq__()= 方法来检测相等性
-3. 若 =a == b= 为真，则 =hash(a) == hash(b)= 也为真
+3. 若 =a==b= 为真，则 =hash(a)==hash(b)= 也为真
 
 
 如果一个含有自定义 =__eq__= 方法的类处于可变的状态，就不要在这个类中实现 =__hash__= 方法，
@@ -1315,16 +1315,28 @@ Python 3 引入了=nonlocal= 声明，它的作用是 _把变量标记为自由�
 
 
 
-* 类
+
+** =__getattr__=
+
+对于 =my_obj.x= 表达式，Python 会检查该实例有没有名为 =x= 的属性，如果没有，到类 =my_obj.__class__= 中查找；
+如果仍然没找到，则顺着继承树继续查找。
+
+如果依旧找不到，则调用 =my_obj= 所属类中定义的 =__getattr__= 方法，传入 =self= 和属性名称的字符串形式 ='x'= 。
+
+多数时候，如果实现了 =__getattr__= 方法，那么也要定义 =__setattr__= 方法，以防对象的行为不一致。
+
 
 ** 抽象类
 
 *** 内置抽象基类
 
-大多数内置抽象基类在 =collection.abc=, =numbers= 和 =io= 模块中定义，
-=collection.abc= 中的抽象基类最常用。
+大多数内置抽象基类在 =collection.abc=, =numbers= 和 =io= 模块中定义。
 
-[[https://docs.python.org/3/library/collections.abc.html#collections-abstract-base-classes][collection.abc 中各个抽象基类的总结]]
+=collection.abc= 中的抽象基类最常用，其次是 =numbers= 。
+
+#+CAPTION: =collections.abc= 模块中各个抽象基类的 UML 类图
+[[file:img/abc_uml.png]]
+
 
 
 *** 自定义抽象基类
@@ -1333,6 +1345,8 @@ Python 3 引入了=nonlocal= 声明，它的作用是 _把变量标记为自由�
 
 即使实现了， *子类也必须覆盖抽象方法* ，但是在子类中可以使用 =super()= 函数调用抽象方法。
 
+与其他装饰器一起使用时， =@abstractmethod= 应放在 _最里层_ ，
+即 =@abstractmethod= 与 =def= 之间不能有其他装饰器。
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from abc import ABC, abstractmethod
@@ -1359,7 +1373,14 @@ Python 3 引入了=nonlocal= 声明，它的作用是 _把变量标记为自由�
 #+RESULTS:
 : WonWonWon
 
+
 *** 虚拟子类
+
+虚拟子类的作用在于：即使不通过继承，也可以把一个类注册为抽象基类的子类。
+
+当注册了抽象子类，必须保证所注册的类忠实地实现了抽象基类定义的接口（虽然 Python 并不在注册时做检查），
+否则在运行时可能会抛异常。
+
 
 注册虚拟子类的方式是在抽象基类上调用 =register= 方法，
 =register= 方法通常作为普通函数调用，也可以作为装饰器使用。
@@ -1390,7 +1411,23 @@ Python 3 引入了=nonlocal= 声明，它的作用是 _把变量标记为自由�
 : ======== Bird.__mro__ ========
 : (<class '__main__.Bird'>, <class 'list'>, <class 'object'>)
 
-虚拟子类的 =__mro__= 属性中没有虚拟基类，也从侧面反映了虚拟子类没有从虚拟基类中继承任何方法。
+虚拟子类的 =__mro__= 属性中没有虚拟基类，说明了虚拟子类并没有从虚拟基类中继承任何方法。
+
+
+**** =__subclasses__=
+
+该方法返回类的直接子类列表， _不含虚拟子类_ 。
+
+
+**** =_abc_registry=
+
+
+只有抽象基类才有这个 _属性_ ，其值是 =WeakSet= 对象，即抽象基类注册的虚拟子类的弱引用。
+
+
+
+
+* 类
 
 
 ** 继承
@@ -3163,3 +3200,9 @@ result:  8
 - [[https://docs.python.org/3/library/stdtypes.html#truth][真值检验标准]]
 
 - [[https://docs.python.org/3/reference/datamodel.html][特殊方法]]
+
+- [[https://docs.python.org/3/library/collections.abc.html#collections-abstract-base-classes][collection.abc 中各个抽象基类的总结]]
+
+- [[https://docs.python.org/3/library/numbers.html][numbers 包]]
+
+- [[https://docs.python.org/dev/library/exceptions.html#exception-hierarchy][异常层次结构]]
