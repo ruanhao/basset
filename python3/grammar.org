@@ -230,6 +230,7 @@ deque([3, 4, 5, 6, 7, 8, 9, 11, 22, 33], maxlen=10)
 
 
 
+
 ** 字典
 
 #+BEGIN_SRC plantuml :file img/map_vs_mutable.png :eval never-export
@@ -745,391 +746,6 @@ Python 3 引入了=nonlocal= 声明，它的作用是 _把变量标记为自由�
 #+END_SRC
 
 
-* 生成器
-
-*生成器保存的是算法* ，每次调用 =next(g)= ，就计算出 g 的下一个元素的值，
-直到计算到最后一个元素，没有更多的元素时，抛出 StopIteration 异常。
-
-** 生成器函数
-
-当 Python 函数定义体中有 yield 关键字，该函数就是生成器函数。
-调用生成器函数时，会返回一个生成器对象。也就是说生成器函数是生成器工厂，
-*而生成器表达式是生成器函数的语法糖。*
-
-
-** 标准库中的生成器函数
-
-*** 用于过滤的生成器函数
-
-- itertools.compress(it, selector_it)
-
-  并行处理两个可迭代对象：如果 selector_it 中的元素是真值，产出 it 中对应的元素。
-
-  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-    import itertools
-    def vowel(c):
-        return c.lower() in 'aeiou'
-
-    result = list(itertools.compress('Aardvark', (1, 0, 1, 1, 0, 1)))
-    print(result)
-#+END_SRC
-
-#+RESULTS:
-: ['A', 'r', 'd', 'a']
-
-
-- itertools.dropwhile(predicate, it)
-
-  处理 it ，跳过 predicate 计算结果为真值的元素，产出剩下的元素。
-
-  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-    print(list(itertools.dropwhile(vowel, 'Aardvark')))
-#+END_SRC
-
-#+RESULTS:
-: ['r', 'd', 'v', 'a', 'r', 'k']
-
-
-- builtin.filter(predicate, it)
-
-  如果 =predicate(item)= 返回真值，产出对应的元素，如果 predicate 是 None ，则只产出真值元素。
-
-  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-    print(list(filter(vowel, 'Aardvark')))
-#+END_SRC
-
-#+RESULTS:
-: ['A', 'a', 'a']
-
-
-- itertools.filterfalse(predicate, it)
-
-  如果 =predicate(item)= 返回假值，产出对应的元素。
-
-
-- itertools.islice(it, [start], stop, step=1)
-
-  产出 it 的切片，类似于 =s[:stop]= 或 =s[start:stop:step]= 。
-
-  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-    print(list(itertools.islice('Aardvark', 4)))
-    print(list(itertools.islice('Aardvark', 4, 7)))
-    print(list(itertools.islice('Aardvark', 1, 7, 2)))
-#+END_SRC
-
-#+RESULTS:
-: ['A', 'a', 'r', 'd']
-: ['v', 'a', 'r']
-: ['a', 'd', 'a']
-
-- itertools.takewhile(predicate, it)
-
-  如果 =predicate(item)= 返回真值，产出对应的元素，然后停止。
-
-  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-    print(list(itertools.takewhile(vowel, 'Aardvark')))
-#+END_SRC
-
-#+RESULTS:
-: ['A', 'a']
-
-
-*** 用于映射的生成器函数
-
-- itertools.accumulate(it, [func])
-
-  产出累计值，默认为求和；如果提供了 func ，则把前面两个元素传个 func ，
-  然后把计算结果和下一个元素传给它，以此类推，最后产出结果。
-
-  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-    from operator import mul
-    sample = [5, 4, 2, 8, 7, 6, 3, 0, 9, 1]
-
-    print(list(itertools.accumulate(sample)))
-    print(list(itertools.accumulate(sample, min)))
-    print(list(itertools.accumulate(sample, mul)))
-
-  #+END_SRC
-
-  #+RESULTS:
-  : [5, 9, 11, 19, 26, 32, 35, 35, 44, 45]
-  : [5, 4, 2, 2, 2, 2, 2, 0, 0, 0]
-  : [5, 20, 40, 320, 2240, 13440, 40320, 0, 0, 0]
-
-
-- builtin.enumerate(it, start=0)
-
-  产出有两个元素组成的元组，结构是 (index, item) ，其中 index 从 start 开始计数，item 则从 iterable 中获取。
-
-- builtin.map(func, it1, [it2, ..., itN])
-
-  如果传入 N 个 可迭代对象，则 func 必须能接受 N 个参数。
-
-- itertools.starmap(func, it)
-
-  把 it 中各个元素传给 func ，产出结果。
-
-  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-    print(list(itertools.starmap(mul, enumerate('albatroz', 1))))
-    print(list(itertools.starmap(lambda a, b: b/a,
-                                 enumerate(itertools.accumulate(sample), 1))))
-  #+END_SRC
-
-  #+RESULTS:
-  : ['a', 'll', 'bbb', 'aaaa', 'ttttt', 'rrrrrr', 'ooooooo', 'zzzzzzzz']
-  : [5.0, 4.5, 3.6666666666666665, 4.75, 5.2, 5.333333333333333, 5.0, 4.375, 4.888888888888889, 4.5]
-
-
-*** 用于合并可迭代对象的生成器函数
-
-- itertools.chain(it1, ..., itN)
-
-  无缝连接多个可迭代对象。
-
-  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-    print(list(itertools.chain('ABC', range(3))))
-  #+END_SRC
-
-  #+RESULTS:
-  : ['A', 'B', 'C', 0, 1, 2]
-
-
-- itertools.chain.from_iterable(it)
-
-  产出 it 生成的各个可迭代对象中的元素，无缝连接在一起。
-
-  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-    print(list(itertools.chain.from_iterable(enumerate('ABC'))))
-  #+END_SRC
-
-  #+RESULTS:
-  : [0, 'A', 1, 'B', 2, 'C']
-
-
-- itertaools.product(it1, ..., itN, repeat=1)
-
-  计算笛卡尔积，合并成由 N 个元素组成的元组。
-  repeat 关键字参数告诉 product 函数重复 N 次处理输入的各个可迭代对象。
-
-  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  print(list(itertools.product('ABC', range(2))))
-  # list(itertools.product('ABC', 'ABC'))
-  print(list(itertools.product('ABC', repeat=2)))
-  #+END_SRC
-
-  #+RESULTS:
-  : [('A', 0), ('A', 1), ('B', 0), ('B', 1), ('C', 0), ('C', 1)]
-  : [('A', 'A'), ('A', 'B'), ('A', 'C'), ('B', 'A'), ('B', 'B'), ('B', 'C'), ('C', 'A'), ('C', 'B'), ('C', 'C')]
-
-- builtin.zip(it1, .., itN)
-
-  产出由 N 个元素组成的元组，只要有一个可迭代对象到头了，即停止。
-
-  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  print(list(zip('ABC', range(5), [10, 20, 30, 40, 50, 60])))
-  #+END_SRC
-
-  #+RESULTS:
-  : [('A', 0, 10), ('B', 1, 20), ('C', 2, 30)]
-
-- itertools.zip_longest(it1, ..., itN, fillvalue=None)
-
-  产出由 N 个元素组成的元组，等到最长的可迭代对象到头了，即停止。
-
-  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-    print(list(itertools.zip_longest('ABC',
-                                     range(5),
-                                     [10, 20, 30, 40, 50, 60],
-                                     fillvalue='?')))
-  #+END_SRC
-
-  #+RESULTS:
-  : [('A', 0, 10), ('B', 1, 20), ('C', 2, 30), ('?', 3, 40), ('?', 4, 50), ('?', '?', 60)]
-
-
-*** 用于扩展输出元素的生成器函数
-
-- itertools.combinations(it, out_len)
-
-  把 it 产出的 out_len 个元素组合在一起，然后产出。
-
-  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-    print(list(itertools.combinations('ABC', 2)))
-  #+END_SRC
-
-  #+RESULTS:
-  : [('A', 'B'), ('A', 'C'), ('B', 'C')]
-
-- itertools.combinations_with_replacement(it, out_len)
-
-  把 it 产出的 out_len 个元素组合在一起，然后产出，包含相同元素的组合。
-
-  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-    print(list(itertools.combinations_with_replacement('ABC', 2)))
-  #+END_SRC
-
-  #+RESULTS:
-  : [('A', 'A'), ('A', 'B'), ('A', 'C'), ('B', 'B'), ('B', 'C'), ('C', 'C')]
-
-- itertools.permutation(it, out_len=None)
-
-  把 out_len 个 it 产出元素排列在一起，然后产出这些排列；out_len 的默认值等于 =len(list(it))= 。
-
-  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-    print(list(itertools.permutations('ABC', 2)))
-  #+END_SRC
-
-  #+RESULTS:
-  : [('A', 'B'), ('A', 'C'), ('B', 'A'), ('B', 'C'), ('C', 'A'), ('C', 'B')]
-
-- itertools.count(start=0, step=1)
-
-  从 start 开支不断产出数字，按 step 步幅增加。
-
-  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-    print(list(itertools.islice(itertools.count(1, .3), 3)))
-  #+END_SRC
-
-  #+RESULTS:
-  : [1, 1.3, 1.6]
-
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  print(list(zip(count(), ['a', 'b', 'c'])))
-#+END_SRC
-
-#+RESULTS:
-: [(0, 'a'), (1, 'b'), (2, 'c')]
-
-- itertools.cycle(it)
-
-  从 it 中产出元素，存储各个元素的 *副本* ，然后按顺序重复不断地产出各个元素。
-
-  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-    print(list(itertools.islice(itertools.cycle('ABC'), 7)))
-  #+END_SRC
-
-  #+RESULTS:
-  : ['A', 'B', 'C', 'A', 'B', 'C', 'A']
-
-
-- itertools.repeat(item, [times])
-
-  不断产出指定元素，除非指定次数。常见用途，为 map 函数提供固定参数：
-
-  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-    print(list(map(mul, range(11), itertools.repeat(5))))
-  #+END_SRC
-
-  #+RESULTS:
-  : [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
-
-
-- builtin.iter(callable, sentinel)
-
-  第一个参数是一个没有参数的可调用对象，用于不断调用，产出各个值；第二个值是哨符，当可调用对象返回这个值时，迭代结束 (不产出哨符) 。
-
-  iter 的[[https://docs.python.org/3/library/functions.html#iter][文档]]中有个实用的例子，这段代码逐行读取文件，直到遇到空行或到达文件末尾为止：
-
-  #+BEGIN_SRC ipython :eval never-export
-    with open('mydata.txt') as fp:
-        for line in iter(fp.readline, ''):
-            process_line(line)
-  #+END_SRC
-
-
-*** 用于重新排列元素的生成器函数
-
-- itertools.groupby(it, key=None)
-
-  产出由两个元素组成的元组，形式为 (key, group) ，其中 key 是分组标准，group 是生成器，用于产出分组里的元素。
-
-  注意， =itertool.groupby= 假定输入的可迭代对象已使用指定的 key 分组了各个元素。
-
-  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-    print(list(itertools.groupby('LLLAAGGG')))
-    print(list(itertools.groupby('LLAALAAGGG')))
-  #+END_SRC
-
-  #+RESULTS:
-  : [('L', <itertools._grouper object at 0x106a79208>), ('A', <itertools._grouper object at 0x106a791d0>), ('G', <itertools._grouper object at 0x106a79080>)]
-  : [('L', <itertools._grouper object at 0x106a79cf8>), ('A', <itertools._grouper object at 0x106a791d0>), ('L', <itertools._grouper object at 0x106a79080>), ('A', <itertools._grouper object at 0x106a79160>), ('G', <itertools._grouper object at 0x106a79358>)]
-
-  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-    animals = ['duck', 'eagle', 'rat', 'giraffe', 'bear', 'bat', 'dolphin', 'shark', 'lion']
-    animals.sort(key=len)
-    for length, group in itertools.groupby(animals, len):
-        print(length, '->', list(group))
-  #+END_SRC
-
-  #+RESULTS:
-  : 3 -> ['rat', 'bat']
-  : 4 -> ['duck', 'bear', 'lion']
-  : 5 -> ['eagle', 'shark']
-  : 7 -> ['giraffe', 'dolphin']
-
-
-- builtin.reversed(seq)
-
-  seq 必须是序列，或是实现了 =__reversed__= 特殊方法的对象。
-
-- itertools.tee(it, n=2)
-
-  产出一个由 n 个生成器组成的元组，每个生成器用于单独产出输入的可迭代对象中的元素。
-
-  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-    print(list(zip(*itertools.tee('ABC'))))
-  #+END_SRC
-
-  #+RESULTS:
-  : [('A', 'A'), ('B', 'B'), ('C', 'C')]
-
-
-** yield from 语法
-
-这个语句的作用是把不同的生成器结合在一起使用。
-
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  def chain(*iterables):
-      for it in iterables:
-          for i in it:
-              yield i
-
-  print(list(chain('ABC', range(3))))
-#+END_SRC
-
-#+RESULTS:
-: ['A', 'B', 'C', 0, 1, 2]
-
-
-*等效于：*
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  def chain(*iterables):
-      for i in iterables:
-          yield from i
-
-  print(list(chain('ABC', range(3))))
-#+END_SRC
-
-#+RESULTS:
-: ['A', 'B', 'C', 0, 1, 2]
-
-
-** 把生成器当成协程
-
-[[https://www.python.org/dev/peps/pep-0342/][PEP 342]] 为生成器对象添加了 =send()= 方法，该方法使得生成器前进到下一个 yield 语句。
-
-=send()= 方法还允许使用生成器的客户把数据发给自己，传给 =send()= 方法的参数，
-会成为生成器函数定义体中对应 yield 表达式的值。
-也就是说， =send()= 方法允许在客户代码和生成器之间 *双向交换数据。*
-
-*生成器用于生成供迭代的数据，而协程是数据的消费者，协程与迭代无关。*
-
-
-
-
 
 * 面向对象编程
 
@@ -1285,46 +901,6 @@ Python 3 引入了=nonlocal= 声明，它的作用是 _把变量标记为自由�
 
 
 
-** =classmethod= / =staticmethod= 装饰器
-
-=classmethod== 最常见的用途是 _定义备选构造方法_ 。
-
-=staticmethod= 就是 _普通的函数_ ，只是碰巧在类的定义体中。
-该装饰器 _并不是很重要_ ，因为可以在同一模块中该类的前后定义函数即可达到同样的效果。
-
-
-** =__slots__=
-
-
-默认情况下，Python 在各个实例中名为 =__dict__= 的字典里存储实例属性。
-
-为了使用底层的散列表提升访问速度，字典会消耗大量内存。
-如果要处理数百万个属性不多的实例，通过 =__slots__= 类属性，能节省大量内存。
-*其本质是让解释器在元组中存储实例属性，而不是使用字典。*
-
-继承自超类的 =__slots__= 属性 *没有效果* ，Python 只会使用 *各个类中自己定义* 的 =__slots__= 属性。
-
-不要使用 =__slots__= 禁止类的用户新增实例属性，使用 =__slots__= 是 *为了优化，不是为了约束。*
-
-
-*** 节省的内存也可能被再次吃掉
-
-如果把 =__dict__= 这个名称添加到 =__slots__= 中，
-实例会在元祖中保存各个实例的属性，同时还支持动态创建属性，但这样就失去了节省内存的功效。
-
-
-
-
-
-** =__getattr__=
-
-对于 =my_obj.x= 表达式，Python 会检查该实例有没有名为 =x= 的属性，如果没有，到类 =my_obj.__class__= 中查找；
-如果仍然没找到，则顺着继承树继续查找。
-
-如果依旧找不到，则调用 =my_obj= 所属类中定义的 =__getattr__= 方法，传入 =self= 和属性名称的字符串形式 ='x'= 。
-
-多数时候，如果实现了 =__getattr__= 方法，那么也要定义 =__setattr__= 方法，以防对象的行为不一致。
-
 
 ** 抽象类
 
@@ -1427,16 +1003,137 @@ Python 3 引入了=nonlocal= 声明，它的作用是 _把变量标记为自由�
 
 
 
-* 类
-
-
 ** 继承
 
 直接子类化内置类型 (如 =dict=, =list= 或 =str=) 容易出错，
-因为内置类型的方法通常会忽略用户覆盖的方法。
+因为内置类型的方法通常会忽略用户覆盖的方法。([[user dict][例子]])
 
 *不要子类化内置类型* ，用户自己定义的类应该继承 =collection= 模块中的类，
-如 UserDict, UserList 和 UserString ，这些类 *做了特殊设计* ，因此易于扩展。
+如 =UserDict=, =UserList= 和 =UserString= ，这些类 *做了特殊设计* ，易于扩展。
+
+
+
+** =classmethod= / =staticmethod= 装饰器
+
+=classmethod== 最常见的用途是 _定义备选构造方法_ 。
+
+=staticmethod= 就是 _普通的函数_ ，只是碰巧在类的定义体中。
+该装饰器 _并不是很重要_ ，因为可以在同一模块中该类的前后定义函数即可达到同样的效果。
+
+
+** =__slots__=
+
+
+默认情况下，Python 在各个实例中名为 =__dict__= 的字典里存储实例属性。
+
+为了使用底层的散列表提升访问速度，字典会消耗大量内存。
+如果要处理数百万个属性不多的实例，通过 =__slots__= 类属性，能节省大量内存。
+*其本质是让解释器在元组中存储实例属性，而不是使用字典。*
+
+继承自超类的 =__slots__= 属性 *没有效果* ，Python 只会使用 *各个类中自己定义* 的 =__slots__= 属性。
+
+不要使用 =__slots__= 禁止类的用户新增实例属性，使用 =__slots__= 是 *为了优化，不是为了约束。*
+
+
+*** 节省的内存也可能被再次吃掉
+
+如果把 =__dict__= 这个名称添加到 =__slots__= 中，
+实例会在元祖中保存各个实例的属性，同时还支持动态创建属性，但这样就失去了节省内存的功效。
+
+
+
+
+
+** =__getattr__=
+
+对于 =my_obj.x= 表达式，Python 会检查该实例有没有名为 =x= 的属性，如果没有，到类 =my_obj.__class__= 中查找；
+如果仍然没找到，则顺着继承树继续查找。
+
+如果依旧找不到，则调用 =my_obj= 所属类中定义的 =__getattr__= 方法，传入 =self= 和属性名称的字符串形式 ='x'= 。
+
+多数时候，如果实现了 =__getattr__= 方法，那么也要定义 =__setattr__= 方法，以防对象的行为不一致。
+
+
+
+
+
+
+
+
+
+
+* 流程控制
+
+** 内置的 =iter= 函数
+
+当需要迭代对象 =x= 时，会自动调用 =iter(x)= 。内置的 =iter= 函数有以下作用：
+
+1. 检查对象是否实现了 =__iter__= 方法，如果实现了就调用它，获取一个迭代器。
+2. 如果没有实现 =__iter__= 方法，但是实现了 =__getitem__= 方法，Python 会创建一个迭代器，尝试按顺序（从索引0开始）获取元素。
+3. 如果尝试失败，则抛出 =TypeError= 异常。
+
+
+** 生成器
+
+*生成器保存的是算法* ，每次调用 =next(g)= ，就计算出 =g= 的下一个元素的值。
+
+直到计算到最后一个元素，没有更多的元素时，抛出 =StopIteration= 异常。
+
+当 Python 函数定义体中有 =yield= 关键字，该函数就是生成器函数。
+
+调用生成器函数时，会返回一个生成器对象。也就是说生成器函数是生成器工厂。
+
+*生成器表达式本质上是生成器函数的语法糖。*
+
+
+*** yield from 语法
+
+这个语句的作用是把不同的生成器结合在一起使用。
+
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  def chain(*iterables):
+      for it in iterables:
+          for i in it:
+              yield i
+
+  print(list(chain('ABC', range(3))))
+#+END_SRC
+
+#+RESULTS:
+: ['A', 'B', 'C', 0, 1, 2]
+
+
+*等效于：*
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  def chain(*iterables):
+      for i in iterables:
+          yield from i
+
+  print(list(chain('ABC', range(3))))
+#+END_SRC
+
+#+RESULTS:
+: ['A', 'B', 'C', 0, 1, 2]
+
+
+*** 把生成器当成协程
+
+[[https://www.python.org/dev/peps/pep-0342/][PEP 342]] 为生成器对象添加了 =send()= 方法，该方法使得生成器前进到下一个 yield 语句。
+
+=send()= 方法还允许使用生成器的客户把数据发给自己，传给 =send()= 方法的参数，
+会成为生成器函数定义体中对应 yield 表达式的值。
+也就是说， =send()= 方法允许在客户代码和生成器之间 *双向交换数据。*
+
+*生成器用于生成供迭代的数据，而协程是数据的消费者，协程与迭代无关。*
+
+
+
+
+
+
+
 
 
 * 并发编程
@@ -2210,32 +1907,6 @@ taxi: 2      going home  [ 83 ]
 
 
 
-* 模块
-
-** 包目录结构
-
-#+BEGIN_EXAMPLE
-  cisco
-  ├── __init__.py
-  ├── csg
-  │   ├── __init__.py
-  │   ├── modA.py
-  │   └── modB.py
-  ├── modA.py
-  └── modB.py
-#+END_EXAMPLE
-
-每一个包目录下面都会有一个 =__init__.py= 的文件，这个文件是必须存在的，
-否则，Python 就把这个目录当成普通目录，而不是一个包。
-
-=__init__.py= 可以是空文件，也可以有 Python 代码，
-因为 =__init__.py= 本身就是一个模块，而它的模块名就是目录名。
-
-
-
-* 对象
-
-
 
 
 * 元编程
@@ -2628,12 +2299,14 @@ haystack ->  1  4  5  6  8 12 15 20 21 23 23 26 29 30
 
 
 
+
 **** OrderedDict
 
 这个类型在添加键的时候会保持顺序，因此键的迭代次序总是一致的。
 
 OrderedDict 的 popitem 方法默认删除并返回字典里最后一个元素，
 但是如果调用 =popitem(last=False)= ，则删除并返回第一个被添加进去的元素。
+
 
 
 
@@ -2649,6 +2322,7 @@ OrderedDict 的 popitem 方法默认删除并返回字典里最后一个元素�
   pylookup = ChainMap(locals(), globals(), vars(builtins))
 
 #+END_SRC
+
 
 
 **** Counter
@@ -2674,7 +2348,8 @@ Counter 实现了 + 和 - 运算符来合并记录。 =most_common([n])= 方法�
 : [('a', 10), ('z', 3)]
 
 
-**** UserDict
+
+**** UserDict <<user dict>>
 
 这个类其实是把标准 dict 用纯 Python 又实现了一遍，主要的用途是让用户继承写子类的。
 
@@ -2874,6 +2549,7 @@ types.MappingProxyType 会返回一个只读的映射视图。
 : c = {'x': '1', 'y': '2'}
 :
 : missing a required argument: 'a'
+
 
 
 *** 函数式编程风格(operator)
@@ -3194,6 +2870,342 @@ result:  8
 
 #+RESULTS:
 : default
+
+
+
+** 流程控制
+
+
+
+*** 标准库中的生成器函数
+
+**** 用于过滤的生成器函数
+
+***** =itertools.compress(it, selector_it)=
+
+并行处理两个可迭代对象：如果 selector_it 中的元素是真值，产出 it 中对应的元素。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+    import itertools
+    def vowel(c):
+        return c.lower() in 'aeiou'
+
+    result = list(itertools.compress('Aardvark', (1, 0, 1, 1, 0, 1)))
+    print(result)
+#+END_SRC
+
+#+RESULTS:
+: ['A', 'r', 'd', 'a']
+
+
+***** =itertools.dropwhile(predicate, it)=
+
+处理 it ，跳过 predicate 计算结果为真值的元素，产出剩下的元素。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+    print(list(itertools.dropwhile(vowel, 'Aardvark')))
+#+END_SRC
+
+#+RESULTS:
+: ['r', 'd', 'v', 'a', 'r', 'k']
+
+
+***** =builtin.filter(predicate, it)=
+
+如果 =predicate(item)= 返回真值，产出对应的元素，如果 predicate 是 None ，则只产出真值元素。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+    print(list(filter(vowel, 'Aardvark')))
+#+END_SRC
+
+#+RESULTS:
+: ['A', 'a', 'a']
+
+
+***** =itertools.filterfalse(predicate, it)=
+
+如果 =predicate(item)= 返回假值，产出对应的元素。
+
+
+***** =itertools.islice(it, [start], stop, step=1)=
+
+产出 it 的切片，类似于 =s[:stop]= 或 =s[start:stop:step]= 。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+    print(list(itertools.islice('Aardvark', 4)))
+    print(list(itertools.islice('Aardvark', 4, 7)))
+    print(list(itertools.islice('Aardvark', 1, 7, 2)))
+#+END_SRC
+
+#+RESULTS:
+: ['A', 'a', 'r', 'd']
+: ['v', 'a', 'r']
+: ['a', 'd', 'a']
+
+***** =itertools.takewhile(predicate, it)=
+
+如果 =predicate(item)= 返回真值，产出对应的元素，然后停止。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+    print(list(itertools.takewhile(vowel, 'Aardvark')))
+#+END_SRC
+
+#+RESULTS:
+: ['A', 'a']
+
+
+**** 用于映射的生成器函数
+
+***** =itertools.accumulate(it, [func])=
+
+产出累计值，默认为求和；如果提供了 func ，则把前面两个元素传个 func ，
+然后把计算结果和下一个元素传给它，以此类推，最后产出结果。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+    from operator import mul
+    sample = [5, 4, 2, 8, 7, 6, 3, 0, 9, 1]
+
+    print(list(itertools.accumulate(sample)))
+    print(list(itertools.accumulate(sample, min)))
+    print(list(itertools.accumulate(sample, mul)))
+
+#+END_SRC
+
+  #+RESULTS:
+  : [5, 9, 11, 19, 26, 32, 35, 35, 44, 45]
+  : [5, 4, 2, 2, 2, 2, 2, 0, 0, 0]
+  : [5, 20, 40, 320, 2240, 13440, 40320, 0, 0, 0]
+
+
+***** =builtin.enumerate(it, start=0)=
+
+产出有两个元素组成的元组，结构是 (index, item) ，其中 index 从 start 开始计数，item 则从 iterable 中获取。
+
+***** =builtin.map(func, it1, [it2, ..., itN])=
+
+如果传入 N 个 可迭代对象，则 func 必须能接受 N 个参数。
+
+***** =itertools.starmap(func, it)=
+
+把 it 中各个元素传给 func ，产出结果。
+
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+    print(list(itertools.starmap(mul, enumerate('albatroz', 1))))
+    print(list(itertools.starmap(lambda a, b: b/a,
+                                 enumerate(itertools.accumulate(sample), 1))))
+  #+END_SRC
+
+  #+RESULTS:
+  : ['a', 'll', 'bbb', 'aaaa', 'ttttt', 'rrrrrr', 'ooooooo', 'zzzzzzzz']
+  : [5.0, 4.5, 3.6666666666666665, 4.75, 5.2, 5.333333333333333, 5.0, 4.375, 4.888888888888889, 4.5]
+
+
+**** 用于合并可迭代对象的生成器函数
+
+***** =itertools.chain(it1, ..., itN)=
+
+无缝连接多个可迭代对象。
+
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+    print(list(itertools.chain('ABC', range(3))))
+  #+END_SRC
+
+  #+RESULTS:
+  : ['A', 'B', 'C', 0, 1, 2]
+
+
+***** =itertools.chain.from_iterable(it)=
+
+  产出 it 生成的各个可迭代对象中的元素，无缝连接在一起。
+
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+    print(list(itertools.chain.from_iterable(enumerate('ABC'))))
+  #+END_SRC
+
+  #+RESULTS:
+  : [0, 'A', 1, 'B', 2, 'C']
+
+
+***** =itertaools.product(it1, ..., itN, repeat=1)=
+
+  计算笛卡尔积，合并成由 N 个元素组成的元组。
+  repeat 关键字参数告诉 product 函数重复 N 次处理输入的各个可迭代对象。
+
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(list(itertools.product('ABC', range(2))))
+  # list(itertools.product('ABC', 'ABC'))
+  print(list(itertools.product('ABC', repeat=2)))
+  #+END_SRC
+
+  #+RESULTS:
+  : [('A', 0), ('A', 1), ('B', 0), ('B', 1), ('C', 0), ('C', 1)]
+  : [('A', 'A'), ('A', 'B'), ('A', 'C'), ('B', 'A'), ('B', 'B'), ('B', 'C'), ('C', 'A'), ('C', 'B'), ('C', 'C')]
+
+***** =builtin.zip(it1, .., itN)=
+
+  产出由 N 个元素组成的元组，只要有一个可迭代对象到头了，即停止。
+
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(list(zip('ABC', range(5), [10, 20, 30, 40, 50, 60])))
+  #+END_SRC
+
+  #+RESULTS:
+  : [('A', 0, 10), ('B', 1, 20), ('C', 2, 30)]
+
+***** =itertools.zip_longest(it1, ..., itN, fillvalue=None)=
+
+  产出由 N 个元素组成的元组，等到最长的可迭代对象到头了，即停止。
+
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+    print(list(itertools.zip_longest('ABC',
+                                     range(5),
+                                     [10, 20, 30, 40, 50, 60],
+                                     fillvalue='?')))
+  #+END_SRC
+
+  #+RESULTS:
+  : [('A', 0, 10), ('B', 1, 20), ('C', 2, 30), ('?', 3, 40), ('?', 4, 50), ('?', '?', 60)]
+
+
+**** 用于扩展输出元素的生成器函数
+
+***** =itertools.combinations(it, out_len)=
+
+  把 it 产出的 out_len 个元素组合在一起，然后产出。
+
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+    print(list(itertools.combinations('ABC', 2)))
+  #+END_SRC
+
+  #+RESULTS:
+  : [('A', 'B'), ('A', 'C'), ('B', 'C')]
+
+***** =itertools.combinations_with_replacement(it, out_len)=
+
+  把 it 产出的 out_len 个元素组合在一起，然后产出，包含相同元素的组合。
+
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+    print(list(itertools.combinations_with_replacement('ABC', 2)))
+  #+END_SRC
+
+  #+RESULTS:
+  : [('A', 'A'), ('A', 'B'), ('A', 'C'), ('B', 'B'), ('B', 'C'), ('C', 'C')]
+
+***** =itertools.permutation(it, out_len=None)=
+
+  把 out_len 个 it 产出元素排列在一起，然后产出这些排列；out_len 的默认值等于 =len(list(it))= 。
+
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+    print(list(itertools.permutations('ABC', 2)))
+  #+END_SRC
+
+  #+RESULTS:
+  : [('A', 'B'), ('A', 'C'), ('B', 'A'), ('B', 'C'), ('C', 'A'), ('C', 'B')]
+
+***** =itertools.count(start=0, step=1)=
+
+  从 start 开支不断产出数字，按 step 步幅增加。
+
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+    print(list(itertools.islice(itertools.count(1, .3), 3)))
+  #+END_SRC
+
+  #+RESULTS:
+  : [1, 1.3, 1.6]
+
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(list(zip(count(), ['a', 'b', 'c'])))
+#+END_SRC
+
+#+RESULTS:
+: [(0, 'a'), (1, 'b'), (2, 'c')]
+
+***** =itertools.cycle(it)=
+
+  从 it 中产出元素，存储各个元素的 *副本* ，然后按顺序重复不断地产出各个元素。
+
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+    print(list(itertools.islice(itertools.cycle('ABC'), 7)))
+  #+END_SRC
+
+  #+RESULTS:
+  : ['A', 'B', 'C', 'A', 'B', 'C', 'A']
+
+
+***** =itertools.repeat(item, [times])=
+
+  不断产出指定元素，除非指定次数。常见用途，为 map 函数提供固定参数：
+
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+    print(list(map(mul, range(11), itertools.repeat(5))))
+  #+END_SRC
+
+  #+RESULTS:
+  : [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+
+
+***** =builtin.iter(callable, sentinel)=
+
+  第一个参数是一个没有参数的可调用对象，用于不断调用，产出各个值；第二个值是哨符，当可调用对象返回这个值时，迭代结束 (不产出哨符) 。
+
+  iter 的[[https://docs.python.org/3/library/functions.html#iter][文档]]中有个实用的例子，这段代码逐行读取文件，直到遇到空行或到达文件末尾为止：
+
+  #+BEGIN_SRC ipython :eval never-export
+    with open('mydata.txt') as fp:
+        for line in iter(fp.readline, ''):
+            process_line(line)
+  #+END_SRC
+
+
+**** 用于重新排列元素的生成器函数
+
+***** =itertools.groupby(it, key=None)=
+
+  产出由两个元素组成的元组，形式为 (key, group) ，其中 key 是分组标准，group 是生成器，用于产出分组里的元素。
+
+  注意， =itertool.groupby= 假定输入的可迭代对象已使用指定的 key 分组了各个元素。
+
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+    print(list(itertools.groupby('LLLAAGGG')))
+    print(list(itertools.groupby('LLAALAAGGG')))
+  #+END_SRC
+
+  #+RESULTS:
+  : [('L', <itertools._grouper object at 0x106a79208>), ('A', <itertools._grouper object at 0x106a791d0>), ('G', <itertools._grouper object at 0x106a79080>)]
+  : [('L', <itertools._grouper object at 0x106a79cf8>), ('A', <itertools._grouper object at 0x106a791d0>), ('L', <itertools._grouper object at 0x106a79080>), ('A', <itertools._grouper object at 0x106a79160>), ('G', <itertools._grouper object at 0x106a79358>)]
+
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+    animals = ['duck', 'eagle', 'rat', 'giraffe', 'bear', 'bat', 'dolphin', 'shark', 'lion']
+    animals.sort(key=len)
+    for length, group in itertools.groupby(animals, len):
+        print(length, '->', list(group))
+  #+END_SRC
+
+  #+RESULTS:
+  : 3 -> ['rat', 'bat']
+  : 4 -> ['duck', 'bear', 'lion']
+  : 5 -> ['eagle', 'shark']
+  : 7 -> ['giraffe', 'dolphin']
+
+
+***** =builtin.reversed(seq)=
+
+  seq 必须是序列，或是实现了 =__reversed__= 特殊方法的对象。
+
+***** =itertools.tee(it, n=2)=
+
+  产出一个由 n 个生成器组成的元组，每个生成器用于单独产出输入的可迭代对象中的元素。
+
+  #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+    print(list(zip(*itertools.tee('ABC'))))
+  #+END_SRC
+
+  #+RESULTS:
+  : [('A', 'A'), ('B', 'B'), ('C', 'C')]
+
+
+
 
 * 参考文档
 
