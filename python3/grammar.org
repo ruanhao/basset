@@ -1126,8 +1126,8 @@ Python 3 引入了=nonlocal= 声明，它的作用是 _把变量标记为自由�
 [[https://www.python.org/dev/peps/pep-0342/][PEP 342]] 为生成器对象添加了 =send()= 方法，该方法使得生成器前进到下一个 yield 语句。
 
 =send()= 方法还允许使用生成器的客户把数据发给自己，传给 =send()= 方法的参数，
-会成为生成器函数定义体中对应 yield 表达式的值。
-也就是说， =send()= 方法允许在客户代码和生成器之间 *双向交换数据。*
+会成为生成器函数定义体中对应 =yield= 表达式的值。
+也就是说， =send()= 方法允许在客户代码和生成器之间 _双向交换数据_ 。
 
 *生成器用于生成供迭代的数据，而协程是数据的消费者，协程与迭代无关。*
 
@@ -1137,6 +1137,40 @@ Python 3 引入了=nonlocal= 声明，它的作用是 _把变量标记为自由�
 
 
 
+
+
+** =for/else=, =while/else=, =try/else=
+
+在所有情况下，如果因为异常或者 return，break 或 continue 语句导致控制权跳到了块之外，else 子句也会被跳过。
+
+- for/else
+
+  仅当 for 循环运行完毕时 (即 for 循环没有被 break 语句中止) 才运行 else 块。
+
+- while/else
+
+  仅当 while 循环因为条件为假值而退出时 (即 while 循环没有被 break 语句中止) 才运行 else 块。
+
+- try/else
+
+  仅当 try 块中没有异常抛出时才运行 else 块， *else 子句抛出的异常不会由前面的 except 子句处理。*
+
+
+
+** 上下文管理协议(=with=)
+
+_with 语句的目的是简化 try/finally 模式_ 。
+
+上下文管理器协议包含 =__enter__= 和 =__exit__= 两个方法:
+
+- with 语句开始运行时，会在上下文管理器对象上调用 =__enter__= 方法。
+- with 语句运行结束后，会在上下文管理器对象上调用 =__exit__= 方法，以此扮演 =finally= 子句的角色。
+
+=__exit__= 方法如果返回 =True= 之外的值 (包括 None) ，则 with 块中的任何异常都会向上冒泡。
+(返回 True ，即告诉解释器，异常已经处理了)
+
+
+[[contextlib][不要自己造轮子]]
 
 
 * 并发编程
@@ -1423,184 +1457,6 @@ wait 是协程函数，因此它 *不会阻塞* ，默认行为是等传给它�
 #+END_SRC
 
 
-
-* 上下文管理
-
-** for/else, while/else, try/else
-
-在所有情况下，如果因为异常或者 return，break 或 continue 语句导致控制权跳到了块之外，else 子句也会被跳过。
-
-- for/else
-
-  仅当 for 循环运行完毕时 (即 for 循环没有被 break 语句中止) 才运行 else 块。
-
-- while/else
-
-  仅当 while 循环因为条件为假值而退出时 (即 while 循环没有被 break 语句中止) 才运行 else 块。
-
-- try/else
-
-  仅当 try 块中没有异常抛出时才运行 else 块， *else 子句抛出的异常不会由前面的 except 子句处理。*
-
-** with
-
-with 语句的目的是简化 try/finally 模式。
-
-上下文管理器协议包含 =__enter__= 和 =__exit__= 两个方法:
-
-- with 语句开始运行时，会在上下文管理器对象上调用 =__enter__= 方法。
-- with 语句运行结束后，会在上下文管理器对象上调用 =__exit__= 方法，以此扮演 finally 子句的角色。
-
-=__exit__= 方法如果返回 True 之外的值 (包括 None) ，则 with 块中的任何异常都会向上冒泡。
-如果返回 True ，即告诉解释器，异常已经处理了。
-
-
-** contextlib 模块中的实用工具
-
-*** closing
-
-如果对象提供了 =close()= 方法，但没有实现 =__enter__/__exit__= 协议，则可以用这个函数构建上下文管理器。
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  from contextlib import closing
-
-  class Door:
-
-      def open(self):
-          print("door opened")
-
-      def close(self):
-          print("door closed")
-
-  with closing(Door()) as door:
-      door.open()
-#+END_SRC
-
-#+RESULTS:
-: door opened
-: door closed
-
-
-*** suppress
-
-构建忽略指定异常的上下文管理器。
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  from contextlib import suppress
-  import os
-
-  with suppress(FileNotFoundError):
-      os.remove('somefile.tmp')
-#+END_SRC
-
-#+RESULTS:
-
-*** redirect
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  import io
-  from contextlib import redirect_stdout
-
-  f = io.StringIO()
-  with redirect_stdout(f):
-      help(pow)
-
-  log("f.getvalue()", f.getvalue())
-#+END_SRC
-
-#+RESULTS:
-#+begin_example
-======== f.getvalue() ========
-Help on built-in function pow in module builtins:
-
-pow(x, y, z=None, /)
-    Equivalent to x**y (with two arguments) or x**y % z (with three arguments)
-
-    Some types, such as ints, are able to use a more efficient algorithm when
-    invoked using the three argument form.
-
-
-#+end_example
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  with open('/tmp/help.txt', 'w') as f:
-      with redirect_stdout(f):
-          help(pow)
-#+END_SRC
-
-#+RESULTS:
-
-
-*** @contextmanager
-
-这个装饰器把简单的生成器函数变成上下文管理器，这样就不用创建类去实现管理器协议了。
-
-在使用 @contextmanager 装饰的生成器中，yield 语句的作用是把函数的定义体分成两部分：
-
-- yield 语句前面的所有代码在 with 块开始时 (即解释器调用 =__enter__= 方法时) 执行
-- yield 语句后面的代码在 with 块结束时 (即调用 =__exit__= 方法时) 执行
-
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  from contextlib import contextmanager
-
-  class Query(object):
-
-      def __init__(self, name):
-          self.name = name
-
-      def query(self):
-          print('Query info about %s...' % self.name)
-
-  @contextmanager
-  def create_query(name):
-      print('Begin')
-      with suppress(Exception):
-          yield Query(name)  # 需要使用 as
-      print('End')
-
-  with create_query('Bob') as q:
-      q.query()
-#+END_SRC
-
-#+RESULTS:
-: Begin
-: Query info about Bob...
-: End
-
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  @contextmanager
-  def tag(name):
-      print("<%s>" % name, end='')
-      with suppress(Exception):
-          yield  # 无需使用 as
-      print("</%s>" % name)
-
-  with tag("h1"):
-      print("hello", end='')
-#+END_SRC
-
-#+RESULTS:
-: <h1>hello</h1>
-
-本质上，contextlib.contextmanager 装饰器会把函数包装成实现了 =__enter__= 和 =__exit__= 方法的类 (类的名称是 _GeneraorContextManager) 。这个类的 =__enter__= 方法有如下作用：
-
-- 调用生成器函数，保存生成器对象 (这里把它成为 gen)
-- 调用 =next(gen)= ，执行到 yield 关键字所在位置
-- 返回上一步 =next(gen)= 产出的值，以便把产出的值绑定到 with/as 语句中的目标变量上
-
-with 块终止时， =__exit__= 方法会做以下几件事：
-
-- 检查有没有异常，如果有，调用 =gen.throw(ex)= ，在生成器函数定义体中包含 yield 关键字的那一行抛出异常
-- 否则，调用 =next(gen)= ，继续执行生成器函数定义体中 yield 语句之后的代码
-
-
-*注意:*
-
-如果在 with 块中抛出了异常，Python 解释器会将其捕获，然后会在生成器函数中 yield 表达式处再次抛出。因此使用 @contextmanager 装饰器时，要把 yield 语句放在 try/finally 语句中 (或者放在 with 语句中) ，这是无法避免的，因为我们永远不知道使用上下文管理器的用户会在 with 块中做什么。
-
-另外，@contextmanager 装饰器提供的 =__exit__= 方法假定发给生成器的所有异常都得到处理了，因此应该压制异常。如果不想让 @contextmanager 压制异常，必须在被装饰的函数中显示重新抛出异常。
 
 
 * 协程
@@ -2081,9 +1937,9 @@ Python3 引入了特殊方法 =__prepare__= ，这个特殊方法只在元类中
 
 *** 序列操作
 
-**** 使用 ‘*’ 处理元组拆包
+**** 使用 =*= 处理元组拆包
 
-‘*’ 前缀只能用在 *一个* 变量名前面，但是这个变量可以出现在赋值表达式的任意位置。
+=*= 前缀只能用在 *一个* 变量名前面，但是这个变量可以出现在赋值表达式的任意位置。
 
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
@@ -2904,6 +2760,7 @@ result:  8
 
 **** =sum(it, start=0)=
 
+
 *** 标准库中的生成器函数
 
 
@@ -3246,6 +3103,164 @@ result:  8
 
 
 
+
+
+
+
+*** 上下文管理 <<contextlib>>
+
+**** 自动关闭对象(=closing=)
+
+如果对象提供了 =close()= 方法，但没有实现 =__enter__/__exit__= 协议，则可以用这个函数构建上下文管理器。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from contextlib import closing
+
+  class Door:
+
+      def open(self):
+          print("door opened")
+
+      def close(self):
+          print("door closed")
+
+  with closing(Door()) as door:
+      door.open()
+#+END_SRC
+
+#+RESULTS:
+: door opened
+: door closed
+
+
+**** 忽略异常(=suppress=)
+
+构建忽略指定异常的上下文管理器。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from contextlib import suppress
+  import os
+
+  with suppress(FileNotFoundError):
+      os.remove('somefile.tmp')
+#+END_SRC
+
+#+RESULTS:
+
+
+**** 重定向(=redirect_stdout=)
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import io
+  from contextlib import redirect_stdout
+
+  f = io.StringIO()
+  with redirect_stdout(f):
+      help(pow)
+
+  log("f.getvalue()", f.getvalue())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+================================= f.getvalue() =================================
+Help on built-in function pow in module builtins:
+
+pow(x, y, z=None, /)
+    Equivalent to x**y (with two arguments) or x**y % z (with three arguments)
+
+    Some types, such as ints, are able to use a more efficient algorithm when
+    invoked using the three argument form.
+
+
+#+end_example
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  with open('/tmp/help.txt', 'w') as f:
+      with redirect_stdout(f):
+          help(pow)
+#+END_SRC
+
+#+RESULTS:
+
+
+**** 使用生成器作为上下文管理器(=@contextmanager=)
+
+这个装饰器把简单的生成器函数变成上下文管理器，这样就不用创建类去实现管理器协议了。
+
+在使用 =@contextmanager= 装饰的生成器中， =yield=  语句的作用是把函数的定义体分成两部分：
+
+- yield 语句前面的所有代码在 with 块开始时 (即解释器调用 =__enter__= 方法时) 执行
+- yield 语句后面的代码在 with 块结束时 (即调用 =__exit__= 方法时) 执行
+
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from contextlib import contextmanager
+
+  class Query(object):
+
+      def __init__(self, name):
+          self.name = name
+
+      def query(self):
+          print('Query info about %s...' % self.name)
+
+  @contextmanager
+  def create_query(name):
+      print('Begin')
+      with suppress(Exception):
+          yield Query(name)  # 绑定到 as 子句的目标变量
+      print('End')
+
+  with create_query('Bob') as q:
+      q.query()
+#+END_SRC
+
+#+RESULTS:
+: Begin
+: Query info about Bob...
+: End
+
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  @contextmanager
+  def tag(name):
+      print("<%s>" % name, end='')
+      with suppress(Exception):
+          yield  # 无需使用 as 子句
+      print("</%s>" % name)
+
+  with tag("h1"):
+      print("hello", end='')
+#+END_SRC
+
+#+RESULTS:
+: <h1>hello</h1>
+
+本质上，=contextlib.contextmanager= 装饰器会把函数包装成实现了 =__enter__= 和 =__exit__= 方法的类
+(类的名称是 _GeneraorContextManager) 。
+
+这个类的 =__enter__= 方法有如下作用：
+
+- 调用生成器函数，保存生成器对象 (这里把它成为 gen)
+- 调用 =next(gen)= ，执行到 =yield= 关键字所在位置
+- 返回上一步 =next(gen)= 产出的值，以便把产出的值绑定到 with/as 语句中的目标变量上
+
+with 块终止时， =__exit__= 方法会做以下几件事：
+
+- 检查有没有异常，如果有，调用 =gen.throw(ex)= ，在生成器函数定义体中包含 =yield= 关键字的那一行抛出异常
+- 否则，再调用 =next(gen)= ，继续执行生成器函数定义体中 =yield= 语句之后的代码
+
+
+*注意:*
+
+如果在 with 块中抛出了异常，Python 解释器会将其捕获，然后会在生成器函数中 =yield= 表达式处再次抛出。
+
+*因此使用 =@contextmanager= 装饰器时，要把 =yield= 语句放在 try/finally 语句中 (或者放在 with 语句中)。*
+(因为我们永远不知道使用上下文管理器的用户会在 with 块中做什么)
+
+另外，=@contextmanager= 装饰器提供的 =__exit__= 方法 _假定发给生成器的所有异常都得到处理了_ ，因此应该压制异常。
+如果不想让 =@contextmanager= 压制异常，必须在被装饰的函数中显式重新抛出异常。
 
 
 
