@@ -277,9 +277,9 @@ deque([3, 4, 5, 6, 7, 8, 9, 11, 22, 33], maxlen=10)
 [[file:img/map_vs_mutable.png]]
 
 
-非抽象映射类型一般不会直接继承 =collections.abc= 中的抽象基类，
-而是直接对 =dict= 或是 =collections.UserDict= 进行扩展。
-这些抽象基类的主要作用是 _形式化文档_ ，可以和 =isinstance= 一起被用来判定某个数据是不是 *广义上的映射类型* ：
+非抽象映射类型一般不会直接继承 collections.abc 中的抽象基类，
+而是直接对 dict 或是 collections.UserDict 进行扩展。
+这些抽象基类的主要作用是 _形式化文档_ ，可以和 isinstance 一起被用来判定某个数据是不是 *广义上的映射类型* ：
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from collections import abc
@@ -293,9 +293,9 @@ deque([3, 4, 5, 6, 7, 8, 9, 11, 22, 33], maxlen=10)
 
 *** __missing__方法
 
-映射类型在处理找不到的键的时候，都会涉及 =__missing__= 方法。
-虽然基类 dict 没有定义这个方法，但是如果一个类继承了 dict ，然后提供了 =__missing__= 方法，
-那么当 =__getitem__= 遇到找不到键的时候，Python 会自动调用它，而不是抛出 KeyError 异常。
+映射类型在处理找不到的键的时候，都会涉及__missing__方法。
+虽然基类 dict 没有定义这个方法，但是如果一个类继承了 dict ，然后提供了__missing__方法，
+那么当__getitem__遇到找不到键的时候，Python 会自动调用它，而不是抛出 KeyError 异常。
 
 *__missing__ 方法只会被__getitem__调用（即使用表达式 d[k] ）*
 
@@ -311,7 +311,7 @@ _原有的散列表会被复制到一个更大的空间里面_ 。
 
 **** 加盐
 
-=str=, =bytes= 和 =datetime= 对象的散列值计算过程中多了 _随机加盐_ 这一步。
+str, bytes 和 datetime 对象的散列值计算过程中多了 _随机加盐_ 这一步。
 
 所加盐值是进程中一个常量，每次启动解释器都会生成一个不同的盐值。
 随机盐值的加入是为了防止 DOS 攻击而采取的一种安全措施。
@@ -339,12 +339,12 @@ _原有的散列表会被复制到一个更大的空间里面_ 。
 
 **** 可散列对象必须满足的条件
 
-1. 支持 =hash()= 函数，并且通过 =__hash()__= 方法所得到的散列值是不变的
-2. 支持通过 =__eq__()= 方法来检测相等性
+1. 支持 =hash()= 函数，并且通过__hash__方法所得到的散列值是不变的
+2. 支持通过__eq__方法来检测相等性
 3. 若 =a==b= 为真，则 =hash(a)==hash(b)= 也为真
 
 
-如果一个含有自定义 =__eq__= 方法的类处于可变的状态，就不要在这个类中实现 =__hash__= 方法，
+如果一个含有自定义__eq__方法的类处于可变的状态，就不要在这个类中实现__hash__方法，
 因为它的实例是不可散列的。
 
 
@@ -484,10 +484,10 @@ _原有的散列表会被复制到一个更大的空间里面_ 。
 
 
 出现这种现象的原因在于，
-函数在定义的时候，默认参数 =L= 的值就被计算出来了，即 =[]= ，且该 _引用_ 保存在函数属性 =__defaults__= 中。
-每次调用该函数，如果改变了 =L= 的内容， =__defaults__= 中的内容 _也将随之改变_ 。
+函数在定义的时候，默认参数 L 的值就被计算出来了，即 [] ，且该 _引用_ 保存在函数属性__defaults__中。
+每次调用该函数，如果改变了 L 的内容，__defaults__中的内容 _也将随之改变_ 。
 
-可以用 =None= 这个不可变对象来避免这种陷阱：
+可以用 None 这个不可变对象来避免这种陷阱：
 
 #+BEGIN_SRC ipython :eval never-export
   def add_end(L=None):
@@ -550,8 +550,8 @@ _原有的散列表会被复制到一个更大的空间里面_ 。
 : 3
 : Exception: local variable 'b' referenced before assignment
 
-编译函数定义体时，由于在函数中对 =b= 进行了赋值，因此 Python 判定 =b= 为局部变量。
-当函数被调用时，Python 尝试获取局部变量 =b= 时，发现 =b= 没有绑定值，于是报错。
+编译函数定义体时，由于在函数中对 b 进行了赋值，因此 Python 判定 b 为局部变量。
+当函数被调用时，Python 尝试获取局部变量 b 时，发现 b 没有绑定值，于是报错。
 
 这是 Python 的 _设计选择_ ：不要求声明变量，但是假定 *在函数定义体中赋值的变量是局部变量* 。
 
@@ -586,14 +586,14 @@ _原有的散列表会被复制到一个更大的空间里面_ 。
 
 *** 自由变量定义
 
-自由变量指的是未在 =local= 作用域中绑定的变量。
+自由变量指的是未在 local 作用域中绑定的变量。
 
 [[file:img/python3_free_variable.png]]
 
 
 *** 闭包元信息（__code__, __closure__）
 
-局部变量和自由变量的名称保存在 =__code__= 属性中：
+局部变量和自由变量的名称保存在__code__属性中：
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   log("avg.__code__.co_varnames", avg.__code__.co_varnames)
@@ -607,7 +607,7 @@ _原有的散列表会被复制到一个更大的空间里面_ 。
 : ('series',)
 
 
-自由变量的绑定值保存在 =__closure__= 属性中：
+自由变量的绑定值保存在__closure__属性中：
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   log("avg.__closure__", avg.__closure__)
@@ -618,7 +618,7 @@ _原有的散列表会被复制到一个更大的空间里面_ 。
 : (<cell at 0x111aff978: list object at 0x111954dc8>,)
 
 =__closure__= 中的各个元素对应于 =__code__.co_freevars= 中的一个名称。
-这些元素是 =cell= 对象，该对象的 =cell_contents= 属性保存着真正的值：
+这些元素是 cell 对象，该对象的 cell_contents 属性保存着真正的值：
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   log("avg.__closure__[0].cell_contents", avg.__closure__[0].cell_contents)
@@ -658,11 +658,11 @@ _原有的散列表会被复制到一个更大的空间里面_ 。
 : local variable 'count' referenced before assignment
 
 造成上述错误的原因在于，如果 _尝试重新绑定_ ，例如 =count = count + 1= ，
-其实会 _隐式创建局部变量_ =count= ，从而导致错误。
-同时，这样一来， =count= 就不可能是自由变量了，不会保存在闭包中。
+其实会 _隐式创建局部变量_ count ，从而导致错误。
+同时，这样一来， count 就不可能是自由变量了，不会保存在闭包中。
 
 
-Python 3 引入了 =nonlocal= 声明，它的作用是 _把变量标记为自由变量_ ：
+Python 3 引入了 nonlocal 声明，它的作用是 _把变量标记为自由变量_ ：
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   def make_averager():
@@ -754,9 +754,9 @@ Python 3 引入了 =nonlocal= 声明，它的作用是 _把变量标记为自由
 
 =a==b= 等同于 =a.__eq__(b)= 。
 
-继承自 =object= 的 =__eq__= 方法比较两个对象的 ID ，结果与 is 一样。
+继承自 object 的__eq__方法比较两个对象的 ID ，结果与 is 一样。
 
-但多数内置类型使用更有意义的方式覆盖了 =__eq__= 方法，会考虑对象属性的值。
+但多数内置类型使用更有意义的方式覆盖了__eq__方法，会考虑对象属性的值。
 
 
 ** 对象的深复制与浅复制
@@ -764,7 +764,7 @@ Python 3 引入了 =nonlocal= 声明，它的作用是 _把变量标记为自由
 构造方法或 =[:]= 做的是浅复制，即复制了 _最外层_ 容器，
 副本中的元素是源容器中元素的引用。
 
-=copy= 模块提供的 =deepcopy= 和 =copy= 函数能为任意对象做深复制和浅复制：
+copy 模块提供的 deepcopy 和 copy 函数能为任意对象做深复制和浅复制：
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import copy
@@ -823,7 +823,7 @@ Python 3 引入了 =nonlocal= 声明，它的作用是 _把变量标记为自由
 
 *** 创建弱引用
 
-弱引用是可调用对象，如果对象存在，调用弱引用可以获取对象，否则返回 =None= :
+弱引用是可调用对象，如果对象存在，调用弱引用可以获取对象，否则返回 None :
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import weakref
@@ -838,9 +838,9 @@ Python 3 引入了 =nonlocal= 声明，它的作用是 _把变量标记为自由
 
 *** weakref.WeakValueDictionary
 
-=WeakValueDictionary= 类实现的是一种可变映射， _里面的值是对象的弱引用_ 。
-被引用的对象在程序中的其他地方被当作垃圾回收后，对应的键会自动从 =WeakValueDictionary= 中删除。
-因此，=WeakValueDictionary= 经常用于缓存。
+WeakValueDictionary 类实现的是一种可变映射， _里面的值是对象的弱引用_ 。
+被引用的对象在程序中的其他地方被当作垃圾回收后，对应的键会自动从 WeakValueDictionary 中删除。
+因此，WeakValueDictionary 经常用于缓存。
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import weakref
@@ -869,23 +869,23 @@ Python 3 引入了 =nonlocal= 声明，它的作用是 _把变量标记为自由
 
 *** weakref.WeakKeyDictionary
 
-与 =WeakValueDictionary= 对应的是 =WeakKeyDictionary= ，后者的键是弱引用。
+与 WeakValueDictionary 对应的是 WeakKeyDictionary ，后者的键是弱引用。
 
 
 *** weakref.WeakSet
 
 保存元素弱引用的集合类。元素没有强引用时，集合会把它删除。
 
-如果 _一个类需要知道所有实例_ ，一种好的方案是创建一个 =WeakSet= 类型的类属性，用以保存实例的引用。
+如果 _一个类需要知道所有实例_ ，一种好的方案是创建一个 WeakSet 类型的类属性，用以保存实例的引用。
 
 
 *** 弱引用的局限
 
 不是每个 Python 对象都可以作为弱引用的目标 (或称所指对象) 。
 
-=list= 和 =dict= 实例不能作为所指对象， _但是它们的子类可以_ 。
+list 和 dict 实例不能作为所指对象， _但是它们的子类可以_ 。
 
-=int= 和 =tuple= 实例不能作为弱引用的目标，甚至它们的 _子类也不行_ 。
+int 和 tuple 实例不能作为弱引用的目标，甚至它们的 _子类也不行_ 。
 
 这些局限是内部优化导致的结果。
 
@@ -996,7 +996,7 @@ Python 3 引入了 =nonlocal= 声明，它的作用是 _把变量标记为自由
 **** _abc_registry
 
 
-只有抽象基类才有这个 _属性_ ，其值是 =WeakSet= 对象，即抽象基类注册的虚拟子类的弱引用。
+只有抽象基类才有这个 _属性_ ，其值是 WeakSet 对象，即抽象基类注册的虚拟子类的弱引用。
 
 
 
@@ -1075,65 +1075,13 @@ Python 3 引入了 =nonlocal= 声明，它的作用是 _把变量标记为自由
 
 *生成器保存的是算法* ，每次调用 =next(g)= ，就计算出 =g= 的下一个元素的值。
 
-直到计算到最后一个元素，没有更多的元素时，抛出 =StopIteration= 异常。
+直到计算到最后一个元素，没有更多的元素时，抛出 StopIteration 异常。
 
-当 Python 函数定义体中有 =yield= 关键字，该函数就是生成器函数。
+当 Python 函数定义体中有 yield 关键字，该函数就是生成器函数。
 
 调用生成器函数时，会返回一个生成器对象。也就是说生成器函数是生成器工厂。
 
 *生成器表达式本质上是生成器函数的语法糖。*
-
-
-*** yield from 语法
-
-=yield from= 会创建 _通道_ ，将内层生成器直接与外层生成器的 *客户* 联系起来。
-把生成器用作协程时，这个通道尤为重要。
-
-即当一个生成器函数需要产出另一个生成器生成的值，可以使用这个语法。
-
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  def chain(*iterables):
-      for it in iterables:
-          for i in it:
-              yield i
-
-  print(list(chain('ABC', range(3))))
-#+END_SRC
-
-#+RESULTS:
-: ['A', 'B', 'C', 0, 1, 2]
-
-
-*等效于：*
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  def chain(*iterables):
-      for i in iterables:
-          yield from i
-
-  print(list(chain('ABC', range(3))))
-#+END_SRC
-
-#+RESULTS:
-: ['A', 'B', 'C', 0, 1, 2]
-
-
-*** 把生成器当成协程
-
-[[https://www.python.org/dev/peps/pep-0342/][PEP 342]] 为生成器对象添加了 =send()= 方法，该方法使得生成器前进到下一个 yield 语句。
-
-=send()= 方法还允许使用生成器的客户把数据发给自己，传给 =send()= 方法的参数，
-会成为生成器函数定义体中对应 =yield= 表达式的值。
-也就是说， =send()= 方法允许在客户代码和生成器之间 _双向交换数据_ 。
-
-*生成器用于生成供迭代的数据，而协程是数据的消费者，协程与迭代无关。*
-
-
-
-
-
-
 
 
 
@@ -1159,12 +1107,12 @@ Python 3 引入了 =nonlocal= 声明，它的作用是 _把变量标记为自由
 
 _with 语句的目的是简化 try/finally 模式_ 。
 
-上下文管理器协议包含 =__enter__= 和 =__exit__= 两个方法:
+上下文管理器协议包含__enter__和__exit__两个方法:
 
-- with 语句开始运行时，会在上下文管理器对象上调用 =__enter__= 方法。
-- with 语句运行结束后，会在上下文管理器对象上调用 =__exit__= 方法，以此扮演 =finally= 子句的角色。
+- with 语句开始运行时，会在上下文管理器对象上调用__enter__方法。
+- with 语句运行结束后，会在上下文管理器对象上调用__exit__方法，以此扮演 finally 子句的角色。
 
-=__exit__= 方法如果返回 =True= 之外的值 (包括 None) ，则 with 块中的任何异常都会向上冒泡。
+__exit__方法如果返回 True 之外的值 (包括 None) ，则 with 块中的任何异常都会向上冒泡。
 (返回 True ，即告诉解释器，异常已经处理了)
 
 
@@ -1186,6 +1134,7 @@ _with 语句的目的是简化 try/finally 模式_ 。
 3. GEN_SUSPENDED：在 yield 表达式处暂停
 4. GEN_CLOSED：执行结束
 
+
 *** 执行过程举例
 
 [[file:img/py3_coroutine.png]]
@@ -1201,9 +1150,10 @@ _with 语句的目的是简化 try/finally 模式_ 。
 
 如果不预激，则协程没什么用，即调用 =send()= 之前，一定要先调用 =next()= 。
 
-使用 =yield from= 调用协程时，会 _自动预激_ 。
+使用 yield from 调用协程时，会 _自动预激_ 。
 
-标准库里的 =asyncio.coroutine= 装饰器不会预激协程，兼容 =yield from= 语法。
+标准库里的 asyncio.coroutine 装饰器不会预激协程，兼容 yield from 语法。
+
 
 *** 协程的终止和异常处理
 
@@ -1230,6 +1180,62 @@ _with 语句的目的是简化 try/finally 模式_ 。
 捕获到 GeneratorExit 异常后，生成器 _不能再产出值_ ，否则解释器会抛出 RuntimeError 异常。
 
 如果不管协程如何结束都需要做清理工作，需要把协程定义体中相关的代码放入 =try/finally= 块中。
+
+
+*** yield from
+
+=yield from= 主要功能是创建 _双向通道_ ，将内层生成器直接与外层生成器的 *调用方* 联系起来。
+这样两者可以直接发送和产出值，还可以直接传入异常对象。
+
+即当一个生成器函数需要产出另一个生成器生成的值，可以使用这个语法：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  def chain(*iterables):
+      for i in iterables:
+          yield from i
+
+  print(list(chain('ABC', range(3))))
+#+END_SRC
+
+#+RESULTS:
+: ['A', 'B', 'C', 0, 1, 2]
+
+
+_yield from 结构通常会和 asyncio 模块结合起来实现异步编程。_
+
+
+
+**** yield from 工作原理
+
+[[file:img/py3_yield.png]]
+
+委派生成器相当于 _管道_ ，可以把任意数量的委派生成器连接在一起，
+这个管道最终要以一个只使用 yield 表达式的简单生成器结束 (也能以任何可迭代对象结束) 。
+任何 yield from 链都必须 _由客户驱动_ ，即在最外层委派生成器上调用 =next()=, =send()= 方法。
+（也可以隐式调用，如使用 for 循环）
+
+
+=yield from x= 表达式对 x 对象所做的第一件事就是调用 =iter(x)= ，从中获取迭代器。
+因此，只要实现了 =__next__= 方法， yield from 就能处理得了。
+不过，引入 yield from 结构的主要目的是为了支持实现了__next__, send, close 和 throw 方法的生成器。
+
+
+**** yield from 对异常和终止的处理
+
+- 传入委派生成器的异常，除了 GeneratorExit 之外都传给子生成器的 =throw()= 方法。
+  如果调用 =throw()= 方法抛出 StopIteration 异常，委派生成器恢复运行。
+  StopIteration 之外的异常会向上冒泡，传给委派生成器。（即 _委派生成器若提前结束迭代，则子生成器也会自动结束迭代_ ）
+- 如果把 GeneratorExit 异常传入委派生成器，或者在委派生成器上调用 =close()= 方法，
+  则会在子生成器上调用 =close()= 方法 (如果它有的话) 。
+  如果子生成器调用 =close()= 方法导致异常抛出，则异常会向上冒泡，传给委派生成器，
+  如果没有异常抛出，则委派生成器会抛出 GeneratorExit 异常。（即 _关闭委派生成器也将自动关闭子生成器_ ）
+
+
+**** yield from 表达式的值
+
+=yield from subgen= 结构会在内部自动捕获 StopIteration 异常。
+subgen 通过 return 关键字返回的值会赋给 StopIteration 异常的 value 属性，该值最终成为 yield from 表达式的值。
+
 
 
 
@@ -1349,7 +1355,6 @@ chunksize 只对 ProcessPoolExecutor 有用，用于切分 iterables ，提高�
 
 ** asyncio 基本思想 (面向事件编程)
 
-在 asyncio 中，基本的流程和 [[simulation][使用协程进行离散事件仿真]] 中提到的是一样的：
 
 1. 在一个单线程中使用主循环依次激活队列里的协程
 2. 各个协程向前执行几步，然后把控制权让给主循环
@@ -1515,232 +1520,6 @@ wait 是协程函数，因此它 *不会阻塞* ，默认行为是等传给它�
   result = asyncio.get_event_loop().run_until_complete(wait_coro)
   log("result", result)
 #+END_SRC
-
-
-
-
-* 协程
-
-
-
-
-
-** 有返回值的协程
-
-在 Python3.3 之前，如果生成器返回值，解释器会报错。
-
-return 的值会偷偷传给调用方，赋值给 StopIteration 异常的一个属性。这样的做法有点奇怪，但是能保留住生成器对象的常规行为，即耗尽时抛出 StopIteration 异常。
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  from collections import namedtuple
-  Result = namedtuple('Result', 'count average')
-
-  def averager():
-      total = 0.0
-      count = 0
-      average = None
-      while True:
-          term = yield
-          if term is None:
-              break
-          total += term
-          count += 1
-          average = total / count
-      return Result(count, average)
-
-  c_avg = averager()
-  next(c_avg)
-  c_avg.send(10)
-  c_avg.send(20)
-  try:
-      c_avg.send(None)
-  except StopIteration as exc:
-      result = exc.value
-
-  log("result", result)
-#+END_SRC
-
-#+RESULTS:
-: =========== result ===========
-: Result(count=2, average=15.0)
-
-
-** yield from
-
-在生成器 gen 中使用 =yield from subgen()= 时，subgen 会获得控制权，把产出的值传给 gen 的调用方，即调用方可以直接控制 subgen 。与此同时，gen 会阻塞，等待 subgen 终止。
-
-从定义上来说，yield from 的主要功能是打开双向通道，把最外层的调用方与最内层的子生成器连接起来，这样二者可以直接发送和产出值，还可以直接传入异常。
-
-
-*** 结构示意图
-
-#+NAME: yield
-#+CAPTION: yield from 工作原理
-[[file:img/py3_yield.png]]
-
-委派生成器在 yield from 表达式处暂停时，调用方可以直接把数据发给子生成器，子生成器再把产出的值发给调用方。
-子生成器返回之后，解释器抛出 StopIteration 异常，并把返回值附加到异常对象上，届时委派生成器恢复。
-
-委派生成器相当于 *管道* ，可以吧任意数量的委派生成器连接在一起，
-这个管道最终要以一个只使用 yield 表达式的简单生成器结束 (也能以任何可迭代对象结束) 。
-任何 yield from 链都必须由客户驱动，即在最外层委派生成器上调用 =next()=, =send()= 方法，
-也可以隐式调用，如使用 for 循环。
-
-
-*** yield from 意义
-
-- 子生成器产出的值都直接传给委派生成器的调用方，即客户端。
-- 使用 =send()= 发给委派生成器的值都直接传给子生成器。如果发送的值是 None ，那么会调用子生成器的 =__next__()= 方法。如果不是 None ，那么会调用子生成器的 send() 方法。如果调用的方法抛出 StopIteration 异常，那么委派生成器恢复运行。任何其他异常都会向上冒泡，传给委派生成器。
-- 生成器退出时，子生成器中的 =return expr= 表达式会触发 =StopIteration(expr)= 异常抛出。
-- yield from 表达式的值是子生成器终止时传给 StopIteration 异常的第一个参数。
-- 传入委派生成器的异常，除了 GeneratorExit 之外都传给子生成器的 =throw()= 方法。如果调用 =throw()= 方法抛出 StopIteration 异常，委派生成器恢复运行。StopIteration 之外的异常会向上冒泡，传给委派生成器。
-- 如果把 GeneratorExit 异常传入委派生成器，或者在委派生成器上调用 =close()= 方法，则会在子生成器上调用 =close()= 方法 (如果它有的话) 。如果子生成器调用 =close()= 方法导致异常抛出，则异常会向上冒泡，传给委派生成器，如果没有异常抛出，则委派生成器会抛出 GeneratorExit 异常。
-
-
-**** RESULT = yield from EXPR 执行逻辑
-
-#+BEGIN_SRC ipython :eval never-export
-  # _i: The subgenerator
-  # _y: A value yielded from the subgenerator
-  # _r: The eventual result
-  # _s: A value sent by the caller to the delegating generator, which is forwarded to the subgenerator
-  # _e: An exception
-
-  _i = iter(EXPR)
-  try:
-      _y = next(_i)
-  except StopIteration as _e:
-      _r = _e.value
-  else:
-      while 1:
-          try:
-              _s = yield _y
-          except GeneratorExit as _e:
-              try:
-                  _m = _i.close
-              except AttributeError:
-                  pass
-              else:
-                  _m()
-              raise _e
-          except BaseException as _e:
-              _x = sys.exc_info()
-              try:
-                  _m = _i.throw
-              except AttributeError:
-                  raise _e
-              else:
-                  try:
-                      _y = _m(*_x)
-                  except StopIteration as _e:
-                      _r = _e.value
-                      break
-          else:
-              try:
-                  if _s is None:
-                      _y = next(_i)
-                  else:
-                      _y = _i.send(_s)
-              except StopIteration as _e:
-                  _r = _e.value
-                  break
-
-  RESULT = _r
-#+END_SRC
-
-
-
-** <<simulation>>使用协程进行离散事件仿真
-
-这个例子是说明如何在一个主循环中处理事件，以及如何通过发送数据驱动协程。这是 asyncio 包底层的基本思想。
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  from collections import namedtuple
-  import queue
-  import random
-
-  Event = namedtuple('Event', 'time proc action')
-
-  def taxi_process(proc, trips, start_time=0):
-      time = yield Event(start_time, proc, 'leave garage')
-      for i in range (trips):
-          time = yield Event(time, proc, 'pick up passenger')
-          time = yield Event(time, proc, 'drop off passenger')
-      yield Event(time, proc, 'going home')
-
-  class Simulator:
-
-      def __init__(self, procs_map):
-          self.events = queue.PriorityQueue()
-          self.procs = dict(procs_map)
-
-      def run(self, end_time):
-          for _, proc in sorted(self.procs.items()):
-              first_event = next(proc)
-              self.events.put(first_event)
-
-          sim_time = 0
-          while sim_time < end_time:
-              if self.events.empty():
-                  print('=== end of events ===')
-                  break
-
-              current_event = self.events.get()
-              sim_time, proc_id, action = current_event
-              print('taxi:', proc_id, proc_id * '  ', action, ' [', sim_time, ']')
-              active_proc = self.procs[proc_id]
-              next_time = sim_time + random.randint(1, 10)
-              try:
-                  next_event = active_proc.send(next_time)
-              except StopIteration:
-                  del self.procs[proc_id]
-              else:
-                  self.events.put(next_event)
-          else:
-              print('=== end of simulation time: {} events pending ==='
-                    .format(self.events.qsize()))
-
-  num_taxis = 3
-  DEPARTURE_INTERVAL = 5
-  taxis = {i: taxi_process(i, (i+1)*2, i*DEPARTURE_INTERVAL) for i in range(num_taxis)}
-  Simulator(taxis).run(100)
-#+END_SRC
-
-#+RESULTS:
-#+begin_example
-taxi: 0  leave garage  [ 0 ]
-taxi: 0  pick up passenger  [ 2 ]
-taxi: 0  drop off passenger  [ 3 ]
-taxi: 1    leave garage  [ 5 ]
-taxi: 1    pick up passenger  [ 10 ]
-taxi: 2      leave garage  [ 10 ]
-taxi: 0  pick up passenger  [ 13 ]
-taxi: 0  drop off passenger  [ 14 ]
-taxi: 1    drop off passenger  [ 18 ]
-taxi: 1    pick up passenger  [ 20 ]
-taxi: 2      pick up passenger  [ 20 ]
-taxi: 2      drop off passenger  [ 21 ]
-taxi: 0  going home  [ 22 ]
-taxi: 1    drop off passenger  [ 22 ]
-taxi: 2      pick up passenger  [ 27 ]
-taxi: 1    pick up passenger  [ 31 ]
-taxi: 1    drop off passenger  [ 36 ]
-taxi: 1    pick up passenger  [ 37 ]
-taxi: 2      drop off passenger  [ 37 ]
-taxi: 2      pick up passenger  [ 39 ]
-taxi: 1    drop off passenger  [ 41 ]
-taxi: 2      drop off passenger  [ 42 ]
-taxi: 1    going home  [ 43 ]
-taxi: 2      pick up passenger  [ 44 ]
-taxi: 2      drop off passenger  [ 54 ]
-taxi: 2      pick up passenger  [ 59 ]
-taxi: 2      drop off passenger  [ 62 ]
-taxi: 2      pick up passenger  [ 68 ]
-taxi: 2      drop off passenger  [ 76 ]
-taxi: 2      going home  [ 83 ]
-=== end of events ===
-#+end_example
-
 
 
 
