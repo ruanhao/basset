@@ -1243,35 +1243,38 @@ subgen 通过 return 关键字返回的值会赋给 StopIteration 异常的 valu
 
 ** 全局解释锁 (GIL)
 
-CPython 解释器本身不是线程安全的，因此有全局解释器锁 (GIL) ，一次只允许使用一个线程执行 Python 字节码。因此，一个 Python 进程不能同时使用多个 CPU 。
+CPython 解释器本身不是线程安全的，因此有全局解释器锁 (GIL) ，
+一次只允许使用一个线程执行 Python 字节码。因此，一个 Python 进程不能同时使用多个 CPU 。
 
-***  I/O 密集型操作
+*** I/O 密集型操作
 
 标准库中所有执行阻塞型 I/O 操作的函数，在等待操作系统返回结果时都会释放 GIL 。
 这意味着在 Python 语言这个层次上可以使用多线程，I/O 密集型的程序能从中受益。
 ( =time.sleep()= 函数也会释放 GIL)
 
+
 *** CPU 密集型操作
 
-使用 ProcessPoolExecutor 类把工作分配给多个进程处理可以实现真正的并行运算。因此，如果需要做 CPU 密集型处理，可以使用它绕开 GIL ，从而利用所有可用的 CPU 。(多个 Python 进程有各自独立的 GIL 锁，互不影响)
+使用 ProcessPoolExecutor 类把工作分配给多个进程处理可以实现真正的并行运算。
+
+因此，如果需要做 CPU 密集型处理，可以使用它绕开 GIL ，从而利用所有可用的 CPU 。
+(多个 Python 进程有各自独立的 GIL 锁，互不影响)
 
 
-** concurrent.futures 模块
+** 基于 concurrent.futures 模块的并发编程
 
 concurrent.futures 模块的主要特色是 ThreadPoolExecutor 和 ProcessPoolExecutor 类，
 这两个类实现的接口能分别在不同的线程或进程中执行可调用的对象。
 
 通常情况下 future 对象不应由用户创建，而是由并发框架 (concurrent.futures 或 asyncio) 来实例化。
 
-*** Executor.map()
-
-*Executor.map(func, *iterables, timeout=None, chunksize=1)*
+*** Executor.map(func, *iterables, timeout=None, chunksize=1)
 
 chunksize 只对 ProcessPoolExecutor 有用，用于切分 iterables ，提高运行效率。
+因为 future 结果的返回涉及到 IPC ，如果每个进程每次消耗 iterables 中的一个数据，整个过程涉及多个 IPC ，这样效率不高；
+但如果对 iterables 进行切分，N 个 数据同时交给一个进程进行处理，运算结果通过一个 IPC 一并返回，这样就可以提升效率。
 
-因为 future 结果的返回涉及到 IPC ，如果每个进程每次消耗 iterables 中的一个数据，整个过程涉及多个 IPC ，这样效率不高；但如果对 iterables 进行切分，N 个 数据同时交给一个进程进行处理，运算结果通过一个 IPC 一并返回，这样就可以提升效率。
-
-返回值是一个迭代器， *迭代器的 __next__ 方法调用各个 future 对象的 result 方法，得到各个 future 的结果。*
+返回值是一个迭代器，迭代器的__next__方法调用各个 future 对象的 result 方法，得到各个 future 的结果。
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from concurrent.futures import ThreadPoolExecutor
@@ -1299,9 +1302,8 @@ chunksize 只对 ProcessPoolExecutor 有用，用于切分 iterables ，提高�
 : [6, 4, 2]
 : time consumed1:  2.9983181953430176
 
-*** Executor.sumit()
 
-=Executor.sumit(fn, *args, **kwargs)=
+*** Executor.sumit(fn, *args, **kwargs)
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   with ThreadPoolExecutor(max_workers=1) as executor:
@@ -1321,9 +1323,10 @@ chunksize 只对 ProcessPoolExecutor 有用，用于切分 iterables ，提高�
 : time consumed1:  3.004795789718628
 
 
-*** concurrent.futures.as_completed()
+*** concurrent.futures.as_completed(fs, timeout=None)
 
-*concurrent.futures.as_completed(fs, timeout=None)*
+如果调用 =finished = as_completed(fs, timeout)= 后，经过 timeout 时间后仍然无法获取 =next(finishes).result()= 的值，
+则抛出 concurrent.futures.TimeoutError 异常。
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   from concurrent import futures
@@ -1348,12 +1351,53 @@ chunksize 只对 ProcessPoolExecutor 有用，用于切分 iterables ，提高�
 : [2, 4, 6, 8, 10]
 : time consumed1:  4.999896287918091
 
+fs 可以是一个字典，把各个 future 对象映射到其他有用的数据上，
+这样尽管 future 生成的结果顺序可能乱了，依然便于使用结果做后续的处理：
 
-* async 并发编程
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from concurrent import futures
+  from concurrent.futures import ThreadPoolExecutor
+  import time
+  fs = {}
 
-*适合 asyncio API 的协程在定义体中必须使用 yield from ，而不能用 yield 。*
+  def sleep_and_double(value):
+      time.sleep(value)
+      return value * 2
 
-** asyncio 基本思想 (面向事件编程)
+  with ThreadPoolExecutor(max_workers=5) as executor:
+      for i in [5, 4, 3, 2, 1]:
+          f = executor.submit(sleep_and_double, i)
+          fs[f] = i
+      time0 = time.time()
+      finishes = futures.as_completed(fs)
+      time_delta = time.time() - time0
+      print("time consumed0: ", time_delta)
+      time0 = time.time()
+      for f in finishes:
+          print("#{} => {}".format(fs[f], f.result()))
+      time_delta = time.time() - time0
+      print("time consumed1: ", time_delta)
+#+END_SRC
+
+#+RESULTS:
+: time consumed0:  7.867813110351562e-06
+: #1 => 2
+: #2 => 4
+: #3 => 6
+: #4 => 8
+: #5 => 10
+: time consumed1:  5.001190900802612
+
+
+
+** 基于 asyncio 包的并发编程
+
+1. asyncio 包使用的协程是有严格定义的，因此 _适合 asyncio API 的协程在定义体中必须使用 yield from ，而不能用 yield 。_
+2. 适合 asyncio 的协程必须由调用方驱动，由调用方通过 yield from 调用；或者把协程传给 asyncio 包中的某个函数（如 =asyncio.async()= ），从而 _驱动协程_ 。
+3. @asyncio.coroutine 装饰器应该始终应用在协程上。
+
+
+*** 基本思想 (面向事件编程)
 
 
 1. 在一个单线程中使用主循环依次激活队列里的协程
@@ -1368,14 +1412,25 @@ chunksize 只对 ProcessPoolExecutor 有用，用于切分 iterables ，提高�
 
 概括起来就是：使用 asyncio 包时，我们编写的代码中包含委派生成器，
 而生成器最终把职责 *委托* 给 asyncio 包或第三方库中的协程。
-这种处理方式相当于架起了管道，让 asyncio 事件循环驱动执行低层异步 I/O 操作的库函数。
+这种处理方式相当于 _架起了管道_ ，让 asyncio 事件循环驱动执行低层异步 I/O 操作的库函数。
 
 
-** @asyncio.coroutine
+
+
+*** @asyncio.coroutine 装饰器（或 async 关键字）
 
 交给 asyncio 处理的协程要使用 =@asyncio.coroutine= 装饰，这虽不是强制要求，但是建议这么做。
-因为这样能在一众普通函数中把协程凸显出来，也有助于调试：如果还没从协程中产出值，协程就被垃圾回收了，可以发出警告。
+
+因为这样能在一众普通函数中把协程凸显出来，也有助于调试：
+如果还没从协程中产出值，协程就被垃圾回收了，可以发出警告。
+
 也可以使用 *async* 关键字。
+
+
+* dkfjdkjf
+
+
+
 
 
 ** asyncio.Future
