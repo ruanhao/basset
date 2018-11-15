@@ -1393,7 +1393,7 @@ fs 可以是一个字典，把各个 future 对象映射到其他有用的数据
 ** 基于 asyncio 包的并发编程
 
 1. asyncio 包使用的协程是有严格定义的，因此 _适合 asyncio API 的协程在定义体中必须使用 yield from ，而不能用 yield 。_
-2. 适合 asyncio 的协程必须由调用方驱动，由调用方通过 yield from 调用；或者把协程传给 asyncio 包中的某个函数（如 =asyncio.async()= ），从而 _驱动协程_ 。
+2. 适合 asyncio 的协程必须由调用方驱动，由调用方通过 =yield from coro_or_future= 驱动；或者把协程传给 asyncio 包中的某个函数（如 =asyncio.async()= ），从而 _驱动协程_ 。
 3. @asyncio.coroutine 装饰器应该始终应用在协程上。
 
 
@@ -1408,7 +1408,7 @@ fs 可以是一个字典，把各个 future 对象映射到其他有用的数据
 
 - 编写的协程链始终通过把最外层委派生成器传给 asyncio 包中的某个函数驱动，例如 =loop.run_until_complete()= 。即我们的代码不通过调用 =next()= 函数或 =send()= 方法驱动协程。驱动由 asyncio 包实现的事件循环去做。
 
-- 编写的协程链最终通过 =yield from= 把职责委托给 asyncio 包中的某个协程函数，如 =yeild from asyncio.sleep()= ，或者其他库中实现高层协议的协程，如 =response = yield from aiohttp.request('GET', url)= 。也就是说，最内层的子生成器是库中真正执行 I/O 操作的函数，而不是我们自己编写的函数。
+- 编写的协程链最终通过 =yield from= 把职责委托给 asyncio 包中的某个协程函数，如 =yeild from asyncio.sleep()= ，或者其他库中实现高层协议的协程，如 =response = yield from aiohttp.request('GET', url)= 。也就是说， _最内层的子生成器是库中真正执行 I/O 操作的函数，而不是我们自己编写的函数。_
 
 概括起来就是：使用 asyncio 包时，我们编写的代码中包含委派生成器，
 而生成器最终把职责 *委托* 给 asyncio 包或第三方库中的协程。
@@ -1427,83 +1427,46 @@ fs 可以是一个字典，把各个 future 对象映射到其他有用的数据
 也可以使用 *async* 关键字。
 
 
-* dkfjdkjf
+*** asyncio.Future
+
+asyncio.Future 类的目的是与 yield from 一起使用，通常 _不需要_ 使用以下方法：
+
+- asyncio.Future.add_done_callback()
+
+  因为可以直接把在 Future 运行结束后执行的操作放在 yield from 表达式后面。
+
+- asyncio.Future.result()
+
+  因为 yield from 从 Future 对象中产出的值就是结果。
 
 
+*** asyncio.Task
+
+asyncio.Task 是 asyncio.Future 的子类，与 threading.Thread 地位对等，可以理解为协程中的可调度单元。
 
 
+**** 创建 Task 对象
 
-** asyncio.Future
+- asyncio.async(coro_or_future, *, loop=None)
 
-在 asyncio 包中， =BaseEventLoop.create_task()= 方法接收一个协程，排定它的运行时间，
-然后返回一个 asyncio.Task 实例，也是 asyncio.Future 类的实例，因为前者是后者的子类，用于包装协程。
+  如果第一个参数是 Future 或 Task 对象，则原封不动地返回； 如果是协程，则会调用 =loop.create_task()= 方法创建 Task 对象。
 
-asyncio.Future 类的目的是与 =yield from= 一起使用，通常不需要使用以下方法：
-
-- 无需调用 =asyncio.Future.add_done_callback()=
-
-  因为可以直接把在 Future 运行结束后执行的操作放在 =yield from= 表达式后面。
-- 无需调用 =asyncio.Future.result()=
-
-  因为 =yield from= 从 Future 对象中产出的值就是结果，例如： =result = yield from my_future= 。
-
-
-*** 从 Future ，Task ，和协程中产出值
-
-在 asyncio 包中，可以这样写： =result = yield from foo()= ，其中 foo 可以是协程函数，或者是返回 asyncio.Future 或 Task 实例的普通函数， *这是 asyncio 包的 API 中很多地方可以互换协程和 Future 对象的原因之一。*
-
-获取 Task 对象有两种主要方式：
-
-- =asyncio.async(coro_or_future, *, loop=None)=
-
-  这个函数排定了协程的运行时间并统一了协程和 Future ：如果第一个参数是 Future 或 Task 对象，则原封不动地返回；如果是协程，则会调用 =loop.create_task()= 方法创建 Task 对象。loop 关键词参数是可选的，用于传入事件循环，如果没有传入，则将调用 =asyncio.get_event_loop()= 获取。
+  loop 关键词参数是可选的，用于传入事件循环，如果没有传入，则将调用 =asyncio.get_event_loop()= 获取。
 
 - =BaseEventLoop.create_task(coro)=
 
-  这个方法排定了协程的执行时间，返回 Task 对象。
 
+*** APIs
 
-*** 协程和 Future 测试脚本
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  import asyncio
-  import time
-
-  def run_sync(coro_or_future):
-      loop = asyncio.get_event_loop()
-      return loop.run_until_complete(coro_or_future)
-
-  async def test_coro():
-      time0 = time.time()
-      await asyncio.sleep(3)
-      time_delta = time.time() - time0
-      return time_delta
-
-  result = run_sync(test_coro())
-  log("result", result)
-#+END_SRC
-
-
-** 常用 API
-
-*** BaseEventLoop.run_in_executor()
-
-*BaseEventLoop.run_in_executor(executor, func, *args)*
+**** BaseEventLoop.run_in_executor(executor, func, *args)
 
 asyncio 的事件循环在背后维护着一个 ThreadPoolExecutor 对象，
 可以调用 run_in_executor 方法，把可调用对象发给它执行。
 
 第一个参数是 Executor 实例，如果为 None ，则使用默认的 ThreadPoolExecutor 实例。
 
-#+BEGIN_SRC ipython :eval never-export
-  loop = asyncio.get_event_loop()
-  loop.run_in_executor(None, )
-#+END_SRC
 
-
-*** asyncio.as_complete()
-
-*asyncio.as_complete(fs, *, loop=None, timeout=None)*
+**** asyncio.as_complete(fs, *, loop=None, timeout=None)
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
   import asyncio
@@ -1524,9 +1487,7 @@ asyncio 的事件循环在背后维护着一个 ThreadPoolExecutor 对象，
 #+END_SRC
 
 
-*** asyncio.Semaphore
-
-*asyncio.Semaphore(value=1, *, loop=None)*
+**** asyncio.Semaphore(value=1, *, loop=None)
 
 Semaphore 类用于限制并发请求数量。
 
@@ -1556,9 +1517,7 @@ Semaphore 对象维护一个内部计数器:
 #+END_SRC
 
 
-*** asyncio.wait()
-
-*asyncio.wait(futures, *, loop=None, timeout=None, return_when=ALL_COMPLETED)*
+**** asyncio.wait(futures, *, loop=None, timeout=None, return_when=ALL_COMPLETED)
 
 参数是一个由 Future 或协程构成的可迭代对象，wait 会分别把各个协程包装进一个 Task 对象。
 wait 是协程函数，因此它 *不会阻塞* ，默认行为是等传给它的所有协程运行完毕后结束。
@@ -1575,6 +1534,8 @@ wait 是协程函数，因此它 *不会阻塞* ，默认行为是等传给它�
   result = asyncio.get_event_loop().run_until_complete(wait_coro)
   log("result", result)
 #+END_SRC
+
+
 
 
 
@@ -3074,6 +3035,44 @@ with 块终止时， =__exit__= 方法会做以下几件事：
 另外，=@contextmanager= 装饰器提供的 =__exit__= 方法 _假定发给生成器的所有异常都得到处理了_ ，因此应该压制异常。
 如果不想让 =@contextmanager= 压制异常，必须在被装饰的函数中显式重新抛出异常。
 
+
+
+*** 协程
+
+**** 基本用法
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import asyncio
+  import time
+
+  async def my_coro():
+      time0 = time.time()
+      await asyncio.sleep(3)
+      time_delta = time.time() - time0
+      return time_delta
+
+  loop = asyncio.get_event_loop()
+  print(loop.run_until_complete(my_coro()))
+  loop.close()
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import asyncio
+  import time
+
+  async def hello_coro():
+      asyncio.sleep(3)
+      print("hello")
+
+  async def world_coro():
+      asyncio.sleep(1)
+      print("world")
+
+  loop = asyncio.get_event_loop()
+  loop.create_task(hello_coro)
+  loop.create_task(world_coro)
+  loop.run_forever()
+#+END_SRC
 
 
 * 参考文档
