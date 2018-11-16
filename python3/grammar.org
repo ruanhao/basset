@@ -1543,17 +1543,19 @@ wait 是协程函数，因此它 *不会阻塞* ，默认行为是等传给它�
 
 * 元编程
 
-** =__new__=
+** 特殊方法__new__
 
-我们通常把 =__init__= 称为构造方法，其实，用于构建实例的是特殊方法 =__new__= ：
-这是个类方法，由于使用了特殊方式处理，因此不必使用 @classmethod 装饰器，该方法必须返回一个实例。
-返回的实例会作为第一个参数 (即 self) 传给 =__init__= 方法。
+- 通常把__init__方法称为构造方法，其实，用于构建实例的是特殊方法__new__
+- __new__是类方法，由于 _使用了特殊方式处理_ ，因此不必使用 @classmethod 装饰器
+- 该方法必须返回一个实例，返回的实例会作为 _第一个参数_ (self) 传给__init__方法
+- __init__方法其实称为初始化方法更为合适（真正的构造方法是__new__）
+- 几乎不需要自定义__new__方法，从 object 类继承的实现已经足够了
 
-因为调用 =__init__= 方法时要传入实例，而且禁止返回任何值，所以 =__init__= 其实称为初始化方法更为合适。
-*真正的构造方法是* =__new__= 。
-几乎不需要自己编写 =__new__= 方法，因为从 object 类继承的实现已经足够了。
 
-*注意* ： =__new__= 方法也可以返回其他类的实例，此时，解释器不会调用 =__init__= 方法。
+#+BEGIN_EXAMPLE
+__new__方法也可以返回其他类的实例，此时，解释器不会调用__init__方法
+#+END_EXAMPLE
+
 
 Python 构建对象的过程可以用下述伪代码概括：
 
@@ -1569,9 +1571,55 @@ Python 构建对象的过程可以用下述伪代码概括：
   # x = object_maker(Foo, 'bar')
 #+END_SRC
 
-在 =__new__= 方法中调用 =super().__new__(cls)= 会调用 =object.__new__(cls)= ，
-而 object 类构建的实例其实是 cls 实例，即实例的 =__class__= 属性存储的是 cls 类的引用。
-(真正的构建操作由解释器调用 C 语言实现的 =object.__new__= 方法执行)
+
+** property(fget=None, fset=None, fdel=None, doc=None)
+
+- property 经常用作装饰器，但它其实是一个类
+- 如果没有把函数传给某个可选参数，返回的 property 对象就不允许执行相应的操作
+- *property 对象都是类属性，但是管理的其实是实例属性的存取*
+
+
+** 动态属性编程 API
+
+*** 特殊属性
+
+**** __class__属性
+
+Python 对一些特殊方法（比如__getattr__）的搜索 _只在实例的类对象中_ ，而不查找实例对象本身。
+
+**** __dict__属性
+
+
+**** __slots__属性
+
+处理完类的定义体后再修改__slots__没有任何作用。
+
+
+*** 内置函数
+
+**** dir([obj])
+
+- 不会列出__dict__属性本身，但会列出其中的键
+- 不会列出类的几个特殊属性（如__mro__, __bases__和__name__）
+- 如果没有可选参数，则列出当前作用域中的名称
+
+
+**** getattr(obj, name[, default])
+
+
+**** hasattr(obj, name)
+
+该函数的实现方法其实是调用 =getattr(obj, name)= ，并检查是否抛出 AttributeError 异常。
+
+**** setattr(obj, name, value)
+
+
+**** vars([obj])
+
+- 返回对象的__dict__属性
+- 如果实例所属的类定义了__slots__属性，则 vars 函数不能处理这个实例（ dir 函数能处理）
+- 如果没有参数，vars 函数的作用和 locals 函数一样，返回本地作用域的字典
+
 
 
 ** 描述符
@@ -2494,14 +2542,16 @@ result:  8
 类属性可用于为实例属性提供默认值：
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  class A: pass
+  class A:
+      value = 'default value'
+      pass
+
   a = A()
-  A.value = 'default'
   print(a.value)
 #+END_SRC
 
 #+RESULTS:
-: default
+: default value
 
 
 
@@ -3036,43 +3086,6 @@ with 块终止时， =__exit__= 方法会做以下几件事：
 如果不想让 =@contextmanager= 压制异常，必须在被装饰的函数中显式重新抛出异常。
 
 
-
-*** 协程
-
-**** 基本用法
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  import asyncio
-  import time
-
-  async def my_coro():
-      time0 = time.time()
-      await asyncio.sleep(3)
-      time_delta = time.time() - time0
-      return time_delta
-
-  loop = asyncio.get_event_loop()
-  print(loop.run_until_complete(my_coro()))
-  loop.close()
-#+END_SRC
-
-#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
-  import asyncio
-  import time
-
-  async def hello_coro():
-      asyncio.sleep(3)
-      print("hello")
-
-  async def world_coro():
-      asyncio.sleep(1)
-      print("world")
-
-  loop = asyncio.get_event_loop()
-  loop.create_task(hello_coro)
-  loop.create_task(world_coro)
-  loop.run_forever()
-#+END_SRC
 
 
 * 参考文档
