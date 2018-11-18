@@ -1845,6 +1845,7 @@ _类的默认元类是父类的元类_ ，可以通过关键字 *metaclass* 指�
 : ===================== [itemgetter(1, 0)(t) for t in data] ======================
 : [(2, 'c'), (3, 'b'), (1, 'a')]
 
+
 **** 给切片赋值
 
 如果赋值的对象是一个切片， *赋值语句的右侧必须是个可迭代对象* 。
@@ -1986,6 +1987,300 @@ haystack ->  1  4  5  6  8 12 15 20 21 23 23 26 29 30
 :  7 -> [0, 6, 7, 8, 10]
 :  2 -> [0, 2, 6, 7, 8, 10]
 : 10 -> [0, 2, 6, 7, 8, 10, 10]
+
+
+
+**** 列表中删除数据的陷阱
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  lst = ['a', 'b', 'c', '', '']
+  for i in lst:
+      if i is '':
+          lst.remove(i)
+
+  print(lst)
+#+END_SRC
+
+#+RESULTS:
+: ['a', 'b', 'c', '']
+
+***** 原理
+
+list 属于线性表，它的连续在于用一块连续的内存空间存储元素，在调用 remove 时，只是删除了地址内的元素。
+
+回到问题，当删除列表中的元素时， =for in= 是对下标进行操作，
+而 remove 是对值进行操作, 当 for 到达索引为 3 ，即第一个空字符位置时，符合条件即删除。
+因为 list 是线性表，所以删除这个空字符时， *同时后面的所有元素自动移动位置 1* ，
+此时的 lst 等于 =['a', 'b', 'c', '']= ，因为 =for in= 已经遍历到了索引 3 处，所以循环结束。
+
+
+***** 解决方法
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+
+  lst = ['a','','b','','c','','']
+
+  # 做法一
+  while '' in lst:
+      lst.remove('')
+  print(lst)
+
+
+  # 做法二
+
+  lst_new = [i for i in lst if i != '']
+#+END_SRC
+
+
+**** 列表中出现频率最高
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  words = [
+     'look', 'into', 'my', 'eyes', 'look', 'into', 'my', 'eyes',
+     'the', 'eyes', 'the', 'eyes', 'the', 'eyes', 'not', 'around', 'the',
+     'eyes', "don't", 'look', 'around', 'the', 'eyes', 'look', 'into',
+     'my', 'eyes', "you're", 'under'
+  ]
+
+  from collections import Counter
+  word_counts = Counter(words)
+  top_three = word_counts.most_common(3)
+  print(top_three)
+#+END_SRC
+
+#+RESULTS:
+: [('eyes', 8), ('the', 5), ('look', 4)]
+
+
+**** 列表中最大或最小的几项
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import heapq
+
+  portfolio = [
+     {'name': 'IBM', 'shares': 100, 'price': 91.1},
+     {'name': 'AAPL', 'shares': 50, 'price': 543.22},
+     {'name': 'FB', 'shares': 200, 'price': 21.09},
+     {'name': 'HPQ', 'shares': 35, 'price': 31.75},
+     {'name': 'YHOO', 'shares': 45, 'price': 16.35},
+     {'name': 'ACME', 'shares': 75, 'price': 115.65}
+  ]
+
+  cheap = heapq.nsmallest(3, portfolio, key=lambda s: s['price'])
+  expensive = heapq.nlargest(3, portfolio, key=lambda s: s['price'])
+  r = {'cheap': cheap, 'expensive': expensive}
+  print(r)
+#+END_SRC
+
+
+**** 对列表中的数据分组
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export :eval never-export
+  rows = [
+      {'address': '5412 N CLARK', 'date': '07/01/2012'},
+      {'address': '5148 N CLARK', 'date': '07/04/2012'},
+      {'address': '5800 E 58TH', 'date': '07/02/2012'},
+      {'address': '2122 N CLARK', 'date': '07/03/2012'},
+      {'address': '5645 N RAVENSWOOD', 'date': '07/02/2012'},
+      {'address': '1060 W ADDISON', 'date': '07/02/2012'},
+      {'address': '4801 N BROADWAY', 'date': '07/01/2012'},
+      {'address': '1039 W GRANVILLE', 'date': '07/04/2012'},
+  ]
+
+  from itertools import groupby
+
+  rows.sort(key=lambda r: r['date'])
+  for date, items in groupby(rows, key=lambda r: r['date']):
+      print(date)
+      for i in items:
+          print('    ', i)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+07/01/2012
+     {'address': '5412 N CLARK', 'date': '07/01/2012'}
+     {'address': '4801 N BROADWAY', 'date': '07/01/2012'}
+07/02/2012
+     {'address': '5800 E 58TH', 'date': '07/02/2012'}
+     {'address': '5645 N RAVENSWOOD', 'date': '07/02/2012'}
+     {'address': '1060 W ADDISON', 'date': '07/02/2012'}
+07/03/2012
+     {'address': '2122 N CLARK', 'date': '07/03/2012'}
+07/04/2012
+     {'address': '5148 N CLARK', 'date': '07/04/2012'}
+     {'address': '1039 W GRANVILLE', 'date': '07/04/2012'}
+#+end_example
+
+或者使用 defaultdict 来实现：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from collections import defaultdict
+  rows_by_date = defaultdict(list)
+  for row in rows:
+      rows_by_date[row['date']].append(row)
+  print(rows_by_date)
+#+END_SRC
+
+#+RESULTS:
+: defaultdict(<class 'list'>, {'07/01/2012': [{'address': '5412 N CLARK', 'date': '07/01/2012'}, {'address': '4801 N BROADWAY', 'date': '07/01/2012'}], '07/02/2012': [{'address': '5800 E 58TH', 'date': '07/02/2012'}, {'address': '5645 N RAVENSWOOD', 'date': '07/02/2012'}, {'address': '1060 W ADDISON', 'date': '07/02/2012'}], '07/03/2012': [{'address': '2122 N CLARK', 'date': '07/03/2012'}], '07/04/2012': [{'address': '5148 N CLARK', 'date': '07/04/2012'}, {'address': '1039 W GRANVILLE', 'date': '07/04/2012'}]})
+
+
+**** 消除序列中的重复数据，同时保持数据顺序
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  def dedupe(items, key=None):
+      seen = set()
+      for item in items:
+          val = item if key is None else key(item)
+          if val not in seen:
+              yield item
+              seen.add(val)
+
+
+  a = [
+          {'x': 2, 'y': 3},
+          {'x': 1, 'y': 4},
+          {'x': 2, 'y': 3},
+          {'x': 2, 'y': 3},
+          {'x': 10, 'y': 15}
+      ]
+  print(list(dedupe(a, key=lambda a: (a['x'],a['y']))))
+#+END_SRC
+
+#+RESULTS:
+: [{'x': 2, 'y': 3}, {'x': 1, 'y': 4}, {'x': 10, 'y': 15}]
+
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  def dedupe(items):
+      seen = set()
+      for item in items:
+          if item not in seen:
+              yield item
+              seen.add(item)
+
+  a = [1, 5, 2, 1, 9, 1, 5, 10]
+  print(list(dedupe(a)))
+#+END_SRC
+
+#+RESULTS:
+: [1, 5, 2, 9, 10]
+
+
+**** 序列解包 (unpack)
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  records = [
+       ('foo', 1, 2),
+       ('bar', 'hello'),
+       ('foo', 3, 4),
+  ]
+
+  def do_foo(x,y):
+      print('foo', x, y)
+
+  def do_bar(s):
+      print('bar', s)
+
+  for tag, *args in records:
+      if tag == 'foo':
+          do_foo(*args)
+      elif tag == 'bar':
+          do_bar(*args)
+#+END_SRC
+
+#+RESULTS:
+: foo 1 2
+: bar hello
+: foo 3 4
+
+
+**** flatten 列表
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from collections import Iterable
+
+  def flatten(items, ignore_types=(str, bytes)):
+      for x in items:
+          if isinstance(x, Iterable) and not isinstance(x, ignore_types):
+              yield from flatten(x)
+          else:
+              yield x
+
+  items = [1, 2, [3, 4, [5, 6], 7], 8]
+
+  # Produces 1 2 3 4 5 6 7 8
+  for x in flatten(items):
+      print(x)
+
+  items = ['Dave', 'Paula', ['Thomas', 'Lewis']]
+  for x in flatten(items):
+      print(x)
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+1
+2
+3
+4
+5
+6
+7
+8
+Dave
+Paula
+Thomas
+Lewis
+#+end_example
+
+
+
+**** 优先队列
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import heapq
+
+  class PriorityQueue:
+      def __init__(self):
+          self._queue = []
+          self._index = 0
+
+      def push(self, item, priority):
+          heapq.heappush(self._queue, (-priority, self._index, item))
+          self._index += 1
+
+      def pop(self):
+          return heapq.heappop(self._queue)[-1]
+
+  # Example use
+  class Item:
+      def __init__(self, name):
+          self.name = name
+      def __repr__(self):
+          return 'Item({!r})'.format(self.name)
+
+  q = PriorityQueue()
+  q.push(Item('foo'), 1)
+  q.push(Item('bar'), 5)
+  q.push(Item('spam'), 4)
+  q.push(Item('grok'), 1)
+
+  print("Should be bar:", q.pop())
+  print("Should be spam:", q.pop())
+  print("Should be foo:", q.pop())
+  print("Should be grok:", q.pop())
+#+END_SRC
+
+#+RESULTS:
+: Should be bar: Item('bar')
+: Should be spam: Item('spam')
+: Should be foo: Item('foo')
+: Should be grok: Item('grok')
+
+
 
 
 
@@ -2135,6 +2430,110 @@ types.MappingProxyType 会返回一个只读的映射视图。
 
 
 
+**** 对字典作集合运算
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  a = {
+     'x' : 1,
+     'y' : 2,
+     'z' : 3
+  }
+
+  b = {
+     'w' : 10,
+     'x' : 11,
+     'y' : 2
+  }
+
+  print('Common keys:', a.keys() & b.keys())
+  print('Keys in a not in b:', a.keys() - b.keys())
+  print('(key,value) pairs in common:', a.items() & b.items())
+#+END_SRC
+
+#+RESULTS:
+: Common keys: {'y', 'x'}
+: Keys in a not in b: {'z'}
+: (key,value) pairs in common: {('y', 2)}
+
+
+**** 组合多个字典当作一个字典使用
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  a = {'x': 1, 'z': 3 }
+  b = {'y': 2, 'z': 4 }
+
+  # (a) Simple example of combining
+  from collections import ChainMap
+  c = ChainMap(a,b)
+
+  print("c:", c)
+
+  print(c['x'])      # Outputs 1  (from a)
+  print(c['y'])      # Outputs 2  (from b)
+  print(c['z'])      # Outputs 3  (from a)
+
+  # Output some common values
+  print('len(c):', len(c))
+  print('c.keys():', list(c.keys()))
+  print('c.values():', list(c.values()))
+
+  # Modify some values
+  c['z'] = 10
+  c['w'] = 40
+  del c['x']
+  print("a:", a)
+#+END_SRC
+
+#+RESULTS:
+: c: ChainMap({'x': 1, 'z': 3}, {'y': 2, 'z': 4})
+: 1
+: 2
+: 3
+: len(c): 3
+: c.keys(): ['z', 'y', 'x']
+: c.values(): [3, 2, 1]
+: a: {'z': 10, 'w': 40}
+
+
+**** 字典栈
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  # Example of stacking mappings (like scopes)
+  values = ChainMap()
+  values['x'] = 1
+
+  # Add a new mapping
+  values = values.new_child()
+  values['x'] = 2
+
+  # Add a new mapping
+  values = values.new_child()
+  values['x'] = 3
+
+  print(values)
+  print(values['x'])
+
+  # Discard last mapping
+  values = values.parents
+  print(values)
+  print(values['x'])
+
+  # Discard last mapping
+  values = values.parents
+  print(values)
+  print(values['x'])
+#+END_SRC
+
+#+RESULTS:
+: ChainMap({'x': 3}, {'x': 2}, {'x': 1})
+: 3
+: ChainMap({'x': 2}, {'x': 1})
+: 2
+: ChainMap({'x': 1})
+: 1
+
+
+
 *** 文本操作
 
 **** 获取 Unicode 字符名称([[https://docs.python.org/3/library/unicodedata.html][unicodedata]])
@@ -2165,6 +2564,179 @@ types.MappingProxyType 会返回一个只读的映射视图。
 : /Users/ruan/test.org: ascii with confidence 1.0
 
 
+**** 格式化
+
+***** 填充与对齐
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print('{:>10}'.format('test'))
+  print('{:10}'.format('test'))
+  print('{:^10}'.format('test'))
+  print('{:_<10}'.format('test'))
+#+END_SRC
+
+#+RESULTS:
+:       test
+: test
+:    test
+: test______
+
+
+***** 字符串截断
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print('{:.5}'.format('xylophone'))
+  print('{:10.5}'.format('xylophone'))
+#+END_SRC
+
+#+RESULTS:
+: xylop
+: xylop
+
+
+***** 占位符
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  data = {'first': 'Hodor', 'last': 'Hodor!'}
+  print('{first} {last}'.format(**data))
+
+  print('{first} {last}'.format(first='Hodor', last='Hodor!'))
+#+END_SRC
+
+#+RESULTS:
+: Hodor Hodor!
+: Hodor Hodor!
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  person = {'first': 'Jean-Luc', 'last': 'Picard'}
+  data = [4, 8, 15, 16, 23, 42]
+  class Plant(object):
+      category = 'tree'
+      kinds = [{'name': 'oak'}, {'name': 'maple'}]
+
+  print('{p[first]} {p[last]}'.format(p=person))
+  print('{d[4]} {d[5]}'.format(d=data))
+  print('{p.category}: {p.kinds[0][name]}'.format(p=Plant()))
+#+END_SRC
+
+#+RESULTS:
+: Jean-Luc Picard
+: 23 42
+: tree: oak
+
+
+
+***** 排版
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import textwrap
+
+  s = "Look into my eyes, look into my eyes, the eyes, the eyes, \
+  the eyes, not around the eyes, don't look around the eyes, \
+  look into my eyes, you're under."
+
+  print(textwrap.fill(s, 70))
+  print()
+
+  print(textwrap.fill(s, 40))
+  print()
+
+  print(textwrap.fill(s, 40, initial_indent='    '))
+  print()
+
+  print(textwrap.fill(s, 40, subsequent_indent='    '))
+  print()
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+Look into my eyes, look into my eyes, the eyes, the eyes, the eyes,
+not around the eyes, don't look around the eyes, look into my eyes,
+you're under.
+
+Look into my eyes, look into my eyes,
+the eyes, the eyes, the eyes, not around
+the eyes, don't look around the eyes,
+look into my eyes, you're under.
+
+    Look into my eyes, look into my
+eyes, the eyes, the eyes, the eyes, not
+around the eyes, don't look around the
+eyes, look into my eyes, you're under.
+
+Look into my eyes, look into my eyes,
+    the eyes, the eyes, the eyes, not
+    around the eyes, don't look around
+    the eyes, look into my eyes, you're
+    under.
+
+#+end_example
+
+
+
+**** 字符串匹配
+
+***** 使用 shell 风格的通配符匹配字符串
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from fnmatch import fnmatchcase as match
+
+  addresses = [
+      '5412 N CLARK ST',
+      '1060 W ADDISON ST',
+      '1039 W GRANVILLE AVE',
+      '2122 N CLARK ST',
+      '4802 N BROADWAY',
+  ]
+
+  a = [addr for addr in addresses if match(addr, '* ST')]
+  print(a)
+
+  b = [addr for addr in addresses if match(addr, '54[0-9][0-9] *CLARK*')]
+  print(b)
+#+END_SRC
+
+#+RESULTS:
+: ['5412 N CLARK ST', '1060 W ADDISON ST', '2122 N CLARK ST']
+: ['5412 N CLARK ST']
+
+
+***** 贪婪和非贪婪匹配
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import re
+
+  # Sample text
+  text = 'Computer says "no." Phone says "yes."'
+
+  # (a) Regex that finds quoted strings - longest match
+  str_pat = re.compile(r'\"(.*)\"')
+  print(str_pat.findall(text))
+
+  # (b) Regex that finds quoted strings - shortest match
+  str_pat = re.compile(r'\"(.*?)\"')
+  print(str_pat.findall(text))
+#+END_SRC
+
+#+RESULTS:
+: ['no." Phone says "yes.']
+: ['no.', 'yes.']
+
+
+
+**** 输入密码
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import getpass
+
+  user = getpass.getuser()
+  passwd = getpass.getpass()
+
+  print('User:', user)
+  print('Passwd:', passwd)
+#+END_SRC
+
+
 *** 字节操作
 
 **** 将字节序列转换成不同类型字段组成的元组([[https://docs.python.org/3/library/struct.html][struct]])
@@ -2187,6 +2759,160 @@ types.MappingProxyType 会返回一个只读的映射视图。
 : b'\x89PNG\r\n\x1a\n\x00\x00'
 : ========================== struct.unpack(fmt, header) ==========================
 : (b'\x89', b'PNG', 2573, 2586, 0)
+
+
+
+*** 时间操作
+
+**** time 模块
+
+time 模块始终返回 UTC 时间。
+
+***** 获取 Unix Timestamp
+
+即从 Epoch (1970年1月1日00:00:00 UTC) 开始所经过的秒数。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import time
+  print(time.time())
+#+END_SRC
+
+#+RESULTS:
+: 1542554851.5957272
+
+
+***** 获取具体时间值
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  current_time = time.time()
+  current_struct_time = time.gmtime(current_time)
+  print(current_struct_time)
+#+END_SRC
+
+#+RESULTS:
+: time.struct_time(tm_year=2018, tm_mon=11, tm_mday=18, tm_hour=15, tm_min=27, tm_sec=37, tm_wday=6, tm_yday=322, tm_isdst=0)
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  current_year = current_struct_time.tm_year
+  current_mon  = current_struct_time.tm_mon
+  current_mday = current_struct_time.tm_mday
+  current_hour = current_struct_time.tm_hour
+  current_min  = current_struct_time.tm_min
+  r = (current_year, current_mon, current_mday, current_hour, current_min)
+  print(r)
+#+END_SRC
+
+#+RESULTS:
+: (2018, 11, 18, 15, 27)
+
+
+
+**** datatime 模块
+
+datetime 模块简化了日期操作，如增加天数，设置时区等。
+
+***** 创建时间
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import datetime
+  d = datetime.datetime(year=2017, month=12, day=31, hour=12, minute=59, second=59)
+  r = (d.year, d.month, d.day, d.hour, d.minute, d.second, d.microsecond)
+  print(r)
+#+END_SRC
+
+#+RESULTS:
+: (2017, 12, 31, 12, 59, 59, 0)
+
+
+***** 获取 UTC 时间
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(datetime.datetime.utcnow())
+#+END_SRC
+
+#+RESULTS:
+: 2018-11-18 15:27:48.018708
+
+
+***** 获取当前时区时间
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(datetime.datetime.now())
+#+END_SRC
+
+#+RESULTS:
+: 2018-11-18 23:27:54.145839
+
+***** 日期运算
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  today = datetime.datetime.now()
+  diff = datetime.timedelta(weeks=3, days=2)
+  future = today + diff
+  past = today - diff
+  print((future, past))
+#+END_SRC
+
+#+RESULTS:
+: (datetime.datetime(2018, 12, 11, 23, 28, 0, 332108), datetime.datetime(2018, 10, 26, 23, 28, 0, 332108))
+
+
+***** 日期转字符串
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  r = '{:%Y-%m-%d %H:%M}'.format(datetime.datetime(2001, 2, 3, 4, 5))
+  print(r)
+#+END_SRC
+
+#+RESULTS:
+: 2001-02-03 04:05
+
+
+***** 字符串转日期
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  r = datetime.datetime.strptime("Mar 03, 2010", "%b %d, %Y")
+  print(r)
+#+END_SRC
+
+#+RESULTS:
+: 2010-03-03 00:00:00
+
+
+
+**** 获取月份缩写
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from calendar import month_abbr
+  print(list(month_abbr))
+#+END_SRC
+
+#+RESULTS:
+: ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+
+*** 数字操作
+
+**** 数字格式化
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print('{:06.2f}'.format(3.141592653589793))
+  print('{:04d}'.format(42))
+  print('{:+d}'.format(42))
+  print('{: d}'.format(42))
+  print('{: d}'.format(-42))
+  print('{:=5d}'.format((- 23)))
+  print('{:=+5d}'.format((23)))
+#+END_SRC
+
+#+RESULTS:
+: 003.14
+: 0042
+: +42
+:  42
+: -42
+: -  23
+: +  23
 
 
 
@@ -2566,6 +3292,99 @@ result:  8
 #+end_example
 
 
+** IO 编程
+
+*** 文件 IO
+
+**** 将文件描述符包装成文件对象
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from socket import socket, AF_INET, SOCK_STREAM
+
+  def echo_client(client_sock, addr):
+      print("Got connection from", addr)
+
+      # Make text-mode file wrappers for socket reading/writing
+      client_in = open(client_sock.fileno(), 'rt', encoding='latin-1', closefd=False)
+      client_out = open(client_sock.fileno(), 'wt', encoding='latin-1', closefd=False)
+
+      # Echo lines back to the client using file I/O
+      for line in client_in:
+          client_out.write(line)
+          client_out.flush()
+      client_sock.close()
+
+  def echo_server(address):
+      sock = socket(AF_INET, SOCK_STREAM)
+      sock.bind(address)
+      sock.listen(1)
+      while True:
+          client, addr = sock.accept()
+          echo_client(client, addr)
+
+  print('Echo serving running on localhost:25000')
+  echo_server(('', 25000))
+#+END_SRC
+
+
+
+**** 改变已打开文件的编码方式
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  # Example of adding a text encoding to existing file-like object
+
+  import urllib.request
+  import io
+
+  u = urllib.request.urlopen('http://www.python.org')
+  f = io.TextIOWrapper(u, encoding='utf-8')
+  text = f.read()
+
+  print(text)
+#+END_SRC
+
+
+*** 内存 IO
+
+**** 内存字符串
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from io import StringIO
+  f = StringIO()
+  f.write('hello')
+  f.write(' ')
+  f.write('world!')
+  print(f.getvalue())
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  f = StringIO('Hello!\nHi!\nGoodbye!')
+  while True:
+      s = f.readline()
+      if s == '':  # eof
+          break
+      print(s, end='')
+#+END_SRC
+
+
+**** 内存比特流
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from io import BytesIO
+  f = BytesIO()
+  f.write('中文'.encode('utf-8'))
+  print(f.getvalue())
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  f = BytesIO(b'\xe4\xb8\xad\xe6\x96\x87')
+  r = f.read().decode('utf-8')
+  print(r)
+#+END_SRC
+
+
+
+
 ** 面向对象编程
 
 *** 为实例属性提供默认值
@@ -2583,6 +3402,230 @@ result:  8
 
 #+RESULTS:
 : default value
+
+
+
+*** 创建缓存对象
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  class Spam:
+      def __init__(self, name):
+          self.name = name
+
+  # Caching support
+  import weakref
+  _spam_cache = weakref.WeakValueDictionary()
+
+  def get_spam(name):
+      if name not in _spam_cache:
+          s = Spam(name)
+          _spam_cache[name] = s
+      else:
+          s = _spam_cache[name]
+      return s
+
+  if __name__ == '__main__':
+      a = get_spam('foo')
+      b = get_spam('bar')
+      print('a is b:', a is b)
+      c = get_spam('foo')
+      print('a is c:', a is c)
+#+END_SRC
+
+#+RESULTS:
+: a is b: False
+: a is c: True
+
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import weakref
+
+  class CachedSpamManager:
+      def __init__(self):
+          self._cache = weakref.WeakValueDictionary()
+      def get_spam(self, name):
+          if name not in self._cache:
+              s = Spam(name)
+              self._cache[name] = s
+          else:
+              s = self._cache[name]
+          return s
+
+  class Spam:
+      def __init__(self, name):
+          self.name = name
+
+  Spam.manager = CachedSpamManager()
+
+  def get_spam(name):
+      return Spam.manager.get_spam(name)
+
+  if __name__ == '__main__':
+      a = get_spam('foo')
+      b = get_spam('bar')
+      print('a is b:', a is b)
+      c = get_spam('foo')
+      print('a is c:', a is c)
+#+END_SRC
+
+#+RESULTS:
+: a is b: False
+: a is c: True
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  # Example involving new and some of its problems
+
+  import weakref
+
+  class Spam:
+      _spam_cache = weakref.WeakValueDictionary()
+      def __new__(cls, name):
+          if name in cls._spam_cache:
+              return cls._spam_cache[name]
+          else:
+              self = super().__new__(cls)
+              cls._spam_cache[name] = self
+              return self
+
+      def __init__(self, name):
+          print('Initializing Spam')
+          self.name = name
+
+  if __name__ == '__main__':
+      print("This should print 'Initializing Spam' twice")
+      s = Spam('Dave')
+      t = Spam('Dave')
+      print(s is t)
+#+END_SRC
+
+#+RESULTS:
+: This should print 'Initializing Spam' twice
+: Initializing Spam
+: Initializing Spam
+: True
+
+
+
+*** 使用抽象类
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from abc import ABCMeta, abstractmethod
+
+  class A(metaclass=ABCMeta):
+      @property
+      @abstractmethod
+      def name(self):
+          pass
+
+      @name.setter
+      @abstractmethod
+      def name(self, value):
+          pass
+
+      @classmethod
+      @abstractmethod
+      def method1(cls):
+          pass
+
+      @staticmethod
+      @abstractmethod
+      def method2():
+          pass
+#+END_SRC
+
+#+RESULTS:
+
+
+
+*** 处理 Json 数据
+
+**** 使用 OrderedDict 处理 Json 数据
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import json
+
+  # Some JSON encoded text
+  s = '{"name": "ACME", "shares": 50, "price": 490.1}'
+
+  # (a) Turning JSON into an OrderedDict
+
+  from collections import OrderedDict
+  data = json.loads(s, object_pairs_hook=OrderedDict)
+  print(data)
+#+END_SRC
+
+#+RESULTS:
+: OrderedDict([('name', 'ACME'), ('shares', 50), ('price', 490.1)])
+
+**** 使用 Json 数据填充对象
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  class JSONObject:
+      def __init__(self, d):
+          self.__dict__ = d
+
+  data = json.loads(s, object_hook=JSONObject)
+  print(data.name)
+  print(data.shares)
+  print(data.price)
+#+END_SRC
+
+#+RESULTS:
+: ACME
+: 50
+: 490.1
+
+
+**** 将对象序列化成 Json 数据
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  class Point:
+      def __init__(self, x, y):
+          self.x = x
+          self.y = y
+
+  def serialize_instance(obj):
+      d = { '__classname__' : type(obj).__name__ }
+      d.update(vars(obj))
+      return d
+
+  p = Point(3,4)
+  s = json.dumps(p, default=serialize_instance)
+  print(s)
+#+END_SRC
+
+#+RESULTS:
+: {"__classname__": "Point", "x": 3, "y": 4}
+
+
+**** 将 Json 数据反序列化成对象
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  classes = {
+      'Point' : Point
+  }
+
+  def unserialize_object(d):
+      clsname = d.pop('__classname__', None)
+      if clsname:
+          cls = classes[clsname]
+          obj = cls.__new__(cls)
+          for key, value in d.items():
+              setattr(obj, key, value)
+          return obj
+      else:
+          return d
+
+  a = json.loads(s, object_hook=unserialize_object)
+  print(a)
+  print(a.x)
+  print(a.y)
+#+END_SRC
+
+#+RESULTS:
+: <__main__.Point object at 0x11c5f3e48>
+: 3
+: 4
 
 
 
@@ -3119,6 +4162,236 @@ with 块终止时， =__exit__= 方法会做以下几件事：
 
 
 
+** 并发编程
+
+*** 创建子进程
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from multiprocessing import Process
+  import os
+
+  def run_proc(name):
+      print('Run child process %s (%s)...' % (name, os.getpid()))
+
+  if __name__=='__main__':
+      print('Parent process %s.' % os.getpid())
+      p = Process(target=run_proc, args=('test',))
+      print('Child process will start.')
+      p.start()
+      p.join()  # 等待子进程结束后再继续往下运行
+      print('Child process end.')
+#+END_SRC
+
+
+
+*** 子进程的输入输出
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import subprocess
+
+  r = subprocess.call(['nslookup', 'www.python.org'])
+  print('r: {}'.format(r))
+
+  p = subprocess.Popen(['nslookup'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  output, err = p.communicate(b'set q=mx\npython.org\nexit\n')
+  print(output.decode('utf-8'))
+  print('Exit code:', p.returncode)
+
+  # 相当于在命令行执行命令nslookup，然后手动输入：
+  # set q=mx
+  # python.org
+  # exit
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+r: 0
+Server:		64.104.123.144
+Address:	64.104.123.144#53
+
+Non-authoritative answer:
+python.org	mail exchanger = 50 mail.python.org.
+
+Authoritative answers can be found from:
+org	nameserver = d0.org.afilias-nst.org.
+org	nameserver = a2.org.afilias-nst.info.
+org	nameserver = a0.org.afilias-nst.info.
+org	nameserver = b0.org.afilias-nst.org.
+org	nameserver = b2.org.afilias-nst.org.
+org	nameserver = c0.org.afilias-nst.info.
+a0.org.afilias-nst.info	internet address = 199.19.56.1
+a2.org.afilias-nst.info	internet address = 199.249.112.1
+b0.org.afilias-nst.org	internet address = 199.19.54.1
+b2.org.afilias-nst.org	internet address = 199.249.120.1
+c0.org.afilias-nst.info	internet address = 199.19.53.1
+d0.org.afilias-nst.org	internet address = 199.19.57.1
+a0.org.afilias-nst.info	has AAAA address 2001:500:e::1
+a2.org.afilias-nst.info	has AAAA address 2001:500:40::1
+b0.org.afilias-nst.org	has AAAA address 2001:500:c::1
+b2.org.afilias-nst.org	has AAAA address 2001:500:48::1
+c0.org.afilias-nst.info	has AAAA address 2001:500:b::1
+d0.org.afilias-nst.org	has AAAA address 2001:500:f::1
+
+
+Exit code: 0
+#+end_example
+
+
+
+*** 进程间通信
+
+父进程中创建两个子进程，一个往 Queue 里写数据，一个从 Queue 里读数据：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from multiprocessing import Process, Queue
+  import os, time, random
+
+  def write(q):
+      print('Process to write: %s' % os.getpid())
+      for value in ['A', 'B', 'C']:
+          print('Put %s to queue...' % value)
+          q.put(value)
+          time.sleep(random.random())
+
+  def read(q):
+      print('Process to read: %s' % os.getpid())
+      while True:
+          value = q.get(True)
+          print('Get %s from queue.' % value)
+
+  q = Queue()
+  pw = Process(target=write, args=(q,))
+  pr = Process(target=read, args=(q,))
+  pw.start()
+  pr.start()
+  pw.join()
+  pr.terminate()  # pr 进程里是死循环，无法等待其结束，只能强行终止:
+#+END_SRC
+
+#+RESULTS:
+: Process to write: 92549
+: Put A to queue...
+: Process to read: 92550
+: Get A from queue.
+: Put B to queue...
+: Get B from queue.
+: Put C to queue...
+: Get C from queue.
+
+
+
+*** 创建线程
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import time, threading
+
+  def worker():
+      print('thread %s is running...' % threading.current_thread().name)
+      time.sleep(1)
+      print('thread %s ended.' % threading.current_thread().name)
+
+  t = threading.Thread(target=worker, name='WorkerThread')
+  t.start()
+  t.join()
+#+END_SRC
+
+#+RESULTS:
+: thread WorkerThread is running...
+: thread WorkerThread ended.
+
+
+
+*** 线程加锁
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import threading
+  from concurrent.futures import ThreadPoolExecutor
+
+  lock = threading.Lock()
+  count = 0
+
+  def run_thread_without_lock():
+      global count
+      while count < 10:
+          count += 1
+          print("%s, " % count, end='')
+
+  def run_thread_with_lock():
+      global count
+      with lock:
+          while count < 10:
+              count += 1
+              print("%s, " % count, end='')
+
+  with ThreadPoolExecutor(max_workers=4) as executor:
+      for i in range(5):
+          executor.submit(run_thread_without_lock)
+
+  count = 0
+
+  with ThreadPoolExecutor(max_workers=4) as executor:
+      for i in range(5):
+          executor.submit(run_thread_with_lock)
+#+END_SRC
+
+#+RESULTS:
+: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+
+
+
+*** thread local
+
+一个线程使用自己的局部变量比使用全局变量好，因为局部变量只有线程自己能看见，不会影响其他线程，而全局变量的修改必须加锁。
+
+最常用的地方就是为每个线程绑定一个数据库连接，HTTP 请求，用户身份信息等，这样一个线程的所有调用到的处理函数都可以非常方便地访问这些资源。
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import threading, time
+
+  tl = threading.local()
+
+  def worker(name):
+      tl.name = name
+      time.sleep(3)
+      print("in thread:", tl.name)
+
+  t = threading.Thread(target=worker, args=("hello",), name='Thread-A')
+  t.start()
+  tl.name = 'world'
+  print("in main:", tl.name)
+#+END_SRC
+
+#+RESULTS:
+: in main: world
+
+
+
+*** 线程池
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from concurrent.futures import ThreadPoolExecutor
+  import urllib.request
+
+  def fetch_url(url):
+      u = urllib.request.urlopen(url)
+      data = u.read()
+      return data
+
+  pool = ThreadPoolExecutor(10)
+  # Submit work to the pool
+  a = pool.submit(fetch_url, 'http://www.python.org')
+  b = pool.submit(fetch_url, 'http://www.pypy.org')
+
+  # Get the results back
+  x = a.result()
+  y = b.result()
+#+END_SRC
+
+#+RESULTS:
+: # Out[1]:
+
+
+
 ** 元编程
 
 *** 控制类的属性定义的顺序
@@ -3133,6 +4406,891 @@ with 块终止时， =__exit__= 方法会做以下几件事：
           return collections.OrderedDict()
 #+END_SRC
 
+
+*** 控制类的创建
+
+**** 实例缓存
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  # Cached instances
+
+  import weakref
+
+  class Cached(type):
+      def __init__(self, *args, **kwargs):
+          super().__init__(*args, **kwargs)
+          self.__cache = weakref.WeakValueDictionary()
+
+      def __call__(self, *args):
+          if args in self.__cache:
+              return self.__cache[args]
+          else:
+              obj = super().__call__(*args)
+              self.__cache[args] = obj
+              return obj
+
+  class Spam(metaclass=Cached):
+      def __init__(self, name):
+          print('Creating Spam({!r})'.format(name))
+          self.name = name
+
+  if __name__ == '__main__':
+      a = Spam('foo')
+      b = Spam('bar')
+      print('a is b:', a is b)
+      c = Spam('foo')
+      print('a is c:', a is c)
+#+END_SRC
+
+#+RESULTS:
+: Creating Spam('foo')
+: Creating Spam('bar')
+: a is b: False
+: a is c: True
+
+
+**** 单例
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  # Singleton
+
+  class Singleton(type):
+      def __init__(self, *args, **kwargs):
+          self.__instance = None
+          super().__init__(*args, **kwargs)
+
+      def __call__(self, *args, **kwargs):
+          if self.__instance is None:
+              self.__instance = super().__call__(*args, **kwargs)
+              return self.__instance
+          else:
+              return self.__instance
+
+  class Spam(metaclass=Singleton):
+      def __init__(self):
+          print('Creating Spam')
+
+  if __name__ == '__main__':
+      a = Spam()
+      b = Spam()
+      print(a is b)
+#+END_SRC
+
+#+RESULTS:
+: Creating Spam
+: True
+
+
+**** 禁用直接实例化
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  # Not allowing direct instantiation
+
+  class NoInstances(type):
+      def __call__(self, *args, **kwargs):
+          raise TypeError("Can't instantiate directly")
+
+  class Spam(metaclass=NoInstances):
+      @staticmethod
+      def grok(x):
+          print('Spam.grok')
+
+  if __name__ == '__main__':
+      try:
+          s = Spam()
+      except TypeError as e:
+          print(e)
+
+      Spam.grok(42)
+#+END_SRC
+
+#+RESULTS:
+: Can't instantiate directly
+: Spam.grok
+
+
+
+*** 不通过__init__方法创建实例
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from time import localtime
+
+  class Date:
+      def __init__(self, year, month, day):
+          self.year = year
+          self.month = month
+          self.day = day
+
+      # Class method that bypasses __init__
+      @classmethod
+      def today(cls):
+          d = cls.__new__(cls)
+          t = localtime()
+          d.year = t.tm_year
+          d.month = t.tm_mon
+          d.day = t.tm_mday
+          return d
+
+  d = Date.__new__(Date)
+  print(d)
+  print(hasattr(d,'year'))
+
+  data = {
+      'year' : 2012,
+      'month' : 8,
+      'day' : 29
+  }
+
+  d.__dict__.update(data)
+  print(d.year)
+  print(d.month)
+
+  d = Date.today()
+  print(d.year, d.month, d.day)
+#+END_SRC
+
+#+RESULTS:
+: <__main__.Date object at 0x1085e1588>
+: False
+: 2012
+: 8
+: 2018 6 13
+
+
+
+
+*** 动态定义类
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  # Example of making a class manually from parts
+
+  # Methods
+  def __init__(self, name, shares, price):
+      self.name = name
+      self.shares = shares
+      self.price = price
+
+  def cost(self):
+      return self.shares * self.price
+
+  cls_dict = {
+      '__init__' : __init__,
+      'cost' : cost,
+  }
+
+  # Make a class
+  import types
+
+  Stock = types.new_class('Stock', (), {}, lambda ns: ns.update(cls_dict))
+
+  if __name__ == '__main__':
+      s = Stock('ACME', 50, 91.1)
+      print(s)
+      print(s.cost())
+#+END_SRC
+
+#+RESULTS:
+: <types.Stock object at 0x1085e1518>
+: 4555.0
+
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  # An alternative formulation of namedtuples
+
+  import operator
+  import types
+  import sys
+
+  def named_tuple(classname, fieldnames):
+      # Populate a dictionary of field property accessors
+      cls_dict = { name: property(operator.itemgetter(n))
+                   for n, name in enumerate(fieldnames) }
+
+      # Make a __new__ function and add to the class dict
+      def __new__(cls, *args):
+          if len(args) != len(fieldnames):
+              raise TypeError('Expected {} arguments'.format(len(fieldnames)))
+          return tuple.__new__(cls, (args))
+
+      cls_dict['__new__'] = __new__
+
+      # Make the class
+      cls = types.new_class(classname, (tuple,), {},
+                             lambda ns: ns.update(cls_dict))
+      cls.__module__ = sys._getframe(1).f_globals['__name__']
+      return cls
+
+  if __name__ == '__main__':
+      Point = named_tuple('Point', ['x', 'y'])
+      print(Point)
+      p = Point(4, 5)
+      print(len(p))
+      print(p.x, p[0])
+      print(p.y, p[1])
+      try:
+          p.x = 2
+      except AttributeError as e:
+          print(e)
+      print('%s %s' % p)
+#+END_SRC
+
+#+RESULTS:
+: <class '__main__.Point'>
+: 2
+: 4 4
+: 5 5
+: can't set attribute
+: 4 5
+
+
+
+*** 猴子补丁
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import importlib
+  import sys
+  from collections import defaultdict
+
+  _post_import_hooks = defaultdict(list)
+
+  class PostImportFinder:
+      def __init__(self):
+          self._skip = set()
+
+      def find_module(self, fullname, path=None):
+          if fullname in self._skip:
+              return None
+          self._skip.add(fullname)
+          return PostImportLoader(self)
+
+  class PostImportLoader:
+      def __init__(self, finder):
+          self._finder = finder
+
+      def load_module(self, fullname):
+          importlib.import_module(fullname)
+          module = sys.modules[fullname]
+          for func in _post_import_hooks[fullname]:
+              func(module)
+          self._finder._skip.remove(fullname)
+          return module
+
+  def when_imported(fullname):
+      def decorate(func):
+          if fullname in sys.modules:
+              func(sys.modules[fullname])
+          else:
+              _post_import_hooks[fullname].append(func)
+          return func
+      return decorate
+
+  sys.meta_path.insert(0, PostImportFinder())
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  @when_imported('threading')
+  def warn_threads(mod):
+      print('Threads? Are you crazy?')
+
+  import threading
+#+END_SRC
+
+
+
+
+
+** 网络编程
+
+*** netaddr 模块（可处理 IP 和 MAC）
+
+netaddr 模块有两个基本类：IPAddress 和 IPNetwork
+
+**** IP 地址操作
+
+***** 定义网络
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from netaddr import IPAddress, IPNetwork
+  nw = IPNetwork('192.168.0.1/24')
+  print(nw)
+#+END_SRC
+
+#+RESULTS:
+: 192.168.0.1/24
+
+
+***** 网络掩码
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(nw.netmask)
+#+END_SRC
+
+#+RESULTS:
+: 255.255.255.0
+
+
+***** 广播地址
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(nw.broadcast)
+#+END_SRC
+
+#+RESULTS:
+: 192.168.0.255
+
+
+***** 网络地址
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(nw.network)
+#+END_SRC
+
+#+RESULTS:
+: 192.168.0.0
+
+
+***** 主机掩码
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(nw.hostmask)
+#+END_SRC
+
+#+RESULTS:
+: 0.0.0.255
+
+
+***** 网段包含主机数量
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(nw.size)
+#+END_SRC
+
+#+RESULTS:
+: 256
+
+
+***** 获取所有主机地址
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import itertools
+  print(list(itertools.islice(nw.iter_hosts(), 3)))
+#+END_SRC
+
+#+RESULTS:
+: [IPAddress('192.168.0.1'), IPAddress('192.168.0.2'), IPAddress('192.168.0.3')]
+
+
+***** 将 IP 地址所在网段根据掩码长度划分子网
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  subnets = [x for x in nw.subnet(30)] # 分为掩码长度为 30 的几个子网
+  print(subnets[:3])
+#+END_SRC
+
+#+RESULTS:
+: [IPNetwork('192.168.0.0/30'), IPNetwork('192.168.0.4/30'), IPNetwork('192.168.0.8/30')]
+
+
+***** 修改掩码长度
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  nw.prefixlen = 28
+  print(nw)
+#+END_SRC
+
+#+RESULTS:
+: 192.168.0.1/28
+
+
+***** 判断公私网
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("IPAddress('10.74.68.58').is_private()", IPAddress('10.74.68.58').is_private())
+  log("IPAddress('1.1.1.2').is_private()", IPAddress('1.1.1.2').is_private())
+#+END_SRC
+
+#+RESULTS:
+:  IPAddress('10.74.68.58').is_private()
+: True
+:  IPAddress('1.1.1.2').is_private()
+: False
+
+
+***** 定义网段地址范围
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from netaddr import IPRange
+  ipRange = IPRange('192.168.1.10', '192.168.1.130')
+  print(ipRange)
+#+END_SRC
+
+#+RESULTS:
+: 192.168.1.10-192.168.1.130
+
+
+***** 地址聚合
+
+****** IPRange
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(ipRange.cidrs())
+#+END_SRC
+
+#+RESULTS:
+: [IPNetwork('192.168.1.10/31'), IPNetwork('192.168.1.12/30'), IPNetwork('192.168.1.16/28'), IPNetwork('192.168.1.32/27'), IPNetwork('192.168.1.64/26'), IPNetwork('192.168.1.128/31'), IPNetwork('192.168.1.130/32')]
+
+
+****** cidr_merge
+
+这个方法可以用于路由汇总的计算
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from netaddr import cidr_merge
+  ip_list = []
+  ip_list.append(IPNetwork("192.168.1.0/25"))
+  ip_list.append(IPNetwork("192.168.1.128/25"))
+  ip_list.append(IPNetwork("192.168.0.0/24"))
+  ip_list.append(IPNetwork("192.168.3.0/26"))
+  ip_list.append(IPNetwork("192.168.3.64/26"))
+  print(cidr_merge(ip_list))
+
+#+END_SRC
+
+#+RESULTS:
+: [IPNetwork('192.168.0.0/23'), IPNetwork('192.168.3.0/25')]
+
+
+***** 地址加减
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  ip = IPAddress('172.20.1.1')
+  ip += 256
+  print(ip)
+  ip -= 3
+  print(ip)
+
+#+END_SRC
+
+#+RESULTS:
+: 172.20.2.1
+: 172.20.1.254
+
+
+
+
+
+
+**** MAC 地址操作
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from netaddr import *
+  mac = EUI('98:5a:eb:9f:35:f8')
+  mac.dialect = mac_unix
+  log("unix mac", mac)
+  mac.dialect = mac_cisco
+  log("cisco mac", mac)
+  mac.dialect = mac_bare
+  log("bare mac", mac)
+#+END_SRC
+
+#+RESULTS:
+: ========== unix mac ==========
+: 98:5a:eb:9f:35:f8
+: ========= cisco mac ==========
+: 985a.eb9f.35f8
+: ========== bare mac ==========
+: 985AEB9F35F8
+
+
+***** 获取厂家信息
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(mac.info)
+#+END_SRC
+
+#+RESULTS:
+: {'OUI': {'address': ['1 Infinite Loop', 'Cupertino  CA  95014', 'US'],
+:  'idx': 9984747,
+:  'offset': 750381,
+:  'org': 'Apple, Inc.',
+:  'oui': '98-5A-EB',
+:  'size': 123}}
+
+
+
+*** ipaddr(>Python3.3: ipaddress) 模块（仅处理 IP）
+
+轻量级 IP 处理模块，不支持 MAC 地址处理。
+
+Python3.3 起，加入标准库中，模块名为 *ipaddress*
+
+**** 定义地址
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import ipaddr
+  ipv4 = ipaddr.IPNetwork('192.168.33.83/28')
+  ipv6 = ipaddr.IPNetwork('2017:11:AF::17/56')
+  log("ipv4", ipv4)
+  log("ipv6", ipv6)
+#+END_SRC
+
+#+RESULTS:
+: ============ ipv4 ============
+: 192.168.33.83/28
+: ============ ipv6 ============
+: 2017:11:af::17/56
+
+**** 子网掩码
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("ipv4.netmask", ipv4.netmask)
+  log("ipv6.netmask", ipv6.netmask)
+#+END_SRC
+
+#+RESULTS:
+: ======== ipv4.netmask ========
+: 255.255.255.240
+: ======== ipv6.netmask ========
+: ffff:ffff:ffff:ff00::
+
+
+**** 广播地址
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(ipv4.broadcast)
+  print(ipv6.broadcast)
+#+END_SRC
+
+#+RESULTS:
+: 192.168.33.95
+: 2017:11:af:ff:ffff:ffff:ffff:ffff
+
+
+**** 网络地址
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(ipv4.network)
+#+END_SRC
+
+#+RESULTS:
+: 192.168.33.80
+
+
+**** 主机掩码
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(ipv4.hostmask)
+#+END_SRC
+
+#+RESULTS:
+: 0.0.0.15
+
+
+**** 地址包含关系
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("ipaddr.IPAddress('192.168.33.84') in ipv4", ipaddr.IPAddress('192.168.33.84') in ipv4)
+#+END_SRC
+
+#+RESULTS:
+:  ipaddr.IPAddress('192.168.33.84') in ipv4
+: True
+
+
+**** 地址聚合
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  ip_list = []
+  ip_list.append(ipaddr.IPNetwork("192.168.1.0/25"))
+  ip_list.append(ipaddr.IPNetwork("192.168.1.128/25"))
+  ip_list.append(ipaddr.IPNetwork("192.168.0.0/24"))
+  ip_list.append(ipaddr.IPNetwork("192.168.3.0/26"))
+  ip_list.append(ipaddr.IPNetwork("192.168.3.64/26"))
+  print(ipaddr.CollapseAddrList(ip_list))
+#+END_SRC
+
+#+RESULTS:
+: [IPv4Network('192.168.0.0/23'), IPv4Network('192.168.3.0/25')]
+
+
+
+
+
+
+
+*** [[https://networkx.github.io][networkx]] (拓扑处理)
+
+**** Dot
+
+***** 无向图
+
+#+BEGIN_SRC plantuml :file img/dot_graph.png :eval never-export
+graph site {
+    core1 -- access1;
+    core2 -- access2;
+    core1 -- core2;
+}
+#+END_SRC
+
+#+RESULTS:
+[[file:img/dot_graph.png]]
+
+
+***** 有向图
+
+#+BEGIN_SRC plantuml :file img/dot_digraph.png :eval never-export
+digraph site {
+    core1 [shape=box];
+    core2 [shape=box];
+    access1;
+    access2;
+    access1 -> core1 -> core2 -> access2;
+}
+#+END_SRC
+
+#+RESULTS:
+[[file:img/dot_digraph.png]]
+
+
+***** 多重图
+
+#+BEGIN_SRC plantuml :file img/dot_multigraph.png :eval never-export
+graph site {
+    core1 -- core2 [label="10GE*8",color="red",fontsize=9.0];
+    core1 -- core2 [label="100GE*2",color="blue",fontsize=9.0];
+}
+#+END_SRC
+
+#+RESULTS:
+[[file:img/dot_multigraph.png]]
+
+
+
+**** 描述拓扑
+
+networks 对拓扑分为有向图 (=nx.Graph()=) ，无向图 (=nx.DiGraph()=) 和多重图 (=nx.MultiGraph()=, =nx.MultiDiGraph()=) 。
+
+***** 无 weight 路径
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import networkx as nx
+  nodes = ['BJ', 'SH', 'GZ', 'HZ', 'NJ', 'WH', 'XA']
+  G = nx.Graph()
+
+  for node in nodes:
+      G.add_node(node)
+
+  edges = [
+      ('BJ', 'SH'),
+      ('BJ', 'GZ'),
+
+      ('SH', 'GZ'),
+
+      ('HZ', 'SH'),
+      ('HZ', 'GZ'),
+
+      ('NJ', 'SH'),
+      ('NJ', 'BJ'),
+
+      ('WH', 'SH'),
+      ('WH', 'BJ'),
+
+      ('XA', 'GZ'),
+      ('XA', 'BJ')
+  ]
+
+  G.add_edges_from(edges)
+#+END_SRC
+
+#+BEGIN_SRC plantuml :file img/dot_graph_networkx.png :eval never-export
+  graph site {
+      BJ -- SH;
+      BJ -- GZ;
+      SH -- GZ;
+      HZ -- SH;
+      HZ -- GZ;
+      NJ -- SH;
+      NJ -- BJ;
+      WH -- SH;
+      WH -- BJ;
+      XA -- GZ;
+      XA -- BJ;
+  }
+#+END_SRC
+
+#+RESULTS:
+[[file:img/dot_graph_networkx.png]]
+
+***** 有 weight 路径
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  nodes = ['BJ', 'SH', 'GZ', 'HZ', 'NJ', 'WH', 'XA']
+  WG = nx.Graph()
+
+  for node in nodes:
+      WG.add_node(node)
+
+  edges = [
+      ('BJ', 'SH', 1200),
+      ('BJ', 'GZ', 2500),
+
+      ('SH', 'GZ', 1300),
+
+      ('HZ', 'SH', 280),
+      ('HZ', 'GZ', 1000),
+
+      ('NJ', 'SH', 300),
+      ('NJ', 'BJ', 900),
+
+      ('WH', 'SH', 800),
+      ('WH', 'BJ', 850),
+
+      ('XA', 'GZ', 2600),
+      ('XA', 'BJ', 2000)
+  ]
+
+  WG.add_weighted_edges_from(edges)
+#+END_SRC
+
+可以动态修改链路 weight : =WG['HZ']['SH']['weight']=10000=
+
+#+BEGIN_SRC plantuml :file img/dot_graph_networkx_weight.png :eval never-export
+  graph site {
+      BJ -- SH [label=1200];
+      BJ -- GZ [label=2500];
+      SH -- GZ [label=1300];
+      HZ -- SH [label=280];
+      HZ -- GZ [label=1000];
+      NJ -- SH [label=300];
+      NJ -- BJ [label=900];
+      WH -- SH [label=800];
+      WH -- BJ [label=850];
+      XA -- GZ [label=2600];
+      XA -- BJ [label=2000];
+  }
+#+END_SRC
+
+#+RESULTS:
+[[file:img/dot_graph_networkx_weight.png]]
+
+
+
+
+**** 路径计算
+
+***** 最短路径计算
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("nx.shortest_path(WG, 'XA', 'HZ')", nx.shortest_path(WG, 'XA', 'HZ', weight=None))  # 不考虑 weight，相当于所有路径 weight 都为 1
+  log("nx.shortest_path(WG, 'XA', 'HZ', weight='weight')", nx.shortest_path(WG, 'XA', 'HZ', weight='weight'))
+#+END_SRC
+
+#+RESULTS:
+:  nx.shortest_path(WG, 'XA', 'HZ')
+: ['XA', 'GZ', 'HZ']
+:  nx.shortest_path(WG, 'XA', 'HZ', weight='weight')
+: ['XA', 'BJ', 'SH', 'HZ']
+
+
+***** 等价路径计算
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(list(nx.all_shortest_paths(G, 'WH', 'GZ', weight=None)))
+#+END_SRC
+
+#+RESULTS:
+: [['WH', 'SH', 'GZ'], ['WH', 'BJ', 'GZ']]
+
+
+***** 可用路径
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  for p in nx.all_simple_paths(WG, 'XA', 'HZ'):
+      print(p)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+['XA', 'GZ', 'BJ', 'SH', 'HZ']
+['XA', 'GZ', 'BJ', 'NJ', 'SH', 'HZ']
+['XA', 'GZ', 'BJ', 'WH', 'SH', 'HZ']
+['XA', 'GZ', 'SH', 'HZ']
+['XA', 'GZ', 'HZ']
+['XA', 'BJ', 'SH', 'GZ', 'HZ']
+['XA', 'BJ', 'SH', 'HZ']
+['XA', 'BJ', 'GZ', 'SH', 'HZ']
+['XA', 'BJ', 'GZ', 'HZ']
+['XA', 'BJ', 'NJ', 'SH', 'GZ', 'HZ']
+['XA', 'BJ', 'NJ', 'SH', 'HZ']
+['XA', 'BJ', 'WH', 'SH', 'GZ', 'HZ']
+['XA', 'BJ', 'WH', 'SH', 'HZ']
+#+end_example
+
+***** 获得部分可用路径
+
+当网络中节点增加，可用路径就会变得非常多。
+对于一个全互联网络（即每两个节点之间都直连），任意两点之间的可用路径多达 =(n-2)!= 条。
+
+可以对可用路径的计算加以限制：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  # 从 XA 到 HZ 经过的节点数量最多为 3 个（不包括起始节点）
+  for p in nx.all_simple_paths(WG, 'XA', 'HZ', 3):
+      print(p)
+#+END_SRC
+
+#+RESULTS:
+: ['XA', 'GZ', 'SH', 'HZ']
+: ['XA', 'GZ', 'HZ']
+: ['XA', 'BJ', 'SH', 'HZ']
+: ['XA', 'BJ', 'GZ', 'HZ']
+
+***** 基于链路 weight 计算可用路径
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  # 用于计算一条路径总 weight 值
+  def get_path_wight(g, path):
+      _weight = 0
+      for edge in nx.utils.pairwise(path):
+          _weight += g.edges[edge[0], edge[1]]['weight']
+      return _weight
+
+
+  for path in nx.shortest_simple_paths(WG, 'XA', 'HZ', weight='weight'):
+      print(path, get_path_wight(WG, path))
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+['XA', 'BJ', 'SH', 'HZ'] 3480
+['XA', 'BJ', 'NJ', 'SH', 'HZ'] 3480
+['XA', 'GZ', 'HZ'] 3600
+['XA', 'BJ', 'WH', 'SH', 'HZ'] 3930
+['XA', 'GZ', 'SH', 'HZ'] 4180
+['XA', 'BJ', 'SH', 'GZ', 'HZ'] 5500
+['XA', 'BJ', 'NJ', 'SH', 'GZ', 'HZ'] 5500
+['XA', 'BJ', 'GZ', 'HZ'] 5500
+['XA', 'BJ', 'WH', 'SH', 'GZ', 'HZ'] 5950
+['XA', 'BJ', 'GZ', 'SH', 'HZ'] 6080
+['XA', 'GZ', 'BJ', 'SH', 'HZ'] 6580
+['XA', 'GZ', 'BJ', 'NJ', 'SH', 'HZ'] 6580
+['XA', 'GZ', 'BJ', 'WH', 'SH', 'HZ'] 7030
+#+end_example
+
+=nx.shortest_simple_paths()= 会根据 weight 值对输出路径排序，返回一个生成器。
+
+若想获得 4 条最优路径，则:
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(list(itertools.islice(nx.shortest_simple_paths(WG, 'XA', 'HZ', weight='weight'), 4)))
+#+END_SRC
+
+#+RESULTS:
+: [['XA', 'BJ', 'SH', 'HZ'], ['XA', 'BJ', 'NJ', 'SH', 'HZ'], ['XA', 'GZ', 'HZ'], ['XA', 'BJ', 'WH', 'SH', 'HZ']]
+
+
+***** [[https://networkx.github.io/documentation/stable/reference/algorithms/shortest_paths.html][更多路径计算方法]]
 
 * 参考文档
 

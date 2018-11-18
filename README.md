@@ -2,9 +2,8 @@
 
 ## Python
 
-- [知识点](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/grammar.html)
+- [知识点](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/python3.html)
 - [工具命令](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/utils.html)
-- [Snippet](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/cookbook.html)
 - [Pandas](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/pandas_v2.html)
 - [Numpy](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/numpy.html)
 - [Openpyxl](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/openpyxl.html)
