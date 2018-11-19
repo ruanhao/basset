@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- 2018-11-19 Mon 16:18 -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Networkx</title>
+<meta name="generator" content="Org mode">
+<meta name="author" content="Hao Ruan">
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link href="../org-html-themes/org/style2.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Networkx</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgd795a95">1. 拓扑描述</a>
+<ul>
+<li><a href="#orga0f390a">1.1. 无向图</a></li>
+<li><a href="#org491c43d">1.2. 有向图</a></li>
+<li><a href="#org0e0b22c">1.3. 多重图</a></li>
+</ul>
+</li>
+<li><a href="#org259afd2">2. 路径计算</a>
+<ul>
+<li><a href="#orgc588b6c">2.1. 无 weight 路径</a></li>
+<li><a href="#orgc72f784">2.2. 有 weight 路径</a></li>
+<li><a href="#orgfbc1e83">2.3. 最短路径计算</a></li>
+<li><a href="#org2199839">2.4. 等价路径计算</a></li>
+<li><a href="#org01333f4">2.5. 可用路径</a></li>
+<li><a href="#org7d0e274">2.6. 获得部分可用路径</a></li>
+<li><a href="#org49441df">2.7. 基于链路 weight 计算可用路径</a></li>
+<li><a href="#org617d629">2.8. 更多路径计算方法</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgd795a95" class="outline-2">
+<h2 id="orgd795a95"><span class="section-number-2">1</span> 拓扑描述</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+<a href="https://networkx.github.io">networkx</a> 将拓扑分为：
+</p>
+
+<ul class="org-ul">
+<li>有向图 (<code>nx.Graph()</code>)</li>
+<li>无向图 (<code>nx.DiGraph()</code>)</li>
+<li>多重图 (<code>nx.MultiGraph()</code>, <code>nx.MultiDiGraph()</code>)</li>
+</ul>
+</div>
+
+
+<div id="outline-container-orga0f390a" class="outline-3">
+<h3 id="orga0f390a"><span class="section-number-3">1.1</span> 无向图</h3>
+<div class="outline-text-3" id="text-1-1">
+
+<div class="figure">
+<p><img src="img/dot_graph.png" alt="dot_graph.png">
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org491c43d" class="outline-3">
+<h3 id="org491c43d"><span class="section-number-3">1.2</span> 有向图</h3>
+<div class="outline-text-3" id="text-1-2">
+
+<div class="figure">
+<p><img src="img/dot_digraph.png" alt="dot_digraph.png">
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org0e0b22c" class="outline-3">
+<h3 id="org0e0b22c"><span class="section-number-3">1.3</span> 多重图</h3>
+<div class="outline-text-3" id="text-1-3">
+
+<div class="figure">
+<p><img src="img/dot_multigraph.png" alt="dot_multigraph.png">
+</p>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+
+<div id="outline-container-org259afd2" class="outline-2">
+<h2 id="org259afd2"><span class="section-number-2">2</span> 路径计算</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-orgc588b6c" class="outline-3">
+<h3 id="orgc588b6c"><span class="section-number-3">2.1</span> 无 weight 路径</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #d787d7; font-weight: bold;">import</span> networkx <span style="color: #d787d7; font-weight: bold;">as</span> nx
+<span style="color: #5fafff;">nodes</span> = <span style="color: #ff8c00; font-size: 150%;">[</span><span style="color: #87af5f;">'BJ'</span>, <span style="color: #87af5f;">'SH'</span>, <span style="color: #87af5f;">'GZ'</span>, <span style="color: #87af5f;">'HZ'</span>, <span style="color: #87af5f;">'NJ'</span>, <span style="color: #87af5f;">'WH'</span>, <span style="color: #87af5f;">'XA'</span><span style="color: #ff8c00; font-size: 150%;">]</span>
+<span style="color: #5fafff;">G</span> = nx.Graph<span style="color: #ff8c00; font-size: 150%;">()</span>
+
+<span style="color: #d787d7; font-weight: bold;">for</span> node <span style="color: #d787d7; font-weight: bold;">in</span> nodes:
+    G.add_node<span style="color: #ff8c00; font-size: 150%;">(</span>node<span style="color: #ff8c00; font-size: 150%;">)</span>
+
+<span style="color: #5fafff;">edges</span> = <span style="color: #ff8c00; font-size: 150%;">[</span>
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'BJ'</span>, <span style="color: #87af5f;">'SH'</span><span style="color: #ff1493; font-size: 140%;">)</span>,
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'BJ'</span>, <span style="color: #87af5f;">'GZ'</span><span style="color: #ff1493; font-size: 140%;">)</span>,
+
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'SH'</span>, <span style="color: #87af5f;">'GZ'</span><span style="color: #ff1493; font-size: 140%;">)</span>,
+
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'HZ'</span>, <span style="color: #87af5f;">'SH'</span><span style="color: #ff1493; font-size: 140%;">)</span>,
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'HZ'</span>, <span style="color: #87af5f;">'GZ'</span><span style="color: #ff1493; font-size: 140%;">)</span>,
+
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'NJ'</span>, <span style="color: #87af5f;">'SH'</span><span style="color: #ff1493; font-size: 140%;">)</span>,
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'NJ'</span>, <span style="color: #87af5f;">'BJ'</span><span style="color: #ff1493; font-size: 140%;">)</span>,
+
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'WH'</span>, <span style="color: #87af5f;">'SH'</span><span style="color: #ff1493; font-size: 140%;">)</span>,
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'WH'</span>, <span style="color: #87af5f;">'BJ'</span><span style="color: #ff1493; font-size: 140%;">)</span>,
+
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'XA'</span>, <span style="color: #87af5f;">'GZ'</span><span style="color: #ff1493; font-size: 140%;">)</span>,
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'XA'</span>, <span style="color: #87af5f;">'BJ'</span><span style="color: #ff1493; font-size: 140%;">)</span>
+<span style="color: #ff8c00; font-size: 150%;">]</span>
+
+G.add_edges_from<span style="color: #ff8c00; font-size: 150%;">(</span>edges<span style="color: #ff8c00; font-size: 150%;">)</span>
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="img/dot_graph_networkx.png" alt="dot_graph_networkx.png">
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgc72f784" class="outline-3">
+<h3 id="orgc72f784"><span class="section-number-3">2.2</span> 有 weight 路径</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #5fafff;">nodes</span> = <span style="color: #ff8c00; font-size: 150%;">[</span><span style="color: #87af5f;">'BJ'</span>, <span style="color: #87af5f;">'SH'</span>, <span style="color: #87af5f;">'GZ'</span>, <span style="color: #87af5f;">'HZ'</span>, <span style="color: #87af5f;">'NJ'</span>, <span style="color: #87af5f;">'WH'</span>, <span style="color: #87af5f;">'XA'</span><span style="color: #ff8c00; font-size: 150%;">]</span>
+<span style="color: #5fafff;">WG</span> = nx.Graph<span style="color: #ff8c00; font-size: 150%;">()</span>
+
+<span style="color: #d787d7; font-weight: bold;">for</span> node <span style="color: #d787d7; font-weight: bold;">in</span> nodes:
+    WG.add_node<span style="color: #ff8c00; font-size: 150%;">(</span>node<span style="color: #ff8c00; font-size: 150%;">)</span>
+
+<span style="color: #5fafff;">edges</span> = <span style="color: #ff8c00; font-size: 150%;">[</span>
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'BJ'</span>, <span style="color: #87af5f;">'SH'</span>, 1200<span style="color: #ff1493; font-size: 140%;">)</span>,
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'BJ'</span>, <span style="color: #87af5f;">'GZ'</span>, 2500<span style="color: #ff1493; font-size: 140%;">)</span>,
+
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'SH'</span>, <span style="color: #87af5f;">'GZ'</span>, 1300<span style="color: #ff1493; font-size: 140%;">)</span>,
+
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'HZ'</span>, <span style="color: #87af5f;">'SH'</span>, 280<span style="color: #ff1493; font-size: 140%;">)</span>,
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'HZ'</span>, <span style="color: #87af5f;">'GZ'</span>, 1000<span style="color: #ff1493; font-size: 140%;">)</span>,
+
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'NJ'</span>, <span style="color: #87af5f;">'SH'</span>, 300<span style="color: #ff1493; font-size: 140%;">)</span>,
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'NJ'</span>, <span style="color: #87af5f;">'BJ'</span>, 900<span style="color: #ff1493; font-size: 140%;">)</span>,
+
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'WH'</span>, <span style="color: #87af5f;">'SH'</span>, 800<span style="color: #ff1493; font-size: 140%;">)</span>,
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'WH'</span>, <span style="color: #87af5f;">'BJ'</span>, 850<span style="color: #ff1493; font-size: 140%;">)</span>,
+
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'XA'</span>, <span style="color: #87af5f;">'GZ'</span>, 2600<span style="color: #ff1493; font-size: 140%;">)</span>,
+    <span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'XA'</span>, <span style="color: #87af5f;">'BJ'</span>, 2000<span style="color: #ff1493; font-size: 140%;">)</span>
+<span style="color: #ff8c00; font-size: 150%;">]</span>
+
+WG.add_weighted_edges_from<span style="color: #ff8c00; font-size: 150%;">(</span>edges<span style="color: #ff8c00; font-size: 150%;">)</span>
+</pre>
+</div>
+
+<p>
+可以动态修改链路 weight : <code>WG['HZ']['SH']['weight']=10000</code>
+</p>
+
+
+<div class="figure">
+<p><img src="img/dot_graph_networkx_weight.png" alt="dot_graph_networkx_weight.png">
+</p>
+</div>
+</div>
+</div>
+
+
+
+
+
+<div id="outline-container-orgfbc1e83" class="outline-3">
+<h3 id="orgfbc1e83"><span class="section-number-3">2.3</span> 最短路径计算</h3>
+<div class="outline-text-3" id="text-2-3">
+<div class="org-src-container">
+<pre class="src src-ipython">log<span style="color: #ff8c00; font-size: 150%;">(</span><span style="color: #87af5f;">"nx.shortest_path(WG, 'XA', 'HZ')"</span>, nx.shortest_path<span style="color: #ff1493; font-size: 140%;">(</span>WG, <span style="color: #87af5f;">'XA'</span>, <span style="color: #87af5f;">'HZ'</span>, weight=<span style="color: #d7875f; font-weight: bold;">None</span><span style="color: #ff1493; font-size: 140%;">)</span><span style="color: #ff8c00; font-size: 150%;">)</span>  <span style="color: #707070; font-style: italic;"># </span><span style="color: #707070; font-style: italic;">&#19981;&#32771;&#34385; weight&#65292;&#30456;&#24403;&#20110;&#25152;&#26377;&#36335;&#24452; weight &#37117;&#20026; 1</span>
+log<span style="color: #ff8c00; font-size: 150%;">(</span><span style="color: #87af5f;">"nx.shortest_path(WG, 'XA', 'HZ', weight='weight')"</span>, nx.shortest_path<span style="color: #ff1493; font-size: 140%;">(</span>WG, <span style="color: #87af5f;">'XA'</span>, <span style="color: #87af5f;">'HZ'</span>, weight=<span style="color: #87af5f;">'weight'</span><span style="color: #ff1493; font-size: 140%;">)</span><span style="color: #ff8c00; font-size: 150%;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+ nx.shortest_path(WG, 'XA', 'HZ')
+['XA', 'GZ', 'HZ']
+ nx.shortest_path(WG, 'XA', 'HZ', weight='weight')
+['XA', 'BJ', 'SH', 'HZ']
+
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org2199839" class="outline-3">
+<h3 id="org2199839"><span class="section-number-3">2.4</span> 等价路径计算</h3>
+<div class="outline-text-3" id="text-2-4">
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #d787d7; font-weight: bold;">print</span><span style="color: #ff8c00; font-size: 150%;">(</span><span style="color: #5fafff; font-weight: bold;">list</span><span style="color: #ff1493; font-size: 140%;">(</span>nx.all_shortest_paths<span style="color: #7fff00; font-size: 130%;">(</span>G, <span style="color: #87af5f;">'WH'</span>, <span style="color: #87af5f;">'GZ'</span>, weight=<span style="color: #d7875f; font-weight: bold;">None</span><span style="color: #7fff00; font-size: 130%;">)</span><span style="color: #ff1493; font-size: 140%;">)</span><span style="color: #ff8c00; font-size: 150%;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+[['WH', 'SH', 'GZ'], ['WH', 'BJ', 'GZ']]
+
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org01333f4" class="outline-3">
+<h3 id="org01333f4"><span class="section-number-3">2.5</span> 可用路径</h3>
+<div class="outline-text-3" id="text-2-5">
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #d787d7; font-weight: bold;">for</span> p <span style="color: #d787d7; font-weight: bold;">in</span> nx.all_simple_paths<span style="color: #ff8c00; font-size: 150%;">(</span>WG, <span style="color: #87af5f;">'XA'</span>, <span style="color: #87af5f;">'HZ'</span><span style="color: #ff8c00; font-size: 150%;">)</span>:
+    <span style="color: #d787d7; font-weight: bold;">print</span><span style="color: #ff8c00; font-size: 150%;">(</span>p<span style="color: #ff8c00; font-size: 150%;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+['XA', 'GZ', 'BJ', 'SH', 'HZ']
+['XA', 'GZ', 'BJ', 'NJ', 'SH', 'HZ']
+['XA', 'GZ', 'BJ', 'WH', 'SH', 'HZ']
+['XA', 'GZ', 'SH', 'HZ']
+['XA', 'GZ', 'HZ']
+['XA', 'BJ', 'SH', 'GZ', 'HZ']
+['XA', 'BJ', 'SH', 'HZ']
+['XA', 'BJ', 'GZ', 'SH', 'HZ']
+['XA', 'BJ', 'GZ', 'HZ']
+['XA', 'BJ', 'NJ', 'SH', 'GZ', 'HZ']
+['XA', 'BJ', 'NJ', 'SH', 'HZ']
+['XA', 'BJ', 'WH', 'SH', 'GZ', 'HZ']
+['XA', 'BJ', 'WH', 'SH', 'HZ']
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org7d0e274" class="outline-3">
+<h3 id="org7d0e274"><span class="section-number-3">2.6</span> 获得部分可用路径</h3>
+<div class="outline-text-3" id="text-2-6">
+<p>
+当网络中节点增加，可用路径就会变得非常多。
+对于一个全互联网络（即每两个节点之间都直连），任意两点之间的可用路径多达 <code>(n-2)!</code> 条。
+</p>
+
+<p>
+可以对可用路径的计算加以限制：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #707070; font-style: italic;"># </span><span style="color: #707070; font-style: italic;">&#20174; XA &#21040; HZ &#32463;&#36807;&#30340;&#33410;&#28857;&#25968;&#37327;&#26368;&#22810;&#20026; 3 &#20010;&#65288;&#19981;&#21253;&#25324;&#36215;&#22987;&#33410;&#28857;&#65289;</span>
+<span style="color: #d787d7; font-weight: bold;">for</span> p <span style="color: #d787d7; font-weight: bold;">in</span> nx.all_simple_paths<span style="color: #ff8c00; font-size: 150%;">(</span>WG, <span style="color: #87af5f;">'XA'</span>, <span style="color: #87af5f;">'HZ'</span>, 3<span style="color: #ff8c00; font-size: 150%;">)</span>:
+    <span style="color: #d787d7; font-weight: bold;">print</span><span style="color: #ff8c00; font-size: 150%;">(</span>p<span style="color: #ff8c00; font-size: 150%;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+['XA', 'GZ', 'SH', 'HZ']
+['XA', 'GZ', 'HZ']
+['XA', 'BJ', 'SH', 'HZ']
+['XA', 'BJ', 'GZ', 'HZ']
+
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org49441df" class="outline-3">
+<h3 id="org49441df"><span class="section-number-3">2.7</span> 基于链路 weight 计算可用路径</h3>
+<div class="outline-text-3" id="text-2-7">
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #707070; font-style: italic;"># </span><span style="color: #707070; font-style: italic;">&#29992;&#20110;&#35745;&#31639;&#19968;&#26465;&#36335;&#24452;&#24635; weight &#20540;</span>
+<span style="color: #d787d7; font-weight: bold;">def</span> <span style="color: #5fafff;">get_path_wight</span><span style="color: #ff8c00; font-size: 150%;">(</span>g, path<span style="color: #ff8c00; font-size: 150%;">)</span>:
+    <span style="color: #5fafff;">_weight</span> = 0
+    <span style="color: #d787d7; font-weight: bold;">for</span> edge <span style="color: #d787d7; font-weight: bold;">in</span> nx.utils.pairwise<span style="color: #ff8c00; font-size: 150%;">(</span>path<span style="color: #ff8c00; font-size: 150%;">)</span>:
+        <span style="color: #5fafff;">_weight</span> += g.edges<span style="color: #ff8c00; font-size: 150%;">[</span>edge<span style="color: #ff1493; font-size: 140%;">[</span>0<span style="color: #ff1493; font-size: 140%;">]</span>, edge<span style="color: #ff1493; font-size: 140%;">[</span>1<span style="color: #ff1493; font-size: 140%;">]</span><span style="color: #ff8c00; font-size: 150%;">][</span><span style="color: #87af5f;">'weight'</span><span style="color: #ff8c00; font-size: 150%;">]</span>
+    <span style="color: #d787d7; font-weight: bold;">return</span> _weight
+
+
+<span style="color: #d787d7; font-weight: bold;">for</span> path <span style="color: #d787d7; font-weight: bold;">in</span> nx.shortest_simple_paths<span style="color: #ff8c00; font-size: 150%;">(</span>WG, <span style="color: #87af5f;">'XA'</span>, <span style="color: #87af5f;">'HZ'</span>, weight=<span style="color: #87af5f;">'weight'</span><span style="color: #ff8c00; font-size: 150%;">)</span>:
+    <span style="color: #d787d7; font-weight: bold;">print</span><span style="color: #ff8c00; font-size: 150%;">(</span>path, get_path_wight<span style="color: #ff1493; font-size: 140%;">(</span>WG, path<span style="color: #ff1493; font-size: 140%;">)</span><span style="color: #ff8c00; font-size: 150%;">)</span>
+
+</pre>
+</div>
+
+<pre class="example">
+['XA', 'BJ', 'SH', 'HZ'] 3480
+['XA', 'BJ', 'NJ', 'SH', 'HZ'] 3480
+['XA', 'GZ', 'HZ'] 3600
+['XA', 'BJ', 'WH', 'SH', 'HZ'] 3930
+['XA', 'GZ', 'SH', 'HZ'] 4180
+['XA', 'BJ', 'SH', 'GZ', 'HZ'] 5500
+['XA', 'BJ', 'NJ', 'SH', 'GZ', 'HZ'] 5500
+['XA', 'BJ', 'GZ', 'HZ'] 5500
+['XA', 'BJ', 'WH', 'SH', 'GZ', 'HZ'] 5950
+['XA', 'BJ', 'GZ', 'SH', 'HZ'] 6080
+['XA', 'GZ', 'BJ', 'SH', 'HZ'] 6580
+['XA', 'GZ', 'BJ', 'NJ', 'SH', 'HZ'] 6580
+['XA', 'GZ', 'BJ', 'WH', 'SH', 'HZ'] 7030
+</pre>
+
+<p>
+<code>nx.shortest_simple_paths()</code> 会根据 weight 值对输出路径排序，返回一个生成器。
+</p>
+
+<p>
+若想获得 4 条最优路径，则:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #d787d7; font-weight: bold;">print</span><span style="color: #ff8c00; font-size: 150%;">(</span><span style="color: #5fafff; font-weight: bold;">list</span><span style="color: #ff1493; font-size: 140%;">(</span>itertools.islice<span style="color: #7fff00; font-size: 130%;">(</span>nx.shortest_simple_paths<span style="color: #00bfff; font-size: 120%;">(</span>WG, <span style="color: #87af5f;">'XA'</span>, <span style="color: #87af5f;">'HZ'</span>, weight=<span style="color: #87af5f;">'weight'</span><span style="color: #00bfff; font-size: 120%;">)</span>, 4<span style="color: #7fff00; font-size: 130%;">)</span><span style="color: #ff1493; font-size: 140%;">)</span><span style="color: #ff8c00; font-size: 150%;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+[['XA', 'BJ', 'SH', 'HZ'], ['XA', 'BJ', 'NJ', 'SH', 'HZ'], ['XA', 'GZ', 'HZ'], ['XA', 'BJ', 'WH', 'SH', 'HZ']]
+
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org617d629" class="outline-3">
+<h3 id="org617d629"><span class="section-number-3">2.8</span> <a href="https://networkx.github.io/documentation/stable/reference/algorithms/shortest_paths.html">更多路径计算方法</a></h3>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Hao Ruan</p>
+<p class="date">Created: 2018-11-19 Mon 16:18</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

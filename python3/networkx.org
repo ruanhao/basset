@@ -1,0 +1,297 @@
+#+TITLE:     Networkx
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS:   h:6 tex:t f:t ^:nil
+#+STARTUP:   showall
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="../org-html-themes/org/style2.css" rel="stylesheet" type="text/css" />
+
+#+BEGIN_SRC ipython :session :exports none :eval never-export
+  def log(title0, value):
+      title1 = ' ' + title0 + ' '
+      print("{}\n{}".format(title1.center(80, '='), value))
+#+END_SRC
+
+
+* 拓扑描述
+
+[[https://networkx.github.io][networkx]] 将拓扑分为：
+
+- 有向图 (=nx.Graph()=)
+- 无向图 (=nx.DiGraph()=)
+- 多重图 (=nx.MultiGraph()=, =nx.MultiDiGraph()=)
+
+
+** 无向图
+
+#+BEGIN_SRC plantuml :file img/dot_graph.png :eval never-export
+graph site {
+    core1 -- access1;
+    core2 -- access2;
+    core1 -- core2;
+}
+#+END_SRC
+
+#+RESULTS:
+[[file:img/dot_graph.png]]
+
+
+** 有向图
+
+#+BEGIN_SRC plantuml :file img/dot_digraph.png :eval never-export
+digraph site {
+    core1 [shape=box];
+    core2 [shape=box];
+    access1;
+    access2;
+    access1 -> core1 -> core2 -> access2;
+}
+#+END_SRC
+
+#+RESULTS:
+[[file:img/dot_digraph.png]]
+
+
+** 多重图
+
+#+BEGIN_SRC plantuml :file img/dot_multigraph.png :eval never-export
+graph site {
+    core1 -- core2 [label="10GE*8",color="red",fontsize=9.0];
+    core1 -- core2 [label="100GE*2",color="blue",fontsize=9.0];
+}
+#+END_SRC
+
+#+RESULTS:
+[[file:img/dot_multigraph.png]]
+
+
+
+
+
+* 路径计算
+
+** 无 weight 路径
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import networkx as nx
+  nodes = ['BJ', 'SH', 'GZ', 'HZ', 'NJ', 'WH', 'XA']
+  G = nx.Graph()
+
+  for node in nodes:
+      G.add_node(node)
+
+  edges = [
+      ('BJ', 'SH'),
+      ('BJ', 'GZ'),
+
+      ('SH', 'GZ'),
+
+      ('HZ', 'SH'),
+      ('HZ', 'GZ'),
+
+      ('NJ', 'SH'),
+      ('NJ', 'BJ'),
+
+      ('WH', 'SH'),
+      ('WH', 'BJ'),
+
+      ('XA', 'GZ'),
+      ('XA', 'BJ')
+  ]
+
+  G.add_edges_from(edges)
+#+END_SRC
+
+#+BEGIN_SRC plantuml :file img/dot_graph_networkx.png :eval never-export
+  graph site {
+      BJ -- SH;
+      BJ -- GZ;
+      SH -- GZ;
+      HZ -- SH;
+      HZ -- GZ;
+      NJ -- SH;
+      NJ -- BJ;
+      WH -- SH;
+      WH -- BJ;
+      XA -- GZ;
+      XA -- BJ;
+  }
+#+END_SRC
+
+#+RESULTS:
+[[file:img/dot_graph_networkx.png]]
+
+
+** 有 weight 路径
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  nodes = ['BJ', 'SH', 'GZ', 'HZ', 'NJ', 'WH', 'XA']
+  WG = nx.Graph()
+
+  for node in nodes:
+      WG.add_node(node)
+
+  edges = [
+      ('BJ', 'SH', 1200),
+      ('BJ', 'GZ', 2500),
+
+      ('SH', 'GZ', 1300),
+
+      ('HZ', 'SH', 280),
+      ('HZ', 'GZ', 1000),
+
+      ('NJ', 'SH', 300),
+      ('NJ', 'BJ', 900),
+
+      ('WH', 'SH', 800),
+      ('WH', 'BJ', 850),
+
+      ('XA', 'GZ', 2600),
+      ('XA', 'BJ', 2000)
+  ]
+
+  WG.add_weighted_edges_from(edges)
+#+END_SRC
+
+可以动态修改链路 weight : =WG['HZ']['SH']['weight']=10000=
+
+#+BEGIN_SRC plantuml :file img/dot_graph_networkx_weight.png :eval never-export
+  graph site {
+      BJ -- SH [label=1200];
+      BJ -- GZ [label=2500];
+      SH -- GZ [label=1300];
+      HZ -- SH [label=280];
+      HZ -- GZ [label=1000];
+      NJ -- SH [label=300];
+      NJ -- BJ [label=900];
+      WH -- SH [label=800];
+      WH -- BJ [label=850];
+      XA -- GZ [label=2600];
+      XA -- BJ [label=2000];
+  }
+#+END_SRC
+
+#+RESULTS:
+[[file:img/dot_graph_networkx_weight.png]]
+
+
+
+
+
+** 最短路径计算
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("nx.shortest_path(WG, 'XA', 'HZ')", nx.shortest_path(WG, 'XA', 'HZ', weight=None))  # 不考虑 weight，相当于所有路径 weight 都为 1
+  log("nx.shortest_path(WG, 'XA', 'HZ', weight='weight')", nx.shortest_path(WG, 'XA', 'HZ', weight='weight'))
+#+END_SRC
+
+#+RESULTS:
+:  nx.shortest_path(WG, 'XA', 'HZ')
+: ['XA', 'GZ', 'HZ']
+:  nx.shortest_path(WG, 'XA', 'HZ', weight='weight')
+: ['XA', 'BJ', 'SH', 'HZ']
+
+
+** 等价路径计算
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(list(nx.all_shortest_paths(G, 'WH', 'GZ', weight=None)))
+#+END_SRC
+
+#+RESULTS:
+: [['WH', 'SH', 'GZ'], ['WH', 'BJ', 'GZ']]
+
+
+** 可用路径
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  for p in nx.all_simple_paths(WG, 'XA', 'HZ'):
+      print(p)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+['XA', 'GZ', 'BJ', 'SH', 'HZ']
+['XA', 'GZ', 'BJ', 'NJ', 'SH', 'HZ']
+['XA', 'GZ', 'BJ', 'WH', 'SH', 'HZ']
+['XA', 'GZ', 'SH', 'HZ']
+['XA', 'GZ', 'HZ']
+['XA', 'BJ', 'SH', 'GZ', 'HZ']
+['XA', 'BJ', 'SH', 'HZ']
+['XA', 'BJ', 'GZ', 'SH', 'HZ']
+['XA', 'BJ', 'GZ', 'HZ']
+['XA', 'BJ', 'NJ', 'SH', 'GZ', 'HZ']
+['XA', 'BJ', 'NJ', 'SH', 'HZ']
+['XA', 'BJ', 'WH', 'SH', 'GZ', 'HZ']
+['XA', 'BJ', 'WH', 'SH', 'HZ']
+#+end_example
+
+
+** 获得部分可用路径
+
+当网络中节点增加，可用路径就会变得非常多。
+对于一个全互联网络（即每两个节点之间都直连），任意两点之间的可用路径多达 =(n-2)!= 条。
+
+可以对可用路径的计算加以限制：
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  # 从 XA 到 HZ 经过的节点数量最多为 3 个（不包括起始节点）
+  for p in nx.all_simple_paths(WG, 'XA', 'HZ', 3):
+      print(p)
+#+END_SRC
+
+#+RESULTS:
+: ['XA', 'GZ', 'SH', 'HZ']
+: ['XA', 'GZ', 'HZ']
+: ['XA', 'BJ', 'SH', 'HZ']
+: ['XA', 'BJ', 'GZ', 'HZ']
+
+
+** 基于链路 weight 计算可用路径
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  # 用于计算一条路径总 weight 值
+  def get_path_wight(g, path):
+      _weight = 0
+      for edge in nx.utils.pairwise(path):
+          _weight += g.edges[edge[0], edge[1]]['weight']
+      return _weight
+
+
+  for path in nx.shortest_simple_paths(WG, 'XA', 'HZ', weight='weight'):
+      print(path, get_path_wight(WG, path))
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+['XA', 'BJ', 'SH', 'HZ'] 3480
+['XA', 'BJ', 'NJ', 'SH', 'HZ'] 3480
+['XA', 'GZ', 'HZ'] 3600
+['XA', 'BJ', 'WH', 'SH', 'HZ'] 3930
+['XA', 'GZ', 'SH', 'HZ'] 4180
+['XA', 'BJ', 'SH', 'GZ', 'HZ'] 5500
+['XA', 'BJ', 'NJ', 'SH', 'GZ', 'HZ'] 5500
+['XA', 'BJ', 'GZ', 'HZ'] 5500
+['XA', 'BJ', 'WH', 'SH', 'GZ', 'HZ'] 5950
+['XA', 'BJ', 'GZ', 'SH', 'HZ'] 6080
+['XA', 'GZ', 'BJ', 'SH', 'HZ'] 6580
+['XA', 'GZ', 'BJ', 'NJ', 'SH', 'HZ'] 6580
+['XA', 'GZ', 'BJ', 'WH', 'SH', 'HZ'] 7030
+#+end_example
+
+=nx.shortest_simple_paths()= 会根据 weight 值对输出路径排序，返回一个生成器。
+
+若想获得 4 条最优路径，则:
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(list(itertools.islice(nx.shortest_simple_paths(WG, 'XA', 'HZ', weight='weight'), 4)))
+#+END_SRC
+
+#+RESULTS:
+: [['XA', 'BJ', 'SH', 'HZ'], ['XA', 'BJ', 'NJ', 'SH', 'HZ'], ['XA', 'GZ', 'HZ'], ['XA', 'BJ', 'WH', 'SH', 'HZ']]
+
+
+** [[https://networkx.github.io/documentation/stable/reference/algorithms/shortest_paths.html][更多路径计算方法]]

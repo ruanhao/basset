@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- 2018-11-19 Mon 16:32 -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>netaddr</title>
+<meta name="generator" content="Org mode">
+<meta name="author" content="Hao Ruan">
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+<link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">netaddr</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgfe6719d">1. 概述</a></li>
+<li><a href="#org163eabb">2. IP 地址操作</a>
+<ul>
+<li><a href="#orgcda267a">2.1. 定义网络</a></li>
+<li><a href="#org5f1c159">2.2. 网络掩码</a></li>
+<li><a href="#org903ff92">2.3. 广播地址</a></li>
+<li><a href="#org149a80b">2.4. 网络地址</a></li>
+<li><a href="#org0fbc4da">2.5. 主机掩码</a></li>
+<li><a href="#orga3402e7">2.6. 网段包含主机数量</a></li>
+<li><a href="#org8ad5986">2.7. 获取所有主机地址</a></li>
+<li><a href="#org26d87ec">2.8. 将 IP 地址所在网段根据掩码长度划分子网</a></li>
+<li><a href="#org67f3761">2.9. 修改掩码长度</a></li>
+<li><a href="#org9f32aad">2.10. 判断公私网</a></li>
+<li><a href="#orge4ab0fb">2.11. 定义网段地址范围</a></li>
+<li><a href="#org3e72dc0">2.12. 地址聚合</a>
+<ul>
+<li><a href="#org62dcb9d">2.12.1. IPRange</a></li>
+<li><a href="#orgf624712">2.12.2. cidr_merge</a></li>
+</ul>
+</li>
+<li><a href="#orgc7e2105">2.13. 地址加减</a></li>
+<li><a href="#orgcb5d89d">2.14. MAC 地址操作</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgfe6719d">1. 概述</a></li>
+<li><a href="#org163eabb">2. IP 地址操作</a>
+<ul>
+<li><a href="#orgcda267a">2.1. 定义网络</a></li>
+<li><a href="#org5f1c159">2.2. 网络掩码</a></li>
+<li><a href="#org903ff92">2.3. 广播地址</a></li>
+<li><a href="#org149a80b">2.4. 网络地址</a></li>
+<li><a href="#org0fbc4da">2.5. 主机掩码</a></li>
+<li><a href="#orga3402e7">2.6. 网段包含主机数量</a></li>
+<li><a href="#org8ad5986">2.7. 获取所有主机地址</a></li>
+<li><a href="#org26d87ec">2.8. 将 IP 地址所在网段根据掩码长度划分子网</a></li>
+<li><a href="#org67f3761">2.9. 修改掩码长度</a></li>
+<li><a href="#org9f32aad">2.10. 判断公私网</a></li>
+<li><a href="#orge4ab0fb">2.11. 定义网段地址范围</a></li>
+<li><a href="#org3e72dc0">2.12. 地址聚合</a>
+<ul>
+<li><a href="#org62dcb9d">2.12.1. IPRange</a></li>
+<li><a href="#orgf624712">2.12.2. cidr_merge</a></li>
+</ul>
+</li>
+<li><a href="#orgc7e2105">2.13. 地址加减</a></li>
+<li><a href="#orgcb5d89d">2.14. MAC 地址操作</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="outline-2" id="meta">
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Author</td>
+<td class="org-left">Hao Ruan (haoru@cisco.com)</td>
+</tr>
+
+<tr>
+<td class="org-left">Date</td>
+<td class="org-left">2018-11-19 16:32:40</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div id="outline-container-orgfe6719d" class="outline-2">
+<h2 id="orgfe6719d"><span class="section-number-2">1</span> 概述</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+netaddr 模块用于处理 IP 地址和 MAC 地址，它有两个基本类：IPAddress 和 IPNetwork。
+</p>
+</div>
+</div>
+
+<div id="outline-container-org163eabb" class="outline-2">
+<h2 id="org163eabb"><span class="section-number-2">2</span> IP 地址操作</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-orgcda267a" class="outline-3">
+<h3 id="orgcda267a"><span class="section-number-3">2.1</span> 定义网络</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #d787d7; font-weight: bold;">from</span> netaddr <span style="color: #d787d7; font-weight: bold;">import</span> IPAddress, IPNetwork
+<span style="color: #5fafff;">nw</span> = IPNetwork<span style="color: #ff8c00; font-size: 150%;">(</span><span style="color: #87af5f;">'192.168.0.1/24'</span><span style="color: #ff8c00; font-size: 150%;">)</span>
+<span style="color: #d787d7; font-weight: bold;">print</span><span style="color: #ff8c00; font-size: 150%;">(</span>nw<span style="color: #ff8c00; font-size: 150%;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+192.168.0.1/24
+
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org5f1c159" class="outline-3">
+<h3 id="org5f1c159"><span class="section-number-3">2.2</span> 网络掩码</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #d787d7; font-weight: bold;">print</span><span style="color: #ff8c00; font-size: 150%;">(</span>nw.netmask<span style="color: #ff8c00; font-size: 150%;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+255.255.255.0
+
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org903ff92" class="outline-3">
+<h3 id="org903ff92"><span class="section-number-3">2.3</span> 广播地址</h3>
+<div class="outline-text-3" id="text-2-3">
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #d787d7; font-weight: bold;">print</span><span style="color: #ff8c00; font-size: 150%;">(</span>nw.broadcast<span style="color: #ff8c00; font-size: 150%;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+192.168.0.255
+
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org149a80b" class="outline-3">
+<h3 id="org149a80b"><span class="section-number-3">2.4</span> 网络地址</h3>
+<div class="outline-text-3" id="text-2-4">
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #d787d7; font-weight: bold;">print</span><span style="color: #ff8c00; font-size: 150%;">(</span>nw.network<span style="color: #ff8c00; font-size: 150%;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+192.168.0.0
+
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org0fbc4da" class="outline-3">
+<h3 id="org0fbc4da"><span class="section-number-3">2.5</span> 主机掩码</h3>
+<div class="outline-text-3" id="text-2-5">
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #d787d7; font-weight: bold;">print</span><span style="color: #ff8c00; font-size: 150%;">(</span>nw.hostmask<span style="color: #ff8c00; font-size: 150%;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+0.0.0.255
+
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-orga3402e7" class="outline-3">
+<h3 id="orga3402e7"><span class="section-number-3">2.6</span> 网段包含主机数量</h3>
+<div class="outline-text-3" id="text-2-6">
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #d787d7; font-weight: bold;">print</span><span style="color: #ff8c00; font-size: 150%;">(</span>nw.size<span style="color: #ff8c00; font-size: 150%;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+256
+
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org8ad5986" class="outline-3">
+<h3 id="org8ad5986"><span class="section-number-3">2.7</span> 获取所有主机地址</h3>
+<div class="outline-text-3" id="text-2-7">
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #d787d7; font-weight: bold;">import</span> itertools
+<span style="color: #d787d7; font-weight: bold;">print</span><span style="color: #ff8c00; font-size: 150%;">(</span><span style="color: #5fafff; font-weight: bold;">list</span><span style="color: #ff1493; font-size: 140%;">(</span>itertools.islice<span style="color: #7fff00; font-size: 130%;">(</span>nw.iter_hosts<span style="color: #00bfff; font-size: 120%;">()</span>, 3<span style="color: #7fff00; font-size: 130%;">)</span><span style="color: #ff1493; font-size: 140%;">)</span><span style="color: #ff8c00; font-size: 150%;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+[IPAddress('192.168.0.1'), IPAddress('192.168.0.2'), IPAddress('192.168.0.3')]
+
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org26d87ec" class="outline-3">
+<h3 id="org26d87ec"><span class="section-number-3">2.8</span> 将 IP 地址所在网段根据掩码长度划分子网</h3>
+<div class="outline-text-3" id="text-2-8">
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #5fafff;">subnets</span> = <span style="color: #ff8c00; font-size: 150%;">[</span>x <span style="color: #d787d7; font-weight: bold;">for</span> x <span style="color: #d787d7; font-weight: bold;">in</span> nw.subnet<span style="color: #ff1493; font-size: 140%;">(</span>30<span style="color: #ff1493; font-size: 140%;">)</span><span style="color: #ff8c00; font-size: 150%;">]</span> <span style="color: #707070; font-style: italic;"># </span><span style="color: #707070; font-style: italic;">&#20998;&#20026;&#25513;&#30721;&#38271;&#24230;&#20026; 30 &#30340;&#20960;&#20010;&#23376;&#32593;</span>
+<span style="color: #d787d7; font-weight: bold;">print</span><span style="color: #ff8c00; font-size: 150%;">(</span>subnets<span style="color: #ff1493; font-size: 140%;">[</span>:3<span style="color: #ff1493; font-size: 140%;">]</span><span style="color: #ff8c00; font-size: 150%;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+[IPNetwork('192.168.0.0/30'), IPNetwork('192.168.0.4/30'), IPNetwork('192.168.0.8/30')]
+
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org67f3761" class="outline-3">
+<h3 id="org67f3761"><span class="section-number-3">2.9</span> 修改掩码长度</h3>
+<div class="outline-text-3" id="text-2-9">
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #5fafff;">nw.prefixlen</span> = 28
+<span style="color: #d787d7; font-weight: bold;">print</span><span style="color: #ff8c00; font-size: 150%;">(</span>nw<span style="color: #ff8c00; font-size: 150%;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+192.168.0.1/28
+
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org9f32aad" class="outline-3">
+<h3 id="org9f32aad"><span class="section-number-3">2.10</span> 判断公私网</h3>
+<div class="outline-text-3" id="text-2-10">
+<div class="org-src-container">
+<pre class="src src-ipython">log<span style="color: #ff8c00; font-size: 150%;">(</span><span style="color: #87af5f;">"IPAddress('10.74.68.58').is_private()"</span>, IPAddress<span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'10.74.68.58'</span><span style="color: #ff1493; font-size: 140%;">)</span>.is_private<span style="color: #ff1493; font-size: 140%;">()</span><span style="color: #ff8c00; font-size: 150%;">)</span>
+log<span style="color: #ff8c00; font-size: 150%;">(</span><span style="color: #87af5f;">"IPAddress('1.1.1.2').is_private()"</span>, IPAddress<span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">'1.1.1.2'</span><span style="color: #ff1493; font-size: 140%;">)</span>.is_private<span style="color: #ff1493; font-size: 140%;">()</span><span style="color: #ff8c00; font-size: 150%;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+ IPAddress('10.74.68.58').is_private()
+True
+ IPAddress('1.1.1.2').is_private()
+False
+
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-orge4ab0fb" class="outline-3">
+<h3 id="orge4ab0fb"><span class="section-number-3">2.11</span> 定义网段地址范围</h3>
+<div class="outline-text-3" id="text-2-11">
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #d787d7; font-weight: bold;">from</span> netaddr <span style="color: #d787d7; font-weight: bold;">import</span> IPRange
+<span style="color: #5fafff;">ipRange</span> = IPRange<span style="color: #ff8c00; font-size: 150%;">(</span><span style="color: #87af5f;">'192.168.1.10'</span>, <span style="color: #87af5f;">'192.168.1.130'</span><span style="color: #ff8c00; font-size: 150%;">)</span>
+<span style="color: #d787d7; font-weight: bold;">print</span><span style="color: #ff8c00; font-size: 150%;">(</span>ipRange<span style="color: #ff8c00; font-size: 150%;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+192.168.1.10-192.168.1.130
+
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org3e72dc0" class="outline-3">
+<h3 id="org3e72dc0"><span class="section-number-3">2.12</span> 地址聚合</h3>
+<div class="outline-text-3" id="text-2-12">
+</div>
+<div id="outline-container-org62dcb9d" class="outline-4">
+<h4 id="org62dcb9d"><span class="section-number-4">2.12.1</span> IPRange</h4>
+<div class="outline-text-4" id="text-2-12-1">
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #d787d7; font-weight: bold;">print</span><span style="color: #ff8c00; font-size: 150%;">(</span>ipRange.cidrs<span style="color: #ff1493; font-size: 140%;">()</span><span style="color: #ff8c00; font-size: 150%;">)</span>
+</pre>
+</div>
+
+<pre class="example">
+[IPNetwork('192.168.1.10/31'), IPNetwork('192.168.1.12/30'), IPNetwork('192.168.1.16/28'), IPNetwork('192.168.1.32/27'), IPNetwork('192.168.1.64/26'), IPNetwork('192.168.1.128/31'), IPNetwork('192.168.1.130/32')]
+
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-orgf624712" class="outline-4">
+<h4 id="orgf624712"><span class="section-number-4">2.12.2</span> cidr_merge</h4>
+<div class="outline-text-4" id="text-2-12-2">
+<p>
+这个方法可以用于路由汇总的计算
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #d787d7; font-weight: bold;">from</span> netaddr <span style="color: #d787d7; font-weight: bold;">import</span> cidr_merge
+<span style="color: #5fafff;">ip_list</span> = <span style="color: #ff8c00; font-size: 150%;">[]</span>
+ip_list.append<span style="color: #ff8c00; font-size: 150%;">(</span>IPNetwork<span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">"192.168.1.0/25"</span><span style="color: #ff1493; font-size: 140%;">)</span><span style="color: #ff8c00; font-size: 150%;">)</span>
+ip_list.append<span style="color: #ff8c00; font-size: 150%;">(</span>IPNetwork<span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">"192.168.1.128/25"</span><span style="color: #ff1493; font-size: 140%;">)</span><span style="color: #ff8c00; font-size: 150%;">)</span>
+ip_list.append<span style="color: #ff8c00; font-size: 150%;">(</span>IPNetwork<span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">"192.168.0.0/24"</span><span style="color: #ff1493; font-size: 140%;">)</span><span style="color: #ff8c00; font-size: 150%;">)</span>
+ip_list.append<span style="color: #ff8c00; font-size: 150%;">(</span>IPNetwork<span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">"192.168.3.0/26"</span><span style="color: #ff1493; font-size: 140%;">)</span><span style="color: #ff8c00; font-size: 150%;">)</span>
+ip_list.append<span style="color: #ff8c00; font-size: 150%;">(</span>IPNetwork<span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #87af5f;">"192.168.3.64/26"</span><span style="color: #ff1493; font-size: 140%;">)</span><span style="color: #ff8c00; font-size: 150%;">)</span>
+<span style="color: #d787d7; font-weight: bold;">print</span><span style="color: #ff8c00; font-size: 150%;">(</span>cidr_merge<span style="color: #ff1493; font-size: 140%;">(</span>ip_list<span style="color: #ff1493; font-size: 140%;">)</span><span style="color: #ff8c00; font-size: 150%;">)</span>
+
+</pre>
+</div>
+
+<pre class="example">
+[IPNetwork('192.168.0.0/23'), IPNetwork('192.168.3.0/25')]
+
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgc7e2105" class="outline-3">
+<h3 id="orgc7e2105"><span class="section-number-3">2.13</span> 地址加减</h3>
+<div class="outline-text-3" id="text-2-13">
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #5fafff;">ip</span> = IPAddress<span style="color: #ff8c00; font-size: 150%;">(</span><span style="color: #87af5f;">'172.20.1.1'</span><span style="color: #ff8c00; font-size: 150%;">)</span>
+<span style="color: #5fafff;">ip</span> += 256
+<span style="color: #d787d7; font-weight: bold;">print</span><span style="color: #ff8c00; font-size: 150%;">(</span>ip<span style="color: #ff8c00; font-size: 150%;">)</span>
+<span style="color: #5fafff;">ip</span> -= 3
+<span style="color: #d787d7; font-weight: bold;">print</span><span style="color: #ff8c00; font-size: 150%;">(</span>ip<span style="color: #ff8c00; font-size: 150%;">)</span>
+
+</pre>
+</div>
+
+<pre class="example">
+172.20.2.1
+172.20.1.254
+
+</pre>
+</div>
+</div>
+
+
+
+
+
+
+<div id="outline-container-orgcb5d89d" class="outline-3">
+<h3 id="orgcb5d89d"><span class="section-number-3">2.14</span> MAC 地址操作</h3>
+<div class="outline-text-3" id="text-2-14">
+<div class="org-src-container">
+<pre class="src src-ipython"><span style="color: #d787d7; font-weight: bold;">from</span> netaddr <span style="color: #d787d7; font-weight: bold;">import</span> *
+<span style="color: #5fafff;">mac</span> = EUI<span style="color: #ff8c00; font-size: 150%;">(</span><span style="color: #87af5f;">'98:5a:eb:9f:35:f8'</span><span style="color: #ff8c00; font-size: 150%;">)</span>
+<span style="color: #5fafff;">mac.dialect</span> = mac_unix
+log<span style="color: #ff8c00; font-size: 150%;">(</span><span style="color: #87af5f;">"unix mac"</span>, mac<span style="color: #ff8c00; font-size: 150%;">)</span>
+<span style="color: #5fafff;">mac.dialect</span> = mac_cisco
+log<span style="color: #ff8c00; font-size: 150%;">(</span><span style="color: #87af5f;">"cisco mac"</span>, mac<span style="color: #ff8c00; font-size: 150%;">)</span>
+<span style="color: #5fafff;">mac.dialect</span> = mac_bare
+log<span style="color: #ff8c00; font-size: 150%;">(</span><span style="color: #87af5f;">"bare mac"</span>, mac<span style="color: #ff8c00; font-size: 150%;">)</span>
+log<span style="color: #ff8c00; font-size: 150%;">(</span><span style="color: #87af5f;">"mac.info"</span>, mac.info<span style="color: #ff8c00; font-size: 150%;">)</span> <span style="color: #707070; font-style: italic;"># </span><span style="color: #707070; font-style: italic;">&#33719;&#21462;&#21378;&#23478;&#20449;&#24687;</span>
+</pre>
+</div>
+
+<pre class="example">
+==================== unix mac ====================
+98:5a:eb:9f:35:f8
+=================== cisco mac ====================
+985a.eb9f.35f8
+==================== bare mac ====================
+985AEB9F35F8
+==================== mac.info ====================
+{'OUI': {'address': ['1 Infinite Loop', 'Cupertino  CA  95014', 'US'],
+ 'idx': 9984747,
+ 'offset': 750381,
+ 'org': 'Apple, Inc.',
+ 'oui': '98-5A-EB',
+ 'size': 123}}
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

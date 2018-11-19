@@ -1,0 +1,109 @@
+#+TITLE:     ipaddress
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS:   h:6 tex:t f:t ^:nil
+#+STARTUP:   showall
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="../org-html-themes/org/style2.css" rel="stylesheet" type="text/css" />
+
+#+BEGIN_SRC ipython :session :exports none :eval never-export
+  def log(title0, value):
+      title1 = ' ' + title0 + ' '
+      print("{}\n{}".format(title1.center(80, '='), value))
+#+END_SRC
+
+* 概述
+
+轻量级 IP 处理模块， _不支持 MAC 地址处理_ 。
+
+
+* 定义地址
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  import ipaddr
+  ipv4 = ipaddr.IPNetwork('192.168.33.83/28')
+  ipv6 = ipaddr.IPNetwork('2017:11:AF::17/56')
+  log("ipv4", ipv4)
+  log("ipv6", ipv6)
+#+END_SRC
+
+#+RESULTS:
+: ====================== ipv4 ======================
+: 192.168.33.83/28
+: ====================== ipv6 ======================
+: 2017:11:af::17/56
+
+
+* 子网掩码
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("ipv4.netmask", ipv4.netmask)
+  log("ipv6.netmask", ipv6.netmask)
+#+END_SRC
+
+#+RESULTS:
+: ======== ipv4.netmask ========
+: 255.255.255.240
+: ======== ipv6.netmask ========
+: ffff:ffff:ffff:ff00::
+
+
+* 广播地址
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(ipv4.broadcast)
+  print(ipv6.broadcast)
+#+END_SRC
+
+#+RESULTS:
+: 192.168.33.95
+: 2017:11:af:ff:ffff:ffff:ffff:ffff
+
+
+* 网络地址
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(ipv4.network)
+#+END_SRC
+
+#+RESULTS:
+: 192.168.33.80
+
+
+* 主机掩码
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  print(ipv4.hostmask)
+#+END_SRC
+
+#+RESULTS:
+: 0.0.0.15
+
+
+* 地址包含关系
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  log("ipaddr.IPAddress('192.168.33.84') in ipv4", ipaddr.IPAddress('192.168.33.84') in ipv4)
+#+END_SRC
+
+#+RESULTS:
+:  ipaddr.IPAddress('192.168.33.84') in ipv4
+: True
+
+
+* 地址聚合
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  ip_list = []
+  ip_list.append(ipaddr.IPNetwork("192.168.1.0/25"))
+  ip_list.append(ipaddr.IPNetwork("192.168.1.128/25"))
+  ip_list.append(ipaddr.IPNetwork("192.168.0.0/24"))
+  ip_list.append(ipaddr.IPNetwork("192.168.3.0/26"))
+  ip_list.append(ipaddr.IPNetwork("192.168.3.64/26"))
+  print(ipaddr.CollapseAddrList(ip_list))
+#+END_SRC
+
+#+RESULTS:
+: [IPv4Network('192.168.0.0/23'), IPv4Network('192.168.3.0/25')]
