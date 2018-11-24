@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- 2018-11-24 Sat 19:36 -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rsync</title>
+<meta name="generator" content="Org mode">
+<meta name="author" content="Hao Ruan">
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link href="../org-html-themes/org/style2.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Rsync</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgd560948">1. 基本原理</a></li>
+<li><a href="#org275f1e2">2. 对目录的处理</a></li>
+<li><a href="#org2b79eec">3. 常用命令</a>
+<ul>
+<li><a href="#orgf33906f">3.1. 将本地目录拷贝到远程服务器</a></li>
+<li><a href="#org4b1f336">3.2. 快速删除大量文件</a></li>
+<li><a href="#orgc8b8c7a">3.3. 指定 ssh 端口</a></li>
+<li><a href="#orgbd8e825">3.4. 限流</a></li>
+<li><a href="#org04e824e">3.5. 备份删除的文件</a></li>
+<li><a href="#org4b46dc6">3.6. 排除文件（夹）</a></li>
+<li><a href="#orgb3d0010">3.7. 同步隐藏文件</a>
+<ul>
+<li><a href="#orga183273">3.7.1. 同步时包含隐藏文件（带/）</a></li>
+<li><a href="#orgaeb83ae">3.7.2. 同步时不包含隐藏文件（带/*）</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgdb4315b">4. 常用参数</a>
+<ul>
+<li><a href="#org0988164">4.1. -a, &#x2013;archive</a></li>
+<li><a href="#orgc1e1d2e">4.2. -v, &#x2013;verbose</a></li>
+<li><a href="#org7104995">4.3. -p, &#x2013;perms</a></li>
+<li><a href="#org2929571">4.4. -g, &#x2013;group</a></li>
+<li><a href="#orga545bd9">4.5. -o, &#x2013;owner</a></li>
+<li><a href="#orgfe0d2d4">4.6. -r, &#x2013;recursive</a></li>
+<li><a href="#org47db9b0">4.7. -l, &#x2013;links</a></li>
+<li><a href="#org3c4ef63">4.8. -H, &#x2013;hard-links</a></li>
+<li><a href="#orgf018b55">4.9. -e, &#x2013;rsh=COMMAND</a></li>
+<li><a href="#orga85decd">4.10. -z, &#x2013;compress</a></li>
+<li><a href="#org9928252">4.11. &#x2013;stats</a></li>
+<li><a href="#org288a8ce">4.12. &#x2013;progress</a></li>
+<li><a href="#org0224fb9">4.13. &#x2013;timeout=TIME</a></li>
+<li><a href="#org95d9fe4">4.14. &#x2013;delete</a></li>
+<li><a href="#orgb2254ea">4.15. &#x2013;delete-before</a></li>
+<li><a href="#orgc71c1d2">4.16. &#x2013;delete-after</a></li>
+<li><a href="#org2ee56a1">4.17. &#x2013;delete-excluded</a></li>
+<li><a href="#org59c8b00">4.18. &#x2013;ignore-errors</a></li>
+<li><a href="#orgc2a4674">4.19. &#x2013;exclude</a></li>
+<li><a href="#orgbc04c01">4.20. &#x2013;exclude-from</a></li>
+<li><a href="#org3976b83">4.21. &#x2013;port=PORT</a></li>
+<li><a href="#org596654a">4.22. &#x2013;password-file=FILE</a></li>
+<li><a href="#orgb70199f">4.23. &#x2013;bwlimit=KBPS</a></li>
+<li><a href="#orga3011c9">4.24. -u, &#x2013;update</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-orgd560948" class="outline-2">
+<h2 id="orgd560948"><span class="section-number-2">1</span> 基本原理</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+通常使用 rsync 进行远程同步或拷贝，rsync和scp的区别在于：
+</p>
+
+<ul class="org-ul">
+<li>rsync 只对差异文件做更新，可以做增量或全量备份；而 scp 只能做全量备份。
+简单说就是 rsync 只传修改了的部分，如果改动较小就不需要全部重传，所以 rsync 备份速度较快；
+默认情况下，rsync 通过比较文件的最后修改时间（mtime）和文件的大小（size）来确认哪些文件需要被同步过去。</li>
+<li>rsync 是分块校验 + 传输；scp 是整个文件传输。
+rsync 比 scp 有优势的地方在于单个大文件的一小部分存在改动时，只需传输改动部分，无需重新传输整个文件。
+如果传输一个新的文件，理论上 rsync 没有优势。</li>
+</ul>
+</div>
+</div>
+
+
+
+<div id="outline-container-org275f1e2" class="outline-2">
+<h2 id="org275f1e2"><span class="section-number-2">2</span> 对目录的处理</h2>
+<div class="outline-text-2" id="text-2">
+<ul class="org-ul">
+<li>如果源文件参数末尾有斜杠，将复制指定目录内的文件， <span class="underline">而不复制目录本身</span></li>
+<li>如果源文件参数末尾没有斜杠，将复制指定目录</li>
+<li>目标文件参数末尾的斜杠没有作用</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org2b79eec" class="outline-2">
+<h2 id="org2b79eec"><span class="section-number-2">3</span> 常用命令</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-orgf33906f" class="outline-3">
+<h3 id="orgf33906f"><span class="section-number-3">3.1</span> 将本地目录拷贝到远程服务器</h3>
+<div class="outline-text-3" id="text-3-1">
+<div class="org-src-container">
+<pre class="src src-sh">rsync -avuz --progress --delete SRC DEST
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org4b1f336" class="outline-3">
+<h3 id="org4b1f336"><span class="section-number-3">3.2</span> 快速删除大量文件</h3>
+<div class="outline-text-3" id="text-3-2">
+<ol class="org-ol">
+<li><p>
+建立一个空的文件夹
+</p>
+
+<p>
+<code>mkdir -p /tmp/blank</code>
+</p></li>
+
+<li><p>
+删除目标目录
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">rsync --delete-before -avH --progress --stats /tmp/blank/ DEST
+</pre>
+</div></li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orgc8b8c7a" class="outline-3">
+<h3 id="orgc8b8c7a"><span class="section-number-3">3.3</span> 指定 ssh 端口</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+<code>rsync -e "ssh -p22222" -av --progress SRC DEST</code>
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-orgbd8e825" class="outline-3">
+<h3 id="orgbd8e825"><span class="section-number-3">3.4</span> 限流</h3>
+<div class="outline-text-3" id="text-3-4">
+<div class="org-src-container">
+<pre class="src src-sh">rsync -avz --progress --delete --bwlimit=1000 SRC DEST <span style="color: #707070; font-style: italic;"># </span><span style="color: #707070; font-style: italic;">&#38480;&#21046;&#20026;1000kBytes/s</span>
+rsync -avz --progress --delete --bwlimit=2048 SRC DEST <span style="color: #707070; font-style: italic;"># </span><span style="color: #707070; font-style: italic;">&#38480;&#21046;&#20026;2M/s</span>
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org04e824e" class="outline-3">
+<h3 id="org04e824e"><span class="section-number-3">3.5</span> 备份删除的文件</h3>
+<div class="outline-text-3" id="text-3-5">
+<div class="org-src-container">
+<pre class="src src-sh">rsync -zabvl --delete --backup-dir=/backup/rsync-del SRC DEST
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org4b46dc6" class="outline-3">
+<h3 id="org4b46dc6"><span class="section-number-3">3.6</span> 排除文件（夹）</h3>
+<div class="outline-text-3" id="text-3-6">
+<p>
+排除源目录下的 dir1 文件夹，可以写为：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">rsync -avz --exclude=dir1 SRC DEST
+</pre>
+</div>
+
+<p>
+同时排除多条:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">
+rsync -avz --exclude=dir1 --exclude=dir2 SRC DEST
+</pre>
+</div>
+
+<p>
+也可以通过 &#x2013;exclude-from 来指定:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">rsync -avz --exclude-from=exclude.list /var/www/src/ /var/www/de
+</pre>
+</div>
+
+<p>
+exclude.list文件中指定需要排除的列表:
+</p>
+
+<pre class="example">
+dir1
+[0-9]*
+dir2/.[a-z0-9]*
+.svn
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-orgb3d0010" class="outline-3">
+<h3 id="orgb3d0010"><span class="section-number-3">3.7</span> 同步隐藏文件</h3>
+<div class="outline-text-3" id="text-3-7">
+</div>
+<div id="outline-container-orga183273" class="outline-4">
+<h4 id="orga183273"><span class="section-number-4">3.7.1</span> 同步时包含隐藏文件（带/）</h4>
+<div class="outline-text-4" id="text-3-7-1">
+<p>
+将 <code>/path/to/source/</code> 目录下所有的文件（包括隐藏文件）拷贝到目标目录：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">rsync -avz /path/to/source/ DEST
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgaeb83ae" class="outline-4">
+<h4 id="orgaeb83ae"><span class="section-number-4">3.7.2</span> 同步时不包含隐藏文件（带/*）</h4>
+<div class="outline-text-4" id="text-3-7-2">
+<p>
+将 <code>/path/to/source/</code> 目录下所有的文件（不包括隐藏文件）拷贝到目标目录：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">rsync -avz /path/to/source/* DEST
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-orgdb4315b" class="outline-2">
+<h2 id="orgdb4315b"><span class="section-number-2">4</span> 常用参数</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-org0988164" class="outline-3">
+<h3 id="org0988164"><span class="section-number-3">4.1</span> -a, &#x2013;archive</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+归档模式，表示以递归方式传输文件，并保持所有文件属性，等于 <code>-rlptgoD</code>
+</p>
+</div>
+</div>
+<div id="outline-container-orgc1e1d2e" class="outline-3">
+<h3 id="orgc1e1d2e"><span class="section-number-3">4.2</span> -v, &#x2013;verbose</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+详细模式输出
+</p>
+</div>
+</div>
+<div id="outline-container-org7104995" class="outline-3">
+<h3 id="org7104995"><span class="section-number-3">4.3</span> -p, &#x2013;perms</h3>
+<div class="outline-text-3" id="text-4-3">
+<p>
+保持文件权限
+</p>
+</div>
+</div>
+<div id="outline-container-org2929571" class="outline-3">
+<h3 id="org2929571"><span class="section-number-3">4.4</span> -g, &#x2013;group</h3>
+<div class="outline-text-3" id="text-4-4">
+<p>
+保持文件属组信息
+</p>
+</div>
+</div>
+<div id="outline-container-orga545bd9" class="outline-3">
+<h3 id="orga545bd9"><span class="section-number-3">4.5</span> -o, &#x2013;owner</h3>
+<div class="outline-text-3" id="text-4-5">
+<p>
+保持文件属主信息
+</p>
+</div>
+</div>
+<div id="outline-container-orgfe0d2d4" class="outline-3">
+<h3 id="orgfe0d2d4"><span class="section-number-3">4.6</span> -r, &#x2013;recursive</h3>
+<div class="outline-text-3" id="text-4-6">
+<p>
+对子目录以递归模式处理。同步目录的时候要加上这个参数
+</p>
+</div>
+</div>
+<div id="outline-container-org47db9b0" class="outline-3">
+<h3 id="org47db9b0"><span class="section-number-3">4.7</span> -l, &#x2013;links</h3>
+<div class="outline-text-3" id="text-4-7">
+<p>
+保留软链结，加上这个参数，同步过来的文件会保持之前的软链接属性不变
+</p>
+</div>
+</div>
+<div id="outline-container-org3c4ef63" class="outline-3">
+<h3 id="org3c4ef63"><span class="section-number-3">4.8</span> -H, &#x2013;hard-links</h3>
+<div class="outline-text-3" id="text-4-8">
+<p>
+保留硬链结
+</p>
+</div>
+</div>
+<div id="outline-container-orgf018b55" class="outline-3">
+<h3 id="orgf018b55"><span class="section-number-3">4.9</span> -e, &#x2013;rsh=COMMAND</h3>
+<div class="outline-text-3" id="text-4-9">
+<p>
+指定使用rsh、ssh方式进行数据同步
+</p>
+</div>
+</div>
+<div id="outline-container-orga85decd" class="outline-3">
+<h3 id="orga85decd"><span class="section-number-3">4.10</span> -z, &#x2013;compress</h3>
+<div class="outline-text-3" id="text-4-10">
+<p>
+对备份的文件在传输时进行压缩处理
+</p>
+</div>
+</div>
+<div id="outline-container-org9928252" class="outline-3">
+<h3 id="org9928252"><span class="section-number-3">4.11</span> &#x2013;stats</h3>
+<div class="outline-text-3" id="text-4-11">
+<p>
+给出某些文件的传输状态
+</p>
+</div>
+</div>
+<div id="outline-container-org288a8ce" class="outline-3">
+<h3 id="org288a8ce"><span class="section-number-3">4.12</span> &#x2013;progress</h3>
+<div class="outline-text-3" id="text-4-12">
+<p>
+打印同步的过程
+</p>
+</div>
+</div>
+<div id="outline-container-org0224fb9" class="outline-3">
+<h3 id="org0224fb9"><span class="section-number-3">4.13</span> &#x2013;timeout=TIME</h3>
+<div class="outline-text-3" id="text-4-13">
+<p>
+同步过程中，IP超时时间，单位为秒
+</p>
+</div>
+</div>
+<div id="outline-container-org95d9fe4" class="outline-3">
+<h3 id="org95d9fe4"><span class="section-number-3">4.14</span> &#x2013;delete</h3>
+<div class="outline-text-3" id="text-4-14">
+<ul class="org-ul">
+<li>删除那些目标目录中有而源目录中没有的多余文件</li>
+<li><span class="underline">这是rsync做增量方式的全备份的最佳选择方案</span></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgb2254ea" class="outline-3">
+<h3 id="orgb2254ea"><span class="section-number-3">4.15</span> &#x2013;delete-before</h3>
+<div class="outline-text-3" id="text-4-15">
+<ul class="org-ul">
+<li>接受者在输出之前进行删除操作</li>
+<li>即先将目标目录中文件全部删除，再将源目录文件拷贝过去</li>
+<li><span class="underline">这是保持目标目录跟源目录一致的方案</span></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgc71c1d2" class="outline-3">
+<h3 id="orgc71c1d2"><span class="section-number-3">4.16</span> &#x2013;delete-after</h3>
+<div class="outline-text-3" id="text-4-16">
+<p>
+在同步操作之后做比较，删除那些目标目录中有而源目录中没有的多余文件
+</p>
+</div>
+</div>
+<div id="outline-container-org2ee56a1" class="outline-3">
+<h3 id="org2ee56a1"><span class="section-number-3">4.17</span> &#x2013;delete-excluded</h3>
+<div class="outline-text-3" id="text-4-17">
+<p>
+删除目标目录中那些被该选项指定排除的文件
+</p>
+</div>
+</div>
+<div id="outline-container-org59c8b00" class="outline-3">
+<h3 id="org59c8b00"><span class="section-number-3">4.18</span> &#x2013;ignore-errors</h3>
+<div class="outline-text-3" id="text-4-18">
+<p>
+即使出现IO错误也进行删除，忽略错误
+</p>
+</div>
+</div>
+<div id="outline-container-orgc2a4674" class="outline-3">
+<h3 id="orgc2a4674"><span class="section-number-3">4.19</span> &#x2013;exclude</h3>
+<div class="outline-text-3" id="text-4-19">
+<ul class="org-ul">
+<li>指定同步时需要过滤掉的文件或子目录(即不需要同步过去的)</li>
+<li>后面直接跟不需要同步的单个文件名或子目录(不需要跟路径)</li>
+<li>过滤多个文件或子目录，就使用多个 &#x2013;exclude</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgbc04c01" class="outline-3">
+<h3 id="orgbc04c01"><span class="section-number-3">4.20</span> &#x2013;exclude-from</h3>
+<div class="outline-text-3" id="text-4-20">
+<p>
+指定同步时需要过滤掉的文件或子目录，后面跟文件(比如/root/exclue.txt)，
+然后将不需要同步的文件和子目录写到 /root/exclue.txt 中。
+</p>
+</div>
+</div>
+<div id="outline-container-org3976b83" class="outline-3">
+<h3 id="org3976b83"><span class="section-number-3">4.21</span> &#x2013;port=PORT</h3>
+<div class="outline-text-3" id="text-4-21">
+<p>
+指定其他的rsync服务端口
+</p>
+</div>
+</div>
+<div id="outline-container-org596654a" class="outline-3">
+<h3 id="org596654a"><span class="section-number-3">4.22</span> &#x2013;password-file=FILE</h3>
+<div class="outline-text-3" id="text-4-22">
+<p>
+从FILE中得到密码
+</p>
+</div>
+</div>
+<div id="outline-container-orgb70199f" class="outline-3">
+<h3 id="orgb70199f"><span class="section-number-3">4.23</span> &#x2013;bwlimit=KBPS</h3>
+<div class="outline-text-3" id="text-4-23">
+<p>
+限制I/O带宽(KBytes per second)
+</p>
+</div>
+</div>
+<div id="outline-container-orga3011c9" class="outline-3">
+<h3 id="orga3011c9"><span class="section-number-3">4.24</span> -u, &#x2013;update</h3>
+<div class="outline-text-3" id="text-4-24">
+<p>
+跳过所有已经存在于DEST，并且文件时间晚于要备份的文件(不覆盖更新的文件)
+</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

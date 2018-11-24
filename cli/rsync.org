@@ -1,0 +1,179 @@
+#+TITLE:     Rsync
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS:   h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+STARTUP:   showall
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="../org-html-themes/org/style2.css" rel="stylesheet" type="text/css" />
+
+
+* 基本原理
+
+通常使用 rsync 进行远程同步或拷贝，rsync和scp的区别在于：
+
+- rsync 只对差异文件做更新，可以做增量或全量备份；而 scp 只能做全量备份。
+  简单说就是 rsync 只传修改了的部分，如果改动较小就不需要全部重传，所以 rsync 备份速度较快；
+  默认情况下，rsync 通过比较文件的最后修改时间（mtime）和文件的大小（size）来确认哪些文件需要被同步过去。
+- rsync 是分块校验 + 传输；scp 是整个文件传输。
+  rsync 比 scp 有优势的地方在于单个大文件的一小部分存在改动时，只需传输改动部分，无需重新传输整个文件。
+  如果传输一个新的文件，理论上 rsync 没有优势。
+
+
+
+* 对目录的处理
+
+- 如果源文件参数末尾有斜杠，将复制指定目录内的文件， _而不复制目录本身_
+- 如果源文件参数末尾没有斜杠，将复制指定目录
+- 目标文件参数末尾的斜杠没有作用
+
+* 常用命令
+
+** 将本地目录拷贝到远程服务器
+
+#+BEGIN_SRC sh
+rsync -avuz --progress --delete SRC DEST
+#+END_SRC
+
+
+** 快速删除大量文件
+
+
+1. 建立一个空的文件夹
+
+   =mkdir -p /tmp/blank=
+
+2. 删除目标目录
+
+   #+BEGIN_SRC sh
+   rsync --delete-before -avH --progress --stats /tmp/blank/ DEST
+   #+END_SRC
+
+** 指定 ssh 端口
+
+=rsync -e "ssh -p22222" -av --progress SRC DEST=
+
+
+** 限流
+
+#+BEGIN_SRC sh
+rsync -avz --progress --delete --bwlimit=1000 SRC DEST # 限制为1000kBytes/s
+rsync -avz --progress --delete --bwlimit=2048 SRC DEST # 限制为2M/s
+#+END_SRC
+
+
+** 备份删除的文件
+
+#+BEGIN_SRC sh
+rsync -zabvl --delete --backup-dir=/backup/rsync-del SRC DEST
+#+END_SRC
+
+
+** 排除文件（夹）
+
+排除源目录下的 dir1 文件夹，可以写为：
+
+#+BEGIN_SRC sh
+rsync -avz --exclude=dir1 SRC DEST
+#+END_SRC
+
+同时排除多条:
+
+#+BEGIN_SRC sh
+
+rsync -avz --exclude=dir1 --exclude=dir2 SRC DEST
+#+END_SRC
+
+也可以通过 --exclude-from 来指定:
+
+#+BEGIN_SRC sh
+rsync -avz --exclude-from=exclude.list /var/www/src/ /var/www/de
+#+END_SRC
+
+exclude.list文件中指定需要排除的列表:
+
+#+BEGIN_EXAMPLE
+dir1
+[0-9]*
+dir2/.[a-z0-9]*
+.svn
+#+END_EXAMPLE
+
+
+** 同步隐藏文件
+
+*** 同步时包含隐藏文件（带/）
+
+将 =/path/to/source/= 目录下所有的文件（包括隐藏文件）拷贝到目标目录：
+
+#+BEGIN_SRC sh
+rsync -avz /path/to/source/ DEST
+#+END_SRC
+
+*** 同步时不包含隐藏文件（带/*）
+
+将 =/path/to/source/= 目录下所有的文件（不包括隐藏文件）拷贝到目标目录：
+
+#+BEGIN_SRC sh
+rsync -avz /path/to/source/* DEST
+#+END_SRC
+
+
+
+* 常用参数
+
+** -a, --archive
+归档模式，表示以递归方式传输文件，并保持所有文件属性，等于 =-rlptgoD=
+** -v, --verbose
+详细模式输出
+** -p, --perms
+保持文件权限
+** -g, --group
+保持文件属组信息
+** -o, --owner
+保持文件属主信息
+** -r, --recursive
+对子目录以递归模式处理。同步目录的时候要加上这个参数
+** -l, --links
+保留软链结，加上这个参数，同步过来的文件会保持之前的软链接属性不变
+** -H, --hard-links
+保留硬链结
+** -e, --rsh=COMMAND
+指定使用rsh、ssh方式进行数据同步
+** -z, --compress
+对备份的文件在传输时进行压缩处理
+** --stats
+给出某些文件的传输状态
+** --progress
+打印同步的过程
+** --timeout=TIME
+同步过程中，IP超时时间，单位为秒
+** --delete
+- 删除那些目标目录中有而源目录中没有的多余文件
+- _这是rsync做增量方式的全备份的最佳选择方案_
+** --delete-before
+- 接受者在输出之前进行删除操作
+- 即先将目标目录中文件全部删除，再将源目录文件拷贝过去
+- _这是保持目标目录跟源目录一致的方案_
+** --delete-after
+在同步操作之后做比较，删除那些目标目录中有而源目录中没有的多余文件
+** --delete-excluded
+删除目标目录中那些被该选项指定排除的文件
+** --ignore-errors
+即使出现IO错误也进行删除，忽略错误
+** --exclude
+- 指定同步时需要过滤掉的文件或子目录(即不需要同步过去的)
+- 后面直接跟不需要同步的单个文件名或子目录(不需要跟路径)
+- 过滤多个文件或子目录，就使用多个 --exclude
+** --exclude-from
+指定同步时需要过滤掉的文件或子目录，后面跟文件(比如/root/exclue.txt)，
+然后将不需要同步的文件和子目录写到 /root/exclue.txt 中。
+** --port=PORT
+指定其他的rsync服务端口
+** --password-file=FILE
+从FILE中得到密码
+** --bwlimit=KBPS
+限制I/O带宽(KBytes per second)
+** -u, --update
+跳过所有已经存在于DEST，并且文件时间晚于要备份的文件(不覆盖更新的文件)
