@@ -10,6 +10,7 @@
 - [networkx](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/networkx.html)
 - [netaddr](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/netaddr.html)
 - [ipaddr](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/ipaddr.html)
+- [schedule](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/python3/schedule.html)
 
 ## Java
 
