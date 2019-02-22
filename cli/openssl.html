@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- 2019-01-24 Thu 16:29 -->
+<!-- 2019-02-22 Fri 13:25 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Openssl</title>
@@ -234,145 +234,75 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgc6617f9">1. 基本知识</a>
+<li><a href="#orgaf2a4c9">1. 基本知识</a>
 <ul>
-<li><a href="#org39e88f1">1.1. openssl 组成</a></li>
-<li><a href="#org257f5d0">1.2. X509 格式</a></li>
-<li><a href="#orgb5c4971">1.3. Diffie-Hellman 交换过程</a></li>
-<li><a href="#org57a54ce">1.4. 算法种类</a></li>
+<li><a href="#org5eb78cb">1.1. openssl 组成</a></li>
+<li><a href="#org5da8d45">1.2. X509 格式</a></li>
+<li><a href="#org7521469">1.3. Diffie-Hellman 交换过程</a></li>
+<li><a href="#org79f6016">1.4. 算法种类</a></li>
 </ul>
 </li>
-<li><a href="#orgbf8723e">2. 常见用法</a>
+<li><a href="#orgb876d85">2. 常见用法</a>
 <ul>
-<li><a href="#org08af4cd">2.1. 查询可用子命令</a></li>
-<li><a href="#org480f7e5">2.2. 测试各种加密算法的速度</a></li>
-<li><a href="#orgfef279c">2.3. 加解密</a>
+<li><a href="#org17e634d">2.1. 查询可用子命令</a></li>
+<li><a href="#org36dfcda">2.2. 测试各种加密算法的速度</a></li>
+<li><a href="#org82c1284">2.3. 加解密</a>
 <ul>
-<li><a href="#org3524e73">2.3.1. 加密</a></li>
-<li><a href="#orgc4f8ef6">2.3.2. 解密</a></li>
+<li><a href="#org44c29e0">2.3.1. 加密</a></li>
+<li><a href="#orgffd7927">2.3.2. 解密</a></li>
 </ul>
 </li>
-<li><a href="#org411e675">2.4. 计算文件特征码（指纹）</a></li>
-<li><a href="#org3af972e">2.5. 生成密码串</a></li>
-<li><a href="#orgeb76604">2.6. 制作自签署证书</a>
+<li><a href="#org8330220">2.4. 计算文件特征码（指纹）</a></li>
+<li><a href="#org5bd33fd">2.5. 生成密码串</a></li>
+<li><a href="#orgda5c31e">2.6. 制作自签署证书</a>
 <ul>
-<li><a href="#org1204de0">2.6.1. 第一步：生成密钥</a></li>
-<li><a href="#orge8fb144">2.6.2. 第二步：生成自签署证书</a></li>
+<li><a href="#org5d1c0de">2.6.1. 第一步：生成密钥</a></li>
+<li><a href="#org9133d67">2.6.2. 第二步：生成自签署证书</a></li>
 </ul>
 </li>
-<li><a href="#orga23d6c8">2.7. 从私钥中提取公钥</a></li>
-<li><a href="#orge1b7566">2.8. 查看证书内容</a></li>
-<li><a href="#orgdeb5787">2.9. 签署证书</a>
+<li><a href="#org9133cc3">2.7. 提取公钥</a>
 <ul>
-<li><a href="#org6d149fb">2.9.1. 第一步：部署 CA 证书</a></li>
-<li><a href="#orga976d57">2.9.2. 第二步：生成 csr</a></li>
-<li><a href="#orge7aecab">2.9.3. 第三步：签署 csr</a></li>
-<li><a href="#org78bf34f">2.9.4. 自动化脚本（可设置证书的有效日期）</a></li>
+<li><a href="#org3fb96e8">2.7.1. 从私钥中提取公钥</a></li>
+<li><a href="#orgb890113">2.7.2. 从证书中提取公钥</a></li>
 </ul>
 </li>
-<li><a href="#org15550be">2.10. 证书格式转换</a>
+<li><a href="#org8f75458">2.8. 查看证书内容</a></li>
+<li><a href="#org19111a5">2.9. 签署证书</a>
 <ul>
-<li><a href="#org6969b05">2.10.1. PKCS#1 =&gt; PKCS#8</a>
-<ul>
-<li><a href="#orge1b629c">2.10.1.1. 私钥</a></li>
-<li><a href="#orgfff5ee1">2.10.1.2. 公钥</a></li>
+<li><a href="#orgc74819a">2.9.1. 第一步：部署 CA 证书</a></li>
+<li><a href="#org88b90e3">2.9.2. 第二步：生成 csr</a></li>
+<li><a href="#org37f372b">2.9.3. 第三步：签署 csr</a></li>
+<li><a href="#orgd6f821d">2.9.4. 自动化脚本（可设置证书的有效日期）</a></li>
 </ul>
 </li>
-<li><a href="#org13850a9">2.10.2. PKCS#8 =&gt; PKCS#1</a>
+<li><a href="#orgc9997d5">2.10. 证书格式转换</a>
 <ul>
-<li><a href="#orgda6fef7">2.10.2.1. 私钥</a></li>
-<li><a href="#org5b06350">2.10.2.2. 公钥</a></li>
+<li><a href="#org78f4780">2.10.1. PKCS#1 =&gt; PKCS#8</a>
+<ul>
+<li><a href="#orgedc25b1">2.10.1.1. 私钥</a></li>
+<li><a href="#org9706194">2.10.1.2. 公钥</a></li>
 </ul>
 </li>
-<li><a href="#org4f048c8">2.10.3. PEM =&gt; PKCS#12</a></li>
-<li><a href="#orgaa838d0">2.10.4. PEM =&gt; DER</a></li>
-<li><a href="#org95485a2">2.10.5. DER =&gt; PEM</a></li>
+<li><a href="#orgd55dde4">2.10.2. PKCS#8 =&gt; PKCS#1</a>
+<ul>
+<li><a href="#org2ecc45a">2.10.2.1. 私钥</a></li>
+<li><a href="#org4264496">2.10.2.2. 公钥</a></li>
 </ul>
 </li>
-<li><a href="#org923b927">2.11. 同时生成密钥和证书</a></li>
-<li><a href="#org07316ce">2.12. 查看服务器证书内容</a></li>
-<li><a href="#orgd2b2a5d">2.13. 建立 ssl 连接</a></li>
-<li><a href="#orgff206fa">2.14. 验证证书</a></li>
+<li><a href="#org1ccaa81">2.10.3. PEM =&gt; PKCS#12</a></li>
+<li><a href="#org686055a">2.10.4. PEM =&gt; DER</a></li>
+<li><a href="#orgecb1cd1">2.10.5. DER =&gt; PEM</a></li>
 </ul>
 </li>
-</ul>
-</div>
-</div>
-<div class="outline-2" id="meta">
-<table>
-
-
-<colgroup>
-<col  class="org-left">
-
-<col  class="org-left">
-</colgroup>
-<tbody>
-<tr>
-<td class="org-left">Author</td>
-<td class="org-left">Hao Ruan (haoru@cisco.com)</td>
-</tr>
-
-<tr>
-<td class="org-left">Date</td>
-<td class="org-left">2019-01-24 16:28:57</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="table-of-contents">
-<h2>Table of Contents</h2>
-<div id="text-table-of-contents">
+<li><a href="#org0ffea73">2.11. 同时生成密钥和证书</a></li>
+<li><a href="#orgf27075d">2.12. 查看服务器证书内容(包含签发者证书)</a></li>
+<li><a href="#orgc4ea8c5">2.13. 建立连接</a></li>
+<li><a href="#org14ecc5a">2.14. 证书验证</a>
 <ul>
-<li><a href="#orgc6617f9">1. 基本知识</a>
-<ul>
-<li><a href="#org39e88f1">1.1. openssl 组成</a></li>
-<li><a href="#org257f5d0">1.2. X509 格式</a></li>
-<li><a href="#orgb5c4971">1.3. Diffie-Hellman 交换过程</a></li>
-<li><a href="#org57a54ce">1.4. 算法种类</a></li>
+<li><a href="#orge78dd47">2.14.1. 验证链</a></li>
+<li><a href="#orgcd308ea">2.14.2. 验证签名</a></li>
 </ul>
 </li>
-<li><a href="#orgbf8723e">2. 常见用法</a>
-<ul>
-<li><a href="#org08af4cd">2.1. 查询可用子命令</a></li>
-<li><a href="#org480f7e5">2.2. 测试各种加密算法的速度</a></li>
-<li><a href="#orgfef279c">2.3. 加解密</a>
-<ul>
-<li><a href="#org3524e73">2.3.1. 加密</a></li>
-<li><a href="#orgc4f8ef6">2.3.2. 解密</a></li>
-</ul>
-</li>
-<li><a href="#org411e675">2.4. 计算文件特征码（指纹）</a></li>
-<li><a href="#org3af972e">2.5. 生成密码串</a></li>
-<li><a href="#orgeb76604">2.6. 制作自签署证书</a>
-<ul>
-<li><a href="#org1204de0">2.6.1. 第一步：生成密钥</a></li>
-<li><a href="#orge8fb144">2.6.2. 第二步：生成自签署证书</a></li>
-</ul>
-</li>
-<li><a href="#orga23d6c8">2.7. 从私钥中提取公钥</a></li>
-<li><a href="#orge1b7566">2.8. 查看证书内容</a></li>
-<li><a href="#orgdeb5787">2.9. 签署证书</a>
-<ul>
-<li><a href="#org6d149fb">2.9.1. 第一步：部署 CA 证书</a></li>
-<li><a href="#orga976d57">2.9.2. 第二步：生成 csr</a></li>
-<li><a href="#orge7aecab">2.9.3. 第三步：签署 csr</a></li>
-<li><a href="#org78bf34f">2.9.4. 自动化脚本（可设置证书的有效日期）</a></li>
-</ul>
-</li>
-<li><a href="#org15550be">2.10. 证书格式转换</a>
-<ul>
-<li><a href="#org6969b05">2.10.1. PKCS#1 =&gt; PKCS#8</a></li>
-<li><a href="#org13850a9">2.10.2. PKCS#8 =&gt; PKCS#1</a></li>
-<li><a href="#org4f048c8">2.10.3. PEM =&gt; PKCS#12</a></li>
-<li><a href="#orgaa838d0">2.10.4. PEM =&gt; DER</a></li>
-<li><a href="#org95485a2">2.10.5. DER =&gt; PEM</a></li>
-</ul>
-</li>
-<li><a href="#org923b927">2.11. 同时生成密钥和证书</a></li>
-<li><a href="#org07316ce">2.12. 查看服务器证书内容</a></li>
-<li><a href="#orgd2b2a5d">2.13. 建立 ssl 连接</a></li>
-<li><a href="#orgff206fa">2.14. 验证证书</a></li>
 </ul>
 </li>
 </ul>
@@ -380,13 +310,12 @@ for the JavaScript code in this tag.
 </div>
 
 
-
-<div id="outline-container-orgc6617f9" class="outline-2">
-<h2 id="orgc6617f9"><span class="section-number-2">1</span> 基本知识</h2>
+<div id="outline-container-orgaf2a4c9" class="outline-2">
+<h2 id="orgaf2a4c9"><span class="section-number-2">1</span> 基本知识</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org39e88f1" class="outline-3">
-<h3 id="org39e88f1"><span class="section-number-3">1.1</span> openssl 组成</h3>
+<div id="outline-container-org5eb78cb" class="outline-3">
+<h3 id="org5eb78cb"><span class="section-number-3">1.1</span> openssl 组成</h3>
 <div class="outline-text-3" id="text-1-1">
 <ul class="org-ul">
 <li>libcrypto: 加密库</li>
@@ -396,8 +325,9 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org257f5d0" class="outline-3">
-<h3 id="org257f5d0"><span class="section-number-3">1.2</span> X509 格式</h3>
+
+<div id="outline-container-org5da8d45" class="outline-3">
+<h3 id="org5da8d45"><span class="section-number-3">1.2</span> X509 格式</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 内容包含：
@@ -413,15 +343,10 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-orgb5c4971" class="outline-3">
-<h3 id="orgb5c4971"><span class="section-number-3">1.3</span> Diffie-Hellman 交换过程</h3>
+
+<div id="outline-container-org7521469" class="outline-3">
+<h3 id="org7521469"><span class="section-number-3">1.3</span> Diffie-Hellman 交换过程</h3>
 <div class="outline-text-3" id="text-1-3">
-
-<div class="figure">
-<p><img src="img/openssl-dh.png" alt="openssl-dh.png">
-</p>
-</div>
-
 <p>
 p：大素数；g：生成数；x：clnt_random；y：srv_random
 </p>
@@ -429,8 +354,8 @@ p：大素数；g：生成数；x：clnt_random；y：srv_random
 </div>
 
 
-<div id="outline-container-org57a54ce" class="outline-3">
-<h3 id="org57a54ce"><span class="section-number-3">1.4</span> 算法种类</h3>
+<div id="outline-container-org79f6016" class="outline-3">
+<h3 id="org79f6016"><span class="section-number-3">1.4</span> 算法种类</h3>
 <div class="outline-text-3" id="text-1-4">
 <ul class="org-ul">
 <li>对称加密
@@ -457,12 +382,12 @@ p：大素数；g：生成数；x：clnt_random；y：srv_random
 </div>
 </div>
 
-<div id="outline-container-orgbf8723e" class="outline-2">
-<h2 id="orgbf8723e"><span class="section-number-2">2</span> 常见用法</h2>
+<div id="outline-container-orgb876d85" class="outline-2">
+<h2 id="orgb876d85"><span class="section-number-2">2</span> 常见用法</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org08af4cd" class="outline-3">
-<h3 id="org08af4cd"><span class="section-number-3">2.1</span> 查询可用子命令</h3>
+<div id="outline-container-org17e634d" class="outline-3">
+<h3 id="org17e634d"><span class="section-number-3">2.1</span> 查询可用子命令</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 <code>openssl ?</code>
@@ -470,8 +395,9 @@ p：大素数；g：生成数；x：clnt_random；y：srv_random
 </div>
 </div>
 
-<div id="outline-container-org480f7e5" class="outline-3">
-<h3 id="org480f7e5"><span class="section-number-3">2.2</span> 测试各种加密算法的速度</h3>
+
+<div id="outline-container-org36dfcda" class="outline-3">
+<h3 id="org36dfcda"><span class="section-number-3">2.2</span> 测试各种加密算法的速度</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 <code>openssl speed [ciphername]</code>
@@ -479,12 +405,13 @@ p：大素数；g：生成数；x：clnt_random；y：srv_random
 </div>
 </div>
 
-<div id="outline-container-orgfef279c" class="outline-3">
-<h3 id="orgfef279c"><span class="section-number-3">2.3</span> 加解密</h3>
+
+<div id="outline-container-org82c1284" class="outline-3">
+<h3 id="org82c1284"><span class="section-number-3">2.3</span> 加解密</h3>
 <div class="outline-text-3" id="text-2-3">
 </div>
-<div id="outline-container-org3524e73" class="outline-4">
-<h4 id="org3524e73"><span class="section-number-4">2.3.1</span> 加密</h4>
+<div id="outline-container-org44c29e0" class="outline-4">
+<h4 id="org44c29e0"><span class="section-number-4">2.3.1</span> 加密</h4>
 <div class="outline-text-4" id="text-2-3-1">
 <p>
 <code>openssl enc -des3 -a -in ./test-cipher -out test-cipher.des3</code>
@@ -492,8 +419,9 @@ p：大素数；g：生成数；x：clnt_random；y：srv_random
 </div>
 </div>
 
-<div id="outline-container-orgc4f8ef6" class="outline-4">
-<h4 id="orgc4f8ef6"><span class="section-number-4">2.3.2</span> 解密</h4>
+
+<div id="outline-container-orgffd7927" class="outline-4">
+<h4 id="orgffd7927"><span class="section-number-4">2.3.2</span> 解密</h4>
 <div class="outline-text-4" id="text-2-3-2">
 <p>
 <code>openssl enc -des3 -d -a -in ./test-cipher.des3 -out test-cipher</code>
@@ -502,8 +430,9 @@ p：大素数；g：生成数；x：clnt_random；y：srv_random
 </div>
 </div>
 
-<div id="outline-container-org411e675" class="outline-3">
-<h3 id="org411e675"><span class="section-number-3">2.4</span> 计算文件特征码（指纹）</h3>
+
+<div id="outline-container-org8330220" class="outline-3">
+<h3 id="org8330220"><span class="section-number-3">2.4</span> 计算文件特征码（指纹）</h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
 <code>openssl dgst -md5 &lt;filename&gt;</code>
@@ -511,8 +440,9 @@ p：大素数；g：生成数；x：clnt_random；y：srv_random
 </div>
 </div>
 
-<div id="outline-container-org3af972e" class="outline-3">
-<h3 id="org3af972e"><span class="section-number-3">2.5</span> 生成密码串</h3>
+
+<div id="outline-container-org5bd33fd" class="outline-3">
+<h3 id="org5bd33fd"><span class="section-number-3">2.5</span> 生成密码串</h3>
 <div class="outline-text-3" id="text-2-5">
 <p>
 <code>openssl passwd -1 -salt &lt;saltvalue&gt;</code>
@@ -525,16 +455,16 @@ p：大素数；g：生成数；x：clnt_random；y：srv_random
 </div>
 
 
-<div id="outline-container-orgeb76604" class="outline-3">
-<h3 id="orgeb76604"><span class="section-number-3">2.6</span> 制作自签署证书</h3>
+<div id="outline-container-orgda5c31e" class="outline-3">
+<h3 id="orgda5c31e"><span class="section-number-3">2.6</span> 制作自签署证书</h3>
 <div class="outline-text-3" id="text-2-6">
 <p>
 自签署证书一般作为 CA 的证书，普通的证书由 CA 来签署，也可以按照该步骤制作自签署的普通证书（将自身作为 CA ）：
 </p>
 </div>
 
-<div id="outline-container-org1204de0" class="outline-4">
-<h4 id="org1204de0"><span class="section-number-4">2.6.1</span> 第一步：生成密钥</h4>
+<div id="outline-container-org5d1c0de" class="outline-4">
+<h4 id="org5d1c0de"><span class="section-number-4">2.6.1</span> 第一步：生成密钥</h4>
 <div class="outline-text-4" id="text-2-6-1">
 <div class="org-src-container">
 <pre class="src src-sh">openssl genrsa 2048 &gt;ca.key.pem    <span style="color: #707070; font-style: italic;">## </span><span style="color: #707070; font-style: italic;">&#29983;&#25104; 2048 &#20301;&#31169;&#38053;</span>
@@ -543,8 +473,8 @@ p：大素数；g：生成数；x：clnt_random；y：srv_random
 </div>
 </div>
 
-<div id="outline-container-orge8fb144" class="outline-4">
-<h4 id="orge8fb144"><span class="section-number-4">2.6.2</span> 第二步：生成自签署证书</h4>
+<div id="outline-container-org9133d67" class="outline-4">
+<h4 id="org9133d67"><span class="section-number-4">2.6.2</span> 第二步：生成自签署证书</h4>
 <div class="outline-text-4" id="text-2-6-2">
 <div class="org-src-container">
 <pre class="src src-sh">openssl req -new -x509 -key ca.key.pem -out ca.cert.pem -days 365
@@ -554,17 +484,32 @@ p：大素数；g：生成数；x：clnt_random；y：srv_random
 </div>
 </div>
 
-<div id="outline-container-orga23d6c8" class="outline-3">
-<h3 id="orga23d6c8"><span class="section-number-3">2.7</span> 从私钥中提取公钥</h3>
+
+<div id="outline-container-org9133cc3" class="outline-3">
+<h3 id="org9133cc3"><span class="section-number-3">2.7</span> 提取公钥</h3>
 <div class="outline-text-3" id="text-2-7">
+</div>
+<div id="outline-container-org3fb96e8" class="outline-4">
+<h4 id="org3fb96e8"><span class="section-number-4">2.7.1</span> 从私钥中提取公钥</h4>
+<div class="outline-text-4" id="text-2-7-1">
 <p>
 <code>openssl rsa -in ca.key.pem -pubout</code>
 </p>
 </div>
 </div>
 
-<div id="outline-container-orge1b7566" class="outline-3">
-<h3 id="orge1b7566"><span class="section-number-3">2.8</span> 查看证书内容</h3>
+<div id="outline-container-orgb890113" class="outline-4">
+<h4 id="orgb890113"><span class="section-number-4">2.7.2</span> 从证书中提取公钥</h4>
+<div class="outline-text-4" id="text-2-7-2">
+<p>
+<code>openssl x509 -pubkey -noout -in &lt;cert.pem&gt; &gt; &lt;pubkey.pem&gt;</code>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org8f75458" class="outline-3">
+<h3 id="org8f75458"><span class="section-number-3">2.8</span> 查看证书内容</h3>
 <div class="outline-text-3" id="text-2-8">
 <p>
 <code>openssl x509 -text -in cert.pem</code>
@@ -573,12 +518,12 @@ p：大素数；g：生成数；x：clnt_random；y：srv_random
 </div>
 
 
-<div id="outline-container-orgdeb5787" class="outline-3">
-<h3 id="orgdeb5787"><span class="section-number-3">2.9</span> 签署证书</h3>
+<div id="outline-container-org19111a5" class="outline-3">
+<h3 id="org19111a5"><span class="section-number-3">2.9</span> 签署证书</h3>
 <div class="outline-text-3" id="text-2-9">
 </div>
-<div id="outline-container-org6d149fb" class="outline-4">
-<h4 id="org6d149fb"><span class="section-number-4">2.9.1</span> 第一步：部署 CA 证书</h4>
+<div id="outline-container-orgc74819a" class="outline-4">
+<h4 id="orgc74819a"><span class="section-number-4">2.9.1</span> 第一步：部署 CA 证书</h4>
 <div class="outline-text-4" id="text-2-9-1">
 <div class="org-src-container">
 <pre class="src src-sh">mkdir -p $<span style="color: #5fafff;">CATOP</span>/private  <span style="color: #707070; font-style: italic;">## </span><span style="color: #707070; font-style: italic;">$CATOP: ./demoCA</span>
@@ -589,8 +534,9 @@ cp ca.cert.pem $<span style="color: #5fafff;">CATOP</span>/cacert.pem
 </div>
 </div>
 
-<div id="outline-container-orga976d57" class="outline-4">
-<h4 id="orga976d57"><span class="section-number-4">2.9.2</span> 第二步：生成 csr</h4>
+
+<div id="outline-container-org88b90e3" class="outline-4">
+<h4 id="org88b90e3"><span class="section-number-4">2.9.2</span> 第二步：生成 csr</h4>
 <div class="outline-text-4" id="text-2-9-2">
 <div class="org-src-container">
 <pre class="src src-sh">openssl req -new -key webserver.key -out webserver.csr
@@ -599,8 +545,9 @@ cp ca.cert.pem $<span style="color: #5fafff;">CATOP</span>/cacert.pem
 </div>
 </div>
 
-<div id="outline-container-orge7aecab" class="outline-4">
-<h4 id="orge7aecab"><span class="section-number-4">2.9.3</span> 第三步：签署 csr</h4>
+
+<div id="outline-container-org37f372b" class="outline-4">
+<h4 id="org37f372b"><span class="section-number-4">2.9.3</span> 第三步：签署 csr</h4>
 <div class="outline-text-4" id="text-2-9-3">
 <div class="org-src-container">
 <pre class="src src-sh">openssl ca -in webserver.csr -out webserver.crt
@@ -609,8 +556,9 @@ cp ca.cert.pem $<span style="color: #5fafff;">CATOP</span>/cacert.pem
 </div>
 </div>
 
-<div id="outline-container-org78bf34f" class="outline-4">
-<h4 id="org78bf34f"><span class="section-number-4">2.9.4</span> 自动化脚本（可设置证书的有效日期）</h4>
+
+<div id="outline-container-orgd6f821d" class="outline-4">
+<h4 id="orgd6f821d"><span class="section-number-4">2.9.4</span> 自动化脚本（可设置证书的有效日期）</h4>
 <div class="outline-text-4" id="text-2-9-4">
 <div class="org-src-container">
 <pre class="src src-sh"><span style="color: #707070; font-style: italic;">#</span><span style="color: #707070; font-style: italic;">!/usr/bin/</span><span style="color: #d787d7; font-weight: bold;">env</span><span style="color: #707070; font-style: italic;"> bash</span>
@@ -638,8 +586,8 @@ rm -rf demoCA
 
 
 
-<div id="outline-container-org15550be" class="outline-3">
-<h3 id="org15550be"><span class="section-number-3">2.10</span> 证书格式转换</h3>
+<div id="outline-container-orgc9997d5" class="outline-3">
+<h3 id="orgc9997d5"><span class="section-number-3">2.10</span> 证书格式转换</h3>
 <div class="outline-text-3" id="text-2-10">
 <p>
 PEM 格式分为 <code>PKCS#1</code> 和 <code>PKCS#8</code> ：
@@ -698,16 +646,16 @@ PEM 格式分为 <code>PKCS#1</code> 和 <code>PKCS#8</code> ：
 
 
 
-<div id="outline-container-org6969b05" class="outline-4">
-<h4 id="org6969b05"><span class="section-number-4">2.10.1</span> PKCS#1 =&gt; PKCS#8</h4>
+<div id="outline-container-org78f4780" class="outline-4">
+<h4 id="org78f4780"><span class="section-number-4">2.10.1</span> PKCS#1 =&gt; PKCS#8</h4>
 <div class="outline-text-4" id="text-2-10-1">
 <p>
 openssl 的 <code>genpkey</code> 指令会生成 <code>PKCS#8</code> 格式，而 <code>genrsa</code> 会生成 <code>PKCS#1</code> 格式。
 </p>
 </div>
 
-<div id="outline-container-orge1b629c" class="outline-5">
-<h5 id="orge1b629c"><span class="section-number-5">2.10.1.1</span> 私钥</h5>
+<div id="outline-container-orgedc25b1" class="outline-5">
+<h5 id="orgedc25b1"><span class="section-number-5">2.10.1.1</span> 私钥</h5>
 <div class="outline-text-5" id="text-2-10-1-1">
 <div class="org-src-container">
 <pre class="src src-sh">openssl pkcs8 -topk8 -inform pem -in key.pem -outform pem -nocrypt -out key.pkcs8.pem
@@ -716,8 +664,9 @@ openssl 的 <code>genpkey</code> 指令会生成 <code>PKCS#8</code> 格式，�
 </div>
 </div>
 
-<div id="outline-container-orgfff5ee1" class="outline-5">
-<h5 id="orgfff5ee1"><span class="section-number-5">2.10.1.2</span> 公钥</h5>
+
+<div id="outline-container-org9706194" class="outline-5">
+<h5 id="org9706194"><span class="section-number-5">2.10.1.2</span> 公钥</h5>
 <div class="outline-text-5" id="text-2-10-1-2">
 <div class="org-src-container">
 <pre class="src src-sh">openssl rsa  -RSAPublicKey_in -in public_pkcs1.pem  -out public_pkcs8.pem
@@ -728,12 +677,12 @@ openssl 的 <code>genpkey</code> 指令会生成 <code>PKCS#8</code> 格式，�
 </div>
 
 
-<div id="outline-container-org13850a9" class="outline-4">
-<h4 id="org13850a9"><span class="section-number-4">2.10.2</span> PKCS#8 =&gt; PKCS#1</h4>
+<div id="outline-container-orgd55dde4" class="outline-4">
+<h4 id="orgd55dde4"><span class="section-number-4">2.10.2</span> PKCS#8 =&gt; PKCS#1</h4>
 <div class="outline-text-4" id="text-2-10-2">
 </div>
-<div id="outline-container-orgda6fef7" class="outline-5">
-<h5 id="orgda6fef7"><span class="section-number-5">2.10.2.1</span> 私钥</h5>
+<div id="outline-container-org2ecc45a" class="outline-5">
+<h5 id="org2ecc45a"><span class="section-number-5">2.10.2.1</span> 私钥</h5>
 <div class="outline-text-5" id="text-2-10-2-1">
 <div class="org-src-container">
 <pre class="src src-sh">openssl pkcs8 -in private_pkcs8.pem -nocrypt -out private_pkcs1.pem
@@ -742,8 +691,8 @@ openssl 的 <code>genpkey</code> 指令会生成 <code>PKCS#8</code> 格式，�
 </div>
 </div>
 
-<div id="outline-container-org5b06350" class="outline-5">
-<h5 id="org5b06350"><span class="section-number-5">2.10.2.2</span> 公钥</h5>
+<div id="outline-container-org4264496" class="outline-5">
+<h5 id="org4264496"><span class="section-number-5">2.10.2.2</span> 公钥</h5>
 <div class="outline-text-5" id="text-2-10-2-2">
 <div class="org-src-container">
 <pre class="src src-sh">openssl rsa -pubin -in public.pem -RSAPublicKey_out -out public_pkcs1.pem
@@ -754,8 +703,8 @@ openssl 的 <code>genpkey</code> 指令会生成 <code>PKCS#8</code> 格式，�
 </div>
 
 
-<div id="outline-container-org4f048c8" class="outline-4">
-<h4 id="org4f048c8"><span class="section-number-4">2.10.3</span> PEM =&gt; PKCS#12</h4>
+<div id="outline-container-org1ccaa81" class="outline-4">
+<h4 id="org1ccaa81"><span class="section-number-4">2.10.3</span> PEM =&gt; PKCS#12</h4>
 <div class="outline-text-4" id="text-2-10-3">
 <div class="org-src-container">
 <pre class="src src-sh">openssl pkcs12 -export -in ./cert.pem -inkey ./key.pem -out hello.p12
@@ -765,8 +714,8 @@ openssl 的 <code>genpkey</code> 指令会生成 <code>PKCS#8</code> 格式，�
 </div>
 
 
-<div id="outline-container-orgaa838d0" class="outline-4">
-<h4 id="orgaa838d0"><span class="section-number-4">2.10.4</span> PEM =&gt; DER</h4>
+<div id="outline-container-org686055a" class="outline-4">
+<h4 id="org686055a"><span class="section-number-4">2.10.4</span> PEM =&gt; DER</h4>
 <div class="outline-text-4" id="text-2-10-4">
 <div class="org-src-container">
 <pre class="src src-sh">openssl x509 -in cert.pem -outform der -out cert.der
@@ -776,8 +725,8 @@ openssl 的 <code>genpkey</code> 指令会生成 <code>PKCS#8</code> 格式，�
 </div>
 
 
-<div id="outline-container-org95485a2" class="outline-4">
-<h4 id="org95485a2"><span class="section-number-4">2.10.5</span> DER =&gt; PEM</h4>
+<div id="outline-container-orgecb1cd1" class="outline-4">
+<h4 id="orgecb1cd1"><span class="section-number-4">2.10.5</span> DER =&gt; PEM</h4>
 <div class="outline-text-4" id="text-2-10-5">
 <div class="org-src-container">
 <pre class="src src-sh">openssl x509 -inform der -in cert.der -outform der -out cert.pem
@@ -789,8 +738,8 @@ openssl 的 <code>genpkey</code> 指令会生成 <code>PKCS#8</code> 格式，�
 
 
 
-<div id="outline-container-org923b927" class="outline-3">
-<h3 id="org923b927"><span class="section-number-3">2.11</span> 同时生成密钥和证书</h3>
+<div id="outline-container-org0ffea73" class="outline-3">
+<h3 id="org0ffea73"><span class="section-number-3">2.11</span> 同时生成密钥和证书</h3>
 <div class="outline-text-3" id="text-2-11">
 <div class="org-src-container">
 <pre class="src src-sh">openssl req -new -x509 -days 365 -nodes -out cert.pem -keyout key.pem
@@ -799,19 +748,21 @@ openssl 的 <code>genpkey</code> 指令会生成 <code>PKCS#8</code> 格式，�
 </div>
 </div>
 
-<div id="outline-container-org07316ce" class="outline-3">
-<h3 id="org07316ce"><span class="section-number-3">2.12</span> 查看服务器证书内容</h3>
+
+<div id="outline-container-orgf27075d" class="outline-3">
+<h3 id="orgf27075d"><span class="section-number-3">2.12</span> 查看服务器证书内容(包含签发者证书)</h3>
 <div class="outline-text-3" id="text-2-12">
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #5fafff; font-weight: bold;">echo</span> | openssl s_client -showcerts -connect 10.74.68.89:443 2&gt;/dev/null | sed -n <span style="color: #87af5f;">'/BEGIN CERTIFICATE/,/END CERTIFICATE/p'</span>
+<pre class="src src-sh"><span style="color: #5fafff; font-weight: bold;">echo</span> | openssl s_client -showcerts -connect 10.74.68.89:443 2&gt;/dev/null <span style="color: #87af5f;">\</span>
+    | sed -n <span style="color: #87af5f;">'/BEGIN CERTIFICATE/,/END CERTIFICATE/p'</span>
 </pre>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-orgd2b2a5d" class="outline-3">
-<h3 id="orgd2b2a5d"><span class="section-number-3">2.13</span> 建立 ssl 连接</h3>
+<div id="outline-container-orgc4ea8c5" class="outline-3">
+<h3 id="orgc4ea8c5"><span class="section-number-3">2.13</span> 建立连接</h3>
 <div class="outline-text-3" id="text-2-13">
 <div class="org-src-container">
 <pre class="src src-sh">openssl s_client -connect &lt;ip&gt;:&lt;port&gt;
@@ -821,12 +772,52 @@ openssl 的 <code>genpkey</code> 指令会生成 <code>PKCS#8</code> 格式，�
 </div>
 
 
-<div id="outline-container-orgff206fa" class="outline-3">
-<h3 id="orgff206fa"><span class="section-number-3">2.14</span> 验证证书</h3>
+<div id="outline-container-org14ecc5a" class="outline-3">
+<h3 id="org14ecc5a"><span class="section-number-3">2.14</span> 证书验证</h3>
 <div class="outline-text-3" id="text-2-14">
+</div>
+<div id="outline-container-orge78dd47" class="outline-4">
+<h4 id="orge78dd47"><span class="section-number-4">2.14.1</span> 验证链</h4>
+<div class="outline-text-4" id="text-2-14-1">
 <div class="org-src-container">
 <pre class="src src-sh">openssl verify -CAfile &lt;<span style="color: #ff8c00; font-size: 150%;">(</span>cat root.pem intermediate.pem<span style="color: #ff8c00; font-size: 150%;">)</span> &lt;cert_to_verify&gt;.pem
 </pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgcd308ea" class="outline-4">
+<h4 id="orgcd308ea"><span class="section-number-4">2.14.2</span> 验证签名</h4>
+<div class="outline-text-4" id="text-2-14-2">
+<div class="org-src-container">
+<pre class="src src-sh"><span style="color: #5fafff;">CERT</span>=$<span style="color: #5fafff;">1</span>
+<span style="color: #5fafff;">ISSUER</span>=$<span style="color: #5fafff;">2</span>
+
+openssl x509 -in $<span style="color: #5fafff;">ISSUER</span> -noout -pubkey &gt; /tmp/issuer-pub.pem
+
+<span style="color: #707070; font-style: italic;"># </span><span style="color: #707070; font-style: italic;">extract hex of signature</span>
+<span style="color: #5fafff;">SIGNATURE_HEX</span>=$<span style="color: #ff8c00; font-size: 150%;">(</span><span style="color: #fa8072;">openssl</span> x509 -in $<span style="color: #5fafff;">CERT</span> -text -noout -certopt ca_default <span style="color: #87af5f;">\</span>
+                        -certopt no_validity -certopt no_serial <span style="color: #87af5f;">\</span>
+                        -certopt no_subject -certopt no_extensions -certopt no_signame <span style="color: #87af5f;">\</span>
+                    | grep -v <span style="color: #87af5f;">'Signature Algorithm'</span> | tr -d <span style="color: #87af5f;">'[:space:]:'</span><span style="color: #ff8c00; font-size: 150%;">)</span>
+<span style="color: #707070; font-style: italic;"># </span><span style="color: #707070; font-style: italic;">create signature dump</span>
+<span style="color: #5fafff; font-weight: bold;">echo</span> $<span style="color: #ff8c00; font-size: 150%;">{</span><span style="color: #5fafff;">SIGNATURE_HEX</span><span style="color: #ff8c00; font-size: 150%;">}</span> | xxd -r -p &gt; /tmp/cert-sig.bin
+
+<span style="color: #707070; font-style: italic;"># </span><span style="color: #707070; font-style: italic;">obtain hash function</span>
+openssl rsautl -verify -inkey /tmp/issuer-pub.pem <span style="color: #87af5f;">\</span>
+        -in /tmp/cert-sig.bin -pubin &gt; /tmp/cert-sig-decrypted.bin
+<span style="color: #5fafff;">hash_fun</span>=$<span style="color: #ff8c00; font-size: 150%;">(</span><span style="color: #fa8072;">openssl</span> asn1parse -inform der -in /tmp/cert-sig-decrypted.bin <span style="color: #87af5f;">\</span>
+               | grep <span style="color: #87af5f;">'4:d=2  hl=2 l=   9 prim: OBJECT'</span> <span style="color: #87af5f;">\</span>
+               | awk <span style="color: #87af5f;">'BEGIN {FS = ":"} {print $4}'</span><span style="color: #ff8c00; font-size: 150%;">)</span>
+<span style="color: #5fafff; font-weight: bold;">echo</span> <span style="color: #87af5f;">"Hash: $hash_fun"</span>
+
+openssl asn1parse -in $<span style="color: #5fafff;">CERT</span> -strparse 4 -out /tmp/cert-body.bin -noout
+<span style="color: #707070; font-style: italic;"># </span><span style="color: #707070; font-style: italic;">openssl dgst -sha256 /tmp/cert-body.bin</span>
+openssl dgst -$<span style="color: #5fafff;">hash_fun</span> -verify /tmp/issuer-pub.pem <span style="color: #87af5f;">\</span>
+        -signature /tmp/cert-sig.bin /tmp/cert-body.bin
+</pre>
+</div>
 </div>
 </div>
 </div>

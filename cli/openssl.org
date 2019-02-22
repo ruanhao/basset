@@ -8,12 +8,6 @@
 #+HTML_DOCTYPE: <!DOCTYPE html>
 #+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
 #+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
- #+HTML: <div class="outline-2" id="meta">
-| Author   | {{{author}}} ({{{email}}})    |
-| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
-#+HTML: </div>
-#+TOC: headlines 3
-
 
 
 * 基本知识
@@ -23,6 +17,7 @@
 - libcrypto: 加密库
 - libssl: TLS/SSL 实现
 - openssl: 命令行工具
+
 
 ** X509 格式
 
@@ -34,10 +29,11 @@
 - CA 的信息
 - CA 的签名
 
+
 ** Diffie-Hellman 交换过程
 
 
-#+BEGIN_SRC plantuml :file img/openssl-dh.png
+#+BEGIN_SRC plantuml :file img/openssl-dh.png :eval never-export
   client -> server  : p, g
   rnote over client : p, g, x
   rnote over server : p, g, y
@@ -76,9 +72,11 @@ p：大素数；g：生成数；x：clnt_random；y：srv_random
 
 =openssl ?=
 
+
 ** 测试各种加密算法的速度
 
 =openssl speed [ciphername]=
+
 
 ** 加解密
 
@@ -86,13 +84,16 @@ p：大素数；g：生成数；x：clnt_random；y：srv_random
 
   =openssl enc -des3 -a -in ./test-cipher -out test-cipher.des3=
 
+
 *** 解密
 
   =openssl enc -des3 -d -a -in ./test-cipher.des3 -out test-cipher=
 
+
 ** 计算文件特征码（指纹）
 
 =openssl dgst -md5 <filename>=
+
 
 ** 生成密码串
 
@@ -117,9 +118,16 @@ p：大素数；g：生成数；x：clnt_random；y：srv_random
      openssl req -new -x509 -key ca.key.pem -out ca.cert.pem -days 365
    #+END_SRC
 
-** 从私钥中提取公钥
+
+** 提取公钥
+
+*** 从私钥中提取公钥
 
 =openssl rsa -in ca.key.pem -pubout=
+
+*** 从证书中提取公钥
+
+=openssl x509 -pubkey -noout -in <cert.pem> > <pubkey.pem>=
 
 ** 查看证书内容
 
@@ -136,17 +144,20 @@ p：大素数；g：生成数；x：clnt_random；y：srv_random
      cp ca.cert.pem $CATOP/cacert.pem
    #+END_SRC
 
+
 *** 第二步：生成 csr
 
 #+BEGIN_SRC sh
   openssl req -new -key webserver.key -out webserver.csr
 #+END_SRC
 
+
 *** 第三步：签署 csr
 
    #+BEGIN_SRC sh
      openssl ca -in webserver.csr -out webserver.crt
    #+END_SRC
+
 
 *** 自动化脚本（可设置证书的有效日期）
 
@@ -196,6 +207,7 @@ PEM 格式分为 =PKCS#1= 和 =PKCS#8= ：
   #+BEGIN_SRC sh
     openssl pkcs8 -topk8 -inform pem -in key.pem -outform pem -nocrypt -out key.pkcs8.pem
   #+END_SRC
+
 
 **** 公钥
 
@@ -247,22 +259,57 @@ PEM 格式分为 =PKCS#1= 和 =PKCS#8= ：
   openssl req -new -x509 -days 365 -nodes -out cert.pem -keyout key.pem
 #+END_SRC
 
-** 查看服务器证书内容
+
+** 查看服务器证书内容(包含签发者证书)
 
 #+BEGIN_SRC sh
-  echo | openssl s_client -showcerts -connect 10.74.68.89:443 2>/dev/null | sed -n '/BEGIN CERTIFICATE/,/END CERTIFICATE/p'
+  echo | openssl s_client -showcerts -connect 10.74.68.89:443 2>/dev/null \
+      | sed -n '/BEGIN CERTIFICATE/,/END CERTIFICATE/p'
 #+END_SRC
 
 
-** 建立 ssl 连接
+** 建立连接
 
 #+BEGIN_SRC sh
   openssl s_client -connect <ip>:<port>
 #+END_SRC
 
 
-** 验证证书
+** 证书验证
+
+*** 验证链
 
 #+BEGIN_SRC sh
   openssl verify -CAfile <(cat root.pem intermediate.pem) <cert_to_verify>.pem
+#+END_SRC
+
+
+*** 验证签名
+
+#+BEGIN_SRC sh
+  CERT=$1
+  ISSUER=$2
+
+  openssl x509 -in $ISSUER -noout -pubkey > /tmp/issuer-pub.pem
+
+  # extract hex of signature
+  SIGNATURE_HEX=$(openssl x509 -in $CERT -text -noout -certopt ca_default \
+                          -certopt no_validity -certopt no_serial \
+                          -certopt no_subject -certopt no_extensions -certopt no_signame \
+                      | grep -v 'Signature Algorithm' | tr -d '[:space:]:')
+  # create signature dump
+  echo ${SIGNATURE_HEX} | xxd -r -p > /tmp/cert-sig.bin
+
+  # obtain hash function
+  openssl rsautl -verify -inkey /tmp/issuer-pub.pem \
+          -in /tmp/cert-sig.bin -pubin > /tmp/cert-sig-decrypted.bin
+  hash_fun=$(openssl asn1parse -inform der -in /tmp/cert-sig-decrypted.bin \
+                 | grep '4:d=2  hl=2 l=   9 prim: OBJECT' \
+                 | awk 'BEGIN {FS = ":"} {print $4}')
+  echo "Hash: $hash_fun"
+
+  openssl asn1parse -in $CERT -strparse 4 -out /tmp/cert-body.bin -noout
+  # openssl dgst -sha256 /tmp/cert-body.bin
+  openssl dgst -$hash_fun -verify /tmp/issuer-pub.pem \
+          -signature /tmp/cert-sig.bin /tmp/cert-body.bin
 #+END_SRC
