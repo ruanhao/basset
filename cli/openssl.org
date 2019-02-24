@@ -10,6 +10,8 @@
 #+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
 
 
+
+
 * 基本知识
 
 ** openssl 组成
@@ -17,6 +19,25 @@
 - libcrypto: 加密库
 - libssl: TLS/SSL 实现
 - openssl: 命令行工具
+
+** 编码格式
+
+目前有以下两种编码格式：
+
+
+*** PEM - Privacy Enhanced Mail
+
+文本格式，以 =-----BEGIN-----= 开头， =-----END-----= 结尾，内容是 Base64 编码。
+
+Unix服务器偏向于使用这种编码格式。
+
+*** DER - Distinguished Encoding Rules
+
+二进制格式不可读。
+
+Java 和 Windows 服务器偏向于使用这种编码格式。
+
+
 
 
 ** X509 格式
@@ -32,6 +53,7 @@
 
 ** Diffie-Hellman 交换过程
 
+p：大素数；g：生成数；x：clnt_random；y：srv_random
 
 #+BEGIN_SRC plantuml :file img/openssl-dh.png :eval never-export
   client -> server  : p, g
@@ -43,74 +65,283 @@
   rnote over server : p, g, y, g^(xy)%p
 
 #+END_SRC
-#+NAME: dh
-#+CAPTION: 交换过程示意图
+
 #+RESULTS:
+[[file:img/openssl-dh.png]]
 
-p：大素数；g：生成数；x：clnt_random；y：srv_random
 
+
+#+HTML: <img src="http://www.ruanyifeng.com/blogimg/asset/2014/bg2014092008.png"/>
 
 ** 算法种类
 
-- 对称加密
-  - DES  :: 56 bits
-  - 3DES :: Tripple DES
-  - AES  :: 128 bits
+*** 对称加密
 
-- 单向加密
-  - MD5
-  - SHA1, SHA192, SHA256, SHA384
+**** DES
 
-- 公钥加密
+是一种使用密钥加密的块算法，区块长度为 56 比特。
 
-  - DSA (仅用于签名)
-  - RSA  (可用于加密或签名)
+1976 年被美国联邦政府的国家标准局确定为联邦资料处理标准（FIPS），随后在国际上广泛流传开来。
+
+单密钥算法,是信息的发送方采用密钥 A 进行数据加密，信息的接收方采用同一个密钥 A 进行数据解密。
+
+
+**** AES
+
+AES 的区块长度固定为 128 比特，密钥长度则可以是 128 ，192 或 256 比特。
+
+AES 是美国国家标准技术研究所 NIST 旨在取代 DES 的 21 世纪的加密标准。
+
+
+*** 非对称加密
+
+**** RSA
+
+RSA 是目前最有影响力的公钥加密算法，它能够抵抗到目前为止已知的绝大多数密码攻击，已被 ISO 推荐为公钥数据加密标准。
+
+在 RSA 算法中，对于一个已经生成的私钥来说，它的长度决定了密文的长度，
+比如，1024参数生成的密钥加密一段明文数据后，得到的密文长度换算为字节长度是 1024/8 = 128，
+形象一点，是128个英文字母的长度，这是固定的。
+也就是说，无论明文数据长度是多少，用这个密钥加密生成的密文总是也是最大有 128 个字节那么长，这是由算法本身决定的。
+
+当明文数据超过 128 个字节时，使用这个密钥加密，只有前128字节的数据被加密了，其余的会被舍弃，
+*这种情况下，加密后的密文是无法解密还原为之前的明文的，算法会报错* 。
+
+实际上，RSA 算法规定密文需要 11 字节冗余，因此，最大可加密明文长度应该是 1024/8 - 11 = 117，即明文不能超过117字节。
+
+所以，在使用RSA算法时，需要评估一下你的明文数据，测量明文数据长度，留出冗余度，再决定需要多长的密钥，
+从而生成正确的满足需求的密钥对。
+
+可以意料到，因为算法的复杂，RSA 加解密的开销代价是很大的，加解密的耗时，会随着密钥长度的增长及明文长度增长而比例增长，
+因此，RSA 算法 *更适合用于微量数据的加解密* 。
+
+**** DSA
+
+一般用于数字签名和认证，在DSA数字签名和认证中，发送者使用自己的私钥对文件或消息进行签名，
+接受者收到消息后使用发送者的公钥来验证签名的真实性。
+
+DSA 只是一种算法，和 RSA 不同之处在于 *它不能用作加密和解密，也不能进行密钥交换，只用于签名* ，它比 RSA 要快很多。
+
+**** ECC
+
+基于椭圆曲线算法。
+
+ECC 与 RSA 相比，有以下的优点：
+
+- 相同密钥长度下，安全性能更高
+- 计算量小，处理速度快，在私钥的处理速度上（解密和签名），ECC远比 RSA，DSA 快得多
+- 存储空间占用小
+
+
+** 传送门
+
+- [[http://www.ruanyifeng.com/blog/2014/09/illustration-ssl.html][图解SSL/TLS协议]]
+- [[https://blog.cloudflare.com/keyless-ssl-the-nitty-gritty-technical-details/][The Nitty Gritty Technical Details]]
+
 
 * 常见用法
 
-** 查询可用子命令
+** 工具命令
 
-=openssl ?=
+*** 查看支持的 Cipher Suite
 
-
-** 测试各种加密算法的速度
-
-=openssl speed [ciphername]=
+=openssl ciphers -V | column -t=
 
 
-** 加解密
+*** 使用算法加解密 (openssl enc)
 
-*** 加密
+#+BEGIN_EXAMPLE
+  -in <file>     输入文件
+  -out <file>    输出文件
+  -pass <arg>    密码
+  -S             加盐加密
+  -e             加密操作
+  -d             解密操作
+  -a/-base64     是否将结果base64编码
+  -md            指定密钥生成的摘要算法 默认MD5
+#+END_EXAMPLE
 
-  =openssl enc -des3 -a -in ./test-cipher -out test-cipher.des3=
+
+**** 支持的算法
+
+=openssl enc -ciphers=
 
 
-*** 解密
+**** 加密
 
-  =openssl enc -des3 -d -a -in ./test-cipher.des3 -out test-cipher=
+#+BEGIN_SRC
+  openssl enc -des3 -a -in <data.txt> -out <data.des3>
+#+END_SRC
+
+不同的密码输入方式：
+
+#+BEGIN_SRC sh
+  # 命令行输入，密码123456
+  openssl enc -aes-128-cbc -in plain.txt -out out.txt -pass pass:123456
+
+  # 文件输入，密码123456
+  echo 123456 > passwd.txt
+  openssl enc -aes-128-cbc -in plain.txt -out out.txt -pass file:passwd.txt
+
+  # 环境变量输入，密码123456
+  passwd=123456
+  export passwd
+  openssl enc -aes-128-cbc -in plain.txt -out out.txt -pass env:passwd
+
+  # 从文件描述符输入
+  openssl enc -aes-128-cbc -in plain.txt -out out.txt -pass fd:1
+
+  # 从标准输入输入
+  openssl enc -aes-128-cbc -in plain.txt -out out.txt -pass stdin
+
+#+END_SRC
 
 
-** 计算文件特征码（指纹）
+**** 解密
+
+#+BEGIN_SRC sh
+  openssl enc -des3 -d -a -in <data.des3> -out <data_decrypted.txt>
+#+END_SRC
+
+
+*** 计算文件摘要（指纹）
 
 =openssl dgst -md5 <filename>=
 
 
-** 生成密码串
+*** 生成随机密码串
 
 =openssl passwd -1 -salt <saltvalue>=
 
 -1 表示 MD5-Based Password algorithm
 
 
+
+*** 查看版本编译信息
+
+=openssl version -a=
+
+#+BEGIN_EXAMPLE
+OpenSSL 0.9.8zh 14 Jan 2016
+built on: Jan 23 2017
+platform: darwin64-x86_64-llvm
+options:  bn(64,64) md2(int) rc4(ptr,char) des(idx,cisc,16,int) blowfish(idx)
+compiler: -arch x86_64 -fmessage-length=0 -pipe -Wno-trigraphs -fpascal-strings -fasm-blocks -O3 -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -DL_ENDIAN -DMD32_REG_T=int -DOPENSSL_NO_IDEA -DOPENSSL_PIC -DOPENSSL_THREADS -DZLIB -mmacosx-version-min=10.6
+OPENSSLDIR: "/System/Library/OpenSSL"
+#+END_EXAMPLE
+
+
+*** 查询可用子命令
+
+=openssl ?=
+
+
+*** 测试各种加密算法的速度
+
+=openssl speed [ciphername]=
+
+
+
+
+
+** RSA 密钥对
+
+*** 密钥生成
+
+**** 生成私钥
+
+#+BEGIN_SRC sh
+  openssl genrsa -out <key.pem> 2048
+  # 指定私钥长度为 2048 比特，默认是 512 比特，但 512 比特长度在现今技术环境下已不够安全，
+  # 在被攻击的情况下，这个长度的密钥容易被黑客推算还原，可以使用 512 的整数倍值，推荐使用2048，
+  # 这个长度的密钥已经相对安全可靠。
+#+END_SRC
+
+#+BEGIN_SRC sh
+  openssl genrsa -aes128 -out <key.pem> 2048
+  # 将私钥以 AES-128 算法保护
+#+END_SRC
+
+
+**** 从私钥中提取公钥
+
+#+BEGIN_SRC sh
+  openssl rsa -in <key.pem> -pubout -out <pubkey.pem>
+#+END_SRC
+
+
+**** 从证书中提取公钥
+
+=openssl x509 -pubkey -noout -in <cert.pem> > <pubkey.pem>=
+
+
+*** 使用密钥对加解密
+
+两次加密生成密文是不一样的，这也是 RSA 加密算法的优势体现，密文是动态的。
+
+**** 公钥加密
+
+#+BEGIN_SRC sh
+  openssl rsautl -encrypt -in <data.txt> -inkey <pubkey.pem> -pubin -out <data_encrypted.txt>
+  # 加密时，默认导入的密钥是私钥，所以，公钥加密需要加上 -pubin 参数以表明加密操作是以公钥进行
+#+END_SRC
+
+
+**** 私钥解密
+
+#+BEGIN_SRC sh
+  openssl rsautl -decrypt -in <data_encrypted.txt> -inkey <key.pem> -out <data_decrypted.txt>
+#+END_SRC
+
+
+
+*** 签名(sign)与验证(verify)
+
+*使用 RSA 密钥进行签名，实际上就是使用私钥进行加密，只是算法不同，加密对象一般是摘要。*
+
+*使用 RSA 密钥进行验证，实际上就是使用公钥进行解密。*
+
+[[http://certificate.fyicenter.com/2046_OpenSSL_rsautl-encrypt_vs._rsautl-sign_.html][rsautl -sign 和 rsautl -encrypt 区别：]]
+
+#+BEGIN_EXAMPLE
+  "rsautl -encrypt" and "rsautl -sign" commands use different flavors of PKCS#1 v1.5 padding:
+
+  "rsautl -encrypt" uses 0x02 as the BT (Block Type) and random bytes as padding string.
+  "rsautl -sign" uses 0x01 as the BT (Block Type) and 0xff bytes as padding string.
+
+  So if we are using no padding,
+  the only difference between "rsautl -encrypt" and "rsautl -sign" commands is what type of RSA keys they taking.
+  In other words, "rsautl -encrypt -raw" and "rsautl -sign -raw" are identical commands
+  except that the first takes RSA public keys and the second takes RSA private keys.
+#+END_EXAMPLE
+
+
+**** 签名
+
+#+BEGIN_SRC sh
+  openssl rsautl -sign -in <digest.txt> -inkey key.pem -out <sig.txt>
+#+END_SRC
+
+**** 验证
+
+#+BEGIN_SRC sh
+  openssl rsautl -verify -in <sig.txt> -inkey key.pem -out <digest.txt>
+  # 或
+  openssl rsautl -verify -in <sig.txt> -inkey pub.pem -pubin -out <digest.txt>
+
+#+END_SRC
+
 ** 制作自签署证书
 
 自签署证书一般作为 CA 的证书，普通的证书由 CA 来签署，也可以按照该步骤制作自签署的普通证书（将自身作为 CA ）：
+
 
 *** 第一步：生成密钥
 
    #+BEGIN_SRC sh
      openssl genrsa 2048 >ca.key.pem    ## 生成 2048 位私钥
    #+END_SRC
+
 
 *** 第二步：生成自签署证书
 
@@ -119,15 +350,6 @@ p：大素数；g：生成数；x：clnt_random；y：srv_random
    #+END_SRC
 
 
-** 提取公钥
-
-*** 从私钥中提取公钥
-
-=openssl rsa -in ca.key.pem -pubout=
-
-*** 从证书中提取公钥
-
-=openssl x509 -pubkey -noout -in <cert.pem> > <pubkey.pem>=
 
 ** 查看证书内容
 
@@ -223,6 +445,7 @@ PEM 格式分为 =PKCS#1= 和 =PKCS#8= ：
 #+BEGIN_SRC sh
   openssl pkcs8 -in private_pkcs8.pem -nocrypt -out private_pkcs1.pem
 #+END_SRC
+
 
 **** 公钥
 
