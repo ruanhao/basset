@@ -20,6 +20,7 @@
 - libssl: TLS/SSL 实现
 - openssl: 命令行工具
 
+
 ** 编码格式
 
 目前有以下两种编码格式：
@@ -72,6 +73,7 @@ p：大素数；g：生成数；x：clnt_random；y：srv_random
 
 
 #+HTML: <img src="http://www.ruanyifeng.com/blogimg/asset/2014/bg2014092008.png"/>
+
 
 ** 算法种类
 
@@ -501,6 +503,18 @@ PEM 格式分为 =PKCS#1= 和 =PKCS#8= ：
 ** 证书验证
 
 *** 验证链
+
+只有具备 =CA:TRUE= 属性的证书才能用于验证：
+
+#+BEGIN_EXAMPLE
+X509v3 extensions:
+            X509v3 Subject Key Identifier:
+                83:2B:32:07:7A:F4:EB:56:65:E9:E1:AF:3C:24:E8:96:5B:9F:F8:7D
+            X509v3 Authority Key Identifier:
+                keyid:83:2B:32:07:7A:F4:EB:56:65:E9:E1:AF:3C:24:E8:96:5B:9F:F8:7D
+            X509v3 Basic Constraints:
+                CA:TRUE
+#+END_EXAMPLE
 
 #+BEGIN_SRC sh
   openssl verify -CAfile <(cat root.pem intermediate.pem) <cert_to_verify>.pem
