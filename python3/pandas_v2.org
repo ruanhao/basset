@@ -49,7 +49,7 @@
 #+END_SRC
 
 #+RESULTS:
-: # Out[1]:
+: # Out[3]:
 
 
 * 核心数据结构创建与基本操作
@@ -5509,6 +5509,8 @@ time
 
 ** rolling
 
+
+
 *** 按长度确定窗口
 
 #+BEGIN_SRC ipython :session :exports both :results output :eval never-export :var path="img/fig_rolling.png"
@@ -5594,6 +5596,74 @@ file:img/fig_rolling.png
 #+end_example
 
 
+*** 指定窗口函数(win_type)
+
+**** [[https://zh.wikipedia.org/zh-cn/%E7%AA%97%E5%87%BD%E6%95%B0][各类窗函数介绍]]
+
+**** 计算方法
+
+#+BEGIN_SRC ipython :session :exports both :results output :eval never-export
+  from scipy import signal
+  s = pd.Series([1, 1, 2, 2, 3, 4, 4, 5, 5])
+  log("signal.triang(3)", signal.triang(3))
+  log("s", s)
+  log("s.rolling(window=3, min_periods=1, win_type='triang').sum()", s.rolling(window=3, min_periods=1, win_type='triang').sum())
+  log("s.rolling(window=3, min_periods=1, win_type='triang').mean()", s.rolling(window=3, min_periods=1, win_type='triang').mean())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+=============================== signal.triang(3) ===============================
+[0.5 1.  0.5]
+====================================== s =======================================
+0    1
+1    1
+2    2
+3    2
+4    3
+5    4
+6    4
+7    5
+8    5
+dtype: int64
+========= s.rolling(window=3, min_periods=1, win_type='triang').sum() ==========
+0    0.5
+1    1.5
+2    2.5
+3    3.5
+4    4.5
+5    6.0
+6    7.5
+7    8.5
+8    9.5
+dtype: float64
+========= s.rolling(window=3, min_periods=1, win_type='triang').mean() =========
+0    1.00
+1    1.00
+2    1.25
+3    1.75
+4    2.25
+5    3.00
+6    3.75
+7    4.25
+8    4.75
+dtype: float64
+#+end_example
+
+计算过程：
+
+#+BEGIN_EXAMPLE
+  (1 * 0.5) / 0.5 => 1.00
+  (1 * 1 + 1 * 0.5) / (1 + 0.5) => 1.00
+  (1 * 0.5 + 1 * 1 + 2 * 0.5) / (0.5 + 1 + 0.5) => 1.25
+  ...
+#+END_EXAMPLE
+
+
+
+
+
+
 ** expanding
 
 窗口从小到大增长，直到整个序列长度。
@@ -5640,6 +5710,8 @@ file:img/fig_expanding.png
 
 
 ** ewm
+
+[[https://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:moving_averages][计算原理]]
 
 通过 =span= 指定一个固定衰减因子，赋予 *最近观察值* 更多的权重。
 
