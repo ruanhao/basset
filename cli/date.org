@@ -14,59 +14,225 @@
 #+TOC: headlines 3
 #+STARTUP:   showall
 
-* 今天是本年度的第几天
 
-#+BEGIN_SRC sh
+* 格式化日期
+
+
+=date +%FORMAT=
+
+** 工作日名称(%a/%A)
+
+#+BEGIN_SRC bash :exports both :eval never-export
+  date +%a
+  date +%A
+#+END_SRC
+
+#+RESULTS:
+| Fri    |
+| Friday |
+
+
+** 月份名称(%b/%B)
+
+#+BEGIN_SRC bash :exports both :eval never-export
+  date +%b
+  date +%B
+#+END_SRC
+
+#+RESULTS:
+| Mar   |
+| March |
+
+
+** 全日期(%D:%m/%d/%y)/(%F:%Y-%m-%d)
+
+#+BEGIN_SRC bash :exports both :eval never-export
+  date +%F
+  date +%Y-%m-%d
+  date +%D
+#+END_SRC
+
+#+RESULTS:
+| 2019-03-22 |
+| 2019-03-22 |
+|   03/22/19 |
+
+
+** 今天是本年度的第几天(%j)
+
+#+BEGIN_SRC sh :exports both :eval never-export
   date +%j
 #+END_SRC
 
-* 本周是本年度的第几周
+#+RESULTS:
+: 81
 
-#+BEGIN_SRC sh
+
+** 今天是本周第几天(%w)
+
+#+BEGIN_SRC bash :exports both :eval never-export
+  date +%w
+#+END_SRC
+
+#+RESULTS:
+: 5
+
+
+** 本周是本年度的第几周(%W)
+
+#+BEGIN_SRC sh :exports both :eval never-export
   date +%W
 #+END_SRC
 
+#+RESULTS:
+: 11
 
-* 本月是本年度的第几月
 
-#+BEGIN_SRC sh
+** 本月是本年度的第几月(%m)
+
+#+BEGIN_SRC sh :exports both :eval never-export
   date +%m
 #+END_SRC
 
+#+RESULTS:
+: 3
 
-* 当前小时数(24 小时制)
 
-#+BEGIN_SRC sh
-  date +%k
+** 当前时间(%T:%H:%M:%S)
+
+#+BEGIN_SRC bash :exports both :eval never-export
+  date +%T
 #+END_SRC
 
-* 当前分钟数
+#+RESULTS:
+: 17:38:31
 
-#+BEGIN_SRC sh
+
+** 当前小时数(%k/%l)
+
+#+BEGIN_SRC sh :exports both :eval never-export
+  date +%k                        # 24 制
+  date +%l
+#+END_SRC
+
+#+RESULTS:
+| 17 |
+|  5 |
+
+
+** 当前分钟数(%M)
+
+#+BEGIN_SRC sh :exports both :eval never-export
   date +%M
 #+END_SRC
 
-* UNIX 元年到现在的秒数
+#+RESULTS:
+: 24
 
-#+BEGIN_SRC sh
+
+** Timestamp (UNIX 元年到现在的秒数)(%s)
+
+#+BEGIN_SRC sh :exports both :eval never-export
   date +%s
 #+END_SRC
 
+#+RESULTS:
+: 1553246671
 
-* 以十亿分之一为单位表示当前时间
 
-#+BEGIN_SRC sh
+** 纳秒信息(%N)
+
+(000000000..999999999)
+
+#+BEGIN_SRC bash :exports both :eval never-export
   date +%N
 #+END_SRC
 
+#+RESULTS:
+: 949997773
+
 可以用这个特性产生一个 6 位的随机数:
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both :eval never-export
   date +%N | sed -e 's/000$//' -e 's/^0//'
 #+END_SRC
 
-* timestamp => date string
+#+RESULTS:
+: 998288846
+
+
+
+
+
+* 指定具体时间
+
+** 昨天
+
+#+BEGIN_SRC bash :exports both :eval never-export
+  date -d '1 days ago' "+%Y-%m-%d"
+  date -d '1 days ago' "+%Y-%m-%d"
+  date -d yesterday "+%Y-%m-%d"
+#+END_SRC
+
+#+RESULTS:
+
+
+** 明天
 
 #+BEGIN_SRC sh
-  date -d@1234567890              # Sat Feb 14 07:31:30 CST 2009
+  date --date='1 days' "+%Y-%m-%d"
+  date -d '1 days' "+%Y-%m-%d"
+  date -d tomorrow "+%Y-%m-%d"
 #+END_SRC
+
+** 1 小时前
+
+#+BEGIN_SRC sh
+  date --date='1 hours ago' "+%Y-%m-%d %H:%M:%S"
+#+END_SRC
+
+** 1 小时后
+
+#+BEGIN_SRC sh
+  date --date='1 hours' "+%Y-%m-%d %H:%M:%S"
+#+END_SRC
+
+** 1 分钟前
+
+#+BEGIN_SRC sh
+  date --date='1 minutes ago' "+%Y-%m-%d %H:%M:%S"
+#+END_SRC
+
+** 1 分钟后
+
+#+BEGIN_SRC sh
+  date --date='1 minutes' "+%Y-%m-%d %H:%M:%S"
+#+END_SRC
+
+
+** 1 秒前
+
+#+BEGIN_SRC sh
+  date --date='1 seconds ago' "+%Y-%m-%d %H:%M:%S"
+#+END_SRC
+
+** 1 秒后
+
+#+BEGIN_SRC sh
+  date --date='1 seconds' "+%Y-%m-%d %H:%M:%S"
+#+END_SRC
+
+
+
+** 指定 Timestamp
+
+#+BEGIN_SRC sh :exports both :eval never-export
+  date +%s
+  date -d@`date +%s`
+#+END_SRC
+
+#+RESULTS:
+: 1553248335
+: Fri Mar 22 17:52:15 CST 2019
+
+* [[http://man7.org/linux/man-pages/man1/date.1.html][Man]]
