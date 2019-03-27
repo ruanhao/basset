@@ -1,0 +1,407 @@
+#+TITLE:     Kubernetes
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
+ #+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+#+TOC: headlines 5
+
+
+
+* Resources
+
+
+* Internals
+
+** Container Vs VM
+
+[[file:img/k8s_container_vs_vm.png]]
+
+file:img/k8s_container_vs_vm_cpu.png
+
+
+** K8S components
+
+[[file:img/k8s_components.png]]
+
+
+
+
+
+
+
+
+
+
+
+
+
+* YAML
+
+[[https://plugins.jetbrains.com/plugin/9354-kubernetes-and-openshift-resource-support][IDEA Kubernetes YAML 插件]]
+
+** Key Value Pair
+
+#+BEGIN_SRC yaml
+  fruit: apple
+  vegetable: carrot
+  liquid: water
+  meat: chicken
+#+END_SRC
+
+
+** Array / List
+
+#+BEGIN_SRC yaml
+  fruits:
+    - orange
+    - apple
+    - banana
+
+  vegetables:
+    - carrot
+    - cauliflower
+    - tomato
+#+END_SRC
+
+
+** Dictionary / Map
+
+#+BEGIN_SRC yaml
+  banana:
+    calories: 105
+    fat: 0.4
+    carbs: 27
+
+  grape:
+    calories: 62
+    fat: 0.3
+    carbs: 16
+#+END_SRC
+
+
+* 命令行
+
+#+BEGIN_SRC sh
+$ kubectl COMMAND RESOURCE OPTIONS
+#+END_SRC
+
+
+
+* 核心原理
+
+** 资源对象
+
+*** POD
+
+**** 基本 YAML 定义
+
+
+
+*apiVersion, kind, metadata, spec 是必填项*
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: nginx
+    labels:
+      app: nginx
+  spec:
+    containers:
+    - name: nginx
+      image: nginx
+      ports:
+      - containerPort: 80
+#+END_SRC
+
+
+
+
+
+
+#+BEGIN_SRC sh
+kubectl get pods
+kubectl describe pod <pod_name>
+#+END_SRC
+
+
+
+**** 设计理念
+
+Pod 是在 K8s 集群中运行部署应用或服务的最小单元，它是可以支持多容器的。
+
+Pod 的设计理念是支持多个容器在一个 Pod 中共享网络地址和文件系统，可以通过进程间通信和文件共享这种简单高效的方式组合完成服务。
+
+Pod 是 K8s 集群中所有业务类型的基础，不同类型的业务就需要不同类型的 *控制器* 去执行。
+
+目前 K8s 中的业务主要可以分为：
+
+- 长期伺服型 (long-running)
+- 批处理型 (batch)
+- 节点后台支撑型 (node-daemon)
+- 有状态应用型 (stateful application)
+
+分别对应的控制器类型为：
+
+- Deployment
+- Job
+- DaemonSet
+- StatefulSet
+
+直接创建的 Pod 一旦被调度后就跟 Node 绑定，即使 Node 挂掉也不会被重新调度（ *而是被自动删除* ），因此推荐使用 Deployment、Daemonset 等控制器来容错。
+
+
+
+**** 生命周期
+
+- Pending :: Pod 已经在 apiserver 中创建，但还没有调度到 Node 上面
+- Running :: Pod 已经调度到 Node 上面，所有容器都已经创建，并且至少有一个容器还在运行或者正在启动
+- Succeeded :: Pod 调度到 Node 上面后成功运行结束，并且不会重启
+- Failed :: Pod 调度到 Node 上面后至少有一个容器运行失败（即退出码不为 0 或者被系统终止）
+- Unknonwn :: 状态未知，通常是由于 apiserver 无法与 kubelet 通信导致
+
+
+
+**** 重启策略(restartPolicy)
+
+PodSpec 中的 =restartPolicy= 可以用来设置是否对退出的 Pod 重启，可选项包括:
+
+- Always :: 只要退出就重启
+- OnFailure :: 失败退出（exit code 不等于 0）时重启
+- Never :: 只要退出就不再重启
+
+*注意，这里的重启是指在 Pod 所在 Node 上面本地重启，并不会调度到其他 Node 上去。*
+
+- 单容器的 Pod ，容器成功退出时，不同 restartPolicy 时的动作为
+  - Always: 重启 Container; Pod phase 保持 Running.
+  - OnFailure: Pod phase 变成 Succeeded.
+  - Never: Pod phase 变成 Succeeded.
+
+- 单容器的 Pod ，容器失败退出时，不同 restartPolicy 时的动作为
+  - Always: 重启 Container; Pod phase 保持 Running.
+  - OnFailure: 重启 Container; Pod phase 保持 Running.
+  - Never: Pod phase 变成 Failed.
+
+- 2 个容器的 Pod，其中一个容器在运行而另一个失败退出时，不同 restartPolicy 时的动作为
+  - Always: 重启 Container; Pod phase 保持 Running.
+  - OnFailure: 重启 Container; Pod phase 保持 Running.
+  - Never: 不重启 Container; Pod phase 保持 Running.
+
+- 2 个容器的 Pod，其中一个容器停止而另一个失败退出时，不同 restartPolicy 时的动作为
+  - Always: 重启 Container; Pod phase 保持 Running.
+  - OnFailure: 重启 Container; Pod phase 保持 Running.
+  - Never: Pod phase 变成 Failed.
+
+- 单容器的 Pod，容器内存不足（OOM），不同 restartPolicy 时的动作为
+  - Always: 重启 Container; Pod phase 保持 Running.
+  - OnFailure: 重启 Container; Pod phase 保持 Running.
+  - Never: 记录失败事件; Pod phase 变成 Failed.
+
+其他情况的处理逻辑：
+
+- Pod 还在运行，但磁盘不可访问时
+  1. 终止所有容器
+  2. Pod phase 变成 Failed
+  3. 如果 Pod 是由某个控制器管理的，则重新创建一个 Pod 并调度到其他 Node 运行
+
+- Pod 还在运行，但由于网络分区故障导致 Node 无法访问
+  1. Node controller等待 Node 事件超时
+  2. Node controller 将 Pod phase 设置为 Failed.
+  3. 如果 Pod 是由某个控制器管理的，则重新创建一个 Pod 并调度到其他 Node 运行
+
+
+
+
+**** 使用 Volume
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: redis
+  spec:
+    containers:
+    - name: redis
+      image: redis
+      volumeMounts:
+      - name: redis-storage
+        mountPath: /data/redis
+    volumes:
+    - name: redis-storage
+      emptyDir: {}
+
+#+END_SRC
+
+
+
+**** 环境变量
+
+Pod 的名字、命名空间、IP 以及容器的计算资源限制等可以通过 [[https://kubernetes.io/docs/tasks/inject-data-application/downward-api-volume-expose-pod-information/][Downward API]] 的方式获取并存储到环境变量中。
+
+
+
+**** 镜像拉取策略(ImagePullPolicy)
+
+支持三种 =ImagePullPolicy=:
+
+- Always :: 不管镜像是否存在都会进行一次拉取
+- Never :: 不管镜像是否存在都不会进行拉取
+- IfNotPresent :: 只有镜像不存在时，才会进行镜像拉取
+
+*注意：*
+
+默认为 =IfNotPresent= ，但 :latest 标签的镜像默认为 =Always= 。
+
+拉取镜像时 docker 会进行校验，如果镜像中的 MD5 码没有变，则不会拉取镜像数据。
+
+生产环境中应该尽量避免使用 :latest 标签，而开发环境中可以借助 :latest 标签自动拉取最新的镜像。
+
+
+**** DNS 策略
+
+通过设置 =dnsPolicy= 参数，设置 Pod 中容器访问 DNS 的策略：
+
+- ClusterFirst :: 优先基于 cluster domain （如 default.svc.cluster.local） 后缀，通过 kube-dns 查询 (默认策略)
+- Default :: 优先从 Node 中配置的 DNS 查询
+
+
+**** Health Probe
+
+为了确保容器在部署后确实处在正常运行状态，Kubernetes 提供了两种探针（Probe）来探测容器的状态：
+
+- LivenessProbe :: 探测应用是否处于健康状态，如果不健康则删除并重新创建容器
+- ReadinessProbe :: 探测应用是否启动完成并且处于正常服务状态，如果不正常则不会接收来自 Kubernetes Service 的流量
+
+Kubernetes 支持三种方式来执行探针：
+
+- exec :: 在容器中执行一个命令，如果 命令退出码 返回 0 则表示探测成功，否则表示失败
+- tcpSocket :: 对指定的容器 IP 及端口执行一个 TCP 检查，如果端口是开放的则表示探测成功，否则表示失败
+- httpGet :: 对指定的容器 IP、端口及路径执行一个 HTTP Get 请求，如果返回的 状态码 在 [200,400) 之间则表示探测成功，否则表示失败
+
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    labels:
+      app: nginx
+    name: nginx
+  spec:
+      containers:
+      - image: nginx
+        imagePullPolicy: Always
+        name: http
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+            httpHeaders:
+            - name: X-Custom-Header
+              value: Awesome
+          initialDelaySeconds: 15
+          timeoutSeconds: 1
+        readinessProbe:
+          exec:
+            command:
+            - cat
+            - /usr/share/nginx/html/index.html
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+      - name: goproxy
+        image: gcr.io/google_containers/goproxy:0.1
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 20
+#+END_SRC
+
+
+**** 调度到指定 Node 上
+
+可以通过 =nodeSelector=, =nodeAffinity=, =podAffinity= 以及 =Taints= 和 =tolerations= 等来将 Pod 调度到需要的 Node 上。
+
+#+BEGIN_EXAMPLE yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: nginx
+    labels:
+      env: test
+  spec:
+    containers:
+    - name: nginx
+      image: nginx
+      imagePullPolicy: IfNotPresent
+    nodeSelector:
+      <label>: <value>
+#+END_EXAMPLE
+
+
+**** 常用命令
+
+***** 查看 Pod 状态
+
+=kubectl get pod <pod_name> -o jsonpath="{.status.phase}"=
+
+
+
+*** Deployment
+
+
+
+*** Replica Set
+
+ReplicaSet 跟 ReplicationController 没有本质的不同，只是名字不一样，
+并且 ReplicaSet 支持集合式的 selector（ReplicationController 仅支持等式）。
+
+Deployment 使用了 Replica Set ，是更高一层的概念。
+除非需要自定义升级功能或根本不需要升级 Pod ，一般情况下，推荐使用 Deployment 而不直接使用 Replica Set 。
+这样就无需担心跟其他机制的不兼容问题（比如 ReplicaSet 不支持 rolling-update 但 Deployment 支持），
+并且还支持版本记录、回滚、暂停升级等高级特性。
+
+
+**** YAML 定义
+
+=spec.template= 可以从 Pod 定义文件中复制过来：
+
+[[file:img/k8s_replica-set-tmpl.png]]
+
+
+**** 常用命令
+
+#+BEGIN_SRC sh
+kubectl replace -f rs-def.yml
+kubectl scale --replicas=6 -f rs-def.yml
+kubectl scale --replicas=6 replicaset <name>
+#+END_SRC
+
+
+* Utils
+
+** Bash completion
+
+#+BEGIN_SRC sh
+  source <(kubectl completion bash | sed s/kubectl/<your_alias>/g)
+#+END_SRC
+
+** Show all resources
+
+#+BEGIN_SRC sh
+  kubectl get
+#+END_SRC
