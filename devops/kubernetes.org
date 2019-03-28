@@ -17,6 +17,41 @@
 
 * Resources
 
+** Pod
+
+*** YAML Definition
+
+定义文件主要包含：
+
+1. API version
+2. Resource type
+3. Metadata \\
+   Includes the name, namespace, labels, and other information about the pod.
+4. Spec \\
+   Contains the actual description of the pod’s contents, such as the pod’s con- tainers, volumes, and other data.
+5. Status\\
+   Contains read-only runtime data that shows the state of the resource at a given moment.\\
+   *When creating a new pod, you never need to provide the status part.*
+
+
+[[file:img/k8s_pod_def.png]]
+
+
+*注意：*
+
+在 POD 定义文件中定义 ports 是可选的行为，端口始终可以被访问，主要是为了方便用户清楚的了解提供了哪些服务。
+
+
+
+
+
+*** Label
+
+A label is an arbitrary key-value pair you attach to a resource, \\
+which is then utilized when selecting resources using *label selectors* \\
+(resources are filtered based on whether they include the label specified in the selector).
+
+[[file:img/k8s_labels.png]]
 
 * Internals
 
@@ -400,8 +435,30 @@ kubectl scale --replicas=6 replicaset <name>
   source <(kubectl completion bash | sed s/kubectl/<your_alias>/g)
 #+END_SRC
 
+
 ** Show all resources
 
 #+BEGIN_SRC sh
   kubectl get
+#+END_SRC
+
+** Discover possible API object fields
+
+#+BEGIN_SRC sh
+  kubectl explain pods
+#+END_SRC
+
+You can then drill deeper to find out more about each attribute.
+
+#+BEGIN_SRC sh
+  kubectl explain pod.spec
+#+END_SRC
+
+
+** Forwarding a local network port to a port in the pod
+
+Using port forwarding like this is an effective way to test an individual pod.
+
+#+BEGIN_SRC sh
+  kubectl port-forward <pod-name> <local-port>:<pod-port>
 #+END_SRC
