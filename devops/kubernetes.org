@@ -53,6 +53,46 @@ which is then utilized when selecting resources using *label selectors* \\
 
 [[file:img/k8s_labels.png]]
 
+A label selector can select resources based on whether the resource:
+
+1. Contains (or doesn’t contain) a label with a certain key \\
+2. Contains a label with a certain key and value \\
+3. Contains a label with a certain key, but with a value not equal to the one you specify
+
+
+*** Annotation
+
+Annotations are also key-value pairs, so in essence, they’re similar to labels,
+but they aren’t meant to hold identifying information.
+
+They can’t be used to group objects the way labels can.
+While objects can be selected through label selectors, *there’s no such thing as an annotation selector.*
+
+Annotations can hold much larger pieces of information (up to 256 KB in total) and are primarily *meant to be used by tools.*
+
+#+BEGIN_EXAMPLE
+  Annotations are also commonly used when introducing new features to Kubernetes.
+  Usually, alpha and beta versions of new features don’t introduce any new fields to API objects.
+  Annotations are used instead of fields, and then once the required API changes have become clear and been agreed upon by the Kubernetes developers, new fields are introduced and the related annotations deprecated.
+
+  A great use of annotations is adding descriptions for each pod or other API object, so that everyone using the cluster can quickly look up information about each individual object.
+  For example, an annotation used to specify the name of the person who created the object can make collaboration between everyone working on the cluster much easier.
+#+END_EXAMPLE
+
+
+*** Deleting
+
+By deleting a pod, you’re instructing Kubernetes to terminate all the containers that are part of that pod.
+
+Kubernetes sends a *SIGTERM* signal to the process and waits a certain number of seconds (30 by default) for it to shut down gracefully.
+
+If it doesn’t shut down in time, the process is then killed through *SIGKILL*.
+To make sure your processes are always shut down gracefully, they need to handle the SIGTERM signal properly.
+
+** ReplicaSet
+
+
+
 * Internals
 
 ** Container Vs VM
@@ -454,6 +494,13 @@ You can then drill deeper to find out more about each attribute.
   kubectl explain pod.spec
 #+END_SRC
 
+** Quickly switch to a different namespace
+
+#+BEGIN_SRC sh
+  alias kcd='kubectl config set-context $(kubectl config current- context) --namespace '
+#+END_SRC
+
+You can then switch between namespaces using =kcd <some-namespace>=
 
 ** Forwarding a local network port to a port in the pod
 
