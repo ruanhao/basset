@@ -19,6 +19,7 @@
 
 ** Pod
 
+
 *** YAML Definition
 
 定义文件主要包含：
@@ -88,6 +89,38 @@ Kubernetes sends a *SIGTERM* signal to the process and waits a certain number of
 
 If it doesn’t shut down in time, the process is then killed through *SIGKILL*.
 To make sure your processes are always shut down gracefully, they need to handle the SIGTERM signal properly.
+
+
+*** Liveness probes
+
+As soon as a pod is scheduled to a node, the Kubelet on that node will run its containers and, from then on, *keep them running as long as the pod exists.*
+
+If the container’s main process crashes, *the Kubelet will restart the container.*
+
+Kubernetes can check if a *container* is still alive through =liveness probes=.
+
+You can specify a liveness probe for each container in the pod’s specification.
+Kubernetes will periodically execute the probe and restart the container if the probe fails.
+
+*Notes:*
+
+Kubernetes also supports readiness probes, which we’ll learn about in the next chapter.
+Be sure not to confuse the two. They’re used for two different things.
+
+[[file:img/k8s_pod_liveness.png]]
+
+#+BEGIN_EXAMPLE
+  Liveness:       http-get http://:8080/ delay=0s timeout=1s period=10s #success=1 #failure=3
+
+  The delay=0s part shows that the probing begins immediately after the container is started.
+  If you don’t set the initial delay, the prober will start probing the container as soon as it starts,
+  which usually leads to the probe failing, because the app isn’t ready to start receiving requests.
+
+  The timeout is set to only 1 second, so the container must return a response in 1 second or the probe is counted as failed.
+
+  The container is probed every 10 seconds (period=10s) and the container is restarted after the probe fails three consecutive times (#failure=3).
+#+END_EXAMPLE
+
 
 ** ReplicaSet
 
@@ -508,4 +541,16 @@ Using port forwarding like this is an effective way to test an individual pod.
 
 #+BEGIN_SRC sh
   kubectl port-forward <pod-name> <local-port>:<pod-port>
+#+END_SRC
+
+
+** Obtaining the application log of a crashed container
+
+You can print the application’s log with kubectl logs. If your container is restarted, the kubectl logs command will show the log of the current container.
+
+When you want to figure out why the previous container terminated, you’ll want to see those logs instead of the current container’s logs.
+This can be done by using the =--previous= option:
+
+#+BEGIN_SRC sh
+  kubectl logs <pod> --previous
 #+END_SRC

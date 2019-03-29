@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- 2019-03-28 Thu 18:03 -->
+<!-- 2019-03-29 Fri 13:24 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kubernetes</title>
@@ -234,70 +234,75 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org39ec4c8">1. Resources</a>
+<li><a href="#orgbd7f850">1. Resources</a>
 <ul>
-<li><a href="#orgb098381">1.1. Pod</a>
+<li><a href="#orga4b65bb">1.1. Pod</a>
 <ul>
-<li><a href="#orgc2ad426">1.1.1. YAML Definition</a></li>
-<li><a href="#orgca210c2">1.1.2. Label</a></li>
+<li><a href="#org261d754">1.1.1. YAML Definition</a></li>
+<li><a href="#orgaf246d7">1.1.2. Label</a></li>
+<li><a href="#orga3bf44c">1.1.3. Annotation</a></li>
+<li><a href="#org3df2609">1.1.4. Deleting</a></li>
+<li><a href="#orga83f3d3">1.1.5. Liveness probes</a></li>
+</ul>
+</li>
+<li><a href="#org061bace">1.2. ReplicaSet</a></li>
+</ul>
+</li>
+<li><a href="#orgb9c1c2c">2. Internals</a>
+<ul>
+<li><a href="#org3a220f3">2.1. Container Vs VM</a></li>
+<li><a href="#orge6165a7">2.2. K8S components</a></li>
+</ul>
+</li>
+<li><a href="#orgeae74a2">3. YAML</a>
+<ul>
+<li><a href="#org843a41d">3.1. Key Value Pair</a></li>
+<li><a href="#org37eaee9">3.2. Array / List</a></li>
+<li><a href="#org720fcd2">3.3. Dictionary / Map</a></li>
+</ul>
+</li>
+<li><a href="#org6a7fa36">4. 命令行</a></li>
+<li><a href="#org936183b">5. 核心原理</a>
+<ul>
+<li><a href="#org20e97c3">5.1. 资源对象</a>
+<ul>
+<li><a href="#orgc218f01">5.1.1. POD</a>
+<ul>
+<li><a href="#org433257f">5.1.1.1. 基本 YAML 定义</a></li>
+<li><a href="#org96f3104">5.1.1.2. 设计理念</a></li>
+<li><a href="#org5cd70a0">5.1.1.3. 生命周期</a></li>
+<li><a href="#orgb711b8d">5.1.1.4. 重启策略(restartPolicy)</a></li>
+<li><a href="#orgb8ce4c7">5.1.1.5. 使用 Volume</a></li>
+<li><a href="#orgf0e6e2a">5.1.1.6. 环境变量</a></li>
+<li><a href="#org70a1941">5.1.1.7. 镜像拉取策略(ImagePullPolicy)</a></li>
+<li><a href="#orgd3be12e">5.1.1.8. DNS 策略</a></li>
+<li><a href="#org1db9de5">5.1.1.9. Health Probe</a></li>
+<li><a href="#orga212608">5.1.1.10. 调度到指定 Node 上</a></li>
+<li><a href="#org15854bc">5.1.1.11. 常用命令</a>
+<ul>
+<li><a href="#org1f9bb6b">5.1.1.11.1. 查看 Pod 状态</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org3aaa950">2. Internals</a>
+<li><a href="#org233cded">5.1.2. Deployment</a></li>
+<li><a href="#org7bc820b">5.1.3. Replica Set</a>
 <ul>
-<li><a href="#orga8a7733">2.1. Container Vs VM</a></li>
-<li><a href="#org5eae484">2.2. K8S components</a></li>
-</ul>
-</li>
-<li><a href="#org07f47d8">3. YAML</a>
-<ul>
-<li><a href="#org14f1003">3.1. Key Value Pair</a></li>
-<li><a href="#org8e64a35">3.2. Array / List</a></li>
-<li><a href="#org5ddf9b8">3.3. Dictionary / Map</a></li>
-</ul>
-</li>
-<li><a href="#orgfe55263">4. 命令行</a></li>
-<li><a href="#orgb177ac9">5. 核心原理</a>
-<ul>
-<li><a href="#org108418a">5.1. 资源对象</a>
-<ul>
-<li><a href="#org6c5c4d4">5.1.1. POD</a>
-<ul>
-<li><a href="#org54bfd24">5.1.1.1. 基本 YAML 定义</a></li>
-<li><a href="#org999ff20">5.1.1.2. 设计理念</a></li>
-<li><a href="#org7f88447">5.1.1.3. 生命周期</a></li>
-<li><a href="#org3b39693">5.1.1.4. 重启策略(restartPolicy)</a></li>
-<li><a href="#org3b18daa">5.1.1.5. 使用 Volume</a></li>
-<li><a href="#orge222d39">5.1.1.6. 环境变量</a></li>
-<li><a href="#org36c8d5c">5.1.1.7. 镜像拉取策略(ImagePullPolicy)</a></li>
-<li><a href="#org2819193">5.1.1.8. DNS 策略</a></li>
-<li><a href="#orge3b483a">5.1.1.9. Health Probe</a></li>
-<li><a href="#org899aeea">5.1.1.10. 调度到指定 Node 上</a></li>
-<li><a href="#orga88c720">5.1.1.11. 常用命令</a>
-<ul>
-<li><a href="#org66c802b">5.1.1.11.1. 查看 Pod 状态</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#org797f07e">5.1.2. Deployment</a></li>
-<li><a href="#org2f1cf1a">5.1.3. Replica Set</a>
-<ul>
-<li><a href="#org08f9e01">5.1.3.1. YAML 定义</a></li>
-<li><a href="#orgb47089f">5.1.3.2. 常用命令</a></li>
+<li><a href="#org7dbba18">5.1.3.1. YAML 定义</a></li>
+<li><a href="#orgbddeaee">5.1.3.2. 常用命令</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org732045e">6. Utils</a>
+<li><a href="#orgf3be45e">6. Utils</a>
 <ul>
-<li><a href="#orgf0d9f5d">6.1. Bash completion</a></li>
-<li><a href="#orge2f9e3d">6.2. Show all resources</a></li>
-<li><a href="#orga650c8d">6.3. Discover possible API object fields</a></li>
-<li><a href="#orgccc0337">6.4. Forwarding a local network port to a port in the pod</a></li>
+<li><a href="#orgb996252">6.1. Bash completion</a></li>
+<li><a href="#org1bb5a7b">6.2. Show all resources</a></li>
+<li><a href="#org994d2d8">6.3. Discover possible API object fields</a></li>
+<li><a href="#org621f75b">6.4. Quickly switch to a different namespace</a></li>
+<li><a href="#org35a64ec">6.5. Forwarding a local network port to a port in the pod</a></li>
 </ul>
 </li>
 </ul>
@@ -320,7 +325,7 @@ for the JavaScript code in this tag.
 
 <tr>
 <td class="org-left">Date</td>
-<td class="org-left">2019-03-28 18:03:39</td>
+<td class="org-left">2019-03-29 13:24:30</td>
 </tr>
 </tbody>
 </table>
@@ -329,70 +334,75 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org39ec4c8">1. Resources</a>
+<li><a href="#orgbd7f850">1. Resources</a>
 <ul>
-<li><a href="#orgb098381">1.1. Pod</a>
+<li><a href="#orga4b65bb">1.1. Pod</a>
 <ul>
-<li><a href="#orgc2ad426">1.1.1. YAML Definition</a></li>
-<li><a href="#orgca210c2">1.1.2. Label</a></li>
+<li><a href="#org261d754">1.1.1. YAML Definition</a></li>
+<li><a href="#orgaf246d7">1.1.2. Label</a></li>
+<li><a href="#orga3bf44c">1.1.3. Annotation</a></li>
+<li><a href="#org3df2609">1.1.4. Deleting</a></li>
+<li><a href="#orga83f3d3">1.1.5. Liveness probes</a></li>
+</ul>
+</li>
+<li><a href="#org061bace">1.2. ReplicaSet</a></li>
+</ul>
+</li>
+<li><a href="#orgb9c1c2c">2. Internals</a>
+<ul>
+<li><a href="#org3a220f3">2.1. Container Vs VM</a></li>
+<li><a href="#orge6165a7">2.2. K8S components</a></li>
+</ul>
+</li>
+<li><a href="#orgeae74a2">3. YAML</a>
+<ul>
+<li><a href="#org843a41d">3.1. Key Value Pair</a></li>
+<li><a href="#org37eaee9">3.2. Array / List</a></li>
+<li><a href="#org720fcd2">3.3. Dictionary / Map</a></li>
+</ul>
+</li>
+<li><a href="#org6a7fa36">4. 命令行</a></li>
+<li><a href="#org936183b">5. 核心原理</a>
+<ul>
+<li><a href="#org20e97c3">5.1. 资源对象</a>
+<ul>
+<li><a href="#orgc218f01">5.1.1. POD</a>
+<ul>
+<li><a href="#org433257f">5.1.1.1. 基本 YAML 定义</a></li>
+<li><a href="#org96f3104">5.1.1.2. 设计理念</a></li>
+<li><a href="#org5cd70a0">5.1.1.3. 生命周期</a></li>
+<li><a href="#orgb711b8d">5.1.1.4. 重启策略(restartPolicy)</a></li>
+<li><a href="#orgb8ce4c7">5.1.1.5. 使用 Volume</a></li>
+<li><a href="#orgf0e6e2a">5.1.1.6. 环境变量</a></li>
+<li><a href="#org70a1941">5.1.1.7. 镜像拉取策略(ImagePullPolicy)</a></li>
+<li><a href="#orgd3be12e">5.1.1.8. DNS 策略</a></li>
+<li><a href="#org1db9de5">5.1.1.9. Health Probe</a></li>
+<li><a href="#orga212608">5.1.1.10. 调度到指定 Node 上</a></li>
+<li><a href="#org15854bc">5.1.1.11. 常用命令</a>
+<ul>
+<li><a href="#org1f9bb6b">5.1.1.11.1. 查看 Pod 状态</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org3aaa950">2. Internals</a>
+<li><a href="#org233cded">5.1.2. Deployment</a></li>
+<li><a href="#org7bc820b">5.1.3. Replica Set</a>
 <ul>
-<li><a href="#orga8a7733">2.1. Container Vs VM</a></li>
-<li><a href="#org5eae484">2.2. K8S components</a></li>
-</ul>
-</li>
-<li><a href="#org07f47d8">3. YAML</a>
-<ul>
-<li><a href="#org14f1003">3.1. Key Value Pair</a></li>
-<li><a href="#org8e64a35">3.2. Array / List</a></li>
-<li><a href="#org5ddf9b8">3.3. Dictionary / Map</a></li>
-</ul>
-</li>
-<li><a href="#orgfe55263">4. 命令行</a></li>
-<li><a href="#orgb177ac9">5. 核心原理</a>
-<ul>
-<li><a href="#org108418a">5.1. 资源对象</a>
-<ul>
-<li><a href="#org6c5c4d4">5.1.1. POD</a>
-<ul>
-<li><a href="#org54bfd24">5.1.1.1. 基本 YAML 定义</a></li>
-<li><a href="#org999ff20">5.1.1.2. 设计理念</a></li>
-<li><a href="#org7f88447">5.1.1.3. 生命周期</a></li>
-<li><a href="#org3b39693">5.1.1.4. 重启策略(restartPolicy)</a></li>
-<li><a href="#org3b18daa">5.1.1.5. 使用 Volume</a></li>
-<li><a href="#orge222d39">5.1.1.6. 环境变量</a></li>
-<li><a href="#org36c8d5c">5.1.1.7. 镜像拉取策略(ImagePullPolicy)</a></li>
-<li><a href="#org2819193">5.1.1.8. DNS 策略</a></li>
-<li><a href="#orge3b483a">5.1.1.9. Health Probe</a></li>
-<li><a href="#org899aeea">5.1.1.10. 调度到指定 Node 上</a></li>
-<li><a href="#orga88c720">5.1.1.11. 常用命令</a>
-<ul>
-<li><a href="#org66c802b">5.1.1.11.1. 查看 Pod 状态</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#org797f07e">5.1.2. Deployment</a></li>
-<li><a href="#org2f1cf1a">5.1.3. Replica Set</a>
-<ul>
-<li><a href="#org08f9e01">5.1.3.1. YAML 定义</a></li>
-<li><a href="#orgb47089f">5.1.3.2. 常用命令</a></li>
+<li><a href="#org7dbba18">5.1.3.1. YAML 定义</a></li>
+<li><a href="#orgbddeaee">5.1.3.2. 常用命令</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org732045e">6. Utils</a>
+<li><a href="#orgf3be45e">6. Utils</a>
 <ul>
-<li><a href="#orgf0d9f5d">6.1. Bash completion</a></li>
-<li><a href="#orge2f9e3d">6.2. Show all resources</a></li>
-<li><a href="#orga650c8d">6.3. Discover possible API object fields</a></li>
-<li><a href="#orgccc0337">6.4. Forwarding a local network port to a port in the pod</a></li>
+<li><a href="#orgb996252">6.1. Bash completion</a></li>
+<li><a href="#org1bb5a7b">6.2. Show all resources</a></li>
+<li><a href="#org994d2d8">6.3. Discover possible API object fields</a></li>
+<li><a href="#org621f75b">6.4. Quickly switch to a different namespace</a></li>
+<li><a href="#org35a64ec">6.5. Forwarding a local network port to a port in the pod</a></li>
 </ul>
 </li>
 </ul>
@@ -401,16 +411,16 @@ for the JavaScript code in this tag.
 
 
 
-<div id="outline-container-org39ec4c8" class="outline-2">
-<h2 id="org39ec4c8"><span class="section-number-2">1</span> Resources</h2>
+<div id="outline-container-orgbd7f850" class="outline-2">
+<h2 id="orgbd7f850"><span class="section-number-2">1</span> Resources</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgb098381" class="outline-3">
-<h3 id="orgb098381"><span class="section-number-3">1.1</span> Pod</h3>
+<div id="outline-container-orga4b65bb" class="outline-3">
+<h3 id="orga4b65bb"><span class="section-number-3">1.1</span> Pod</h3>
 <div class="outline-text-3" id="text-1-1">
 </div>
-<div id="outline-container-orgc2ad426" class="outline-4">
-<h4 id="orgc2ad426"><span class="section-number-4">1.1.1</span> YAML Definition</h4>
+<div id="outline-container-org261d754" class="outline-4">
+<h4 id="org261d754"><span class="section-number-4">1.1.1</span> YAML Definition</h4>
 <div class="outline-text-4" id="text-1-1-1">
 <p>
 定义文件主要包含：
@@ -450,25 +460,128 @@ Contains read-only runtime data that shows the state of the resource at a given 
 
 
 
-<div id="outline-container-orgca210c2" class="outline-4">
-<h4 id="orgca210c2"><span class="section-number-4">1.1.2</span> Label</h4>
+<div id="outline-container-orgaf246d7" class="outline-4">
+<h4 id="orgaf246d7"><span class="section-number-4">1.1.2</span> Label</h4>
 <div class="outline-text-4" id="text-1-1-2">
 <p>
 A label is an arbitrary key-value pair you attach to a resource, <br>
 which is then utilized when selecting resources using <b>label selectors</b> <br>
 (resources are filtered based on whether they include the label specified in the selector).
 </p>
+
+
+<div class="figure">
+<p><img src="img/k8s_labels.png" alt="k8s_labels.png">
+</p>
 </div>
+
+<p>
+A label selector can select resources based on whether the resource:
+</p>
+
+<ol class="org-ol">
+<li>Contains (or doesn’t contain) a label with a certain key <br></li>
+<li>Contains a label with a certain key and value <br></li>
+<li>Contains a label with a certain key, but with a value not equal to the one you specify</li>
+</ol>
+</div>
+</div>
+
+
+<div id="outline-container-orga3bf44c" class="outline-4">
+<h4 id="orga3bf44c"><span class="section-number-4">1.1.3</span> Annotation</h4>
+<div class="outline-text-4" id="text-1-1-3">
+<p>
+Annotations are also key-value pairs, so in essence, they’re similar to labels,
+but they aren’t meant to hold identifying information.
+</p>
+
+<p>
+They can’t be used to group objects the way labels can.
+While objects can be selected through label selectors, <b>there’s no such thing as an annotation selector.</b>
+</p>
+
+<p>
+Annotations can hold much larger pieces of information (up to 256 KB in total) and are primarily <b>meant to be used by tools.</b>
+</p>
+
+<pre class="example">
+Annotations are also commonly used when introducing new features to Kubernetes.
+Usually, alpha and beta versions of new features don’t introduce any new fields to API objects.
+Annotations are used instead of fields, and then once the required API changes have become clear and been agreed upon by the Kubernetes developers, new fields are introduced and the related annotations deprecated.
+
+A great use of annotations is adding descriptions for each pod or other API object, so that everyone using the cluster can quickly look up information about each individual object.
+For example, an annotation used to specify the name of the person who created the object can make collaboration between everyone working on the cluster much easier.
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org3df2609" class="outline-4">
+<h4 id="org3df2609"><span class="section-number-4">1.1.4</span> Deleting</h4>
+<div class="outline-text-4" id="text-1-1-4">
+<p>
+By deleting a pod, you’re instructing Kubernetes to terminate all the containers that are part of that pod.
+</p>
+
+<p>
+Kubernetes sends a <b>SIGTERM</b> signal to the process and waits a certain number of seconds (30 by default) for it to shut down gracefully.
+</p>
+
+<p>
+If it doesn’t shut down in time, the process is then killed through <b>SIGKILL</b>.
+To make sure your processes are always shut down gracefully, they need to handle the SIGTERM signal properly.
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-orga83f3d3" class="outline-4">
+<h4 id="orga83f3d3"><span class="section-number-4">1.1.5</span> Liveness probes</h4>
+<div class="outline-text-4" id="text-1-1-5">
+<p>
+As soon as a pod is scheduled to a node, the Kubelet on that node will run its containers and, from then on, <b>keep them running as long as the pod exists.</b>
+</p>
+
+<p>
+If the container’s main process crashes, <b>the Kubelet will restart the container.</b>
+</p>
+
+<p>
+Kubernetes can check if a <b>container</b> is still alive through <code>liveness probes</code>.
+</p>
+
+<p>
+You can specify a liveness probe for each container in the pod’s specification.
+Kubernetes will periodically execute the probe and restart the container if the probe fails.
+</p>
+
+<p>
+<b>Notes:</b>
+</p>
+
+<p>
+Kubernetes also supports readiness probes, which we’ll learn about in the next chapter.
+Be sure not to confuse the two. They’re used for two different things.
+</p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org3aaa950" class="outline-2">
-<h2 id="org3aaa950"><span class="section-number-2">2</span> Internals</h2>
+
+<div id="outline-container-org061bace" class="outline-3">
+<h3 id="org061bace"><span class="section-number-3">1.2</span> ReplicaSet</h3>
+</div>
+</div>
+
+
+
+<div id="outline-container-orgb9c1c2c" class="outline-2">
+<h2 id="orgb9c1c2c"><span class="section-number-2">2</span> Internals</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orga8a7733" class="outline-3">
-<h3 id="orga8a7733"><span class="section-number-3">2.1</span> Container Vs VM</h3>
+<div id="outline-container-org3a220f3" class="outline-3">
+<h3 id="org3a220f3"><span class="section-number-3">2.1</span> Container Vs VM</h3>
 <div class="outline-text-3" id="text-2-1">
 
 <div class="figure">
@@ -485,8 +598,8 @@ which is then utilized when selecting resources using <b>label selectors</b> <br
 </div>
 
 
-<div id="outline-container-org5eae484" class="outline-3">
-<h3 id="org5eae484"><span class="section-number-3">2.2</span> K8S components</h3>
+<div id="outline-container-orge6165a7" class="outline-3">
+<h3 id="orge6165a7"><span class="section-number-3">2.2</span> K8S components</h3>
 <div class="outline-text-3" id="text-2-2">
 
 <div class="figure">
@@ -509,16 +622,16 @@ which is then utilized when selecting resources using <b>label selectors</b> <br
 
 
 
-<div id="outline-container-org07f47d8" class="outline-2">
-<h2 id="org07f47d8"><span class="section-number-2">3</span> YAML</h2>
+<div id="outline-container-orgeae74a2" class="outline-2">
+<h2 id="orgeae74a2"><span class="section-number-2">3</span> YAML</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 <a href="https://plugins.jetbrains.com/plugin/9354-kubernetes-and-openshift-resource-support">IDEA Kubernetes YAML 插件</a>
 </p>
 </div>
 
-<div id="outline-container-org14f1003" class="outline-3">
-<h3 id="org14f1003"><span class="section-number-3">3.1</span> Key Value Pair</h3>
+<div id="outline-container-org843a41d" class="outline-3">
+<h3 id="org843a41d"><span class="section-number-3">3.1</span> Key Value Pair</h3>
 <div class="outline-text-3" id="text-3-1">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">fruit</span>: apple
@@ -531,8 +644,8 @@ which is then utilized when selecting resources using <b>label selectors</b> <br
 </div>
 
 
-<div id="outline-container-org8e64a35" class="outline-3">
-<h3 id="org8e64a35"><span class="section-number-3">3.2</span> Array / List</h3>
+<div id="outline-container-org37eaee9" class="outline-3">
+<h3 id="org37eaee9"><span class="section-number-3">3.2</span> Array / List</h3>
 <div class="outline-text-3" id="text-3-2">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">fruits</span>:
@@ -550,8 +663,8 @@ which is then utilized when selecting resources using <b>label selectors</b> <br
 </div>
 
 
-<div id="outline-container-org5ddf9b8" class="outline-3">
-<h3 id="org5ddf9b8"><span class="section-number-3">3.3</span> Dictionary / Map</h3>
+<div id="outline-container-org720fcd2" class="outline-3">
+<h3 id="org720fcd2"><span class="section-number-3">3.3</span> Dictionary / Map</h3>
 <div class="outline-text-3" id="text-3-3">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">banana</span>:
@@ -570,8 +683,8 @@ which is then utilized when selecting resources using <b>label selectors</b> <br
 </div>
 
 
-<div id="outline-container-orgfe55263" class="outline-2">
-<h2 id="orgfe55263"><span class="section-number-2">4</span> 命令行</h2>
+<div id="outline-container-org6a7fa36" class="outline-2">
+<h2 id="org6a7fa36"><span class="section-number-2">4</span> 命令行</h2>
 <div class="outline-text-2" id="text-4">
 <div class="org-src-container">
 <pre class="src src-sh">$ kubectl COMMAND RESOURCE OPTIONS
@@ -582,20 +695,20 @@ which is then utilized when selecting resources using <b>label selectors</b> <br
 
 
 
-<div id="outline-container-orgb177ac9" class="outline-2">
-<h2 id="orgb177ac9"><span class="section-number-2">5</span> 核心原理</h2>
+<div id="outline-container-org936183b" class="outline-2">
+<h2 id="org936183b"><span class="section-number-2">5</span> 核心原理</h2>
 <div class="outline-text-2" id="text-5">
 </div>
-<div id="outline-container-org108418a" class="outline-3">
-<h3 id="org108418a"><span class="section-number-3">5.1</span> 资源对象</h3>
+<div id="outline-container-org20e97c3" class="outline-3">
+<h3 id="org20e97c3"><span class="section-number-3">5.1</span> 资源对象</h3>
 <div class="outline-text-3" id="text-5-1">
 </div>
-<div id="outline-container-org6c5c4d4" class="outline-4">
-<h4 id="org6c5c4d4"><span class="section-number-4">5.1.1</span> POD</h4>
+<div id="outline-container-orgc218f01" class="outline-4">
+<h4 id="orgc218f01"><span class="section-number-4">5.1.1</span> POD</h4>
 <div class="outline-text-4" id="text-5-1-1">
 </div>
-<div id="outline-container-org54bfd24" class="outline-5">
-<h5 id="org54bfd24"><span class="section-number-5">5.1.1.1</span> 基本 YAML 定义</h5>
+<div id="outline-container-org433257f" class="outline-5">
+<h5 id="org433257f"><span class="section-number-5">5.1.1.1</span> 基本 YAML 定义</h5>
 <div class="outline-text-5" id="text-5-1-1-1">
 <p>
 <b>apiVersion, kind, metadata, spec 是必填项</b>
@@ -632,8 +745,8 @@ kubectl describe pod &lt;pod_name&gt;
 
 
 
-<div id="outline-container-org999ff20" class="outline-5">
-<h5 id="org999ff20"><span class="section-number-5">5.1.1.2</span> 设计理念</h5>
+<div id="outline-container-org96f3104" class="outline-5">
+<h5 id="org96f3104"><span class="section-number-5">5.1.1.2</span> 设计理念</h5>
 <div class="outline-text-5" id="text-5-1-1-2">
 <p>
 Pod 是在 K8s 集群中运行部署应用或服务的最小单元，它是可以支持多容器的。
@@ -677,8 +790,8 @@ Pod 是 K8s 集群中所有业务类型的基础，不同类型的业务就需�
 
 
 
-<div id="outline-container-org7f88447" class="outline-5">
-<h5 id="org7f88447"><span class="section-number-5">5.1.1.3</span> 生命周期</h5>
+<div id="outline-container-org5cd70a0" class="outline-5">
+<h5 id="org5cd70a0"><span class="section-number-5">5.1.1.3</span> 生命周期</h5>
 <div class="outline-text-5" id="text-5-1-1-3">
 <dl class="org-dl">
 <dt>Pending</dt><dd>Pod 已经在 apiserver 中创建，但还没有调度到 Node 上面</dd>
@@ -692,8 +805,8 @@ Pod 是 K8s 集群中所有业务类型的基础，不同类型的业务就需�
 
 
 
-<div id="outline-container-org3b39693" class="outline-5">
-<h5 id="org3b39693"><span class="section-number-5">5.1.1.4</span> 重启策略(restartPolicy)</h5>
+<div id="outline-container-orgb711b8d" class="outline-5">
+<h5 id="orgb711b8d"><span class="section-number-5">5.1.1.4</span> 重启策略(restartPolicy)</h5>
 <div class="outline-text-5" id="text-5-1-1-4">
 <p>
 PodSpec 中的 <code>restartPolicy</code> 可以用来设置是否对退出的 Pod 重启，可选项包括:
@@ -771,8 +884,8 @@ PodSpec 中的 <code>restartPolicy</code> 可以用来设置是否对退出的 P
 
 
 
-<div id="outline-container-org3b18daa" class="outline-5">
-<h5 id="org3b18daa"><span class="section-number-5">5.1.1.5</span> 使用 Volume</h5>
+<div id="outline-container-orgb8ce4c7" class="outline-5">
+<h5 id="orgb8ce4c7"><span class="section-number-5">5.1.1.5</span> 使用 Volume</h5>
 <div class="outline-text-5" id="text-5-1-1-5">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -797,8 +910,8 @@ PodSpec 中的 <code>restartPolicy</code> 可以用来设置是否对退出的 P
 
 
 
-<div id="outline-container-orge222d39" class="outline-5">
-<h5 id="orge222d39"><span class="section-number-5">5.1.1.6</span> 环境变量</h5>
+<div id="outline-container-orgf0e6e2a" class="outline-5">
+<h5 id="orgf0e6e2a"><span class="section-number-5">5.1.1.6</span> 环境变量</h5>
 <div class="outline-text-5" id="text-5-1-1-6">
 <p>
 Pod 的名字、命名空间、IP 以及容器的计算资源限制等可以通过 <a href="https://kubernetes.io/docs/tasks/inject-data-application/downward-api-volume-expose-pod-information/">Downward API</a> 的方式获取并存储到环境变量中。
@@ -808,8 +921,8 @@ Pod 的名字、命名空间、IP 以及容器的计算资源限制等可以通�
 
 
 
-<div id="outline-container-org36c8d5c" class="outline-5">
-<h5 id="org36c8d5c"><span class="section-number-5">5.1.1.7</span> 镜像拉取策略(ImagePullPolicy)</h5>
+<div id="outline-container-org70a1941" class="outline-5">
+<h5 id="org70a1941"><span class="section-number-5">5.1.1.7</span> 镜像拉取策略(ImagePullPolicy)</h5>
 <div class="outline-text-5" id="text-5-1-1-7">
 <p>
 支持三种 <code>ImagePullPolicy</code>:
@@ -840,8 +953,8 @@ Pod 的名字、命名空间、IP 以及容器的计算资源限制等可以通�
 </div>
 
 
-<div id="outline-container-org2819193" class="outline-5">
-<h5 id="org2819193"><span class="section-number-5">5.1.1.8</span> DNS 策略</h5>
+<div id="outline-container-orgd3be12e" class="outline-5">
+<h5 id="orgd3be12e"><span class="section-number-5">5.1.1.8</span> DNS 策略</h5>
 <div class="outline-text-5" id="text-5-1-1-8">
 <p>
 通过设置 <code>dnsPolicy</code> 参数，设置 Pod 中容器访问 DNS 的策略：
@@ -855,8 +968,8 @@ Pod 的名字、命名空间、IP 以及容器的计算资源限制等可以通�
 </div>
 
 
-<div id="outline-container-orge3b483a" class="outline-5">
-<h5 id="orge3b483a"><span class="section-number-5">5.1.1.9</span> Health Probe</h5>
+<div id="outline-container-org1db9de5" class="outline-5">
+<h5 id="org1db9de5"><span class="section-number-5">5.1.1.9</span> Health Probe</h5>
 <div class="outline-text-5" id="text-5-1-1-9">
 <p>
 为了确保容器在部署后确实处在正常运行状态，Kubernetes 提供了两种探针（Probe）来探测容器的状态：
@@ -926,8 +1039,8 @@ Kubernetes 支持三种方式来执行探针：
 </div>
 
 
-<div id="outline-container-org899aeea" class="outline-5">
-<h5 id="org899aeea"><span class="section-number-5">5.1.1.10</span> 调度到指定 Node 上</h5>
+<div id="outline-container-orga212608" class="outline-5">
+<h5 id="orga212608"><span class="section-number-5">5.1.1.10</span> 调度到指定 Node 上</h5>
 <div class="outline-text-5" id="text-5-1-1-10">
 <p>
 可以通过 <code>nodeSelector</code>, <code>nodeAffinity</code>, <code>podAffinity</code> 以及 <code>Taints</code> 和 <code>tolerations</code> 等来将 Pod 调度到需要的 Node 上。
@@ -952,12 +1065,12 @@ spec:
 </div>
 
 
-<div id="outline-container-orga88c720" class="outline-5">
-<h5 id="orga88c720"><span class="section-number-5">5.1.1.11</span> 常用命令</h5>
+<div id="outline-container-org15854bc" class="outline-5">
+<h5 id="org15854bc"><span class="section-number-5">5.1.1.11</span> 常用命令</h5>
 <div class="outline-text-5" id="text-5-1-1-11">
 </div>
-<div id="outline-container-org66c802b" class="outline-6">
-<h6 id="org66c802b"><span class="section-number-6">5.1.1.11.1</span> 查看 Pod 状态</h6>
+<div id="outline-container-org1f9bb6b" class="outline-6">
+<h6 id="org1f9bb6b"><span class="section-number-6">5.1.1.11.1</span> 查看 Pod 状态</h6>
 <div class="outline-text-6" id="text-5-1-1-11-1">
 <p>
 <code>kubectl get pod &lt;pod_name&gt; -o jsonpath</code>"{.status.phase}"=
@@ -969,14 +1082,14 @@ spec:
 
 
 
-<div id="outline-container-org797f07e" class="outline-4">
-<h4 id="org797f07e"><span class="section-number-4">5.1.2</span> Deployment</h4>
+<div id="outline-container-org233cded" class="outline-4">
+<h4 id="org233cded"><span class="section-number-4">5.1.2</span> Deployment</h4>
 </div>
 
 
 
-<div id="outline-container-org2f1cf1a" class="outline-4">
-<h4 id="org2f1cf1a"><span class="section-number-4">5.1.3</span> Replica Set</h4>
+<div id="outline-container-org7bc820b" class="outline-4">
+<h4 id="org7bc820b"><span class="section-number-4">5.1.3</span> Replica Set</h4>
 <div class="outline-text-4" id="text-5-1-3">
 <p>
 ReplicaSet 跟 ReplicationController 没有本质的不同，只是名字不一样，
@@ -992,8 +1105,8 @@ Deployment 使用了 Replica Set ，是更高一层的概念。
 </div>
 
 
-<div id="outline-container-org08f9e01" class="outline-5">
-<h5 id="org08f9e01"><span class="section-number-5">5.1.3.1</span> YAML 定义</h5>
+<div id="outline-container-org7dbba18" class="outline-5">
+<h5 id="org7dbba18"><span class="section-number-5">5.1.3.1</span> YAML 定义</h5>
 <div class="outline-text-5" id="text-5-1-3-1">
 <p>
 <code>spec.template</code> 可以从 Pod 定义文件中复制过来：
@@ -1008,8 +1121,8 @@ Deployment 使用了 Replica Set ，是更高一层的概念。
 </div>
 
 
-<div id="outline-container-orgb47089f" class="outline-5">
-<h5 id="orgb47089f"><span class="section-number-5">5.1.3.2</span> 常用命令</h5>
+<div id="outline-container-orgbddeaee" class="outline-5">
+<h5 id="orgbddeaee"><span class="section-number-5">5.1.3.2</span> 常用命令</h5>
 <div class="outline-text-5" id="text-5-1-3-2">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl replace -f rs-def.yml
@@ -1024,12 +1137,12 @@ kubectl scale --replicas=6 replicaset &lt;name&gt;
 </div>
 
 
-<div id="outline-container-org732045e" class="outline-2">
-<h2 id="org732045e"><span class="section-number-2">6</span> Utils</h2>
+<div id="outline-container-orgf3be45e" class="outline-2">
+<h2 id="orgf3be45e"><span class="section-number-2">6</span> Utils</h2>
 <div class="outline-text-2" id="text-6">
 </div>
-<div id="outline-container-orgf0d9f5d" class="outline-3">
-<h3 id="orgf0d9f5d"><span class="section-number-3">6.1</span> Bash completion</h3>
+<div id="outline-container-orgb996252" class="outline-3">
+<h3 id="orgb996252"><span class="section-number-3">6.1</span> Bash completion</h3>
 <div class="outline-text-3" id="text-6-1">
 <div class="org-src-container">
 <pre class="src src-sh"><span style="color: #5fafff; font-weight: bold;">source</span> &lt;<span style="color: #ff8c00; font-size: 150%;">(</span>kubectl completion bash | sed s/kubectl/&lt;your_alias&gt;/g<span style="color: #ff8c00; font-size: 150%;">)</span>
@@ -1039,8 +1152,8 @@ kubectl scale --replicas=6 replicaset &lt;name&gt;
 </div>
 
 
-<div id="outline-container-orge2f9e3d" class="outline-3">
-<h3 id="orge2f9e3d"><span class="section-number-3">6.2</span> Show all resources</h3>
+<div id="outline-container-org1bb5a7b" class="outline-3">
+<h3 id="org1bb5a7b"><span class="section-number-3">6.2</span> Show all resources</h3>
 <div class="outline-text-3" id="text-6-2">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl get
@@ -1049,8 +1162,8 @@ kubectl scale --replicas=6 replicaset &lt;name&gt;
 </div>
 </div>
 
-<div id="outline-container-orga650c8d" class="outline-3">
-<h3 id="orga650c8d"><span class="section-number-3">6.3</span> Discover possible API object fields</h3>
+<div id="outline-container-org994d2d8" class="outline-3">
+<h3 id="org994d2d8"><span class="section-number-3">6.3</span> Discover possible API object fields</h3>
 <div class="outline-text-3" id="text-6-3">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl explain pods
@@ -1068,10 +1181,23 @@ You can then drill deeper to find out more about each attribute.
 </div>
 </div>
 
-
-<div id="outline-container-orgccc0337" class="outline-3">
-<h3 id="orgccc0337"><span class="section-number-3">6.4</span> Forwarding a local network port to a port in the pod</h3>
+<div id="outline-container-org621f75b" class="outline-3">
+<h3 id="org621f75b"><span class="section-number-3">6.4</span> Quickly switch to a different namespace</h3>
 <div class="outline-text-3" id="text-6-4">
+<div class="org-src-container">
+<pre class="src src-sh"><span style="color: #5fafff; font-weight: bold;">alias</span> <span style="color: #5fafff;">kcd</span>=<span style="color: #87af5f;">'kubectl config set-context $(</span><span style="color: #fa8072;">kubectl</span><span style="color: #87af5f;"> config current- context) --namespace '</span>
+</pre>
+</div>
+
+<p>
+You can then switch between namespaces using <code>kcd &lt;some-namespace&gt;</code>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org35a64ec" class="outline-3">
+<h3 id="org35a64ec"><span class="section-number-3">6.5</span> Forwarding a local network port to a port in the pod</h3>
+<div class="outline-text-3" id="text-6-5">
 <p>
 Using port forwarding like this is an effective way to test an individual pod.
 </p>
