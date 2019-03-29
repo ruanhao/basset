@@ -169,7 +169,7 @@ To modify the old pods, you’d need to delete them and let the ReplicationContr
 [[file:img/k8s_rc_change_pod_tmpl.png]]
 
 
-*** Deleting a ReplicationController Without Deletint Pods
+*** Deleting a ReplicationController Without Deleting Pods
 
 When you delete a ReplicationController through kubectl delete, the pods are also deleted.\\
 But because pods created by a ReplicationController aren’t an integral part of the ReplicationController, and are only managed by it, \\
@@ -182,6 +182,31 @@ But because pods created by a ReplicationController aren’t an integral part of
 
 ** ReplicaSet
 
+You usually won’t create them directly, but instead have them created automatically *when you create the higher-level Deployment resource.*
+
+A ReplicaSet behaves exactly like a ReplicationController, but it has *more expressive pod selectors.*
+
+*** More Expressive Label Selectors
+
+[[file:img/k8s_rs_label_selector.png]]
+
+Each expression must contain _a key_, _an operator_, and possibly (depending on the operator) _a list of values_. \\
+Four valid operators:
+
++ In :: Label’s value must match one of the specified _values_.
++ NotIn :: Label’s value must not match any of the specified _values_.
++ Exists :: Pod must include a label with the specified key (the value isn’t important). When using this operator, you shouldn’t specify the _values_ field.
++ DoesNotExist :: Pod must not include a label with the specified key. The _values_ property must not be specified.
+
+** DaemonSet
+
+DaemonSet is used when you want *a pod to run on each and every node in the cluster* \\
+(and each node needs to run exactly *one instance of the pod*).
+
+[[file:img/k8s_ds.png]]
+
+To run a pod on all cluster nodes, you create a DaemonSet object, which is much like a ReplicationController or a ReplicaSet, \\
+except that pods created by a DaemonSet already have a target node specified and *skip the Kubernetes Scheduler.*
 
 
 * Internals
