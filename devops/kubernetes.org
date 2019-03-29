@@ -102,10 +102,10 @@ Kubernetes can check if a *container* is still alive through =liveness probes=.
 You can specify a liveness probe for each container in the pod’s specification.
 Kubernetes will periodically execute the probe and restart the container if the probe fails.
 
-*Notes:*
+#+BEGIN_EXAMPLE
+  Kubernetes also supports readiness probes. Be sure not to confuse the two. They’re used for two different things.
+#+END_EXAMPLE
 
-Kubernetes also supports readiness probes, which we’ll learn about in the next chapter.
-Be sure not to confuse the two. They’re used for two different things.
 
 [[file:img/k8s_pod_liveness.png]]
 
@@ -120,6 +120,64 @@ Be sure not to confuse the two. They’re used for two different things.
 
   The container is probed every 10 seconds (period=10s) and the container is restarted after the probe fails three consecutive times (#failure=3).
 #+END_EXAMPLE
+
+
+** ReplicationController
+
+A ReplicationController’s job is to make sure that an exact number of pods always *matches its label selector.* \\
+If it doesn’t, the ReplicationController takes the appropriate action to reconcile the actual with the desired number.
+
+[[file:img/k8s_rc_loop.png]]
+
+
+*** Three Parts Of A Replicationcontroller
+
+[[file:img/k8s_rc_3parts.png]]
+
+
+A ReplicationController’s replica count, the label selector, and even the pod template can all be modified at any time,
+*but only changes to the replica count affect existing pods.*
+
+
+*** Create
+
+[[file:img/k8s_rc_def.png]]
+
+The pod labels in the template must obviously match the label selector of the ReplicationController;
+otherwise the controller would create new pods indefinitely, because spinning up a new pod wouldn’t bring the actual replica count any closer to the desired number of replicas.
+
+To prevent such scenarios, the API server verifies the ReplicationController definition and will not accept it if it’s misconfigured.
+*Not specifying the selector at all is also an option.* In that case, it will be configured automatically from the labels in the pod template.
+
+
+#+BEGIN_EXAMPLE
+  Don’t specify a pod selector when defining a ReplicationController.
+  Let Kubernetes extract it from the pod template. This will keep your YAML shorter and simpler.
+#+END_EXAMPLE
+
+Although a pod isn’t tied to a ReplicationController, the pod does reference it in the =metadata.ownerReferences= field, \\
+which you can use to easily find which ReplicationController a pod belongs to.
+
+
+*** Change Pod Template
+
+A ReplicationController’s pod template can be modified at any time. \\
+Changing the pod template is like replacing a cookie cutter with another one. \\
+It will only affect the cookies you cut out afterward and will have no effect on the ones you’ve already cut. \\
+To modify the old pods, you’d need to delete them and let the ReplicationController replace them with new ones based on the new template.
+
+[[file:img/k8s_rc_change_pod_tmpl.png]]
+
+
+*** Deleting a ReplicationController Without Deletint Pods
+
+When you delete a ReplicationController through kubectl delete, the pods are also deleted.\\
+But because pods created by a ReplicationController aren’t an integral part of the ReplicationController, and are only managed by it, \\
+*you can delete only the ReplicationController and leave the pods running:*
+
+#+BEGIN_SRC sh
+  kubectl delete rc <rc-name> --cascade=false
+#+END_SRC
 
 
 ** ReplicaSet
@@ -192,13 +250,6 @@ file:img/k8s_container_vs_vm_cpu.png
     calories: 62
     fat: 0.3
     carbs: 16
-#+END_SRC
-
-
-* 命令行
-
-#+BEGIN_SRC sh
-$ kubectl COMMAND RESOURCE OPTIONS
 #+END_SRC
 
 
@@ -467,9 +518,6 @@ Kubernetes 支持三种方式来执行探针：
 
 =kubectl get pod <pod_name> -o jsonpath="{.status.phase}"=
 
-
-
-*** Deployment
 
 
 
