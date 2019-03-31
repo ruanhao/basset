@@ -242,6 +242,253 @@ A CronJob creates Job resources from the =jobTemplate= property configured in th
 The Job then creates the pods.
 
 
+** Service
+
+*** Overall
+
+Although the primary purpose of services is exposing groups of pods to other pods *in the cluster*, \\
+*Both* internal (by DNS or ENV) and external (by IP) clients usually connect to pods through services:
+
+[[file:img/k8s_svc_overall.png]]
+
+*Label selectors* determine which pods belong to the Service:
+
+[[file:img/k8s_svc_label.png]]
+
+
+*** Creation
+
+**** By =kubectl expose=
+
+
+**** By YAML
+
+[[file:img/k8s_svc_def.png]]
+
+***** Exposing Multiple Ports In The Same Service
+
+#+BEGIN_EXAMPLE
+  When creating a service with multiple ports, you must specify a name for each port.
+#+END_EXAMPLE
+
+#+BEGIN_SRC yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubia
+spec: ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  - name: https
+    port: 443
+    targetPort: 8443
+  selector:
+    app: kubia
+#+END_SRC
+
+
+***** Using Named Ports
+
+[[file:img/k8s_svc_named_ports_container.png]]
+
+You can then refer to those ports by name in the service spec:
+
+[[file:img/k8s_svc_named_ports_pod.png]]
+
+#+BEGIN_EXAMPLE
+  The biggest benefit of doing so is that it enables you to change port numbers later without having to change the service spec.
+#+END_EXAMPLE
+
+
+
+
+
+*** Session Affinity
+
+If you want all requests made by a certain client to be redirected to the *same* pod every time, \\
+you can set the service's _sessionAffinity_ property to =ClientIP= (instead of =None=, which is the default).
+
+This makes the service proxy redirect all requests originating *from the same client IP to the same pod.*
+
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Service
+  spec:
+    sessionAffinity: ClientIP
+  ...
+#+END_SRC
+
+
+
+
+
+*** Discovering Service
+
+**** Through ENV
+
+#+BEGIN_EXAMPLE
+  Dashes in the service name are converted to underscores and all letters are uppercased
+  when the service name is used as the prefix in the environment variable's name.
+#+END_EXAMPLE
+
+**** Through DNS
+
+#+BEGIN_EXAMPLE
+  kubia        .default  .svc.cluster.local
+  ------------
+  service name
+               ---------
+               namespace
+                         ------------------
+                         configurable cluster domain suffix
+#+END_EXAMPLE
+
+*You can omit the =svc.cluster.local= suffix and even the namespace, when pods are in the same namespace.* \\
+(This is because how =/etc/resolv.conf= is configured)
+
+
+#+BEGIN_EXAMPLE
+  Whether a pod uses the internal DNS server or not is configurable through the 'dnsPolicy' property in each pod's spec.
+#+END_EXAMPLE
+
+
+*** Endpoints
+
+Services don't link to pods directly, but *Endpoints*. \\
+An Endpoints resource (plural) is *a list of IP addresses and ports* exposing a service.
+
+[[file:img/k8s_svc_endpoints.png]]
+
+
+#+BEGIN_EXAMPLE
+  Although the pod selector is defined in the service spec, it's not used directly when redirecting incoming connections.
+  Instead, the selector is used to build a list of IPs and ports, which is then stored in the Endpoints resource.
+
+  If you create a service without a pod selector, Kubernetes won't even create the Endpoints resource
+  (after all, without a selector, it can't know which pods to include in the service).
+  It's up to you to create the Endpoints resource to specify the list of endpoints for the service.
+#+END_EXAMPLE
+
+**** Manually configuring service endpoints
+
+To create a service with manually managed endpoints, you need to create both a Service and an Endpoints resource.
+
+Define a service called external-service that will accept incoming connections on port 80 (didn't define a pod selector for the service):
+
+[[file:img/k8s_svc_manual_ep_svc.png]]
+
+
+The Endpoints object needs to *have the same name as the service* and contain the list of target IP addresses and ports for the service:
+
+[[file:img/k8s_svc_manual_ep_ep.png]]
+
+After both the Service and the Endpoints resource are posted to the server, \\
+the service is ready to be used like any regular service with a pod selector:
+
+[[file:img/k8s_svc_manual_ep_external.png]]
+
+If you later decide to migrate the external service to pods running inside Kubernetes, \\
+you can add a selector to the service, thereby making its Endpoints managed automatically.
+The same is also true in reverse by removing the selector from a Service, Kubernetes stops updating its Endpoints. \\
+This means a service IP address can remain constant while the actual implementation of the service is changed.
+
+
+
+
+
+**** Creating an alias for an external service
+
+[[file:img/k8s_svc_external_name.png]]
+
+After the service is created, pods can connect to the external service through the =external-service.default.svc.cluster.local= domain name.
+
+#+BEGIN_EXAMPLE
+  ExternalName services are implemented solely at the DNS level: a simple CNAME DNS record is created for the service.
+  Therefore, clients connecting to the service will connect to the external service directly, bypassing the service proxy completely.
+  For this reason, these types of services don't even get a cluster IP.
+#+END_EXAMPLE
+
+
+
+*** Exposing Services To External Clients
+
+A few ways to make a service accessible externally:
+
+1. Setting the service type to NodePort
+2. Setting the service type to LoadBalancer, an extension of the NodePort type
+3. Creating an Ingress resource
+
+**** NodePort
+
+[[file:img/k8s_svc_node_port_overall.png]]
+
+An incoming connection to one of those ports will be redirected to a randomly selected pod, \\
+which may or may not be the one running on the node the connection is being made to.
+
+#+BEGIN_EXAMPLE
+  If you only point your clients to the first node, when that node fails, your clients can't access the service anymore.
+  That's why it makes sense to put a load balancer in front of the nodes to make sure you're spreading requests across all healthy nodes and never sending them to a node that's offline at that moment.
+#+END_EXAMPLE
+
+***** YAML Definition
+
+[[file:img/k8s_svc_node_port_def.png]]
+
+#+BEGIN_EXAMPLE
+  Specifying the port isn't mandatory; Kubernetes will choose a random port if you omit it.
+#+END_EXAMPLE
+
+
+
+**** LoadBalancer
+
+Kubernetes clusters running on cloud providers usually support the automatic provision of a load balancer from the cloud infrastructure. \\
+The load balancer will have its own unique, publicly accessible IP address and will redirect all connections to your service. \\
+You can thus access your service through the load balancer's IP address.
+
+If Kubernetes is running in an environment that doesn't support LoadBalancer services, \\
+the load balancer will not be provisioned, but the service will still behave like a NodePort service. \\
+That's because *a LoadBalancer service is an extension of a NodePort service.* \\
+(LoadBalancer type service is still a NodePort service but with an additional infrastructure-provided load balancer)
+
+
+[[file:img/k8s_svc_lb_overall.png]]
+
+
+***** YAML Definition
+
+[[file:img/k8s_svc_lb_def.png]]
+
+
+*** External Traffic Issure
+
+When an external client connects to a service through the node port (this also includes cases when it goes through the load balancer first), \\
+the randomly chosen pod may or may not be running on the same node that received the connection. \\
+An additional network hop is required to reach the pod, but this may not always be desirable.
+
+You can prevent this additional hop by configuring the service to redirect external traffic only to pods running on the node that received the connection. \\
+This is done by setting the =externalTrafficPolicy= field in the service's spec section:
+
+#+BEGIN_SRC yaml
+  spec:
+    externalTrafficPolicy: Local
+    ...
+#+END_SRC
+
+f a service definition includes this setting and an external connection is opened through the service's node port, \\
+the service proxy will choose a locally running pod. If no local pods exist, the connection will *hang*. \\
+You therefore need to ensure the load balancer forwards connections only to nodes that *have at least one such pod*.
+
+**** Non-Preservation Of The Client's IP Issue
+
+Usually, when clients inside the cluster connect to a service, the pods backing the service *can obtain the client's IP address*. \\
+But when the connection is received through a node port, the packets' *source IP is changed*, because SNAT is performed on the packets.
+
+The _Local_ external traffic policy (externalTrafficPolicy: Local) described in the previous section affects the preservation of the client's IP, \\
+because there's no additional hop between the node receiving the connection and the node hosting the target pod (*SNAT isn't performed*).
+
 * Internals
 
 ** Container Vs VM
@@ -660,3 +907,11 @@ This can be done by using the =--previous= option:
 #+BEGIN_SRC sh
   kubectl logs <pod> --previous
 #+END_SRC
+
+** Get IPs of all nodes
+
+#+BEGIN_SRC sh
+  kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="ExternalIP")].address}'
+#+END_SRC
+
+To learn more about how to use JSONPath with kubectl, refer to the [To learn more about how to use JSONPath with kubectl, refer to the [[http://kubernetes.io/docs/user-guide/jsonpath][documentation]].
