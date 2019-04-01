@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- 2019-03-31 Sun 22:48 -->
+<!-- 2019-04-01 Mon 15:04 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kubernetes</title>
@@ -234,143 +234,150 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgcf1e65a">1. Resources</a>
+<li><a href="#org2c3c93d">1. Resources</a>
 <ul>
-<li><a href="#orgf88b3a8">1.1. Pod</a>
+<li><a href="#org501460a">1.1. Pod</a>
 <ul>
-<li><a href="#org2ea5fe8">1.1.1. YAML Definition</a></li>
-<li><a href="#org97920ab">1.1.2. Label</a></li>
-<li><a href="#org7462fb3">1.1.3. Annotation</a></li>
-<li><a href="#org6e006cc">1.1.4. Deleting</a></li>
-<li><a href="#org5e355c9">1.1.5. Liveness probes</a></li>
+<li><a href="#org8db4171">1.1.1. YAML Definition</a></li>
+<li><a href="#org736063e">1.1.2. Label</a></li>
+<li><a href="#org2b373ef">1.1.3. Annotation</a></li>
+<li><a href="#orgf50f431">1.1.4. Deleting</a></li>
+<li><a href="#orga634556">1.1.5. Liveness probes</a></li>
 </ul>
 </li>
-<li><a href="#org8716213">1.2. ReplicationController</a>
+<li><a href="#orga5ed204">1.2. ReplicationController</a>
 <ul>
-<li><a href="#org89f34ba">1.2.1. Three Parts Of A Replicationcontroller</a></li>
-<li><a href="#org59ca988">1.2.2. Create</a></li>
-<li><a href="#org68187da">1.2.3. Change Pod Template</a></li>
-<li><a href="#org2eee849">1.2.4. Deleting a ReplicationController Without Deleting Pods</a></li>
+<li><a href="#org79c518d">1.2.1. Three Parts Of A Replicationcontroller</a></li>
+<li><a href="#org446d58a">1.2.2. Create</a></li>
+<li><a href="#orgc8edd4c">1.2.3. Change Pod Template</a></li>
+<li><a href="#orgf1009b2">1.2.4. Deleting a ReplicationController Without Deleting Pods</a></li>
 </ul>
 </li>
-<li><a href="#orgd2419ab">1.3. ReplicaSet</a>
+<li><a href="#orgc31dbf3">1.3. ReplicaSet</a>
 <ul>
-<li><a href="#org475b8ed">1.3.1. More Expressive Label Selectors</a></li>
+<li><a href="#org7c3cd9c">1.3.1. More Expressive Label Selectors</a></li>
 </ul>
 </li>
-<li><a href="#org84e535d">1.4. DaemonSet</a></li>
-<li><a href="#org2872c0f">1.5. Job</a>
+<li><a href="#org979981b">1.4. DaemonSet</a></li>
+<li><a href="#org2f40308">1.5. Job</a>
 <ul>
-<li><a href="#org0da1308">1.5.1. Definition</a></li>
-<li><a href="#org6aca45e">1.5.2. Limiting the time allowed for a Job pod to complete</a></li>
+<li><a href="#org033a278">1.5.1. Definition</a></li>
+<li><a href="#org50e1b95">1.5.2. Limiting the time allowed for a Job pod to complete</a></li>
 </ul>
 </li>
-<li><a href="#org38efcea">1.6. CronJob</a></li>
-<li><a href="#orgb1a0d2d">1.7. Service</a>
+<li><a href="#org10314e5">1.6. CronJob</a></li>
+<li><a href="#orgcf153a7">1.7. Service</a>
 <ul>
-<li><a href="#org75bd517">1.7.1. Overall</a></li>
-<li><a href="#org097f11c">1.7.2. Creation</a>
+<li><a href="#orgf04bc11">1.7.1. Overall</a></li>
+<li><a href="#org8584135">1.7.2. Creation</a>
 <ul>
-<li><a href="#org3aebfb0">1.7.2.1. By <code>kubectl expose</code></a></li>
-<li><a href="#org4ad3c4a">1.7.2.2. By YAML</a>
+<li><a href="#org3fcac5c">1.7.2.1. By <code>kubectl expose</code></a></li>
+<li><a href="#org510ca40">1.7.2.2. By YAML</a>
 <ul>
-<li><a href="#orgac79be3">1.7.2.2.1. Exposing Multiple Ports In The Same Service</a></li>
-<li><a href="#orgff90fed">1.7.2.2.2. Using Named Ports</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#org618aeae">1.7.3. Session Affinity</a></li>
-<li><a href="#orge5d3976">1.7.4. Discovering Service</a>
-<ul>
-<li><a href="#org248b3c5">1.7.4.1. Through ENV</a></li>
-<li><a href="#org86b3721">1.7.4.2. Through DNS</a></li>
-</ul>
-</li>
-<li><a href="#org0569e9f">1.7.5. Endpoints</a>
-<ul>
-<li><a href="#orgb9c7290">1.7.5.1. Manually configuring service endpoints</a></li>
-<li><a href="#orgd516893">1.7.5.2. Creating an alias for an external service</a></li>
-</ul>
-</li>
-<li><a href="#org053a866">1.7.6. Exposing Services To External Clients</a>
-<ul>
-<li><a href="#org4c36a9c">1.7.6.1. NodePort</a>
-<ul>
-<li><a href="#org92788f8">1.7.6.1.1. YAML Definition</a></li>
-</ul>
-</li>
-<li><a href="#orgc0788f1">1.7.6.2. LoadBalancer</a>
-<ul>
-<li><a href="#org1948c3d">1.7.6.2.1. YAML Definition</a></li>
+<li><a href="#orgcd69957">1.7.2.2.1. Exposing Multiple Ports In The Same Service</a></li>
+<li><a href="#orgca7d36a">1.7.2.2.2. Using Named Ports</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org2240881">1.7.7. External Traffic Issure</a>
+<li><a href="#orgf9c8d29">1.7.3. Session Affinity</a></li>
+<li><a href="#orgc14e42a">1.7.4. Discovering Service</a>
 <ul>
-<li><a href="#org6b5be67">1.7.7.1. Non-Preservation Of The Client's IP Issue</a></li>
+<li><a href="#org2dac318">1.7.4.1. Through ENV</a></li>
+<li><a href="#org48b8276">1.7.4.2. Through DNS</a></li>
+</ul>
+</li>
+<li><a href="#org2fca82e">1.7.5. Endpoints</a>
+<ul>
+<li><a href="#org2ba3a1a">1.7.5.1. Manually configuring service endpoints</a></li>
+<li><a href="#org6774a22">1.7.5.2. Creating an alias for an external service</a></li>
+</ul>
+</li>
+<li><a href="#orgf752357">1.7.6. Exposing Services To External Clients</a>
+<ul>
+<li><a href="#orge9c676e">1.7.6.1. NodePort</a>
+<ul>
+<li><a href="#org203b300">1.7.6.1.1. YAML Definition</a></li>
+</ul>
+</li>
+<li><a href="#orgc87bc53">1.7.6.2. LoadBalancer</a>
+<ul>
+<li><a href="#org6764c99">1.7.6.2.1. YAML Definition</a></li>
+</ul>
+</li>
+<li><a href="#org41b84ef">1.7.6.3. Ingress</a>
+<ul>
+<li><a href="#org2fc8be7">1.7.6.3.1. YAML Definition</a></li>
 </ul>
 </li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a href="#orgd316b5f">2. Internals</a>
+<li><a href="#orgdca84b7">1.7.7. Readiness Probe</a></li>
+<li><a href="#org8fd3af5">1.7.8. Headless</a></li>
+<li><a href="#org9425967">1.7.9. External Traffic Issure</a>
 <ul>
-<li><a href="#org47fa765">2.1. Container Vs VM</a></li>
-<li><a href="#org3c7b089">2.2. K8S components</a></li>
-</ul>
-</li>
-<li><a href="#orge242eea">3. YAML</a>
-<ul>
-<li><a href="#orgfa5fb64">3.1. Key Value Pair</a></li>
-<li><a href="#org2bfe1d8">3.2. Array / List</a></li>
-<li><a href="#org015632f">3.3. Dictionary / Map</a></li>
-</ul>
-</li>
-<li><a href="#orge785589">4. 核心原理</a>
-<ul>
-<li><a href="#orgc2bbd9c">4.1. 资源对象</a>
-<ul>
-<li><a href="#orgefba2ef">4.1.1. POD</a>
-<ul>
-<li><a href="#org7156ac3">4.1.1.1. 基本 YAML 定义</a></li>
-<li><a href="#org0af0cf1">4.1.1.2. 设计理念</a></li>
-<li><a href="#org8732416">4.1.1.3. 生命周期</a></li>
-<li><a href="#org4aa0e9e">4.1.1.4. 重启策略(restartPolicy)</a></li>
-<li><a href="#org42d01e1">4.1.1.5. 使用 Volume</a></li>
-<li><a href="#org625947b">4.1.1.6. 环境变量</a></li>
-<li><a href="#org6ee3e72">4.1.1.7. 镜像拉取策略(ImagePullPolicy)</a></li>
-<li><a href="#org182760e">4.1.1.8. DNS 策略</a></li>
-<li><a href="#org8777ef8">4.1.1.9. Health Probe</a></li>
-<li><a href="#orgb2c4302">4.1.1.10. 调度到指定 Node 上</a></li>
-<li><a href="#org5909cae">4.1.1.11. 常用命令</a>
-<ul>
-<li><a href="#org6546322">4.1.1.11.1. 查看 Pod 状态</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#orgd6fd0e1">4.1.2. Replica Set</a>
-<ul>
-<li><a href="#org888a1fa">4.1.2.1. YAML 定义</a></li>
-<li><a href="#orgef7a6f6">4.1.2.2. 常用命令</a></li>
+<li><a href="#orgf8e1316">1.7.9.1. Non-Preservation Of The Client's IP Issue</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgaa8b4ff">5. Utils</a>
+<li><a href="#org214cc4c">2. Internals</a>
 <ul>
-<li><a href="#orgc07ae9c">5.1. Bash completion</a></li>
-<li><a href="#org5806f85">5.2. Show all resources</a></li>
-<li><a href="#orge160f1c">5.3. Discover possible API object fields</a></li>
-<li><a href="#org2076e22">5.4. Quickly switch to a different namespace</a></li>
-<li><a href="#org7a06dd5">5.5. Forwarding a local network port to a port in the pod</a></li>
-<li><a href="#orgaf151b3">5.6. Obtaining the application log of a crashed container</a></li>
-<li><a href="#orga3ced32">5.7. Get IPs of all nodes</a></li>
+<li><a href="#org1fcc5e5">2.1. Container Vs VM</a></li>
+<li><a href="#org3e174cf">2.2. K8S components</a></li>
+</ul>
+</li>
+<li><a href="#org1b0ba88">3. YAML</a>
+<ul>
+<li><a href="#org183b224">3.1. Key Value Pair</a></li>
+<li><a href="#orga85b5db">3.2. Array / List</a></li>
+<li><a href="#org3ad62d8">3.3. Dictionary / Map</a></li>
+</ul>
+</li>
+<li><a href="#org56bc088">4. 核心原理</a>
+<ul>
+<li><a href="#org664c959">4.1. 资源对象</a>
+<ul>
+<li><a href="#org9fd6a7a">4.1.1. POD</a>
+<ul>
+<li><a href="#org5973f3a">4.1.1.1. 基本 YAML 定义</a></li>
+<li><a href="#orge2a5f5e">4.1.1.2. 设计理念</a></li>
+<li><a href="#org75bfed2">4.1.1.3. 生命周期</a></li>
+<li><a href="#org8dde103">4.1.1.4. 重启策略(restartPolicy)</a></li>
+<li><a href="#org2f01009">4.1.1.5. 使用 Volume</a></li>
+<li><a href="#org2fddd8a">4.1.1.6. 环境变量</a></li>
+<li><a href="#org9310b38">4.1.1.7. 镜像拉取策略(ImagePullPolicy)</a></li>
+<li><a href="#org2c5509e">4.1.1.8. DNS 策略</a></li>
+<li><a href="#org5b41764">4.1.1.9. Health Probe</a></li>
+<li><a href="#orgd6195c0">4.1.1.10. 调度到指定 Node 上</a></li>
+<li><a href="#orgf311db5">4.1.1.11. 常用命令</a>
+<ul>
+<li><a href="#org01f5012">4.1.1.11.1. 查看 Pod 状态</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org02a8afa">4.1.2. Replica Set</a>
+<ul>
+<li><a href="#org48ac512">4.1.2.1. YAML 定义</a></li>
+<li><a href="#orgd3e3ecd">4.1.2.2. 常用命令</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org89b84a1">5. Utils</a>
+<ul>
+<li><a href="#org52c856b">5.1. Bash completion</a></li>
+<li><a href="#orga8590fc">5.2. Show all resources</a></li>
+<li><a href="#org42060c0">5.3. Discover possible API object fields</a></li>
+<li><a href="#org22c3d2a">5.4. Quickly switch to a different namespace</a></li>
+<li><a href="#org2d84f53">5.5. Forwarding a local network port to a port in the pod</a></li>
+<li><a href="#org50c5c02">5.6. Obtaining the application log of a crashed container</a></li>
+<li><a href="#org1d5eb2f">5.7. Get IPs of all nodes</a></li>
 </ul>
 </li>
 </ul>
@@ -393,7 +400,7 @@ for the JavaScript code in this tag.
 
 <tr>
 <td class="org-left">Date</td>
-<td class="org-left">2019-03-31 22:48:19</td>
+<td class="org-left">2019-04-01 15:04:25</td>
 </tr>
 </tbody>
 </table>
@@ -402,143 +409,150 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgcf1e65a">1. Resources</a>
+<li><a href="#org2c3c93d">1. Resources</a>
 <ul>
-<li><a href="#orgf88b3a8">1.1. Pod</a>
+<li><a href="#org501460a">1.1. Pod</a>
 <ul>
-<li><a href="#org2ea5fe8">1.1.1. YAML Definition</a></li>
-<li><a href="#org97920ab">1.1.2. Label</a></li>
-<li><a href="#org7462fb3">1.1.3. Annotation</a></li>
-<li><a href="#org6e006cc">1.1.4. Deleting</a></li>
-<li><a href="#org5e355c9">1.1.5. Liveness probes</a></li>
+<li><a href="#org8db4171">1.1.1. YAML Definition</a></li>
+<li><a href="#org736063e">1.1.2. Label</a></li>
+<li><a href="#org2b373ef">1.1.3. Annotation</a></li>
+<li><a href="#orgf50f431">1.1.4. Deleting</a></li>
+<li><a href="#orga634556">1.1.5. Liveness probes</a></li>
 </ul>
 </li>
-<li><a href="#org8716213">1.2. ReplicationController</a>
+<li><a href="#orga5ed204">1.2. ReplicationController</a>
 <ul>
-<li><a href="#org89f34ba">1.2.1. Three Parts Of A Replicationcontroller</a></li>
-<li><a href="#org59ca988">1.2.2. Create</a></li>
-<li><a href="#org68187da">1.2.3. Change Pod Template</a></li>
-<li><a href="#org2eee849">1.2.4. Deleting a ReplicationController Without Deleting Pods</a></li>
+<li><a href="#org79c518d">1.2.1. Three Parts Of A Replicationcontroller</a></li>
+<li><a href="#org446d58a">1.2.2. Create</a></li>
+<li><a href="#orgc8edd4c">1.2.3. Change Pod Template</a></li>
+<li><a href="#orgf1009b2">1.2.4. Deleting a ReplicationController Without Deleting Pods</a></li>
 </ul>
 </li>
-<li><a href="#orgd2419ab">1.3. ReplicaSet</a>
+<li><a href="#orgc31dbf3">1.3. ReplicaSet</a>
 <ul>
-<li><a href="#org475b8ed">1.3.1. More Expressive Label Selectors</a></li>
+<li><a href="#org7c3cd9c">1.3.1. More Expressive Label Selectors</a></li>
 </ul>
 </li>
-<li><a href="#org84e535d">1.4. DaemonSet</a></li>
-<li><a href="#org2872c0f">1.5. Job</a>
+<li><a href="#org979981b">1.4. DaemonSet</a></li>
+<li><a href="#org2f40308">1.5. Job</a>
 <ul>
-<li><a href="#org0da1308">1.5.1. Definition</a></li>
-<li><a href="#org6aca45e">1.5.2. Limiting the time allowed for a Job pod to complete</a></li>
+<li><a href="#org033a278">1.5.1. Definition</a></li>
+<li><a href="#org50e1b95">1.5.2. Limiting the time allowed for a Job pod to complete</a></li>
 </ul>
 </li>
-<li><a href="#org38efcea">1.6. CronJob</a></li>
-<li><a href="#orgb1a0d2d">1.7. Service</a>
+<li><a href="#org10314e5">1.6. CronJob</a></li>
+<li><a href="#orgcf153a7">1.7. Service</a>
 <ul>
-<li><a href="#org75bd517">1.7.1. Overall</a></li>
-<li><a href="#org097f11c">1.7.2. Creation</a>
+<li><a href="#orgf04bc11">1.7.1. Overall</a></li>
+<li><a href="#org8584135">1.7.2. Creation</a>
 <ul>
-<li><a href="#org3aebfb0">1.7.2.1. By <code>kubectl expose</code></a></li>
-<li><a href="#org4ad3c4a">1.7.2.2. By YAML</a>
+<li><a href="#org3fcac5c">1.7.2.1. By <code>kubectl expose</code></a></li>
+<li><a href="#org510ca40">1.7.2.2. By YAML</a>
 <ul>
-<li><a href="#orgac79be3">1.7.2.2.1. Exposing Multiple Ports In The Same Service</a></li>
-<li><a href="#orgff90fed">1.7.2.2.2. Using Named Ports</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#org618aeae">1.7.3. Session Affinity</a></li>
-<li><a href="#orge5d3976">1.7.4. Discovering Service</a>
-<ul>
-<li><a href="#org248b3c5">1.7.4.1. Through ENV</a></li>
-<li><a href="#org86b3721">1.7.4.2. Through DNS</a></li>
-</ul>
-</li>
-<li><a href="#org0569e9f">1.7.5. Endpoints</a>
-<ul>
-<li><a href="#orgb9c7290">1.7.5.1. Manually configuring service endpoints</a></li>
-<li><a href="#orgd516893">1.7.5.2. Creating an alias for an external service</a></li>
-</ul>
-</li>
-<li><a href="#org053a866">1.7.6. Exposing Services To External Clients</a>
-<ul>
-<li><a href="#org4c36a9c">1.7.6.1. NodePort</a>
-<ul>
-<li><a href="#org92788f8">1.7.6.1.1. YAML Definition</a></li>
-</ul>
-</li>
-<li><a href="#orgc0788f1">1.7.6.2. LoadBalancer</a>
-<ul>
-<li><a href="#org1948c3d">1.7.6.2.1. YAML Definition</a></li>
+<li><a href="#orgcd69957">1.7.2.2.1. Exposing Multiple Ports In The Same Service</a></li>
+<li><a href="#orgca7d36a">1.7.2.2.2. Using Named Ports</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org2240881">1.7.7. External Traffic Issure</a>
+<li><a href="#orgf9c8d29">1.7.3. Session Affinity</a></li>
+<li><a href="#orgc14e42a">1.7.4. Discovering Service</a>
 <ul>
-<li><a href="#org6b5be67">1.7.7.1. Non-Preservation Of The Client's IP Issue</a></li>
+<li><a href="#org2dac318">1.7.4.1. Through ENV</a></li>
+<li><a href="#org48b8276">1.7.4.2. Through DNS</a></li>
+</ul>
+</li>
+<li><a href="#org2fca82e">1.7.5. Endpoints</a>
+<ul>
+<li><a href="#org2ba3a1a">1.7.5.1. Manually configuring service endpoints</a></li>
+<li><a href="#org6774a22">1.7.5.2. Creating an alias for an external service</a></li>
+</ul>
+</li>
+<li><a href="#orgf752357">1.7.6. Exposing Services To External Clients</a>
+<ul>
+<li><a href="#orge9c676e">1.7.6.1. NodePort</a>
+<ul>
+<li><a href="#org203b300">1.7.6.1.1. YAML Definition</a></li>
+</ul>
+</li>
+<li><a href="#orgc87bc53">1.7.6.2. LoadBalancer</a>
+<ul>
+<li><a href="#org6764c99">1.7.6.2.1. YAML Definition</a></li>
+</ul>
+</li>
+<li><a href="#org41b84ef">1.7.6.3. Ingress</a>
+<ul>
+<li><a href="#org2fc8be7">1.7.6.3.1. YAML Definition</a></li>
 </ul>
 </li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a href="#orgd316b5f">2. Internals</a>
+<li><a href="#orgdca84b7">1.7.7. Readiness Probe</a></li>
+<li><a href="#org8fd3af5">1.7.8. Headless</a></li>
+<li><a href="#org9425967">1.7.9. External Traffic Issure</a>
 <ul>
-<li><a href="#org47fa765">2.1. Container Vs VM</a></li>
-<li><a href="#org3c7b089">2.2. K8S components</a></li>
-</ul>
-</li>
-<li><a href="#orge242eea">3. YAML</a>
-<ul>
-<li><a href="#orgfa5fb64">3.1. Key Value Pair</a></li>
-<li><a href="#org2bfe1d8">3.2. Array / List</a></li>
-<li><a href="#org015632f">3.3. Dictionary / Map</a></li>
-</ul>
-</li>
-<li><a href="#orge785589">4. 核心原理</a>
-<ul>
-<li><a href="#orgc2bbd9c">4.1. 资源对象</a>
-<ul>
-<li><a href="#orgefba2ef">4.1.1. POD</a>
-<ul>
-<li><a href="#org7156ac3">4.1.1.1. 基本 YAML 定义</a></li>
-<li><a href="#org0af0cf1">4.1.1.2. 设计理念</a></li>
-<li><a href="#org8732416">4.1.1.3. 生命周期</a></li>
-<li><a href="#org4aa0e9e">4.1.1.4. 重启策略(restartPolicy)</a></li>
-<li><a href="#org42d01e1">4.1.1.5. 使用 Volume</a></li>
-<li><a href="#org625947b">4.1.1.6. 环境变量</a></li>
-<li><a href="#org6ee3e72">4.1.1.7. 镜像拉取策略(ImagePullPolicy)</a></li>
-<li><a href="#org182760e">4.1.1.8. DNS 策略</a></li>
-<li><a href="#org8777ef8">4.1.1.9. Health Probe</a></li>
-<li><a href="#orgb2c4302">4.1.1.10. 调度到指定 Node 上</a></li>
-<li><a href="#org5909cae">4.1.1.11. 常用命令</a>
-<ul>
-<li><a href="#org6546322">4.1.1.11.1. 查看 Pod 状态</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#orgd6fd0e1">4.1.2. Replica Set</a>
-<ul>
-<li><a href="#org888a1fa">4.1.2.1. YAML 定义</a></li>
-<li><a href="#orgef7a6f6">4.1.2.2. 常用命令</a></li>
+<li><a href="#orgf8e1316">1.7.9.1. Non-Preservation Of The Client's IP Issue</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgaa8b4ff">5. Utils</a>
+<li><a href="#org214cc4c">2. Internals</a>
 <ul>
-<li><a href="#orgc07ae9c">5.1. Bash completion</a></li>
-<li><a href="#org5806f85">5.2. Show all resources</a></li>
-<li><a href="#orge160f1c">5.3. Discover possible API object fields</a></li>
-<li><a href="#org2076e22">5.4. Quickly switch to a different namespace</a></li>
-<li><a href="#org7a06dd5">5.5. Forwarding a local network port to a port in the pod</a></li>
-<li><a href="#orgaf151b3">5.6. Obtaining the application log of a crashed container</a></li>
-<li><a href="#orga3ced32">5.7. Get IPs of all nodes</a></li>
+<li><a href="#org1fcc5e5">2.1. Container Vs VM</a></li>
+<li><a href="#org3e174cf">2.2. K8S components</a></li>
+</ul>
+</li>
+<li><a href="#org1b0ba88">3. YAML</a>
+<ul>
+<li><a href="#org183b224">3.1. Key Value Pair</a></li>
+<li><a href="#orga85b5db">3.2. Array / List</a></li>
+<li><a href="#org3ad62d8">3.3. Dictionary / Map</a></li>
+</ul>
+</li>
+<li><a href="#org56bc088">4. 核心原理</a>
+<ul>
+<li><a href="#org664c959">4.1. 资源对象</a>
+<ul>
+<li><a href="#org9fd6a7a">4.1.1. POD</a>
+<ul>
+<li><a href="#org5973f3a">4.1.1.1. 基本 YAML 定义</a></li>
+<li><a href="#orge2a5f5e">4.1.1.2. 设计理念</a></li>
+<li><a href="#org75bfed2">4.1.1.3. 生命周期</a></li>
+<li><a href="#org8dde103">4.1.1.4. 重启策略(restartPolicy)</a></li>
+<li><a href="#org2f01009">4.1.1.5. 使用 Volume</a></li>
+<li><a href="#org2fddd8a">4.1.1.6. 环境变量</a></li>
+<li><a href="#org9310b38">4.1.1.7. 镜像拉取策略(ImagePullPolicy)</a></li>
+<li><a href="#org2c5509e">4.1.1.8. DNS 策略</a></li>
+<li><a href="#org5b41764">4.1.1.9. Health Probe</a></li>
+<li><a href="#orgd6195c0">4.1.1.10. 调度到指定 Node 上</a></li>
+<li><a href="#orgf311db5">4.1.1.11. 常用命令</a>
+<ul>
+<li><a href="#org01f5012">4.1.1.11.1. 查看 Pod 状态</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org02a8afa">4.1.2. Replica Set</a>
+<ul>
+<li><a href="#org48ac512">4.1.2.1. YAML 定义</a></li>
+<li><a href="#orgd3e3ecd">4.1.2.2. 常用命令</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org89b84a1">5. Utils</a>
+<ul>
+<li><a href="#org52c856b">5.1. Bash completion</a></li>
+<li><a href="#orga8590fc">5.2. Show all resources</a></li>
+<li><a href="#org42060c0">5.3. Discover possible API object fields</a></li>
+<li><a href="#org22c3d2a">5.4. Quickly switch to a different namespace</a></li>
+<li><a href="#org2d84f53">5.5. Forwarding a local network port to a port in the pod</a></li>
+<li><a href="#org50c5c02">5.6. Obtaining the application log of a crashed container</a></li>
+<li><a href="#org1d5eb2f">5.7. Get IPs of all nodes</a></li>
 </ul>
 </li>
 </ul>
@@ -547,16 +561,16 @@ for the JavaScript code in this tag.
 
 
 
-<div id="outline-container-orgcf1e65a" class="outline-2">
-<h2 id="orgcf1e65a"><span class="section-number-2">1</span> Resources</h2>
+<div id="outline-container-org2c3c93d" class="outline-2">
+<h2 id="org2c3c93d"><span class="section-number-2">1</span> Resources</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgf88b3a8" class="outline-3">
-<h3 id="orgf88b3a8"><span class="section-number-3">1.1</span> Pod</h3>
+<div id="outline-container-org501460a" class="outline-3">
+<h3 id="org501460a"><span class="section-number-3">1.1</span> Pod</h3>
 <div class="outline-text-3" id="text-1-1">
 </div>
-<div id="outline-container-org2ea5fe8" class="outline-4">
-<h4 id="org2ea5fe8"><span class="section-number-4">1.1.1</span> YAML Definition</h4>
+<div id="outline-container-org8db4171" class="outline-4">
+<h4 id="org8db4171"><span class="section-number-4">1.1.1</span> YAML Definition</h4>
 <div class="outline-text-4" id="text-1-1-1">
 <p>
 定义文件主要包含：
@@ -590,8 +604,8 @@ Contains read-only runtime data that shows the state of the resource at a given 
 
 
 
-<div id="outline-container-org97920ab" class="outline-4">
-<h4 id="org97920ab"><span class="section-number-4">1.1.2</span> Label</h4>
+<div id="outline-container-org736063e" class="outline-4">
+<h4 id="org736063e"><span class="section-number-4">1.1.2</span> Label</h4>
 <div class="outline-text-4" id="text-1-1-2">
 <p>
 A label is an arbitrary key-value pair you attach to a resource, <br>
@@ -618,8 +632,8 @@ A label selector can select resources based on whether the resource:
 </div>
 
 
-<div id="outline-container-org7462fb3" class="outline-4">
-<h4 id="org7462fb3"><span class="section-number-4">1.1.3</span> Annotation</h4>
+<div id="outline-container-org2b373ef" class="outline-4">
+<h4 id="org2b373ef"><span class="section-number-4">1.1.3</span> Annotation</h4>
 <div class="outline-text-4" id="text-1-1-3">
 <p>
 Annotations are also key-value pairs, so in essence, they’re similar to labels,
@@ -647,8 +661,8 @@ For example, an annotation used to specify the name of the person who created th
 </div>
 
 
-<div id="outline-container-org6e006cc" class="outline-4">
-<h4 id="org6e006cc"><span class="section-number-4">1.1.4</span> Deleting</h4>
+<div id="outline-container-orgf50f431" class="outline-4">
+<h4 id="orgf50f431"><span class="section-number-4">1.1.4</span> Deleting</h4>
 <div class="outline-text-4" id="text-1-1-4">
 <p>
 By deleting a pod, you’re instructing Kubernetes to terminate all the containers that are part of that pod.
@@ -666,8 +680,8 @@ To make sure your processes are always shut down gracefully, they need to handle
 </div>
 
 
-<div id="outline-container-org5e355c9" class="outline-4">
-<h4 id="org5e355c9"><span class="section-number-4">1.1.5</span> Liveness probes</h4>
+<div id="outline-container-orga634556" class="outline-4">
+<h4 id="orga634556"><span class="section-number-4">1.1.5</span> Liveness probes</h4>
 <div class="outline-text-4" id="text-1-1-5">
 <p>
 As soon as a pod is scheduled to a node, the Kubelet on that node will run its containers and, from then on, <b>keep them running as long as the pod exists.</b>
@@ -713,8 +727,8 @@ The container is probed every 10 seconds (period=10s) and the container is resta
 </div>
 
 
-<div id="outline-container-org8716213" class="outline-3">
-<h3 id="org8716213"><span class="section-number-3">1.2</span> ReplicationController</h3>
+<div id="outline-container-orga5ed204" class="outline-3">
+<h3 id="orga5ed204"><span class="section-number-3">1.2</span> ReplicationController</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 A ReplicationController’s job is to make sure that an exact number of pods always <b>matches its label selector.</b> <br>
@@ -729,8 +743,8 @@ If it doesn’t, the ReplicationController takes the appropriate action to recon
 </div>
 
 
-<div id="outline-container-org89f34ba" class="outline-4">
-<h4 id="org89f34ba"><span class="section-number-4">1.2.1</span> Three Parts Of A Replicationcontroller</h4>
+<div id="outline-container-org79c518d" class="outline-4">
+<h4 id="org79c518d"><span class="section-number-4">1.2.1</span> Three Parts Of A Replicationcontroller</h4>
 <div class="outline-text-4" id="text-1-2-1">
 
 <div class="figure">
@@ -747,8 +761,8 @@ A ReplicationController’s replica count, the label selector, and even the pod 
 </div>
 
 
-<div id="outline-container-org59ca988" class="outline-4">
-<h4 id="org59ca988"><span class="section-number-4">1.2.2</span> Create</h4>
+<div id="outline-container-org446d58a" class="outline-4">
+<h4 id="org446d58a"><span class="section-number-4">1.2.2</span> Create</h4>
 <div class="outline-text-4" id="text-1-2-2">
 
 <div class="figure">
@@ -780,8 +794,8 @@ which you can use to easily find which ReplicationController a pod belongs to.
 </div>
 
 
-<div id="outline-container-org68187da" class="outline-4">
-<h4 id="org68187da"><span class="section-number-4">1.2.3</span> Change Pod Template</h4>
+<div id="outline-container-orgc8edd4c" class="outline-4">
+<h4 id="orgc8edd4c"><span class="section-number-4">1.2.3</span> Change Pod Template</h4>
 <div class="outline-text-4" id="text-1-2-3">
 <p>
 A ReplicationController’s pod template can be modified at any time. <br>
@@ -799,8 +813,8 @@ To modify the old pods, you’d need to delete them and let the ReplicationContr
 </div>
 
 
-<div id="outline-container-org2eee849" class="outline-4">
-<h4 id="org2eee849"><span class="section-number-4">1.2.4</span> Deleting a ReplicationController Without Deleting Pods</h4>
+<div id="outline-container-orgf1009b2" class="outline-4">
+<h4 id="orgf1009b2"><span class="section-number-4">1.2.4</span> Deleting a ReplicationController Without Deleting Pods</h4>
 <div class="outline-text-4" id="text-1-2-4">
 <p>
 When you delete a ReplicationController through kubectl delete, the pods are also deleted.<br>
@@ -817,8 +831,8 @@ But because pods created by a ReplicationController aren’t an integral part of
 </div>
 
 
-<div id="outline-container-orgd2419ab" class="outline-3">
-<h3 id="orgd2419ab"><span class="section-number-3">1.3</span> ReplicaSet</h3>
+<div id="outline-container-orgc31dbf3" class="outline-3">
+<h3 id="orgc31dbf3"><span class="section-number-3">1.3</span> ReplicaSet</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 You usually won’t create them directly, but instead have them created automatically <b>when you create the higher-level Deployment resource.</b>
@@ -829,8 +843,8 @@ A ReplicaSet behaves exactly like a ReplicationController, but it has <b>more ex
 </p>
 </div>
 
-<div id="outline-container-org475b8ed" class="outline-4">
-<h4 id="org475b8ed"><span class="section-number-4">1.3.1</span> More Expressive Label Selectors</h4>
+<div id="outline-container-org7c3cd9c" class="outline-4">
+<h4 id="org7c3cd9c"><span class="section-number-4">1.3.1</span> More Expressive Label Selectors</h4>
 <div class="outline-text-4" id="text-1-3-1">
 
 <div class="figure">
@@ -854,8 +868,8 @@ Four valid operators:
 </div>
 
 
-<div id="outline-container-org84e535d" class="outline-3">
-<h3 id="org84e535d"><span class="section-number-3">1.4</span> DaemonSet</h3>
+<div id="outline-container-org979981b" class="outline-3">
+<h3 id="org979981b"><span class="section-number-3">1.4</span> DaemonSet</h3>
 <div class="outline-text-3" id="text-1-4">
 <p>
 DaemonSet is used when you want <b>a pod to run on each and every node in the cluster</b> <br>
@@ -876,8 +890,8 @@ except that pods created by a DaemonSet already have a target node specified and
 </div>
 
 
-<div id="outline-container-org2872c0f" class="outline-3">
-<h3 id="org2872c0f"><span class="section-number-3">1.5</span> Job</h3>
+<div id="outline-container-org2f40308" class="outline-3">
+<h3 id="org2f40308"><span class="section-number-3">1.5</span> Job</h3>
 <div class="outline-text-3" id="text-1-5">
 <p>
 <b>In the event of a node failure</b>, the pods on that node that are managed by a Job will be rescheduled to other nodes the way ReplicaSet pods are. <br>
@@ -887,8 +901,8 @@ the Job can be configured to either restart the container or not.
 </div>
 
 
-<div id="outline-container-org0da1308" class="outline-4">
-<h4 id="org0da1308"><span class="section-number-4">1.5.1</span> Definition</h4>
+<div id="outline-container-org033a278" class="outline-4">
+<h4 id="org033a278"><span class="section-number-4">1.5.1</span> Definition</h4>
 <div class="outline-text-4" id="text-1-5-1">
 
 <div class="figure">
@@ -905,8 +919,8 @@ Need to explicitly set the restart policy to either <code>OnFailure</code> or <c
 </div>
 
 
-<div id="outline-container-org6aca45e" class="outline-4">
-<h4 id="org6aca45e"><span class="section-number-4">1.5.2</span> Limiting the time allowed for a Job pod to complete</h4>
+<div id="outline-container-org50e1b95" class="outline-4">
+<h4 id="org50e1b95"><span class="section-number-4">1.5.2</span> Limiting the time allowed for a Job pod to complete</h4>
 <div class="outline-text-4" id="text-1-5-2">
 <p>
 A pod's time can be limited by setting the <code>activeDeadlineSeconds</code> property in the pod spec. <br>
@@ -923,8 +937,8 @@ If you don't explicitly specify it, it defaults to 6.
 
 
 
-<div id="outline-container-org38efcea" class="outline-3">
-<h3 id="org38efcea"><span class="section-number-3">1.6</span> CronJob</h3>
+<div id="outline-container-org10314e5" class="outline-3">
+<h3 id="org10314e5"><span class="section-number-3">1.6</span> CronJob</h3>
 <div class="outline-text-3" id="text-1-6">
 <p>
 A CronJob creates Job resources from the <code>jobTemplate</code> property configured in the CronJob spec. <br>
@@ -934,12 +948,12 @@ The Job then creates the pods.
 </div>
 
 
-<div id="outline-container-orgb1a0d2d" class="outline-3">
-<h3 id="orgb1a0d2d"><span class="section-number-3">1.7</span> Service</h3>
+<div id="outline-container-orgcf153a7" class="outline-3">
+<h3 id="orgcf153a7"><span class="section-number-3">1.7</span> Service</h3>
 <div class="outline-text-3" id="text-1-7">
 </div>
-<div id="outline-container-org75bd517" class="outline-4">
-<h4 id="org75bd517"><span class="section-number-4">1.7.1</span> Overall</h4>
+<div id="outline-container-orgf04bc11" class="outline-4">
+<h4 id="orgf04bc11"><span class="section-number-4">1.7.1</span> Overall</h4>
 <div class="outline-text-4" id="text-1-7-1">
 <p>
 Although the primary purpose of services is exposing groups of pods to other pods <b>in the cluster</b>, <br>
@@ -965,17 +979,17 @@ Although the primary purpose of services is exposing groups of pods to other pod
 </div>
 
 
-<div id="outline-container-org097f11c" class="outline-4">
-<h4 id="org097f11c"><span class="section-number-4">1.7.2</span> Creation</h4>
+<div id="outline-container-org8584135" class="outline-4">
+<h4 id="org8584135"><span class="section-number-4">1.7.2</span> Creation</h4>
 <div class="outline-text-4" id="text-1-7-2">
 </div>
-<div id="outline-container-org3aebfb0" class="outline-5">
-<h5 id="org3aebfb0"><span class="section-number-5">1.7.2.1</span> By <code>kubectl expose</code></h5>
+<div id="outline-container-org3fcac5c" class="outline-5">
+<h5 id="org3fcac5c"><span class="section-number-5">1.7.2.1</span> By <code>kubectl expose</code></h5>
 </div>
 
 
-<div id="outline-container-org4ad3c4a" class="outline-5">
-<h5 id="org4ad3c4a"><span class="section-number-5">1.7.2.2</span> By YAML</h5>
+<div id="outline-container-org510ca40" class="outline-5">
+<h5 id="org510ca40"><span class="section-number-5">1.7.2.2</span> By YAML</h5>
 <div class="outline-text-5" id="text-1-7-2-2">
 
 <div class="figure">
@@ -984,35 +998,35 @@ Although the primary purpose of services is exposing groups of pods to other pod
 </div>
 </div>
 
-<div id="outline-container-orgac79be3" class="outline-6">
-<h6 id="orgac79be3"><span class="section-number-6">1.7.2.2.1</span> Exposing Multiple Ports In The Same Service</h6>
+<div id="outline-container-orgcd69957" class="outline-6">
+<h6 id="orgcd69957"><span class="section-number-6">1.7.2.2.1</span> Exposing Multiple Ports In The Same Service</h6>
 <div class="outline-text-6" id="text-1-7-2-2-1">
 <pre class="example">
 When creating a service with multiple ports, you must specify a name for each port.
 </pre>
 
 <div class="org-src-container">
-<pre class="src src-yaml">apiVersion: v1
-kind: Service
-metadata:
-  name: kubia
-spec: ports:
-  - name: http
-    port: 80
-    targetPort: 8080
-  - name: https
-    port: 443
-    targetPort: 8443
-  selector:
-    app: kubia
+<pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
+<span style="color: #5fafff;">kind</span>: Service
+<span style="color: #5fafff;">metadata</span>:
+  <span style="color: #5fafff;">name</span>: kubia
+<span style="color: #5fafff;">spec</span>: ports:
+  - <span style="color: #5fafff;">name</span>: http
+    <span style="color: #5fafff;">port</span>: 80
+    <span style="color: #5fafff;">targetPort</span>: 8080
+  - <span style="color: #5fafff;">name</span>: https
+    <span style="color: #5fafff;">port</span>: 443
+    <span style="color: #5fafff;">targetPort</span>: 8443
+  <span style="color: #5fafff;">selector</span>:
+    <span style="color: #5fafff;">app</span>: kubia
 </pre>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-orgff90fed" class="outline-6">
-<h6 id="orgff90fed"><span class="section-number-6">1.7.2.2.2</span> Using Named Ports</h6>
+<div id="outline-container-orgca7d36a" class="outline-6">
+<h6 id="orgca7d36a"><span class="section-number-6">1.7.2.2.2</span> Using Named Ports</h6>
 <div class="outline-text-6" id="text-1-7-2-2-2">
 
 <div class="figure">
@@ -1042,8 +1056,8 @@ The biggest benefit of doing so is that it enables you to change port numbers la
 
 
 
-<div id="outline-container-org618aeae" class="outline-4">
-<h4 id="org618aeae"><span class="section-number-4">1.7.3</span> Session Affinity</h4>
+<div id="outline-container-orgf9c8d29" class="outline-4">
+<h4 id="orgf9c8d29"><span class="section-number-4">1.7.3</span> Session Affinity</h4>
 <div class="outline-text-4" id="text-1-7-3">
 <p>
 If you want all requests made by a certain client to be redirected to the <b>same</b> pod every time, <br>
@@ -1056,11 +1070,11 @@ This makes the service proxy redirect all requests originating <b>from the same 
 
 
 <div class="org-src-container">
-<pre class="src src-yaml">apiVersion: v1
-kind: Service
-spec:
-  sessionAffinity: ClientIP
-...
+<pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
+<span style="color: #5fafff;">kind</span>: Service
+<span style="color: #5fafff;">spec</span>:
+  <span style="color: #5fafff;">sessionAffinity</span>: ClientIP
+<span style="color: #707070; font-style: italic;">...</span>
 </pre>
 </div>
 </div>
@@ -1070,12 +1084,12 @@ spec:
 
 
 
-<div id="outline-container-orge5d3976" class="outline-4">
-<h4 id="orge5d3976"><span class="section-number-4">1.7.4</span> Discovering Service</h4>
+<div id="outline-container-orgc14e42a" class="outline-4">
+<h4 id="orgc14e42a"><span class="section-number-4">1.7.4</span> Discovering Service</h4>
 <div class="outline-text-4" id="text-1-7-4">
 </div>
-<div id="outline-container-org248b3c5" class="outline-5">
-<h5 id="org248b3c5"><span class="section-number-5">1.7.4.1</span> Through ENV</h5>
+<div id="outline-container-org2dac318" class="outline-5">
+<h5 id="org2dac318"><span class="section-number-5">1.7.4.1</span> Through ENV</h5>
 <div class="outline-text-5" id="text-1-7-4-1">
 <pre class="example">
 Dashes in the service name are converted to underscores and all letters are uppercased
@@ -1084,8 +1098,8 @@ when the service name is used as the prefix in the environment variable's name.
 </div>
 </div>
 
-<div id="outline-container-org86b3721" class="outline-5">
-<h5 id="org86b3721"><span class="section-number-5">1.7.4.2</span> Through DNS</h5>
+<div id="outline-container-org48b8276" class="outline-5">
+<h5 id="org48b8276"><span class="section-number-5">1.7.4.2</span> Through DNS</h5>
 <div class="outline-text-5" id="text-1-7-4-2">
 <pre class="example">
 kubia        .default  .svc.cluster.local
@@ -1111,8 +1125,8 @@ Whether a pod uses the internal DNS server or not is configurable through the 'd
 </div>
 
 
-<div id="outline-container-org0569e9f" class="outline-4">
-<h4 id="org0569e9f"><span class="section-number-4">1.7.5</span> Endpoints</h4>
+<div id="outline-container-org2fca82e" class="outline-4">
+<h4 id="org2fca82e"><span class="section-number-4">1.7.5</span> Endpoints</h4>
 <div class="outline-text-4" id="text-1-7-5">
 <p>
 Services don't link to pods directly, but <b>Endpoints</b>. <br>
@@ -1136,8 +1150,8 @@ It's up to you to create the Endpoints resource to specify the list of endpoints
 </pre>
 </div>
 
-<div id="outline-container-orgb9c7290" class="outline-5">
-<h5 id="orgb9c7290"><span class="section-number-5">1.7.5.1</span> Manually configuring service endpoints</h5>
+<div id="outline-container-org2ba3a1a" class="outline-5">
+<h5 id="org2ba3a1a"><span class="section-number-5">1.7.5.1</span> Manually configuring service endpoints</h5>
 <div class="outline-text-5" id="text-1-7-5-1">
 <p>
 To create a service with manually managed endpoints, you need to create both a Service and an Endpoints resource.
@@ -1188,8 +1202,8 @@ This means a service IP address can remain constant while the actual implementat
 
 
 
-<div id="outline-container-orgd516893" class="outline-5">
-<h5 id="orgd516893"><span class="section-number-5">1.7.5.2</span> Creating an alias for an external service</h5>
+<div id="outline-container-org6774a22" class="outline-5">
+<h5 id="org6774a22"><span class="section-number-5">1.7.5.2</span> Creating an alias for an external service</h5>
 <div class="outline-text-5" id="text-1-7-5-2">
 
 <div class="figure">
@@ -1212,8 +1226,8 @@ For this reason, these types of services don't even get a cluster IP.
 
 
 
-<div id="outline-container-org053a866" class="outline-4">
-<h4 id="org053a866"><span class="section-number-4">1.7.6</span> Exposing Services To External Clients</h4>
+<div id="outline-container-orgf752357" class="outline-4">
+<h4 id="orgf752357"><span class="section-number-4">1.7.6</span> Exposing Services To External Clients</h4>
 <div class="outline-text-4" id="text-1-7-6">
 <p>
 A few ways to make a service accessible externally:
@@ -1226,8 +1240,8 @@ A few ways to make a service accessible externally:
 </ol>
 </div>
 
-<div id="outline-container-org4c36a9c" class="outline-5">
-<h5 id="org4c36a9c"><span class="section-number-5">1.7.6.1</span> NodePort</h5>
+<div id="outline-container-orge9c676e" class="outline-5">
+<h5 id="orge9c676e"><span class="section-number-5">1.7.6.1</span> NodePort</h5>
 <div class="outline-text-5" id="text-1-7-6-1">
 
 <div class="figure">
@@ -1246,8 +1260,8 @@ That's why it makes sense to put a load balancer in front of the nodes to make s
 </pre>
 </div>
 
-<div id="outline-container-org92788f8" class="outline-6">
-<h6 id="org92788f8"><span class="section-number-6">1.7.6.1.1</span> YAML Definition</h6>
+<div id="outline-container-org203b300" class="outline-6">
+<h6 id="org203b300"><span class="section-number-6">1.7.6.1.1</span> YAML Definition</h6>
 <div class="outline-text-6" id="text-1-7-6-1-1">
 
 <div class="figure">
@@ -1264,8 +1278,8 @@ Specifying the port isn't mandatory; Kubernetes will choose a random port if you
 
 
 
-<div id="outline-container-orgc0788f1" class="outline-5">
-<h5 id="orgc0788f1"><span class="section-number-5">1.7.6.2</span> LoadBalancer</h5>
+<div id="outline-container-orgc87bc53" class="outline-5">
+<h5 id="orgc87bc53"><span class="section-number-5">1.7.6.2</span> LoadBalancer</h5>
 <div class="outline-text-5" id="text-1-7-6-2">
 <p>
 Kubernetes clusters running on cloud providers usually support the automatic provision of a load balancer from the cloud infrastructure. <br>
@@ -1289,8 +1303,8 @@ That's because <b>a LoadBalancer service is an extension of a NodePort service.<
 </div>
 
 
-<div id="outline-container-org1948c3d" class="outline-6">
-<h6 id="org1948c3d"><span class="section-number-6">1.7.6.2.1</span> YAML Definition</h6>
+<div id="outline-container-org6764c99" class="outline-6">
+<h6 id="org6764c99"><span class="section-number-6">1.7.6.2.1</span> YAML Definition</h6>
 <div class="outline-text-6" id="text-1-7-6-2-1">
 
 <div class="figure">
@@ -1300,12 +1314,106 @@ That's because <b>a LoadBalancer service is an extension of a NodePort service.<
 </div>
 </div>
 </div>
+
+
+<div id="outline-container-org41b84ef" class="outline-5">
+<h5 id="org41b84ef"><span class="section-number-5">1.7.6.3</span> Ingress</h5>
+<div class="outline-text-5" id="text-1-7-6-3">
+<p>
+One important reason is that each LoadBalancer service requires its own load balancer with its own public IP address, <br>
+whereas an Ingress <b>only requires one</b>, even when providing access to dozens of services.
+</p>
+
+<p>
+Ingresses operate at the application layer of the network stack (HTTP) and can provide features such as cookie-based session affinity and the like, <br>
+which services can’t.
+</p>
+
+
+
+<div class="figure">
+<p><img src="img/k8s_svc_ingress_overall.png" alt="k8s_svc_ingress_overall.png">
+</p>
+</div>
+
+<pre class="example">
+Ingress controller provisions a load balancer behind the scenes.
+</pre>
 </div>
 
 
-<div id="outline-container-org2240881" class="outline-4">
-<h4 id="org2240881"><span class="section-number-4">1.7.7</span> External Traffic Issure</h4>
+<div id="outline-container-org2fc8be7" class="outline-6">
+<h6 id="org2fc8be7"><span class="section-number-6">1.7.6.3.1</span> YAML Definition</h6>
+<div class="outline-text-6" id="text-1-7-6-3-1">
+
+<div class="figure">
+<p><img src="img/k8s_svc_ingress_def.png" alt="k8s_svc_ingress_def.png">
+</p>
+</div>
+
+
+<div class="figure">
+<p><img src="img/k8s_svc_ingress_process.png" alt="k8s_svc_ingress_process.png">
+</p>
+</div>
+
+
+<p>
+Ingress controller didn’t forward the request to the service. <b>It only used it to select a pod</b>. (Most controllers work like this)
+</p>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-orgdca84b7" class="outline-4">
+<h4 id="orgdca84b7"><span class="section-number-4">1.7.7</span> Readiness Probe</h4>
 <div class="outline-text-4" id="text-1-7-7">
+<p>
+Kubernetes invokes the probe periodically and acts based on the result of the readiness probe. <br>
+If a pod reports that it’s not ready, it’s removed from the service. If the pod then becomes ready again, it’s re-added.
+</p>
+
+<p>
+Unlike liveness probes, if a container fails the readiness check, it won’t be killed or restarted. <br>
+The effect is the same as when the pod doesn’t match the service’s label selector at all:
+</p>
+
+
+<div class="figure">
+<p><img src="img/k8s_svc_readiness_probe.png" alt="k8s_svc_readiness_probe.png">
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org8fd3af5" class="outline-4">
+<h4 id="org8fd3af5"><span class="section-number-4">1.7.8</span> Headless</h4>
+<div class="outline-text-4" id="text-1-7-8">
+<p>
+Kubernetes allows clients to <b>discover pod IPs</b> through DNS lookups. <br>
+Usually, when you perform a DNS lookup for a service, the DNS server returns a single IP (the service’s cluster IP). <br>
+By setting the <code>clusterIP</code> field to <code>None</code> in the service specification, the DNS server will return the pod IPs instead of the single service IP.
+</p>
+
+<p>
+Instead of returning a single DNS A record, the DNS server will return multiple A records for the service, <br>
+each pointing to the IP of an individual pod backing the service at that moment.
+</p>
+
+<pre class="example">
+A headless services still provides load balancing across pods,
+but through the DNS round-robin mechanism instead of through the service proxy.
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org9425967" class="outline-4">
+<h4 id="org9425967"><span class="section-number-4">1.7.9</span> External Traffic Issure</h4>
+<div class="outline-text-4" id="text-1-7-9">
 <p>
 When an external client connects to a service through the node port (this also includes cases when it goes through the load balancer first), <br>
 the randomly chosen pod may or may not be running on the same node that received the connection. <br>
@@ -1318,9 +1426,9 @@ This is done by setting the <code>externalTrafficPolicy</code> field in the serv
 </p>
 
 <div class="org-src-container">
-<pre class="src src-yaml">spec:
-  externalTrafficPolicy: Local
-  ...
+<pre class="src src-yaml"><span style="color: #5fafff;">spec</span>:
+  <span style="color: #5fafff;">externalTrafficPolicy</span>: Local
+<span style="color: #707070; font-style: italic;">  ...</span>
 </pre>
 </div>
 
@@ -1331,9 +1439,9 @@ You therefore need to ensure the load balancer forwards connections only to node
 </p>
 </div>
 
-<div id="outline-container-org6b5be67" class="outline-5">
-<h5 id="org6b5be67"><span class="section-number-5">1.7.7.1</span> Non-Preservation Of The Client's IP Issue</h5>
-<div class="outline-text-5" id="text-1-7-7-1">
+<div id="outline-container-orgf8e1316" class="outline-5">
+<h5 id="orgf8e1316"><span class="section-number-5">1.7.9.1</span> Non-Preservation Of The Client's IP Issue</h5>
+<div class="outline-text-5" id="text-1-7-9-1">
 <p>
 Usually, when clients inside the cluster connect to a service, the pods backing the service <b>can obtain the client's IP address</b>. <br>
 But when the connection is received through a node port, the packets' <b>source IP is changed</b>, because SNAT is performed on the packets.
@@ -1349,12 +1457,13 @@ because there's no additional hop between the node receiving the connection and 
 </div>
 </div>
 
-<div id="outline-container-orgd316b5f" class="outline-2">
-<h2 id="orgd316b5f"><span class="section-number-2">2</span> Internals</h2>
+
+<div id="outline-container-org214cc4c" class="outline-2">
+<h2 id="org214cc4c"><span class="section-number-2">2</span> Internals</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org47fa765" class="outline-3">
-<h3 id="org47fa765"><span class="section-number-3">2.1</span> Container Vs VM</h3>
+<div id="outline-container-org1fcc5e5" class="outline-3">
+<h3 id="org1fcc5e5"><span class="section-number-3">2.1</span> Container Vs VM</h3>
 <div class="outline-text-3" id="text-2-1">
 
 <div class="figure">
@@ -1371,8 +1480,8 @@ because there's no additional hop between the node receiving the connection and 
 </div>
 
 
-<div id="outline-container-org3c7b089" class="outline-3">
-<h3 id="org3c7b089"><span class="section-number-3">2.2</span> K8S components</h3>
+<div id="outline-container-org3e174cf" class="outline-3">
+<h3 id="org3e174cf"><span class="section-number-3">2.2</span> K8S components</h3>
 <div class="outline-text-3" id="text-2-2">
 
 <div class="figure">
@@ -1395,38 +1504,64 @@ because there's no additional hop between the node receiving the connection and 
 
 
 
-<div id="outline-container-orge242eea" class="outline-2">
-<h2 id="orge242eea"><span class="section-number-2">3</span> YAML</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="outline-container-org1b0ba88" class="outline-2">
+<h2 id="org1b0ba88"><span class="section-number-2">3</span> YAML</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 <a href="https://plugins.jetbrains.com/plugin/9354-kubernetes-and-openshift-resource-support">IDEA Kubernetes YAML 插件</a>
 </p>
 </div>
 
-<div id="outline-container-orgfa5fb64" class="outline-3">
-<h3 id="orgfa5fb64"><span class="section-number-3">3.1</span> Key Value Pair</h3>
+<div id="outline-container-org183b224" class="outline-3">
+<h3 id="org183b224"><span class="section-number-3">3.1</span> Key Value Pair</h3>
 <div class="outline-text-3" id="text-3-1">
 <div class="org-src-container">
-<pre class="src src-yaml">fruit: apple
-vegetable: carrot
-liquid: water
-meat: chicken
+<pre class="src src-yaml"><span style="color: #5fafff;">fruit</span>: apple
+<span style="color: #5fafff;">vegetable</span>: carrot
+<span style="color: #5fafff;">liquid</span>: water
+<span style="color: #5fafff;">meat</span>: chicken
 </pre>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-org2bfe1d8" class="outline-3">
-<h3 id="org2bfe1d8"><span class="section-number-3">3.2</span> Array / List</h3>
+<div id="outline-container-orga85b5db" class="outline-3">
+<h3 id="orga85b5db"><span class="section-number-3">3.2</span> Array / List</h3>
 <div class="outline-text-3" id="text-3-2">
 <div class="org-src-container">
-<pre class="src src-yaml">fruits:
+<pre class="src src-yaml"><span style="color: #5fafff;">fruits</span>:
   - orange
   - apple
   - banana
 
-vegetables:
+<span style="color: #5fafff;">vegetables</span>:
   - carrot
   - cauliflower
   - tomato
@@ -1436,19 +1571,19 @@ vegetables:
 </div>
 
 
-<div id="outline-container-org015632f" class="outline-3">
-<h3 id="org015632f"><span class="section-number-3">3.3</span> Dictionary / Map</h3>
+<div id="outline-container-org3ad62d8" class="outline-3">
+<h3 id="org3ad62d8"><span class="section-number-3">3.3</span> Dictionary / Map</h3>
 <div class="outline-text-3" id="text-3-3">
 <div class="org-src-container">
-<pre class="src src-yaml">banana:
-  calories: 105
-  fat: 0.4
-  carbs: 27
+<pre class="src src-yaml"><span style="color: #5fafff;">banana</span>:
+  <span style="color: #5fafff;">calories</span>: 105
+  <span style="color: #5fafff;">fat</span>: 0.4
+  <span style="color: #5fafff;">carbs</span>: 27
 
-grape:
-  calories: 62
-  fat: 0.3
-  carbs: 16
+<span style="color: #5fafff;">grape</span>:
+  <span style="color: #5fafff;">calories</span>: 62
+  <span style="color: #5fafff;">fat</span>: 0.3
+  <span style="color: #5fafff;">carbs</span>: 16
 </pre>
 </div>
 </div>
@@ -1457,38 +1592,38 @@ grape:
 
 
 
-<div id="outline-container-orge785589" class="outline-2">
-<h2 id="orge785589"><span class="section-number-2">4</span> 核心原理</h2>
+<div id="outline-container-org56bc088" class="outline-2">
+<h2 id="org56bc088"><span class="section-number-2">4</span> 核心原理</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-orgc2bbd9c" class="outline-3">
-<h3 id="orgc2bbd9c"><span class="section-number-3">4.1</span> 资源对象</h3>
+<div id="outline-container-org664c959" class="outline-3">
+<h3 id="org664c959"><span class="section-number-3">4.1</span> 资源对象</h3>
 <div class="outline-text-3" id="text-4-1">
 </div>
-<div id="outline-container-orgefba2ef" class="outline-4">
-<h4 id="orgefba2ef"><span class="section-number-4">4.1.1</span> POD</h4>
+<div id="outline-container-org9fd6a7a" class="outline-4">
+<h4 id="org9fd6a7a"><span class="section-number-4">4.1.1</span> POD</h4>
 <div class="outline-text-4" id="text-4-1-1">
 </div>
-<div id="outline-container-org7156ac3" class="outline-5">
-<h5 id="org7156ac3"><span class="section-number-5">4.1.1.1</span> 基本 YAML 定义</h5>
+<div id="outline-container-org5973f3a" class="outline-5">
+<h5 id="org5973f3a"><span class="section-number-5">4.1.1.1</span> 基本 YAML 定义</h5>
 <div class="outline-text-5" id="text-4-1-1-1">
 <p>
 <b>apiVersion, kind, metadata, spec 是必填项</b>
 </p>
 
 <div class="org-src-container">
-<pre class="src src-yaml">apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx
-  labels:
-    app: nginx
-spec:
-  containers:
-  - name: nginx
-    image: nginx
-    ports:
-    - containerPort: 80
+<pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
+<span style="color: #5fafff;">kind</span>: Pod
+<span style="color: #5fafff;">metadata</span>:
+  <span style="color: #5fafff;">name</span>: nginx
+  <span style="color: #5fafff;">labels</span>:
+    <span style="color: #5fafff;">app</span>: nginx
+<span style="color: #5fafff;">spec</span>:
+  <span style="color: #5fafff;">containers</span>:
+  - <span style="color: #5fafff;">name</span>: nginx
+    <span style="color: #5fafff;">image</span>: nginx
+    <span style="color: #5fafff;">ports</span>:
+    - <span style="color: #5fafff;">containerPort</span>: 80
 </pre>
 </div>
 
@@ -1507,8 +1642,8 @@ kubectl describe pod &lt;pod_name&gt;
 
 
 
-<div id="outline-container-org0af0cf1" class="outline-5">
-<h5 id="org0af0cf1"><span class="section-number-5">4.1.1.2</span> 设计理念</h5>
+<div id="outline-container-orge2a5f5e" class="outline-5">
+<h5 id="orge2a5f5e"><span class="section-number-5">4.1.1.2</span> 设计理念</h5>
 <div class="outline-text-5" id="text-4-1-1-2">
 <p>
 Pod 是在 K8s 集群中运行部署应用或服务的最小单元，它是可以支持多容器的。
@@ -1552,8 +1687,8 @@ Pod 是 K8s 集群中所有业务类型的基础，不同类型的业务就需�
 
 
 
-<div id="outline-container-org8732416" class="outline-5">
-<h5 id="org8732416"><span class="section-number-5">4.1.1.3</span> 生命周期</h5>
+<div id="outline-container-org75bfed2" class="outline-5">
+<h5 id="org75bfed2"><span class="section-number-5">4.1.1.3</span> 生命周期</h5>
 <div class="outline-text-5" id="text-4-1-1-3">
 <dl class="org-dl">
 <dt>Pending</dt><dd>Pod 已经在 apiserver 中创建，但还没有调度到 Node 上面</dd>
@@ -1567,8 +1702,8 @@ Pod 是 K8s 集群中所有业务类型的基础，不同类型的业务就需�
 
 
 
-<div id="outline-container-org4aa0e9e" class="outline-5">
-<h5 id="org4aa0e9e"><span class="section-number-5">4.1.1.4</span> 重启策略(restartPolicy)</h5>
+<div id="outline-container-org8dde103" class="outline-5">
+<h5 id="org8dde103"><span class="section-number-5">4.1.1.4</span> 重启策略(restartPolicy)</h5>
 <div class="outline-text-5" id="text-4-1-1-4">
 <p>
 PodSpec 中的 <code>restartPolicy</code> 可以用来设置是否对退出的 Pod 重启，可选项包括:
@@ -1646,24 +1781,24 @@ PodSpec 中的 <code>restartPolicy</code> 可以用来设置是否对退出的 P
 
 
 
-<div id="outline-container-org42d01e1" class="outline-5">
-<h5 id="org42d01e1"><span class="section-number-5">4.1.1.5</span> 使用 Volume</h5>
+<div id="outline-container-org2f01009" class="outline-5">
+<h5 id="org2f01009"><span class="section-number-5">4.1.1.5</span> 使用 Volume</h5>
 <div class="outline-text-5" id="text-4-1-1-5">
 <div class="org-src-container">
-<pre class="src src-yaml">apiVersion: v1
-kind: Pod
-metadata:
-  name: redis
-spec:
-  containers:
-  - name: redis
-    image: redis
-    volumeMounts:
-    - name: redis-storage
-      mountPath: /data/redis
-  volumes:
-  - name: redis-storage
-    emptyDir: {}
+<pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
+<span style="color: #5fafff;">kind</span>: Pod
+<span style="color: #5fafff;">metadata</span>:
+  <span style="color: #5fafff;">name</span>: redis
+<span style="color: #5fafff;">spec</span>:
+  <span style="color: #5fafff;">containers</span>:
+  - <span style="color: #5fafff;">name</span>: redis
+    <span style="color: #5fafff;">image</span>: redis
+    <span style="color: #5fafff;">volumeMounts</span>:
+    - <span style="color: #5fafff;">name</span>: redis-storage
+      <span style="color: #5fafff;">mountPath</span>: /data/redis
+  <span style="color: #5fafff;">volumes</span>:
+  - <span style="color: #5fafff;">name</span>: redis-storage
+    <span style="color: #5fafff;">emptyDir</span>: {}
 
 </pre>
 </div>
@@ -1672,8 +1807,8 @@ spec:
 
 
 
-<div id="outline-container-org625947b" class="outline-5">
-<h5 id="org625947b"><span class="section-number-5">4.1.1.6</span> 环境变量</h5>
+<div id="outline-container-org2fddd8a" class="outline-5">
+<h5 id="org2fddd8a"><span class="section-number-5">4.1.1.6</span> 环境变量</h5>
 <div class="outline-text-5" id="text-4-1-1-6">
 <p>
 Pod 的名字、命名空间、IP 以及容器的计算资源限制等可以通过 <a href="https://kubernetes.io/docs/tasks/inject-data-application/downward-api-volume-expose-pod-information/">Downward API</a> 的方式获取并存储到环境变量中。
@@ -1683,8 +1818,8 @@ Pod 的名字、命名空间、IP 以及容器的计算资源限制等可以通�
 
 
 
-<div id="outline-container-org6ee3e72" class="outline-5">
-<h5 id="org6ee3e72"><span class="section-number-5">4.1.1.7</span> 镜像拉取策略(ImagePullPolicy)</h5>
+<div id="outline-container-org9310b38" class="outline-5">
+<h5 id="org9310b38"><span class="section-number-5">4.1.1.7</span> 镜像拉取策略(ImagePullPolicy)</h5>
 <div class="outline-text-5" id="text-4-1-1-7">
 <p>
 支持三种 <code>ImagePullPolicy</code>:
@@ -1715,8 +1850,8 @@ Pod 的名字、命名空间、IP 以及容器的计算资源限制等可以通�
 </div>
 
 
-<div id="outline-container-org182760e" class="outline-5">
-<h5 id="org182760e"><span class="section-number-5">4.1.1.8</span> DNS 策略</h5>
+<div id="outline-container-org2c5509e" class="outline-5">
+<h5 id="org2c5509e"><span class="section-number-5">4.1.1.8</span> DNS 策略</h5>
 <div class="outline-text-5" id="text-4-1-1-8">
 <p>
 通过设置 <code>dnsPolicy</code> 参数，设置 Pod 中容器访问 DNS 的策略：
@@ -1730,8 +1865,8 @@ Pod 的名字、命名空间、IP 以及容器的计算资源限制等可以通�
 </div>
 
 
-<div id="outline-container-org8777ef8" class="outline-5">
-<h5 id="org8777ef8"><span class="section-number-5">4.1.1.9</span> Health Probe</h5>
+<div id="outline-container-org5b41764" class="outline-5">
+<h5 id="org5b41764"><span class="section-number-5">4.1.1.9</span> Health Probe</h5>
 <div class="outline-text-5" id="text-4-1-1-9">
 <p>
 为了确保容器在部署后确实处在正常运行状态，Kubernetes 提供了两种探针（Probe）来探测容器的状态：
@@ -1754,55 +1889,55 @@ Kubernetes 支持三种方式来执行探针：
 
 
 <div class="org-src-container">
-<pre class="src src-yaml">apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    app: nginx
-  name: nginx
-spec:
-    containers:
-    - image: nginx
-      imagePullPolicy: Always
-      name: http
-      livenessProbe:
-        httpGet:
-          path: /
-          port: 80
-          httpHeaders:
-          - name: X-Custom-Header
-            value: Awesome
-        initialDelaySeconds: 15
-        timeoutSeconds: 1
-      readinessProbe:
-        exec:
-          command:
+<pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
+<span style="color: #5fafff;">kind</span>: Pod
+<span style="color: #5fafff;">metadata</span>:
+  <span style="color: #5fafff;">labels</span>:
+    <span style="color: #5fafff;">app</span>: nginx
+  <span style="color: #5fafff;">name</span>: nginx
+<span style="color: #5fafff;">spec</span>:
+    <span style="color: #5fafff;">containers</span>:
+    - <span style="color: #5fafff;">image</span>: nginx
+      <span style="color: #5fafff;">imagePullPolicy</span>: Always
+      <span style="color: #5fafff;">name</span>: http
+      <span style="color: #5fafff;">livenessProbe</span>:
+        <span style="color: #5fafff;">httpGet</span>:
+          <span style="color: #5fafff;">path</span>: /
+          <span style="color: #5fafff;">port</span>: 80
+          <span style="color: #5fafff;">httpHeaders</span>:
+          - <span style="color: #5fafff;">name</span>: X-Custom-Header
+            <span style="color: #5fafff;">value</span>: Awesome
+        <span style="color: #5fafff;">initialDelaySeconds</span>: 15
+        <span style="color: #5fafff;">timeoutSeconds</span>: 1
+      <span style="color: #5fafff;">readinessProbe</span>:
+        <span style="color: #5fafff;">exec</span>:
+          <span style="color: #5fafff;">command</span>:
           - cat
           - /usr/share/nginx/html/index.html
-        initialDelaySeconds: 5
-        timeoutSeconds: 1
-    - name: goproxy
-      image: gcr.io/google_containers/goproxy:0.1
-      ports:
-      - containerPort: 8080
-      readinessProbe:
-        tcpSocket:
-          port: 8080
-        initialDelaySeconds: 5
-        periodSeconds: 10
-      livenessProbe:
-        tcpSocket:
-          port: 8080
-        initialDelaySeconds: 15
-        periodSeconds: 20
+        <span style="color: #5fafff;">initialDelaySeconds</span>: 5
+        <span style="color: #5fafff;">timeoutSeconds</span>: 1
+    - <span style="color: #5fafff;">name</span>: goproxy
+      <span style="color: #5fafff;">image</span>: gcr.io/google_containers/goproxy:0.1
+      <span style="color: #5fafff;">ports</span>:
+      - <span style="color: #5fafff;">containerPort</span>: 8080
+      <span style="color: #5fafff;">readinessProbe</span>:
+        <span style="color: #5fafff;">tcpSocket</span>:
+          <span style="color: #5fafff;">port</span>: 8080
+        <span style="color: #5fafff;">initialDelaySeconds</span>: 5
+        <span style="color: #5fafff;">periodSeconds</span>: 10
+      <span style="color: #5fafff;">livenessProbe</span>:
+        <span style="color: #5fafff;">tcpSocket</span>:
+          <span style="color: #5fafff;">port</span>: 8080
+        <span style="color: #5fafff;">initialDelaySeconds</span>: 15
+        <span style="color: #5fafff;">periodSeconds</span>: 20
 </pre>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-orgb2c4302" class="outline-5">
-<h5 id="orgb2c4302"><span class="section-number-5">4.1.1.10</span> 调度到指定 Node 上</h5>
+<div id="outline-container-orgd6195c0" class="outline-5">
+<h5 id="orgd6195c0"><span class="section-number-5">4.1.1.10</span> 调度到指定 Node 上</h5>
 <div class="outline-text-5" id="text-4-1-1-10">
 <p>
 可以通过 <code>nodeSelector</code>, <code>nodeAffinity</code>, <code>podAffinity</code> 以及 <code>Taints</code> 和 <code>tolerations</code> 等来将 Pod 调度到需要的 Node 上。
@@ -1827,12 +1962,12 @@ spec:
 </div>
 
 
-<div id="outline-container-org5909cae" class="outline-5">
-<h5 id="org5909cae"><span class="section-number-5">4.1.1.11</span> 常用命令</h5>
+<div id="outline-container-orgf311db5" class="outline-5">
+<h5 id="orgf311db5"><span class="section-number-5">4.1.1.11</span> 常用命令</h5>
 <div class="outline-text-5" id="text-4-1-1-11">
 </div>
-<div id="outline-container-org6546322" class="outline-6">
-<h6 id="org6546322"><span class="section-number-6">4.1.1.11.1</span> 查看 Pod 状态</h6>
+<div id="outline-container-org01f5012" class="outline-6">
+<h6 id="org01f5012"><span class="section-number-6">4.1.1.11.1</span> 查看 Pod 状态</h6>
 <div class="outline-text-6" id="text-4-1-1-11-1">
 <p>
 <code>kubectl get pod &lt;pod_name&gt; -o jsonpath</code>"{.status.phase}"=
@@ -1845,8 +1980,8 @@ spec:
 
 
 
-<div id="outline-container-orgd6fd0e1" class="outline-4">
-<h4 id="orgd6fd0e1"><span class="section-number-4">4.1.2</span> Replica Set</h4>
+<div id="outline-container-org02a8afa" class="outline-4">
+<h4 id="org02a8afa"><span class="section-number-4">4.1.2</span> Replica Set</h4>
 <div class="outline-text-4" id="text-4-1-2">
 <p>
 ReplicaSet 跟 ReplicationController 没有本质的不同，只是名字不一样，
@@ -1862,8 +1997,8 @@ Deployment 使用了 Replica Set ，是更高一层的概念。
 </div>
 
 
-<div id="outline-container-org888a1fa" class="outline-5">
-<h5 id="org888a1fa"><span class="section-number-5">4.1.2.1</span> YAML 定义</h5>
+<div id="outline-container-org48ac512" class="outline-5">
+<h5 id="org48ac512"><span class="section-number-5">4.1.2.1</span> YAML 定义</h5>
 <div class="outline-text-5" id="text-4-1-2-1">
 <p>
 <code>spec.template</code> 可以从 Pod 定义文件中复制过来：
@@ -1878,8 +2013,8 @@ Deployment 使用了 Replica Set ，是更高一层的概念。
 </div>
 
 
-<div id="outline-container-orgef7a6f6" class="outline-5">
-<h5 id="orgef7a6f6"><span class="section-number-5">4.1.2.2</span> 常用命令</h5>
+<div id="outline-container-orgd3e3ecd" class="outline-5">
+<h5 id="orgd3e3ecd"><span class="section-number-5">4.1.2.2</span> 常用命令</h5>
 <div class="outline-text-5" id="text-4-1-2-2">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl replace -f rs-def.yml
@@ -1894,23 +2029,23 @@ kubectl scale --replicas=6 replicaset &lt;name&gt;
 </div>
 
 
-<div id="outline-container-orgaa8b4ff" class="outline-2">
-<h2 id="orgaa8b4ff"><span class="section-number-2">5</span> Utils</h2>
+<div id="outline-container-org89b84a1" class="outline-2">
+<h2 id="org89b84a1"><span class="section-number-2">5</span> Utils</h2>
 <div class="outline-text-2" id="text-5">
 </div>
-<div id="outline-container-orgc07ae9c" class="outline-3">
-<h3 id="orgc07ae9c"><span class="section-number-3">5.1</span> Bash completion</h3>
+<div id="outline-container-org52c856b" class="outline-3">
+<h3 id="org52c856b"><span class="section-number-3">5.1</span> Bash completion</h3>
 <div class="outline-text-3" id="text-5-1">
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #a6e22e;">source</span> &lt;(kubectl completion bash | sed s/kubectl/&lt;your_alias&gt;/g)
+<pre class="src src-sh"><span style="color: #5fafff; font-weight: bold;">source</span> &lt;<span style="color: #ff8c00; font-size: 150%;">(</span>kubectl completion bash | sed s/kubectl/&lt;your_alias&gt;/g<span style="color: #ff8c00; font-size: 150%;">)</span>
 </pre>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-org5806f85" class="outline-3">
-<h3 id="org5806f85"><span class="section-number-3">5.2</span> Show all resources</h3>
+<div id="outline-container-orga8590fc" class="outline-3">
+<h3 id="orga8590fc"><span class="section-number-3">5.2</span> Show all resources</h3>
 <div class="outline-text-3" id="text-5-2">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl get
@@ -1919,8 +2054,8 @@ kubectl scale --replicas=6 replicaset &lt;name&gt;
 </div>
 </div>
 
-<div id="outline-container-orge160f1c" class="outline-3">
-<h3 id="orge160f1c"><span class="section-number-3">5.3</span> Discover possible API object fields</h3>
+<div id="outline-container-org42060c0" class="outline-3">
+<h3 id="org42060c0"><span class="section-number-3">5.3</span> Discover possible API object fields</h3>
 <div class="outline-text-3" id="text-5-3">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl explain pods
@@ -1938,11 +2073,11 @@ You can then drill deeper to find out more about each attribute.
 </div>
 </div>
 
-<div id="outline-container-org2076e22" class="outline-3">
-<h3 id="org2076e22"><span class="section-number-3">5.4</span> Quickly switch to a different namespace</h3>
+<div id="outline-container-org22c3d2a" class="outline-3">
+<h3 id="org22c3d2a"><span class="section-number-3">5.4</span> Quickly switch to a different namespace</h3>
 <div class="outline-text-3" id="text-5-4">
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #a6e22e;">alias</span> <span style="color: #fd971f;">kcd</span>=<span style="color: #e6db74;">'kubectl config set-context $(</span><span style="color: #fa8072;">kubectl</span><span style="color: #e6db74;"> config current- context) --namespace '</span>
+<pre class="src src-sh"><span style="color: #5fafff; font-weight: bold;">alias</span> <span style="color: #5fafff;">kcd</span>=<span style="color: #87af5f;">'kubectl config set-context $(</span><span style="color: #fa8072;">kubectl</span><span style="color: #87af5f;"> config current- context) --namespace '</span>
 </pre>
 </div>
 
@@ -1952,8 +2087,8 @@ You can then switch between namespaces using <code>kcd &lt;some-namespace&gt;</c
 </div>
 </div>
 
-<div id="outline-container-org7a06dd5" class="outline-3">
-<h3 id="org7a06dd5"><span class="section-number-3">5.5</span> Forwarding a local network port to a port in the pod</h3>
+<div id="outline-container-org2d84f53" class="outline-3">
+<h3 id="org2d84f53"><span class="section-number-3">5.5</span> Forwarding a local network port to a port in the pod</h3>
 <div class="outline-text-3" id="text-5-5">
 <p>
 Using port forwarding like this is an effective way to test an individual pod.
@@ -1967,8 +2102,8 @@ Using port forwarding like this is an effective way to test an individual pod.
 </div>
 
 
-<div id="outline-container-orgaf151b3" class="outline-3">
-<h3 id="orgaf151b3"><span class="section-number-3">5.6</span> Obtaining the application log of a crashed container</h3>
+<div id="outline-container-org50c5c02" class="outline-3">
+<h3 id="org50c5c02"><span class="section-number-3">5.6</span> Obtaining the application log of a crashed container</h3>
 <div class="outline-text-3" id="text-5-6">
 <p>
 You can print the application’s log with kubectl logs. If your container is restarted, the kubectl logs command will show the log of the current container.
@@ -1986,11 +2121,11 @@ This can be done by using the <code>--previous</code> option:
 </div>
 </div>
 
-<div id="outline-container-orga3ced32" class="outline-3">
-<h3 id="orga3ced32"><span class="section-number-3">5.7</span> Get IPs of all nodes</h3>
+<div id="outline-container-org1d5eb2f" class="outline-3">
+<h3 id="org1d5eb2f"><span class="section-number-3">5.7</span> Get IPs of all nodes</h3>
 <div class="outline-text-3" id="text-5-7">
 <div class="org-src-container">
-<pre class="src src-sh">kubectl get nodes -o <span style="color: #fd971f;">jsonpath</span>=<span style="color: #e6db74;">'{.items[*].status.addresses[?(@.type=="ExternalIP")].address}'</span>
+<pre class="src src-sh">kubectl get nodes -o <span style="color: #5fafff;">jsonpath</span>=<span style="color: #87af5f;">'{.items[*].status.addresses[?(@.type=="ExternalIP")].address}'</span>
 </pre>
 </div>
 

@@ -462,6 +462,58 @@ That's because *a LoadBalancer service is an extension of a NodePort service.* \
 [[file:img/k8s_svc_lb_def.png]]
 
 
+**** Ingress
+
+One important reason is that each LoadBalancer service requires its own load balancer with its own public IP address, \\
+whereas an Ingress *only requires one*, even when providing access to dozens of services.
+
+Ingresses operate at the application layer of the network stack (HTTP) and can provide features such as cookie-based session affinity and the like, \\
+which services can’t.
+
+
+[[file:img/k8s_svc_ingress_overall.png]]
+
+#+BEGIN_EXAMPLE
+  Ingress controller provisions a load balancer behind the scenes.
+#+END_EXAMPLE
+
+
+***** YAML Definition
+
+[[file:img/k8s_svc_ingress_def.png]]
+
+[[file:img/k8s_svc_ingress_process.png]]
+
+
+Ingress controller didn’t forward the request to the service. *It only used it to select a pod*. (Most controllers work like this)
+
+
+
+*** Readiness Probe
+
+Kubernetes invokes the probe periodically and acts based on the result of the readiness probe. \\
+If a pod reports that it’s not ready, it’s removed from the service. If the pod then becomes ready again, it’s re-added.
+
+Unlike liveness probes, if a container fails the readiness check, it won’t be killed or restarted. \\
+The effect is the same as when the pod doesn’t match the service’s label selector at all:
+
+[[file:img/k8s_svc_readiness_probe.png]]
+
+
+*** Headless
+
+Kubernetes allows clients to *discover pod IPs* through DNS lookups. \\
+Usually, when you perform a DNS lookup for a service, the DNS server returns a single IP (the service’s cluster IP). \\
+By setting the =clusterIP= field to =None= in the service specification, the DNS server will return the pod IPs instead of the single service IP.
+
+Instead of returning a single DNS A record, the DNS server will return multiple A records for the service, \\
+each pointing to the IP of an individual pod backing the service at that moment.
+
+#+BEGIN_EXAMPLE
+  A headless services still provides load balancing across pods,
+  but through the DNS round-robin mechanism instead of through the service proxy.
+#+END_EXAMPLE
+
 *** External Traffic Issure
 
 When an external client connects to a service through the node port (this also includes cases when it goes through the load balancer first), \\
@@ -489,6 +541,7 @@ But when the connection is received through a node port, the packets' *source IP
 The _Local_ external traffic policy (externalTrafficPolicy: Local) described in the previous section affects the preservation of the client's IP, \\
 because there's no additional hop between the node receiving the connection and the node hosting the target pod (*SNAT isn't performed*).
 
+
 * Internals
 
 ** Container Vs VM
@@ -501,6 +554,32 @@ file:img/k8s_container_vs_vm_cpu.png
 ** K8S components
 
 [[file:img/k8s_components.png]]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
