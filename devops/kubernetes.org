@@ -593,6 +593,58 @@ file:img/k8s_container_vs_vm_cpu.png
 
 
 
+** Volume
+
+Volumes aren't top-level resources like pods, but are instead defined as a part of a pod and *share the same lifecycle as the pod.* \\
+This means _a volume is created when the pod is started and is destroyed when the pod is deleted._
+
+#+BEGIN_EXAMPLE
+  Kubernetes volumes are a component of a pod and are thus defined in the pod's specification-much like containers.
+  They aren't a standalone Kubernetes object and can not be created or deleted on their own.
+#+END_EXAMPLE
+
+
+*** Volume Types
+
+- emptyDir :: A simple empty directory used for storing transient data.
+- hostPath :: Used for mounting directories from the worker node's filesystem into the pod.
+- gitRepo :: A volume initialized by checking out the contents of a Git repository.
+- nfs :: An NFS share mounted into the pod.
+- gcePersistentDisk, awsElasticBlockStore, azureDisk :: Cloud provider.
+- cinder, cephfs, iscsi, flocker, glusterfs, quobyte, rbd, flexVolume, vsphere- Volume, photonPersistentDisk, scaleIO :: Network storage.
+- onfigMap, secret, downwardAPI
+- persistentVolumeClaim
+
+*** =emptyDir= Volume
+
+An =emptyDir= volume is especially useful for sharing files between containers running in the same pod.
+
+An =emptyDir= volume is the simplest type of volume, but *other types build upon it*. \\
+(After the empty directory is created, they then populate it with data)
+
+**** The medium used
+
+The =emptyDir= used as the volume was created on the actual disk of the worker node hosting the pod. \\
+Kubernetes can create the =emptyDir= on a tmpfs filesystem (in memory instead of on disk). \\
+To do this, set the =emptyDir='s medium to =Memory=:
+
+#+BEGIN_SRC yaml
+  volumes:
+    - name: html
+      emptyDir:
+        medium: Memory
+#+END_SRC
+
+
+
+
+
+
+
+
+
+
+
 * YAML
 
 [[https://plugins.jetbrains.com/plugin/9354-kubernetes-and-openshift-resource-support][IDEA Kubernetes YAML 插件]]
