@@ -684,7 +684,7 @@ The PersistentVolumeClaim can then be used as one of the volumes inside a pod.
         storage: 1Gi
     accessModes:
     - ReadWriteOnce
-    storageClassName: ""
+    storageClassName: ""  # Specifying an empty string as the storage class name ensures the PVC binds to a pre-provisioned PV instead of dynamically provisioning a new one.
 #+END_SRC
 
 
@@ -721,7 +721,7 @@ Additionally, the volume’s access modes must *include* the access modes reques
 [[file:img/k8s_vol_pv_pvc_logic.png]]
 
 
-**** StorageClass(Dynamic Provisioning of PV)
+**** Dynamic Provisioning of PV
 
 Cluster administrator can define =StorageClass= and let the system create a new PersistentVolume *each time* one is requested through a PersistentVolumeClaim.
 
@@ -729,11 +729,69 @@ Cluster administrator can define =StorageClass= and let the system create a new 
   Similar to PersistentVolumes, StorageClass resources aren’t namespaced.
 #+END_EXAMPLE
 
+[[file:img/k8s_vol_pv_dp.png]]
+
+***** Defining StorageClass
+
+#+BEGIN_SRC yaml
+  apiVersion: storage.k8s.io/v1
+  kind: StorageClass
+  metadata:
+    name: fast
+  provisioner: k8s.io/minikube-hostpath # The volume plugin to use for provisioning the PersistentVolume
+  parameters:                           # Parameterd passed to the provisioner
+    type: pd-ssd
+#+END_SRC
+
+
+***** Requesting the SC in a PVC
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: mongodb-pvc
+  spec:
+    storageClassName: fast
+    resources:
+      requests:
+        storage: 100Mi
+    accessModes:
+      - ReadWriteOnce
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  The provisioner is used even if an existing manually provisioned PersistentVolume matches the PersistentVolumeClaim.
+#+END_EXAMPLE
+
+
+***** Creating a PVC Without SC
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: mongodb-pvc2
+  spec:
+    resources:
+      requests:
+        storage: 100Mi
+    accessModes:
+      - ReadWriteOnce
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  The default storage class is what's used to dynamically provision a PersistentVolume if the PersistentVolumeClaim doesn't explicitly say which storage class to use.
+#+END_EXAMPLE
 
 
 
 
+***** Forcing a PVC to Be Bound to One of The Pre-Provisioned PVs
 
+#+BEGIN_EXAMPLE
+  Explicitly set storageClassName to "" if you want the PVC to use a pre-provisioned PersistentVolume.
+#+END_EXAMPLE
 
 * Internals
 
