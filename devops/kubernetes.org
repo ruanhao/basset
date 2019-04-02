@@ -514,7 +514,7 @@ each pointing to the IP of an individual pod backing the service at that moment.
   but through the DNS round-robin mechanism instead of through the service proxy.
 #+END_EXAMPLE
 
-*** External Traffic Issure
+*** External Traffic Issue
 
 When an external client connects to a service through the node port (this also includes cases when it goes through the load balancer first), \\
 the randomly chosen pod may or may not be running on the same node that received the connection. \\
@@ -541,6 +541,184 @@ But when the connection is received through a node port, the packets' *source IP
 The _Local_ external traffic policy (externalTrafficPolicy: Local) described in the previous section affects the preservation of the client's IP, \\
 because there's no additional hop between the node receiving the connection and the node hosting the target pod (*SNAT isn't performed*).
 
+
+** Volume
+
+Volumes aren't top-level resources like pods, but are instead defined as *a part of a pod* and *share the same lifecycle as the pod.* \\
+This means _a volume is created when the pod is started and is destroyed when the pod is deleted._
+
+#+BEGIN_EXAMPLE
+  Kubernetes volumes are a component of a pod and are thus defined in the pod's specification-much like containers.
+  They aren't a standalone Kubernetes object and can not be created or deleted on their own.
+#+END_EXAMPLE
+
+[[file:img/k8s_vol.png]]
+
+*** Volume Types
+
+- emptyDir :: A simple empty directory used for storing transient data.
+- hostPath :: Used for mounting directories from the worker node's filesystem into the pod.
+- gitRepo :: A volume initialized by checking out the contents of a Git repository.
+- nfs :: An NFS share mounted into the pod.
+- gcePersistentDisk, awsElasticBlockStore, azureDisk :: Cloud provider.
+- cinder, cephfs, iscsi, flocker, glusterfs, quobyte, rbd, flexVolume, vsphere- Volume, photonPersistentDisk, scaleIO :: Network storage.
+- configMap, secret, downwardAPI ::
+- persistentVolumeClaim ::
+
+
+*** emptyDir
+
+An =emptyDir= volume is especially useful for sharing files between containers running in the same pod.
+
+An =emptyDir= volume is the simplest type of volume, but *other types build upon it*. (After the empty directory is created, they then populate it with data)
+
+[[file:img/k8s_vol_empty_def.png]]
+
+
+
+
+
+**** The medium used
+
+The =emptyDir= used as the volume was created on the actual disk of the worker node hosting the pod. \\
+Kubernetes can create the =emptyDir= on a tmpfs filesystem (in memory instead of on disk). \\
+To do this, set the =emptyDir='s medium to =Memory=:
+
+#+BEGIN_SRC yaml
+  volumes:
+    - name: html
+      emptyDir:
+        medium: Memory
+#+END_SRC
+
+
+
+
+
+
+
+
+
+
+
+
+*** hostPath
+
+[[file:img/k8s_vol_host.png]]
+
+It’s not a good idea to use a hostPath volume for regular pods, because it makes the pod sensitive to what node it’s scheduled to.
+
+#+BEGIN_EXAMPLE
+  Remember to use hostPath volumes only if you need to read or write system files on the node. Never use them to persist data across pods.
+#+END_EXAMPLE
+
+
+
+*** PersistentVolume and PersistentVolumeClaim
+
+[[file:img/k8s_vol_pv_pvc.png]]
+
+
+Instead of the developer adding a technology-specific volume to their pod, it’s the *cluster administrator* who sets up the underlying storage and then \\
+registers it in Kubernetes by creating a PersistentVolume resource through the Kubernetes API server.
+
+When a cluster user needs to use persistent storage in one of their pods, they first create a PersistentVolumeClaim manifest,
+specifying the minimum size and the access mode they require. \\
+The user then submits the PersistentVolumeClaim manifest to the Kubernetes API server,
+and Kubernetes finds the appropriate PersistentVolume and *binds the volume to the claim.* \\
+The PersistentVolumeClaim can then be used as one of the volumes inside a pod.
+
+#+BEGIN_EXAMPLE
+  Other users cannot use the same PersistentVolume until it has been released by delet- ing the bound PersistentVolumeClaim.
+#+END_EXAMPLE
+
+**** Creating PersistentVolume
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    name: mongodb-pv
+  spec:
+    capacity:
+      storage: 1Gi                # Defining the PersistentVolume's size
+    accessModes:                  # Cwhether it can be read from and/or written to by a single node or by multiple nodes at the same time.
+      - ReadWriteOnce
+      - ReadOnlyMany
+    persistentVolumeReclaimPolicy: Retain # After the claim is released, the PersistentVolume should be retained (not erased or deleted).
+                                          # Have to manually delete pv when it is no more needed. (no deleted when pvc is deleted)
+    hostPath:
+      path: /tmp/mongodb
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  PersistentVolumes don’t belong to any namespace. They’re cluster-level resources like nodes.
+#+END_EXAMPLE
+
+[[file:img/k8s_vol_pv_pvc_overall.png]]
+
+
+***** Access Mode
+
+- ReadWriteOnce :: Only a single node can mount the volume for reading and writing.
+- ReadOnlyMany :: Multiple nodes can mount the volume for reading.
+- ReadWriteMany :: Multiple nodes can mount the volume for both reading and writing.
+
+#+BEGIN_EXAMPLE
+  RWO, ROX, and RWX pertain to the number of worker nodes that can use the volume at the same time, not to the number of pods!
+#+END_EXAMPLE
+
+
+
+
+**** Creating PersistentVolumeClaim
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: mongodb-pvc
+  spec:
+    resources:
+      requests:
+        storage: 1Gi
+    accessModes:
+    - ReadWriteOnce
+    storageClassName: ""
+#+END_SRC
+
+
+As soon as you create the claim, Kubernetes finds the appropriate PersistentVolume and binds it to the claim. \\
+The PersistentVolume’s capacity must be *large enough* to accommodate what the claim requests.
+Additionally, the volume’s access modes must *include* the access modes requested by the claim.
+
+
+**** Using PersistentVolumeClaim in Pod
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: mongodb
+  spec:
+    containers:
+    - image: mongo
+      name: mongodb
+      volumeMounts:
+      - name: mongodb-data
+        mountPath: /data/db
+      ports:
+      - containerPort: 27017
+        protocol: TCP
+    volumes:
+    - name: mongodb-data
+      persistentVolumeClaim:
+        claimName: mongodb-pvc    # referenced by name
+
+#+END_SRC
+
+
+[[file:img/k8s_vol_pv_pvc_logic.png]]
 
 * Internals
 
@@ -583,57 +761,6 @@ file:img/k8s_container_vs_vm_cpu.png
 
 
 
-
-
-
-
-
-
-
-
-
-
-** Volume
-
-Volumes aren't top-level resources like pods, but are instead defined as a part of a pod and *share the same lifecycle as the pod.* \\
-This means _a volume is created when the pod is started and is destroyed when the pod is deleted._
-
-#+BEGIN_EXAMPLE
-  Kubernetes volumes are a component of a pod and are thus defined in the pod's specification-much like containers.
-  They aren't a standalone Kubernetes object and can not be created or deleted on their own.
-#+END_EXAMPLE
-
-
-*** Volume Types
-
-- emptyDir :: A simple empty directory used for storing transient data.
-- hostPath :: Used for mounting directories from the worker node's filesystem into the pod.
-- gitRepo :: A volume initialized by checking out the contents of a Git repository.
-- nfs :: An NFS share mounted into the pod.
-- gcePersistentDisk, awsElasticBlockStore, azureDisk :: Cloud provider.
-- cinder, cephfs, iscsi, flocker, glusterfs, quobyte, rbd, flexVolume, vsphere- Volume, photonPersistentDisk, scaleIO :: Network storage.
-- onfigMap, secret, downwardAPI
-- persistentVolumeClaim
-
-*** =emptyDir= Volume
-
-An =emptyDir= volume is especially useful for sharing files between containers running in the same pod.
-
-An =emptyDir= volume is the simplest type of volume, but *other types build upon it*. \\
-(After the empty directory is created, they then populate it with data)
-
-**** The medium used
-
-The =emptyDir= used as the volume was created on the actual disk of the worker node hosting the pod. \\
-Kubernetes can create the =emptyDir= on a tmpfs filesystem (in memory instead of on disk). \\
-To do this, set the =emptyDir='s medium to =Memory=:
-
-#+BEGIN_SRC yaml
-  volumes:
-    - name: html
-      emptyDir:
-        medium: Memory
-#+END_SRC
 
 
 
