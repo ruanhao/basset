@@ -800,6 +800,157 @@ Cluster administrator can define =StorageClass= and let the system create a new 
 
 
 
+** ConfigMap & Secret
+
+*** Basic
+
+**** Overriding the command and arguments
+
+In Kubernetes, when specifying a container, you can choose to override both =ENTRYPOINT= and =CMD=.
+
+[[file:img/k8s_config_overriding.png]]
+
+
+In most cases, you’ll only set custom arguments and rarely override the command
+(except in *general-purpose images such as busybox*, which doesn’t define an =ENTRYPOINT= at all).
+
+#+BEGIN_EXAMPLE
+  The command and args fields can’t be updated after the pod is created.
+#+END_EXAMPLE
+
+
+**** Specifing env variables
+
+#+BEGIN_SRC yaml
+  kind: Pod
+  spec:
+   containers:
+   - image: luksa/fortune:env
+     env:                         # Adding a single variable to the environment variable list
+     - name: INTERVAL
+       value: "30"
+     name: html-generator
+#+END_SRC
+
+#+BEGIN_SRC yaml
+  env:
+  - name: FIRST_VAR
+    value: "foo"
+  - name: SECOND_VAR
+    value: "$(FIRST_VAR)bar"      # Referring to other environment variables
+#+END_SRC
+
+
+*** ConfigMap
+
+[[file:img/k8s_config_map.png]]
+
+
+**** Creating
+
+
+***** CLI
+
+#+BEGIN_SRC sh
+  kubectl create configmap my-config \
+          --from-file=foo.json \  # A single file
+          --from-file=bar=foobar.conf \ # A file stored under a custom key
+          --from-file=config-opts/ \ A whole directory
+          --from-literal=some=thing # A literal value
+#+END_SRC
+
+
+[[file:img/k8s_config_map_cli.png]]
+
+
+
+***** YAML
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: fortune-config
+  data:
+    sleep-interval: "25"
+#+END_SRC
+
+
+
+
+**** Passing CM to Container
+
+***** As ENV
+
+[[file:img/k8s_config_map_env.png]]
+
+- Passing all entries of a ConfigMap as environment variables at once
+
+  #+BEGIN_SRC yaml
+    spec:
+      containers:
+      - image: some-image
+        envFrom:                    # Using envFrom instead of env
+        - prefix: CONFIG_           # All environment variables will be prefixed with CONFIG_.
+          configMapRef:
+            name: my-config-map     # Referencing the ConfigMap called my-config-map
+
+  #+END_SRC
+
+#+BEGIN_EXAMPLE
+  The prefix is optional, so if you omit it the environment variables will have the same name as the keys.
+#+END_EXAMPLE
+
+- Passing a ConfigMap entry as a command-line argument
+
+  You can’t reference ConfigMap entries directly in the =pod.spec.containers.args= field,
+  but you can first initialize an environment variable from the ConfigMap entry and then refer to the variable inside the arguments:
+
+  [[file:img/k8s_config_map_env_args.png]]
+
+
+
+
+***** As Volume
+
+A =configMap= volume will expose each entry of the ConfigMap *as a file.*
+The process running in the container can obtain the entry’s value by reading the contents of the file.
+
+[[file:img/k8s_config_map_vol_yaml.png]]
+
+[[file:img/k8s_config_map_vol.png]]
+
+
+- Exposing Certain ConfigMap Entries in the Volume
+
+  [[file:img/k8s_config_map_vol_with_items.png]]
+
+
+- Mounting Individual ConfigMap Entries as Files without Hiding Other Files in the Directory
+
+  [[file:img/k8s_config_map_vol_with_specific_items.png]]
+
+  [[file:img/k8s_config_map_vol_with_specific_items_pic.png]]
+
+
+  #+BEGIN_EXAMPLE
+  The 'subPath' property can be used when mounting any kind of volume. Instead of mounting the whole volume, you can mount part of it.
+  #+END_EXAMPLE
+
+
+
+
+- Setting the File Permissions for Files in a ConfigMap Volume
+
+  #+BEGIN_SRC yaml
+    volumes:
+    - name: config
+      configMap:
+        name: fortune-config
+        defaultMode: "6600"         # This sets the permissions for all files to -rw-rw------
+  #+END_SRC
+
+
 * Internals
 
 ** Container Vs VM
