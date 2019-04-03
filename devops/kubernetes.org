@@ -951,6 +951,27 @@ The process running in the container can obtain the entry’s value by reading t
   #+END_SRC
 
 
+*** Secret
+
+Kubernetes helps keep your Secrets safe by making sure each Secret *is only distributed to the nodes* that run the pods that need access to the Secret. \\
+Also, on the nodes themselves, Secrets are always *stored in memory and never written to physical storage.*
+
+
+**** Default Token Secret
+
+*Every pod has a secret volume* attached to it automatically, which represent everything you need to securely talk to the Kubernetes API server from within your pods, should you need to do that.
+
+#+BEGIN_EXAMPLE
+  By default, the default-token Secret is mounted into every container, but you can disable that in each pod
+  by setting the automountServiceAccountToken field in the pod spec to false or by setting it to false on the service account the pod is using.
+#+END_EXAMPLE
+
+
+[[file:img/k8s_secret_default_token.png]]
+
+
+
+
 * Internals
 
 ** Container Vs VM
