@@ -197,27 +197,57 @@ EXPOSE 8080
   docker rmi `docker images -a -q` # 删除所有镜像
 #+END_SRC
 
+
 ** 常用指令
 
-*** CMD
+*** ENTRYPOINT & CMD
 
-Dockerfile 中只能有一个 CMD 指令生效， =docker run= 中的 command 会覆盖 Dockerfile 中的 CMD 指令
+- ENTRYPOINT :: defines the executable invoked when the container is started.
+- CMD :: specifies the arguments that get passed to the ENTRYPOINT.
 
-#+BEGIN_SRC
-     CMD [ "executable", "param1", "param2" ] # exec 模式
-     CMD command param1 param2                # shell 模式
-     CMD [ "param1", "param2" ]               # 作为 ENTRYPOINT 指令的默认参数
+Although you can use the =CMD= instruction to specify the command you want to execute when the image is run,
+the *correct way* is to do it through the =ENTRYPOINT= instruction and to only specify the =CMD= if you want to *define the default arguments.* \\
+The image can then be run without specifying any arguments:
+
+#+BEGIN_SRC sh
+  docker run <image>
 #+END_SRC
 
-*** ENTRYPOINT
+or with additional arguments, which override whatever’s set under =CMD= in the Dockerfile:
 
-如果要覆盖 Dockerfile 中的 ENTRYPOINT 指令, 则必须由 =docker run -e= 指定
-
-#+BEGIN_SRC
-     ENTRYPOINT [ "executable", "param1", "param2" ] # exec 模式
-     ENTRYPOINT command param1 param2                # shell 模式
+#+BEGIN_SRC sh
+  docker run <image> <arguments>
 #+END_SRC
 
+如果要覆盖 Dockerfile 中的 =ENTRYPOINT= 指令, 须由 =docker run -e= 指定。
+
+**** shell and exec forms
+
+- shell form :: For example, ENTRYPOINT node app.js.
+- exec form :: For example, ENTRYPOINT ["node", "app.js"].
+
+The difference is whether the specified command is invoked inside a shell or not.
+
+exec form:
+
+#+BEGIN_EXAMPLE
+  $ docker exec 4675d ps x
+    PID TTY    STAT   TIME COMMAND
+    1   ?      Ssl    0:00 node app.js
+    12 ?       Rs     0:00 ps x
+#+END_EXAMPLE
+
+shell form:
+
+#+BEGIN_EXAMPLE
+  $ docker exec -it e4bad ps x
+    PID TTY      STAT   TIME COMMAND
+      1 ?        Ss     0:00 /bin/sh -c node app.js
+      7 ?        Sl     0:00 node app.js
+      13 ?       Rs+    0:00 ps x
+#+END_EXAMPLE
+
+*Should always use the exec form of the ENTRYPOINT instruction.*
 
 * Docker Networking
 
