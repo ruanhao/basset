@@ -1477,6 +1477,7 @@ kubectl scale --replicas=6 replicaset <name>
   kubectl get
 #+END_SRC
 
+
 ** Discover possible API object fields
 
 #+BEGIN_SRC sh
@@ -1489,6 +1490,7 @@ You can then drill deeper to find out more about each attribute.
   kubectl explain pod.spec
 #+END_SRC
 
+
 ** Quickly switch to a different namespace
 
 #+BEGIN_SRC sh
@@ -1496,6 +1498,7 @@ You can then drill deeper to find out more about each attribute.
 #+END_SRC
 
 You can then switch between namespaces using =kcd <some-namespace>=
+
 
 ** Forwarding a local network port to a port in the pod
 
@@ -1517,6 +1520,7 @@ This can be done by using the =--previous= option:
   kubectl logs <pod> --previous
 #+END_SRC
 
+
 ** Get IPs of all nodes
 
 #+BEGIN_SRC sh
@@ -1524,3 +1528,34 @@ This can be done by using the =--previous= option:
 #+END_SRC
 
 To learn more about how to use JSONPath with kubectl, refer to the [To learn more about how to use JSONPath with kubectl, refer to the [[http://kubernetes.io/docs/user-guide/jsonpath][documentation]].
+
+** Talking to API Server
+
+*** kubectl proxy
+
+#+BEGIN_SRC sh
+  kubectl proxy --port 8081
+#+END_SRC
+
+#+BEGIN_SRC sh
+  curl http://localhost:8081
+#+END_SRC
+
+
+*** From in POD
+
+#+BEGIN_SRC sh
+  export CURL_CA_BUNDLE=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+  TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+  NS=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
+  curl -H "Authorization: Bearer $TOKEN" https://kubernetes
+  # Listing pods in the pod's own namespace
+  curl -H "Authorization: Bearer $TOKEN" https://kubernetes/api/v1/namespaces/$NS/pods
+#+END_SRC
+
+[[file:img/k8s_api_server_access.png]]
+
+
+- Using Ambassador Container
+
+  [[file:img/k8s_api_server_ambassador.png]]
