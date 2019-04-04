@@ -956,6 +956,10 @@ The process running in the container can obtain the entry’s value by reading t
 Kubernetes helps keep your Secrets safe by making sure each Secret *is only distributed to the nodes* that run the pods that need access to the Secret. \\
 Also, on the nodes themselves, Secrets are always *stored in memory and never written to physical storage.*
 
+#+BEGIN_EXAMPLE
+  The maximum size of a Secret is limited to 1MB.
+#+END_EXAMPLE
+
 
 **** Default Token Secret
 
@@ -970,7 +974,102 @@ Also, on the nodes themselves, Secrets are always *stored in memory and never wr
 [[file:img/k8s_secret_default_token.png]]
 
 
+**** Image Pull Secret
 
+#+BEGIN_SRC sh
+  kubectl create secret docker-registry mydockerhubsecret \
+    --docker-username=myusername --docker-password=mypassword \
+    --docker-email=my.email@provider.com
+
+#+END_SRC
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: private-pod
+  spec:
+    imagePullSecrets:             #| This enables pulling images
+    - name: mydockerhubsecret     #| from a private image registry.
+    containers:
+    - image: username/private:tag
+      name: main
+
+#+END_SRC
+
+**** Passing Secret to Container
+
+***** As Volume
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: fortune-https
+  spec:
+    containers:
+    - image: luksa/fortune:env
+      name: html-generator
+      env:
+      - name: INTERVAL
+        valueFrom:
+          configMapKeyRef:
+            name: fortune-config
+            key: sleep-interval
+      volumeMounts:
+      - name: html
+        mountPath: /var/htdocs
+    - image: nginx:alpine
+      name: web-server
+      volumeMounts:
+      - name: html
+        mountPath: /usr/share/nginx/html
+        readOnly: true
+      - name: config
+        mountPath: /etc/nginx/conf.d
+        readOnly: true
+      - name: certs                    # | Configured Nginx to read the cert and
+        mountPath: /etc/nginx/certs/   # | key file from /etc/nginx/certs, so you
+        readOnly: true                 # | need to mount the Secret volume there.
+      ports:
+      - containerPort: 80
+      - containerPort: 443
+    volumes:
+    - name: html
+      emptyDir: {}
+    - name: config
+      configMap:
+        name: fortune-config
+        items:
+        - key: my-nginx-config.conf
+          path: https.conf
+    - name: certs                 # | Define the secret
+      secret:                     # | volume here, referring to
+        secretName: fortune-https # | the fortune-https Secret.
+
+#+END_SRC
+
+
+[[file:img/k8s_secret_vol.png]]
+
+
+
+
+***** As ENV
+
+#+BEGIN_SRC yaml
+  env:
+  - name: FOO_SECRET
+    valueFrom:                    #| The variable should be set
+      secretKeyRef:               #| from the entry of a Secret.
+        name: fortune-https       # The name of the Secret holding the key
+        key: foo                  # The key of the Secret to exopse
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  Think twice before using environment variables to pass your Secrets to your container, because they may get exposed inadvertently.
+  To be safe, always use secret volumes for exposing Secrets.
+#+END_EXAMPLE
 
 * Internals
 
