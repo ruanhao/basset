@@ -1071,6 +1071,221 @@ Also, on the nodes themselves, Secrets are always *stored in memory and never wr
   To be safe, always use secret volumes for exposing Secrets.
 #+END_EXAMPLE
 
+
+** Deployment
+
+Deployment sits *on top of ReplicaSets* and enables declarative application updates.
+
+#+BEGIN_EXAMPLE
+  The ReplicaSet(created by Deployment)'s name also contains the hash value of its pod template.
+#+END_EXAMPLE
+
+[[file:img/k8s_deploy.png]]
+
+*** Updating Strategies
+
+You have two ways of updating all those pods. You can do one of the following:
+
+- Delete all existing pods first and then start the new ones (Recreate)
+
+  [[file:img/k8s_deploy_recreate.png]]
+
+
+- Start new ones and, once they're up, delete the old ones
+
+  You can do this either by adding all the new pods and then deleting all the old ones at once, or sequentially,
+  by adding new pods and removing old ones gradually.
+
+  - Spinning up new pods and then deleting the old ones (blue-green deployment)
+
+    [[file:img/k8s_deploy_blue_green.png]]
+
+
+  - RollingUpdate
+
+    Should use this strategy only when your app can handle running both the old and new version *at the same time.*
+
+
+    [[file:img/k8s_deploy_rolling.png]]
+
+
+
+*** Performing RU with =kubectl=
+
+#+BEGIN_SRC sh
+  kubectl rolling-update   kubia-v1      kubia-v2   --image=luksa/kubia:v2
+  #                      ===old rc===  ===new rc===
+#+END_SRC
+
+**** Steps Required Before RU
+
+1. Copying old controller to new controller and changing the image in its pod template.
+2. Add an additional =deployment= label in *both* origin and new contoller.
+3. Modify the labels of the live pods.
+
+[[file:img/k8s_deploy_cli_warmup.png]]
+
+After setting up all this, kubectl starts replacing pods by first scaling up the new controller to 1.
+The controller thus creates the first v2 pod.
+kubectl then scales down the old ReplicationController by 1.
+
+[[file:img/k8s_deploy_cli_doing.png]]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*** Creating Deployment
+
+#+BEGIN_SRC yaml
+  apiVersion: apps/v1beta1        # Deployments are in the apps API group, version v1beta1.
+  kind: Deployment
+  metadata:
+    name: kubia                   # There's no need to include the version info in the name of the Deployment.
+  spec:
+    replicas: 3
+    template:
+      metadata:
+        name: kubia
+        labels:
+          app: kubia
+      spec:
+        containers:
+        - image: luksa/kubia:v1
+          name: nodejs
+#+END_SRC
+
+#+BEGIN_SRC sh
+  kubectl create -f kubia-deployment-v1.yaml --record
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  Be sure to include the --record command-line option when creating it. This records the command in the revision history.
+#+END_EXAMPLE
+
+
+*** Updating Deployment
+
+The only thing you need to do is modify the pod template defined in the Deployment resource and
+Kubernetes will take all the steps necessary to get the actual system state to what's defined in the resource.
+
+[[file:img/k8s_deploy_update_image.png]]
+
+
+[[file:img/k8s_deploy_update_process.png]]
+
+*** Rolling Back
+
+Deployments make it easy to roll back to the previously deployed version by telling Kubernetes to undo the last rollout of a Deployment:
+
+#+BEGIN_SRC sh
+  $ kubectl rollout undo deployment kubia
+  deployment "kubia" rolled back
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  The undo command can also be used while the rollout process is still in progress to essentially abort the rollout.
+  Pods already created during the roll- out process are removed and replaced with the old ones again.
+#+END_EXAMPLE
+
+The length of the revision history is limited by the =revisionHistoryLimit= property on the Deployment resource.
+
+
+
+
+
+
+
+
+
+*** maxSurge/maxUnavailable
+
+#+BEGIN_SRC yaml
+  spec:
+    strategy:
+      rollingUpdate:
+        maxSurge: 1
+        maxUnavailable: 0
+      type: RollingUpdate
+#+END_SRC
+
+- maxSurge
+
+  Determines how many pod instances you allow to exist *above* the desired replica count configured on the Deployment. \\
+  It defaults to 25%, so there can be at most 25% more pod instances than the desired count. \\
+  The value can also be an absolute value.
+- maxUnavailable
+
+  Determines how many pod instances can be unavailable relative to the desired replica count during the update. \\
+  It also defaults to 25%, so the number of available pod instances must never fall below 75% of the desired replica count. \\
+  Can also specify an absolute value instead of a percentage.
+
+
+[[file:img/k8s_deploy_rollout_rate.png]]
+
+
+*** Pausing Rollout Process
+
+A Deployment can also be paused during the rollout process. \\
+This *allows you to verify that everything is fine with the new version* before proceeding with the rest of the rollout.
+
+#+BEGIN_SRC sh
+  $ kubectl set image deployment kubia nodejs=luksa/kubia:v4
+  deployment "kubia" image updated
+
+  $ kubectl rollout pause deployment kubia
+  deployment "kubia" paused
+
+  # A single new pod should have been created, but all original pods should also still be running.
+  # Once the new pod is up, a part of all requests to the service will be redirected to the new pod.
+
+  # Once you're confident the new version works as it should, you can resume the deployment to replace all the old pods with new ones:
+  $ kubectl rollout resume deployment kubia
+  deployment "kubia" resumed
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  If a Deployment is paused, the 'undo' command won't undo it until you resume the Deployment.
+#+END_EXAMPLE
+
+
+*** Blocking Rollout (minReadySeconds)
+
+=minReadySeconds= can be used to slow down the rollout, so you could see it was indeed performing a rolling update and not replacing all the pods at once. \\
+But the main function of =minReadySeconds= is to prevent deploying malfunctioning versions, *not slowing down a deployment for fun.*
+
+- This property specifies how long a newly created pod should be ready before the pod is treated as available.
+- *Until the pod is available, the rollout process will not continue.*
+- If a new pod's readiness probe starts failing before minReadySeconds have passed, the rollout of the new version will effectively *be blocked.*
+
+
+#+BEGIN_EXAMPLE
+  With a properly configured readiness probe and a proper minReadySeconds setting,
+  Kubernetes would have prevented us from deploying buggy version at an earlier stage.
+
+  If only define the readiness probe without setting 'minReadySeconds' properly,
+  new pods are considered available immediately when the first invocation of the readiness probe succeeds.
+  If the readiness probe starts failing shortly after, the bad version is rolled out across all pods.
+  Therefore, you should set 'minReadySeconds' appropriately.
+#+END_EXAMPLE
+
+When the rollout will never continue, the only thing to do now is abort the rollout by undoing it:
+
+#+BEGIN_SRC sh
+  $ kubectl rollout undo deployment kubia
+  deployment "kubia" rolled back
+#+END_SRC
+
+
 * Internals
 
 ** Container Vs VM
@@ -1529,6 +1744,7 @@ This can be done by using the =--previous= option:
 
 To learn more about how to use JSONPath with kubectl, refer to the [To learn more about how to use JSONPath with kubectl, refer to the [[http://kubernetes.io/docs/user-guide/jsonpath][documentation]].
 
+
 ** Talking to API Server
 
 *** kubectl proxy
@@ -1559,3 +1775,47 @@ To learn more about how to use JSONPath with kubectl, refer to the [To learn mor
 - Using Ambassador Container
 
   [[file:img/k8s_api_server_ambassador.png]]
+
+
+** Ways of modifying Deployments and other resources
+
+*** edit
+
+Opens the object's manifest in your default editor. \\
+After making changes, saving the file, and exiting the editor, the object is updated.
+
+Example: =kubectl edit deployment kubia=
+
+
+*** patch
+
+Modifies individual properties of an object. \\
+Example:
+
+#+BEGIN_SRC sh
+  kubectl patch deployment kubia -p '{"spec": {"template": {"spec": {"containers": [{"name": "nodejs", "image": "luksa/kubia:v2"}]}}}}'
+#+END_SRC
+
+
+*** apply
+
+Modifies the object by applying property values from a full YAML or JSON file. \\
+If the object specified in the YAML/JSON *doesn't exist yet, it's created.* \\
+The file needs to contain the *full* definition of the resource
+(it can't include only the fields you want to update, as is the case with =kubectl patch=).
+
+Example: =kubectl apply -f kubia-deployment-v2.yaml=
+
+
+*** replace
+
+Replaces the object with a new one from a YAML/JSON file. \\
+In contrast to the apply command, this command *requires the object to exist*; otherwise it prints an error.
+
+Example: =kubectl replace -f kubia-deployment-v2.yaml=
+
+*** set image
+
+Changes the container image defined in a Pod, ReplicationController's template, Deployment, DaemonSet, Job, or ReplicaSet.
+
+Example: =kubectl set image deployment kubia nodejs=luksa/kubia:v2=
