@@ -629,7 +629,7 @@ and Kubernetes finds the appropriate PersistentVolume and *binds the volume to t
 The PersistentVolumeClaim can then be used as one of the volumes inside a pod.
 
 #+BEGIN_EXAMPLE
-  Other users cannot use the same PersistentVolume until it has been released by delet- ing the bound PersistentVolumeClaim.
+  Other users cannot use the same PersistentVolume until it has been released by deleting the bound PersistentVolumeClaim.
 #+END_EXAMPLE
 
 **** Creating PersistentVolume
@@ -1286,6 +1286,113 @@ When the rollout will never continue, the only thing to do now is abort the roll
 #+END_SRC
 
 
+** StatefulSet
+
+StatefulSet makes sure pods are rescheduled in such a way that they retain their identity and state.
+
+StatefulSets were more like ReplicaSets and not like Deployments, so they *don't perform a rollout when the template is modified.*
+
+#+BEGIN_EXAMPLE
+  Starting from Kubernetes version 1.7, StatefulSets support rolling updates the same way Deployments and DaemonSets do.
+  See the StatefulSet's spec.updateStrategy field documentation using kubectl explain for more information.
+#+END_EXAMPLE
+
+*** 设计思想
+
+**** Stable Identity
+
+Each pod created by a StatefulSet is assigned an ordinal index (zero-based),
+which is then used to derive the pod's name and hostname, and to attach stable storage to the pod. \\
+The names of the pods are thus *predictable*.
+
+[[file:img/k8s_sts_stable_id.png]]
+
+
+***** Governing Service
+
+StatefulSet requires to create a corresponding *governing headless Service* that's used to provide the actual network identity to each pod. \\
+Through this Service, *each pod gets its own DNS entry*, so its peers and possibly other clients in the cluster can *address the pod by its hostname:*
+
+#+BEGIN_EXAMPLE
+  a-0       .foo          .default   .svc.cluster.local
+  --------  ------------  ---------  ----------------------------------
+  pod name  service name  namespace  configurable cluster domain suffix
+#+END_EXAMPLE
+
+Additionally, we can also use DNS to look up all the StatefulSet's pods' names by looking up *SRV records* for the =foo.default.svc.cluster.local= domain.
+
+#+BEGIN_EXAMPLE
+  SRV records are used to point to hostnames and ports of servers providing a specific service.
+  Kubernetes creates SRV records to point to the hostnames of the pods backing a HEADLESS SERVICE.
+#+END_EXAMPLE
+
+
+***** Scaling
+
+- Scaling the StatefulSet creates a new pod instance with the *next unused ordinal index.*
+- Scaling down a StatefulSet always removes the instances with the *highest ordinal index first.*
+
+#+BEGIN_EXAMPLE
+  ONLY ONE POD INSTANCE AT A TIME WHEN SCALING DOWN/UP:
+
+  Because some stateful applications don't handle rapid scale-downs nicely,
+  StatefulSets scale down ONLY ONE POD INSTANCE AT A TIME
+  (for example: distributed data store may lose data if multiple nodes go down at the same time).
+  For this exact reason, StatefulSets also never permit scale-down operations IF ANY OF THE INSTANCES ARE UNHEALTHY.
+  If an instance is unhealthy, and you scale down by one at the same time, you've effectively lost two cluster members at once.
+#+END_EXAMPLE
+
+
+
+
+
+
+
+
+**** Stable Dedicated Storage
+
+Each stateful pod instance needs to use its *own* storage, if a stateful pod is rescheduled
+the new instance must have the *same* storage attached to it.
+
+StatefulSet uses volume claim *templates* to _stamp out_ PersistentVolumeClaims along with each pod instance:
+
+[[file:img/k8s_sts_stable_vol.png]]
+
+PersistentVolumeClaim remains after a scale-down:
+
+[[file:img/k8s_sts_stable_vol2.png]]
+
+
+**** Guarantees
+
+A StatefulSet must guarantee *at-most-one semantics* for stateful pod instances. \\
+This means a StatefulSet must be _absolutely certain_ that a pod is no longer running before it can create a replacement pod.
+
+Kubernetes master can only know that *when the cluster administrator tells it so.* \\
+To do that, the admin needs to *either* _delete the pod forcibly_ or _delete the whole node._
+
+
+#+BEGIN_EXAMPLE
+  UNDERSTANDING WHAT HAPPENS TO PODS WHOSE STATUS IS UNKNOWN
+
+  If the pod's status remains UNKNOWN for more than a few minutes (this time is configurable),
+  the pod is marked for deletion, and will be removed as soon as the Kubelet notifies the API server that the pod's containers have terminated.
+  The only thing you can do is tell the API server to delete the pod without waiting for the Kubelet to confirm that the pod is no longer running:
+  kubectl delete po <name> --force --grace-period 0
+#+END_EXAMPLE
+
+
+*** Deploying App through StatefulSet
+
+To deploy app, you'll need to create two (or three) different types of objects:
+- PersistentVolumes for storing your data files
+
+  Need to create these *only if* the cluster doesn't support dynamic provisioning of PersistentVolumes.
+- A governing Service required by the StatefulSet.
+- The StatefulSet itself.
+
+
+
 * Internals
 
 ** Container Vs VM
@@ -1693,6 +1800,15 @@ kubectl scale --replicas=6 replicaset <name>
 #+END_SRC
 
 
+** Run Temporary Pod
+
+#+BEGIN_SRC sh
+  kubectl run -it srvlookup --image=tutum/dnsutils --rm --restart=Never -- dig SRV kubia.default.svc.cluster.local
+#+END_SRC
+
+The command runs a _one-off_ pod (--restart=Never) called srvlookup,
+which is attached to the console (-it) and is deleted as soon as it terminates (--rm).
+
 ** Discover possible API object fields
 
 #+BEGIN_SRC sh
@@ -1721,6 +1837,25 @@ Using port forwarding like this is an effective way to test an individual pod.
 
 #+BEGIN_SRC sh
   kubectl port-forward <pod-name> <local-port>:<pod-port>
+#+END_SRC
+
+
+** Communicating with Pods through API Server
+
+One useful feature of the API server is the ability to proxy connections directly to individual pods. \\
+If you want to perform requests against your kubia-0 pod, you hit the following URL:
+#+BEGIN_SRC sh
+  <apiServerHost>:<port>/api/v1/namespaces/default/pods/kubia-0/proxy/<path>
+#+END_SRC
+
+
+** Connecting to Cluster-Internal Services through API Server
+
+Instead of using a piggyback pod to access the service from inside the cluster, \\
+you can use the same proxy feature provided by the API server to access the service:
+
+#+BEGIN_SRC sh
+ /api/v1/namespaces/<namespace>/services/<service name>/proxy/<path>
 #+END_SRC
 
 
