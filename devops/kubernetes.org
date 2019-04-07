@@ -478,6 +478,8 @@ which services can’t.
 #+END_EXAMPLE
 
 
+
+
 ***** YAML Definition
 
 [[file:img/k8s_svc_ingress_def.png]]
@@ -485,8 +487,9 @@ which services can’t.
 [[file:img/k8s_svc_ingress_process.png]]
 
 
-Ingress controller didn’t forward the request to the service. *It only used it to select a pod*. (Most controllers work like this)
-
+Ingress controller didn’t forward the request to the service. *It only used it to select a pod*. (Most controllers work like this) \\
+This affects the preservation of client IPs when external clients connect through the Ingress controller,
+which makes them preferred over Services in certain use cases.
 
 
 *** Readiness Probe
@@ -1397,6 +1400,8 @@ To deploy app, you'll need to create two (or three) different types of objects:
 
 ** Architecture
 
+[[file:img/k8s_components.png]]
+
 - components of the control plane
   - etcd
   - api server
@@ -1413,9 +1418,113 @@ To deploy app, you'll need to create two (or three) different types of objects:
   - heapster
   - container network interface network plugin
 
-[[file:img/k8s_components.png]]
 
 
+Kubernetes system components communicate only with the API server.
+The API server is *the only component* that communicates with etcd.
+
+Components on the worker nodes all need to run *on the same node*,
+the components of the Control Plane can easily be split *across multiple servers.*
+
+
+*** etcd
+
+Kubernetes stores all its data in etcd under =/registry=.
+
+**** Optimistic Concurrency Control
+
+#+HTML: <img src="https://img.mukewang.com/5b5c698900010e0004970285.jpg"/>
+
+All Kubernetes resources include a =metadata.resourceVersion= field, which clients need to pass back to the API server when updating an object. \\
+If the version doesn't match the one stored in etcd, the API server rejects the update.
+
+
+**** RAFT
+
+[[http://thesecretlivesofdata.com/raft/][Understandable Distributed Consensus by Animation]]
+
+
+
+
+*** API Server
+
+[[file:img/k8s_api_server.png]]
+
+
+- Authentication Plugins
+
+  Extracts the client's username, user ID, and groups the user belongs to, that are then used in the next stage (Authorization).\\
+  Plugins are called *in turn* until one of them determines who is sending the request.
+- Authorization Plugins
+
+  Determine whether the authenticated user can perform the requested action on the requested resource.\\
+  Plugins are called *in turn* until one plugin says the user can perform the action.
+- Admission Control Plugins
+  Modify the resource (or other related resources). \\
+  The resource passes through *all* plugins. \\
+  When the request is _only trying to read data_, the request doesn't go through the Admission Control.
+
+
+**** Resource Changes Notification
+
+API server doesn't create resources. That's what *controllers in the Controller Manager* do. \\
+Control Plane components can request *to be notified* when a resource is created, modified, or deleted.
+
+[[file:img/k8s_api_server_notify.png]]
+
+
+
+
+
+
+*** Scheduler
+
+Scheduler *doesn't instruct the selected node* (or the Kubelet running on that node) to run the pod. \\
+All the Scheduler does is update the pod definition through the API server. The API server then notifies the Kubelet
+(through the WATCHING MECHANISM) that the pod has been scheduled.
+
+
+*** Controller Manager
+
+Actual work (create, update, delete...) is done by controllers running inside the Controller Manager.
+
+[[file:img/k8s_controller_manager.png]]
+
+(Replication Manager is a controller for ReplicationController resources)
+
+
+*** Kublet
+
+Kubelet is the component responsible for *everything* running on a worker node:
+
+- Monitors running containers and reports their status, events, and resource consumption to the API server.
+- Runs the container liveness probes, restarting containers when the probes fail.
+- Terminates containers when their Pod is deleted from the API server and notifies the server that the pod has terminated.
+
+**** Run Static Pods without API Server
+
+Instead of running Kubernetes system components natively, you can put their pod manifests into the Kubelet's manifest directory
+and have the Kubelet run and manage them.
+
+[[file:img/k8s_kubelet.png]]
+
+#+BEGIN_EXAMPLE
+  You can also use the same method to run your custom system containers, but doing it through a DaemonSet is the recommended method.
+#+END_EXAMPLE
+
+
+*** Kube-Proxy
+
+kube-proxy's purpose is to make sure clients can connect to the services you define through the Kubernetes API.
+
+[[file:img/k8s_kubeproxy_iptables.png]]
+
+
+
+*** Add-on
+
+Add-on components are deployed as pods by submitting YAML manifests to the API server. \\
+Some of these components are deployed through a Deployment resource or a ReplicationController resource, and some through a DaemonSet.
 
 * YAML
 
@@ -1926,3 +2035,22 @@ Example: =kubectl replace -f kubia-deployment-v2.yaml=
 Changes the container image defined in a Pod, ReplicationController's template, Deployment, DaemonSet, Job, or ReplicaSet.
 
 Example: =kubectl set image deployment kubia nodejs=luksa/kubia:v2=
+
+
+** Checking the status of the Control Plane components
+
+#+BEGIN_SRC sh
+$ kubectl get componentstatuses
+NAME                 STATUS    MESSAGE            ERROR
+scheduler            Healthy   ok
+controller-manager   Healthy   ok
+etcd-0               Healthy   {"health": "true"}
+
+#+END_SRC
+
+
+** WATCHING Resources
+
+#+BEGIN_SRC sh
+  kubectl get po --watch
+#+END_SRC
