@@ -120,6 +120,8 @@ Kubernetes will periodically execute the probe and restart the container if the 
 #+END_EXAMPLE
 
 
+
+
 ** ReplicationController
 
 A ReplicationController’s job is to make sure that an exact number of pods always *matches its label selector.* \\
@@ -1526,48 +1528,69 @@ kube-proxy's purpose is to make sure clients can connect to the services you def
 Add-on components are deployed as pods by submitting YAML manifests to the API server. \\
 Some of these components are deployed through a Deployment resource or a ReplicationController resource, and some through a DaemonSet.
 
-* YAML
-
-[[https://plugins.jetbrains.com/plugin/9354-kubernetes-and-openshift-resource-support][IDEA Kubernetes YAML 插件]]
-
-** Key Value Pair
-
-#+BEGIN_SRC yaml
-  fruit: apple
-  vegetable: carrot
-  liquid: water
-  meat: chicken
-#+END_SRC
 
 
-** Array / List
 
-#+BEGIN_SRC yaml
-  fruits:
-    - orange
-    - apple
-    - banana
+** Cooperation between controllers
 
-  vegetables:
-    - carrot
-    - cauliflower
-    - tomato
-#+END_SRC
+[[file:img/k8s_controllers_cope.png]]
+
+[[file:img/k8s_controllers_cope2.png]]
 
 
-** Dictionary / Map
 
-#+BEGIN_SRC yaml
-  banana:
-    calories: 105
-    fat: 0.4
-    carbs: 27
 
-  grape:
-    calories: 62
-    fat: 0.3
-    carbs: 16
-#+END_SRC
+** Pod
+
+*** Infrastructure Container
+
+The _pause container_ is the infrastructure container that holds all the containers of a pod together. \\
+All other user-defined containers of the pod then *use the namespaces* of the pod infrastructure container.
+
+[[file:img/k8x_pod_infra_container.png]]
+
+Actual application containers may die and get restarted. When such a container starts up again, it needs to become part of the same Linux namespaces as before. \\
+If the infrastructure pod is killed in the meantime, the Kubelet *recreates it and all the pod’s containers.*
+
+*** Inter-pod networking
+
+The network is set up by Container Network Interface (CNI) plugin, not by Kubernetes itself.
+
+**** Pods are connected NAT-less
+
+[[file:img/k8s_pod_natless.png]]
+
+
+**** Communication between nodes
+
+Bridges across the nodes must use non-overlapping address ranges to prevent pods on different nodes from getting the same IP.
+
+[[file:img/k8s_pod_communicate_between_nodes.png]]
+
+- Node’s physical network interface needs to be con- nected to the bridge as well.
+- Routing tables on node A need to be configured so all packets destined for 10.1.2.0/24 are routed to node B.
+- Node B’s routing tables need to be configured so packets sent to 10.1.1.0/24 are routed to node A.
+
+#+BEGIN_EXAMPLE
+  This works only when nodes are connected to the same network switch, without any routers in between.
+
+  It’s easier to use a Software Defined Network (SDN), which makes the nodes appear as though they’re connected to the same network switch,
+  regardless of the actual underlying network topology, no matter how complex it is.
+  Packets sent from the pod are encapsulated and sent over the network to the node running the other pod,
+  where they are de-encapsulated and delivered to the pod in their original form.
+#+END_EXAMPLE
+
+**** Container Network Interface
+
+To make it easier to connect containers into a network, a project called Container Network Interface (CNI) was started. \\
+The CNI allows Kubernetes to be configured to use any CNI plugin that’s out there. These plugins include:
+
+- Calico
+- Flannel
+- Romana
+- Weave Net
+
+See [[https://kubernetes.io/docs/concepts/cluster-administration/addons/][Reference]].
 
 
 
@@ -1867,6 +1890,52 @@ kubectl scale --replicas=6 replicaset <name>
 
 * Utils
 
+** YAML Basic
+
+[[https://plugins.jetbrains.com/plugin/9354-kubernetes-and-openshift-resource-support][IDEA Kubernetes YAML 插件]]
+
+*** Key Value Pair
+
+#+BEGIN_SRC yaml
+  fruit: apple
+  vegetable: carrot
+  liquid: water
+  meat: chicken
+#+END_SRC
+
+
+*** Array / List
+
+#+BEGIN_SRC yaml
+  fruits:
+    - orange
+    - apple
+    - banana
+
+  vegetables:
+    - carrot
+    - cauliflower
+    - tomato
+#+END_SRC
+
+
+*** Dictionary / Map
+
+#+BEGIN_SRC yaml
+  banana:
+    calories: 105
+    fat: 0.4
+    carbs: 27
+
+  grape:
+    calories: 62
+    fat: 0.3
+    carbs: 16
+#+END_SRC
+
+
+
+
 ** Bash completion
 
 #+BEGIN_SRC sh
@@ -2053,4 +2122,18 @@ etcd-0               Healthy   {"health": "true"}
 
 #+BEGIN_SRC sh
   kubectl get po --watch
+#+END_SRC
+
+
+** Observing cluster events
+
+Both the Control Plane components and the Kubelet *emit events to the API server as they perform these actions.*
+
+If an event occurs multiple times, the event is displayed *only once* by =kubectl get events=,
+showing when it was first seen, when it was last seen, and the number of times it occurred.
+
+Watching events with the =--watch= option is much easier on the eyes and useful for seeing what’s happening in the cluster:
+
+#+BEGIN_SRC sh
+  kubectl get events --watch
 #+END_SRC
