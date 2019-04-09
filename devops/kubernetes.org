@@ -1531,11 +1531,13 @@ Some of these components are deployed through a Deployment resource or a Replica
 
 
 
+
 ** Cooperation between controllers
 
 [[file:img/k8s_controllers_cope.png]]
 
 [[file:img/k8s_controllers_cope2.png]]
+
 
 
 
@@ -1592,6 +1594,133 @@ The CNI allows Kubernetes to be configured to use any CNI plugin that’s out th
 
 See [[https://kubernetes.io/docs/concepts/cluster-administration/addons/][Reference]].
 
+
+
+** High Availability
+
+[[file:img/k8s_ha.png]]
+
+[[file:img/k8s_ha2.png]]
+
+
+
+
+* Security
+
+** Understanding Authentication
+
+When a request is received by the API server, it goes through the list of authentication plugins, so they can each examine the request and try to determine *who* is sending the request.
+
+The first plugin that can extract that information from the request returns the _username_, _user ID_, and the _groups_ the client belongs to back to the API server core. \\
+The API server stops invoking the remaining authentication plugins and continues onto the authorization phase.
+
+Several authentication plugins are available. They obtain the identity of the client using the following methods:
+
+1. From the client certificate
+2. From an authentication token passed in an HTTP header
+3. Basic HTTP authentication
+
+*** Users
+
+Kubernetes distinguishes between two kinds of clients connecting to the API server:
+
+1. Actual humans (users)
+2. Pods (more specifically, applications running inside them)
+
+Users are meant to be managed by an *external system*, such as a Single Sign On (SSO) system, \\
+but the pods use a mechanism called *service accounts*, which are created and stored in the cluster as ServiceAccount resources.
+
+In contrast, no resource represents user accounts, which means you can’t create, update, or delete users through the API server.
+
+
+*** Group
+
+Both human users and ServiceAccounts can belong to one or more groups.
+
+#+BEGIN_SRC plantuml :file img/k8s_group.png :eval never-export
+  node group1
+  node group2
+
+  actor user
+  component serviceAccount
+
+
+  user .up.> group1
+  user .up.> group2
+
+  serviceAccount .up.> group1
+  serviceAccount .up.> group2
+#+END_SRC
+
+#+RESULTS:
+[[file:img/k8s_group.png]]
+
+
+
+
+
+
+*** Service Account
+
+ServiceAccounts are resources just like Pods, Secrets, ConfigMaps, and so on, and are scoped to individual namespaces.
+
+*Each pod is associated with exactly one ServiceAccount*, but multiple pods can use the same ServiceAccount:
+
+[[file:img/k8s_sa.png]]
+
+#+BEGIN_EXAMPLE
+  When a request bearing the authentication token is received by the API server,
+  the server uses the token to authenticate the client sending the request and then
+  determines whether or not the related ServiceAccount is allowed to perform the requested operation.
+  The API server obtains this information from the system-wide authorization plugin configured by the cluster administrator.
+  One of the available authorization plugins is the role-based access control (RBAC) plugin.
+#+END_EXAMPLE
+
+[[file:img/k8s_sa_inspect.png]]
+
+#+BEGIN_EXAMPLE
+  The authentication tokens used in ServiceAccounts are JWT tokens.
+#+END_EXAMPLE
+
+**** Mountable Secrets
+
+By default, a pod can mount any Secret it wants. But the pod’s ServiceAccount can be configured to only allow the pod to mount Secrets that are listed as mountable Secrets on the ServiceAccount. \\
+To enable this feature, the ServiceAccount must contain the following annotation: _kubernetes.io/enforce-mountable-secrets="true"_.
+
+
+**** Image Pull Secrets
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    name: my-service-account
+  imagePullSecrets:
+  - name: my-dockerhub-secret
+#+END_SRC
+
+Adding image pull Secrets to a ServiceAccount *saves you from having to add them to each pod individually.*
+
+**** Assigning ServiceAccount to Pod
+
+#+BEGIN_EXAMPLE
+  A pod’s ServiceAccount must be set when creating the pod. It can’t be changed later.
+#+END_EXAMPLE
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: curl-custom-sa
+  spec:
+    serviceAccountName: foo       # uses customized service account instead of the default
+    containers:
+    - name: main
+      image: tutum/curl
+      command: ["sleep", "9999999"]
+    - name: ambassador
+      image: luksa/kubectl-proxy:1.6.2
+#+END_SRC
 
 
 * 核心原理
