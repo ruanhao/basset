@@ -1755,7 +1755,9 @@ Roles define *what* can be done, while bindings define *who* can do it:
 
 
 Role and RoleBinding are namespaced resources, whereas the ClusterRole and ClusterRoleBinding are cluster-level resources (not namespaced). \\
-Although RoleBindings are namespaced, they can also reference ClusterRoles:
+Although RoleBindings are namespaced, they can also reference ClusterRoles: \\
+(you can create a RoleBinding and have it reference a ClusterRole when you *want to enable access to namespaced resources,*
+_you can't use the same approach for cluster-level (non-namespaced) resources_)
 
 [[file:img/k8s_rbac_roles2.png]]
 
@@ -1806,6 +1808,14 @@ RoleBinding can add the other pod's ServiceAccount, *even though it's in a diffe
 [[file:img/k8s_role_rolebinding2.png]]
 
 
+
+**** ClusterRole/ClusterRoleBinding
+
+Regular Role only allows access to resources in the same namespace the Role is in,
+and can't grant access to non-resource URLs (/healthz for example), *but ClusterRoles can.*
+
+ClusterRole is a cluster-level resource for allowing access to non-namespaced resources or non-resource URLs or
+used as a *common* role to be bound inside individual namespaces, saving you from having to redefine the same role in each of them.
 
 * 核心原理
 
