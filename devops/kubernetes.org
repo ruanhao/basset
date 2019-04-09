@@ -1701,6 +1701,7 @@ To enable this feature, the ServiceAccount must contain the following annotation
 
 Adding image pull Secrets to a ServiceAccount *saves you from having to add them to each pod individually.*
 
+
 **** Assigning ServiceAccount to Pod
 
 #+BEGIN_EXAMPLE
@@ -1721,6 +1722,89 @@ Adding image pull Secrets to a ServiceAccount *saves you from having to add them
     - name: ambassador
       image: luksa/kubectl-proxy:1.6.2
 #+END_SRC
+
+#+BEGIN_EXAMPLE
+  When your cluster isn't using proper authorization, creating and using additional ServiceAccounts doesn't make much sense,
+  since even the default ServiceAccount is allowed to do anything.
+#+END_EXAMPLE
+
+
+
+** RBAC
+
+RBAC prevents unauthorized users from viewing or modifying the cluster state. \\
+*The default ServiceAccount isn't allowed to view cluster state*, let alone modify it in any way.
+
+A subject (which may be a human, a ServiceAccount, or a group of users or ServiceAccounts) is *associated with one or more roles* and
+each role is allowed to perform certain verbs (actions) on certain resources.
+
+*** RBAC Resources
+
+The RBAC authorization rules are configured through _four resources_, which can be grouped into _two groups_:
+
+1. Roles and ClusterRoles
+
+   Specify *which verbs* can be performed on *which resources*.
+2. RoleBindings and ClusterRoleBindings
+
+   *Bind* the above roles to specific users, groups, or ServiceAccounts.
+
+Roles define *what* can be done, while bindings define *who* can do it:
+
+[[file:img/k8s_rbac_roles.png]]
+
+
+Role and RoleBinding are namespaced resources, whereas the ClusterRole and ClusterRoleBinding are cluster-level resources (not namespaced). \\
+Although RoleBindings are namespaced, they can also reference ClusterRoles:
+
+[[file:img/k8s_rbac_roles2.png]]
+
+
+**** Role/RoleBinding
+
+***** Create Role
+
+#+BEGIN_SRC yaml
+  apiVersion: rbac.authorization.k8s.io/v1
+  kind: Role
+  metadata:
+    namespace: foo                # if namespace is omitted, the current namespace is used
+    name: service-reader
+  rules:
+  - apiGroups: [""]               # core apiGroup, which has no name - hence the ""
+    verbs: ["get", "list"]        # getting individual Services (by name) and listing all of them is allowed.
+    resources: ["services"]       # plural name must be used!
+    # resourceNames: []             # limit access only to specific Service instances by specifying their names
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  The plural form must be used when specifying resources.
+#+END_EXAMPLE
+
+***** Binding Role to ServiceAccount
+
+A Role defines what actions can be performed, but it doesn't specify who can perform them. \\
+To do that, you must bind the Role to a subject, which can be _a user, a ServiceAccount, or a group (of users or ServiceAccounts)._
+
+#+BEGIN_SRC sh
+  kubectl create rolebinding test --role=service-reader --serviceaccount=foo:default -n foo
+  # you can check yaml definition by run: kubectl get rolebinding test -n foo -o yaml
+#+END_SRC
+
+[[file:img/k8s_role_rolebinding.png]]
+
+#+BEGIN_EXAMPLE
+  To bind a Role to a user instead of a ServiceAccount, use the --user argument to specify the username.
+  To bind it to a group, use --group.
+#+END_EXAMPLE
+
+
+****** Including ServiceAccounts from other namespaces
+
+RoleBinding can add the other pod's ServiceAccount, *even though it's in a different namespace*:
+
+[[file:img/k8s_role_rolebinding2.png]]
+
 
 
 * 核心原理
