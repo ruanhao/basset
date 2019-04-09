@@ -528,13 +528,29 @@ X509v3 extensions:
 #+END_EXAMPLE
 
 #+BEGIN_SRC sh
-  openssl verify -CAfile <(cat root.pem intermediate.pem) <cert_to_verify>.pem
+  # root.pem 是用户信任的证书，一般位于 /etc/ssl/certs/ 中
+  # 因此验证证书需要提供完整的证书链
+  openssl verify -CAfile <(cat root.pem intermediate.pem) cert_to_verify.pem
+  openssl verify -CAFile root.pem -untrusted intermediate-ca-chain.pem cert_to_verify.pem
+
 #+END_SRC
 
 #+BEGIN_EXAMPLE
   若出现: error 18 at 0 depth lookup:self signed certificate ，虽然返回 OK ，但实际验证失败。
 #+END_EXAMPLE
 
+如果系统中没有 root.pem ，只有中间证书：
+
+#+BEGIN_SRC sh
+  openssl verify -untrusted intermediate-ca-chain.pem example.pem cert_to_verify.pem
+#+END_SRC
+
+**** 使用 CApath
+
+#+BEGIN_SRC sh
+  (cd /some/where/certs && c_rehash .) # usally /etc/ssl/certs
+  openssl verify -CApath /some/where/certs [-untrusted intermediate-ca-chain.pem] cert_to_verify.pem
+#+END_SRC
 
 *** 验证签名
 
