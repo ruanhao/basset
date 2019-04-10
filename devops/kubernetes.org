@@ -1895,6 +1895,81 @@ They’re meant to be bound to ServiceAccounts used by user-defined pods.
 
 
 
+** Use Node's namespaces
+
+*** Use node’s network namespace
+
+Certain pods (usually system pods) need to operate in the host’s default namespaces, allowing them to see and manipulate node-level resources and devices.
+
+[[file:img/k8s_use_node_nw_ns.png]]
+
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: pod-with-host-network
+  spec:
+    hostNetwork: true             # Using the host node’s network namespace
+    containers:
+    - name: main
+      image: alpine
+      command: ["/bin/sleep", "999999"]
+#+END_SRC
+
+**** Use host port (not in host's nw ns)
+
+Bind to a port in the node’s default namespace, but _still have their own network namespace_. \\
+This is done by using the =hostPort= property in one of the container’s ports defined in the =spec.containers.ports= field.
+
+Don’t confuse pods using =hostPort= with pods exposed through a NodePort service. They’re two different things:
+
+[[file:img/k8s_hostport_vs_nodeport.png]]
+
+
+Because two processes can’t bind to the same host port. The Scheduler takes this into account when scheduling pods, \\
+so it *doesn’t schedule multiple pods to the same node*. \\
+If you have three nodes and want to deploy four pod replicas, only three will be scheduled (_one pod will remain Pending_):
+
+[[file:img/k8s_hostport_limit.png]]
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: kubia-hostport
+  spec:
+    containers:
+    - image: luksa/kubia
+      name: kubia
+      ports:
+      - containerPort: 8080       # The container can be reached on port 8080 of the pod’s IP.
+        hostPort: 9000            # It can also be reached on port 9000 of the node it’s deployed on.
+        protocol: TCP
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  The hostPort feature is primarily used for exposing system services, which are deployed to every node using DaemonSets.
+  People also used it to ensure two replicas of the same pod were never scheduled to the same node.
+#+END_EXAMPLE
+
+
+*** Use node's PID/IPC namespaces
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: pod-with-host-pid-and-ipc
+  spec:
+    hostPID: true                 # You want the pod to use the host’s PID namespace.
+    hostIPC: true                 # You also want the pod to use the host’s IPC namespace.
+    containers:
+    - name: main
+      image: alpine
+      command: ["/bin/sleep", "999999"]
+#+END_SRC
+
 * 核心原理
 
 ** 资源对象
