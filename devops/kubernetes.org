@@ -1970,6 +1970,97 @@ If you have three nodes and want to deploy four pod replicas, only three will be
       command: ["/bin/sleep", "999999"]
 #+END_SRC
 
+
+** Container security context
+
+*** Run container as specific user
+
+#+BEGIN_EXAMPLE
+  What user the container runs as is specified in the container image.
+  In a Dockerfile, this is done using the USER directive.
+  If omitted, the container runs as root.
+#+END_EXAMPLE
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: pod-as-user-guest
+  spec:
+    containers:
+    - name: main
+      image: alpine
+      command: ["/bin/sleep", "999999"]
+      securityContext:
+        runAsUser: 405            # specify a user ID, not a username (id 405 corresponds to the guest user in the alpine container image).
+#+END_SRC
+
+
+*** Run container as non-root
+
+For example, when a host directory is mounted into the container, if the process running in the container is running as root, \\
+it has full access to the mounted directory, whereas if it's running as non-root, it won't.
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: pod-run-as-non-root
+  spec:
+    containers:
+    - name: main
+      image: alpine
+      command: ["/bin/sleep", "999999"]
+      securityContext:
+        runAsNonRoot: true        # This container will only be allowed to run as a non-root user.
+#+END_SRC
+
+If you deploy this pod, it gets scheduled, but *is not allowed to run.*
+So if anyone tampers with your container images, they won't get far.
+
+
+*** Running container in privileged mode
+
+To get full access to the node's kernel, the pod's container shall run in privileged mode.
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: pod-privileged
+  spec:
+    containers:
+    - name: main
+      image: alpine
+      command: ["/bin/sleep", "999999"]
+      securityContext:
+        privileged: true          # This container will run in privileged mode
+#+END_SRC
+
+
+*** Adding individual kernel capabilities
+
+Instead of making a container privileged and giving it unlimited permissions,
+a *much safer* method (from a security perspective) is to give it access only to the kernel features it really requires.
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: pod-add-settime-capability
+  spec:
+    containers:
+    - name: main
+      image: alpine
+      command: ["/bin/sleep", "999999"]
+      securityContext:
+        capabilities:
+          add:
+          - SYS_TIME              # Adding the SYS_TIME capability. When time is set in container, the node's time will also be changed
+
+#+END_SRC
+
+
 * 核心原理
 
 ** 资源对象
