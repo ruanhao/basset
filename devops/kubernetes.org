@@ -1738,8 +1738,6 @@ RBAC prevents unauthorized users from viewing or modifying the cluster state. \\
 A subject (which may be a human, a ServiceAccount, or a group of users or ServiceAccounts) is *associated with one or more roles* and
 each role is allowed to perform certain verbs (actions) on certain resources.
 
-*** RBAC Resources
-
 The RBAC authorization rules are configured through _four resources_, which can be grouped into _two groups_:
 
 1. Roles and ClusterRoles
@@ -1753,18 +1751,20 @@ Roles define *what* can be done, while bindings define *who* can do it:
 
 [[file:img/k8s_rbac_roles.png]]
 
-
 Role and RoleBinding are namespaced resources, whereas the ClusterRole and ClusterRoleBinding are cluster-level resources (not namespaced). \\
 Although RoleBindings are namespaced, they can also reference ClusterRoles: \\
-(you can create a RoleBinding and have it reference a ClusterRole when you *want to enable access to namespaced resources,*
-_you can't use the same approach for cluster-level (non-namespaced) resources_)
 
 [[file:img/k8s_rbac_roles2.png]]
 
+#+BEGIN_EXAMPLE
+  You can create a RoleBinding and have it reference a ClusterRole when you WANT TO ENABLE ACCESS TO NAMESPACED RESOURCES,
+  you can't use the same approach for cluster-level (non-namespaced) resources.
+  RoleBinding can’t grant access to cluster-level resources, even if it references a ClusterRoleBinding.
+#+END_EXAMPLE
 
-**** Role/RoleBinding
+*** Role/RoleBinding
 
-***** Create Role
+**** Create Role
 
 #+BEGIN_SRC yaml
   apiVersion: rbac.authorization.k8s.io/v1
@@ -1783,7 +1783,7 @@ _you can't use the same approach for cluster-level (non-namespaced) resources_)
   The plural form must be used when specifying resources.
 #+END_EXAMPLE
 
-***** Binding Role to ServiceAccount
+**** Binding Role to ServiceAccount
 
 A Role defines what actions can be performed, but it doesn't specify who can perform them. \\
 To do that, you must bind the Role to a subject, which can be _a user, a ServiceAccount, or a group (of users or ServiceAccounts)._
@@ -1801,7 +1801,7 @@ To do that, you must bind the Role to a subject, which can be _a user, a Service
 #+END_EXAMPLE
 
 
-****** Including ServiceAccounts from other namespaces
+***** Including ServiceAccounts from other namespaces
 
 RoleBinding can add the other pod's ServiceAccount, *even though it's in a different namespace*:
 
@@ -1809,13 +1809,91 @@ RoleBinding can add the other pod's ServiceAccount, *even though it's in a diffe
 
 
 
-**** ClusterRole/ClusterRoleBinding
+*** ClusterRole/ClusterRoleBinding
 
 Regular Role only allows access to resources in the same namespace the Role is in,
 and can't grant access to non-resource URLs (/healthz for example), *but ClusterRoles can.*
 
 ClusterRole is a cluster-level resource for allowing access to non-namespaced resources or non-resource URLs or
 used as a *common* role to be bound inside individual namespaces, saving you from having to redefine the same role in each of them.
+
+#+BEGIN_EXAMPLE
+  To grant access to cluster-level resources, you must always use a ClusterRoleBinding.
+#+END_EXAMPLE
+
+[[file:img/k8s_role_cluster.png]]
+
+[[file:img/k8s_role_cluster2.png]]
+
+**** Access non-resource URLs
+
+API server also exposes non-resource URLs. \\
+Access to these URLs must also be granted explicitly; otherwise the API server will reject the client’s request. \\
+Usually, this is done for you automatically through the =system:discovery= ClusterRole and the identically named ClusterRoleBinding.
+
+#+BEGIN_SRC sh
+  $ kubectl get clusterrole system:discovery -o yaml
+  apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRole
+  metadata:
+    name: system:discovery
+    ...
+  rules:
+  - nonResourceURLs:              # refers to non-resource URLs
+    - /api
+    - /api/*
+    - /apis
+    - /apis/*
+    - /healthz
+    - /swaggerapi
+    - /swaggerapi/*
+    - /version
+#+END_SRC
+
+**** Access namespaced resources
+
+If you create a ClusterRoleBinding and reference the ClusterRole in it, the subjects listed in the binding can view the specified resources across all namespaces. \\
+If, on the other hand, you create a RoleBinding, the subjects listed in the binding *can only view resources in the namespace of the RoleBinding.*
+
+[[file:img/k8s_role_cluster_binding.png]]
+
+[[file:img/k8s_role_cluster_binding2.png]]
+
+
+
+
+
+*** Combinations of role/binding types
+
+[[file:img/k8s_role_combinations.png]]
+
+
+*** Default CRs/CRBs
+
+The most important roles are the =view=, =edit=, =admin=, and =cluster-admin= ClusterRoles. \\
+They’re meant to be bound to ServiceAccounts used by user-defined pods.
+
+- view
+
+  Allowing read-only access to resources in a namespace, _except for Roles, RoleBindings, and Secrets._
+- edit
+
+  Allows you to modify resources in a namespace, but also _allows both reading and modifying Secrets._ \\
+  It doesn’t, however, allow viewing or modifying Roles or RoleBindings (to *prevent privilege escalation*).
+- admin
+
+  Complete control of the resources (*except ResourceQuotas and Namespace*) in a namespace. \\
+  The main difference between the edit and the admin ClusterRoles is in the ability to view and modify Roles and RoleBindings in the namespace.
+- cluster-admin
+
+  Complete control of the Kubernetes cluster.
+
+
+
+
+
+
+
 
 * 核心原理
 
