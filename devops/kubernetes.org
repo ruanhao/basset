@@ -2200,6 +2200,109 @@ PodSecurityPolicy resource defines things like:
   When creating pods, if ANY POLICY allows you to deploy a pod with certain features, the API server will accept your pod.
 #+END_EXAMPLE
 
+
+** Inter-Pod Network Isolation
+
+*** Network isolation in a namespace
+
+When you create this NetworkPolicy in a certain namespace, no one can connect to any pod in that namespace:
+
+#+BEGIN_SRC yaml
+  apiVersion: networking.k8s.io/v1
+  kind: NetworkPolicy
+  metadata:
+    name: default-deny
+  spec:
+    podSelector:                  # Empty pod selector matches all pods in the same namespace
+#+END_SRC
+
+
+*** Allow some pods in a ns to connect
+
+#+BEGIN_SRC yaml
+  apiVersion: networking.k8s.io/v1
+  kind: NetworkPolicy
+  metadata:
+    name: postgres-netpolicy
+  spec:
+    podSelector:
+      matchLabels:
+        app: database             # This policy secures access to pods with app=database label.
+    ingress:                      # | It allows incoming connections only from pods with the app=webserver label.
+    - from:                       # |
+      - podSelector:              # |
+          matchLabels:            # |
+            app: webserver        # |
+      ports:
+      - port: 5432                # Connections to this port are allowed.
+#+END_SRC
+
+
+[[file:img/k8s_network_policy.png]]
+
+#+BEGIN_EXAMPLE
+  The NetworkPolicy is enforced when con- necting through a Service, AS WELL.
+#+END_EXAMPLE
+
+
+
+
+
+*** Isolate network between namespaces
+
+#+BEGIN_SRC yaml
+  apiVersion: networking.k8s.io/v1
+  kind: NetworkPolicy
+  metadata:
+    name: shoppingcart-netpolicy
+  spec:
+    podSelector:
+      matchLabels:
+        app: shopping-cart        # This policy applies to pods labeled as microservice=shopping-cart.
+    ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            tenant: manning       # Only pods running in namespaces labeled as tenant=manning are allowed to access the microservice.
+      ports:
+      - port: 80
+#+END_SRC
+
+[[file:img/k8s_network_policy_2.png]]
+
+
+*** Isolate by CIDR notation
+
+#+BEGIN_SRC yaml
+  apiVersion: networking.k8s.io/v1
+  kind: NetworkPolicy
+  metadata:
+    name: ipblock-netpolicy
+  spec:
+    podSelector:
+      matchLabels:
+        app: shopping-cart
+    ingress:
+    - from:
+      - ipBlock:
+          cidr: 192.168.1.0/24    # This ingress rule only allows traffic from clients in the 192.168.1.0/24 IP block.
+#+END_SRC
+
+
+*** Limite outbound traffic
+
+#+BEGIN_SRC yaml
+  spec:
+    podSelector:
+      matchLabels:
+        app: webserver           # This policy applies to pods with the app=webserver label.
+    egress:                      # It limits the pods' outbound traffic.
+    - to:
+      - podSelector:
+          matchLabels:
+            app: database # Webserver pods may only connect to pods with the app=database label.
+#+END_SRC
+
 * 核心原理
 
 ** 资源对象
