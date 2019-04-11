@@ -2019,7 +2019,7 @@ If you deploy this pod, it gets scheduled, but *is not allowed to run.*
 So if anyone tampers with your container images, they won't get far.
 
 
-*** Running container in privileged mode
+*** Run container in privileged mode
 
 To get full access to the node's kernel, the pod's container shall run in privileged mode.
 
@@ -2038,7 +2038,7 @@ To get full access to the node's kernel, the pod's container shall run in privil
 #+END_SRC
 
 
-*** Adding individual kernel capabilities
+*** Add individual kernel capabilities
 
 Instead of making a container privileged and giving it unlimited permissions,
 a *much safer* method (from a security perspective) is to give it access only to the kernel features it really requires.
@@ -2060,6 +2060,93 @@ a *much safer* method (from a security perspective) is to give it access only to
 
 #+END_SRC
 
+
+*** Drop individual kernel capabilities
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: pod-drop-chown-capability
+  spec:
+    containers:
+    - name: main
+      image: alpine
+      command: ["/bin/sleep", "999999"]
+      securityContext:
+        capabilities:
+          drop:                   # | You’re not allowing this container
+            - CHOWN               # | to change file ownership.
+
+#+END_SRC
+
+*** Prevent writing to filesystem
+
+Prevent the processes running in the container from writing to the container’s filesystem, and *only allow* them to write to mounted volumes.
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: pod-with-readonly-filesystem
+  spec:
+    containers:
+    - name: main
+      image: alpine
+      command: ["/bin/sleep", "999999"]
+      securityContext:
+        readOnlyRootFilesystem: true # This container’s filesystem can’t be written to.
+      volumeMounts:
+      - name: my-volume
+        mountPath: /volume           # | Writing to /volume is allowed,
+        readOnly: false              # | becase a volume is mounted there.
+    volumes:
+    - name: my-volume
+      emptyDir:
+#+END_SRC
+
+
+*** Share volume among different users
+
+Kubernetes allows you to specify supplemental groups for all the pods running in the container, allowing them to share files,
+*regardless of the user IDs they’re running as.*
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: pod-with-shared-volume-fsgroup
+  spec:
+    securityContext:                 # | The fsGroup and supplementalGroups are defined
+      fsGroup: 555                   # | in the security context at the pod level.
+      supplementalGroups: [666, 777] # |
+    containers:
+    - name: first
+      image: alpine
+      command: ["/bin/sleep", "999999"]
+      securityContext:
+        runAsUser: 1111           # The first container runs as user ID 1111.
+      volumeMounts:
+      - name: shared-volume
+        mountPath: /volume
+        readOnly: false
+    - name: second
+      image: alpine
+      command: ["/bin/sleep", "999999"]
+      securityContext:
+        runAsUser: 2222           # The first container runs as user ID 2222.
+      volumeMounts:
+      - name: shared-volume
+        mountPath: /volume
+        readOnly: false
+    volumes:
+    - name: shared-volume
+      emptyDir:
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  fsGroup security context property is used when the process creates files IN A VOLUME.
+#+END_EXAMPLE
 
 * 核心原理
 
