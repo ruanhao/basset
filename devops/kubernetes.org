@@ -2303,6 +2303,55 @@ When you create this NetworkPolicy in a certain namespace, no one can connect to
             app: database # Webserver pods may only connect to pods with the app=database label.
 #+END_SRC
 
+* Computation Resources
+
+** Requesting resources for pod's containers
+
+When creating a pod, you can specify the amount of CPU and memory that a container needs (these are called *requests*) and
+a hard limit on what it may consume (known as *limits*). \\
+They're specified _for each container_ individually, _not for the pod as a whole_.
+The pod's resource requests and limits are the *sum of the requests and limits of all its containers*.
+
+
+*** Create pods with resource requests
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: requests-pod
+  spec:
+    containers:
+    - image: busybox
+      command: ["dd", "if=/dev/zero", "of=/dev/null"]
+      name: main                  # | You're specifying resource requests for the main container.
+      resources:                  # |
+        requests:                 # |
+          cpu: 200m               # The container requests 200 millicores (that is, 1/5 of a single CPU core's time).
+          memory: 10Mi            # The container also requests 10 mebibytes of memory.
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  REQUESTS don't limit the amount of CPU a container can use.
+#+END_EXAMPLE
+
+**** How requests affect scheduling
+
+By specifying resource requests, you're specifying the minimum amount of resources your pod needs.
+
+[[file:img/k8s_resource_req.png]]
+
+The CPU requests don't only affect scheduling, they also determine how the remaining (unused) CPU time is distributed between pods:
+
+[[file:img/k8s_resource_req_2.png]]
+
+#+BEGIN_EXAMPLE
+  If one container wants to use up as much CPU as it can, while the other one is sitting idle at a given moment,
+  the first container will BE ALLOWED to use the whole CPU time (minus the small amount of time used by the second container, if any).
+  It makes sense to use all the available CPU if no one else is using it.
+  As soon as the second container needs CPU time, it will get it and the first container will be THROTTLED BACK.
+#+END_EXAMPLE
+
 * 核心原理
 
 ** 资源对象
