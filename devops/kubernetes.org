@@ -2148,6 +2148,58 @@ Kubernetes allows you to specify supplemental groups for all the pods running in
   fsGroup security context property is used when the process creates files IN A VOLUME.
 #+END_EXAMPLE
 
+
+** PodSecurityPolicy
+
+PodSecurityPolicy is a *cluster-level* resource, which defines what security-related features users can or can’t use in their pods.
+
+When someone posts a pod resource to the API server, the =PodSecurityPolicy admission control plugin= validates the pod definition against the configured PodSecurityPolicies. \\
+If the pod conforms to the cluster’s policies, it’s accepted and stored into etcd; otherwise it’s rejected immediately.
+
+PodSecurityPolicy resource defines things like:
+
+- Whether a pod can use the host’s IPC, PID, or Network namespaces
+- Which host ports a pod can bind to
+- What user IDs a container can run as
+- Whether a pod with privileged containers can be created
+- Which kernel capabilities are allowed, which are added by default and which are always dropped
+- What SELinux labels a container can use
+- Whether a container can use a writable root filesystem or not
+- Which filesystem groups the container can run as
+- Which volume types a pod can use
+
+#+BEGIN_SRC yaml
+  apiVersion: extensions/v1beta1
+  kind: PodSecurityPolicy
+  metadata:
+    name: default
+  spec:
+    hostIPC: false                # | Containers aren’t allowed to use the host’s IPC,
+    hostPID: false                # | PID, or network namespace.
+    hostNetwork: false            # |
+    hostPorts:
+    - min: 10000                  # | They can only bind to host ports 10000 to 11000 or host ports 13000 to 14000.
+      max: 11000                  # |
+    - min: 13000                  # |
+      max: 14000                  # |
+    privileged: false             # Containers cannot run in privileged mode.
+    readOnlyRootFilesystem: true  # Containers are forced to run with a read-only root filesystem.
+    runAsUser:                    # | Containers can run as any user and any group.
+      rule: RunAsAny              # |
+    fsGroup:                      # |
+      rule: RunAsAny              # |
+    supplementalGroups:           # |
+      rule: RunAsAny              # |
+    seLinux:
+      rule: RunAsAny              # They can also use any SELinux groups they want.
+    volumes:
+    - '*'                         # All volume types can be used in pods.
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  When creating pods, if ANY POLICY allows you to deploy a pod with certain features, the API server will accept your pod.
+#+END_EXAMPLE
+
 * 核心原理
 
 ** 资源对象
