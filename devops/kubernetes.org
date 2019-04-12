@@ -2305,7 +2305,7 @@ When you create this NetworkPolicy in a certain namespace, no one can connect to
 
 * Computation Resources
 
-** Requesting resources for pod's containers
+** Request resources for containers
 
 When creating a pod, you can specify the amount of CPU and memory that a container needs (these are called *requests*) and
 a hard limit on what it may consume (known as *limits*). \\
@@ -2350,6 +2350,68 @@ The CPU requests don't only affect scheduling, they also determine how the remai
   the first container will BE ALLOWED to use the whole CPU time (minus the small amount of time used by the second container, if any).
   It makes sense to use all the available CPU if no one else is using it.
   As soon as the second container needs CPU time, it will get it and the first container will be THROTTLED BACK.
+#+END_EXAMPLE
+
+
+** Limit resources for containers
+
+Without limiting memory, a container (or a pod) running on a worker node may eat up all the available memory and
+affect all other pods on the node and any new pods scheduled to the node.
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: limited-pod
+  spec:
+    containers:
+    - image: busybox
+      command: ["dd", "if=/dev/zero", "of=/dev/null"]
+      name: main
+      resources:
+        limits:
+          cpu: 1                  # This container will be allowed to use at most 1 CPU core.
+          memory: 20Mi            # The container will be allowed to use up to 20 mebibytes of memory.
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  If you haven’t specified any resource requests, they’ll be set to the SAME VALUES AS THE RESOURCE LIMITS.
+#+END_EXAMPLE
+
+*** Exceeding limits
+
+Unlike resource requests, resource limits *aren't constrained* by the node's allocatable resource amounts. \\
+The sum of all limits of all the pods on a node is *allowed to exceed 100%* of the node's capacity.
+
+When 100% of the node's resources are used up, certain containers will _need to be killed_.
+
+[[file:img/k8s_resource_limit_mem.png]]
+
+
+- For CPU
+
+  When a CPU limit is set for a container, the process isn’t given more CPU time than the config- ured limit.
+- For Memory
+
+  When a process tries to allocate memory over its limit, the process is killed (_the container is OOMKilled_).
+
+#+BEGIN_EXAMPLE
+  If the pod is killed and its restart policy is set to Always or OnFailure, the process is restarted immediately.
+  But if it keeps going over the memory limit and getting killed, Kubernetes will begin restarting it WITH INCREASING DELAYS between restarts.
+  You’ll see a CrashLoopBackOff status in that case.
+
+  The CrashLoopBackOff status doesn't mean the Kubelet has given up.
+  It means that after each crash, the Kubelet is INCREASING THE TIME PERIOD BEFORE restarting the container.
+  After the first crash, it restarts the container immediately and then, if it crashes again, waits for 10 seconds before restarting it again.
+  On subsequent crashes, this delay is then increased EXPONENTIALLY to 20, 40, 80, and 160 seconds, and FINALLY limited to 300 seconds.
+  Once the interval hits the 300-second limit, the Kubelet keeps restarting the container INDEFINITELY EVERY FIVE MINUTES until the pod either stops crashing or is deleted.
+#+END_EXAMPLE
+
+#+BEGIN_EXAMPLE
+  Containers always see the node's memory and cpu, NOT the container's.
+  You get the configured CPU limit by reading the following files:
+  - /sys/fs/cgroup/cpu/cpu.cfs_quota_us
+  - /sys/fs/cgroup/cpu/cpu.cfs_period_us
 #+END_EXAMPLE
 
 * 核心原理
