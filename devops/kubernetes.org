@@ -2303,6 +2303,7 @@ When you create this NetworkPolicy in a certain namespace, no one can connect to
             app: database # Webserver pods may only connect to pods with the app=database label.
 #+END_SRC
 
+
 * Computation Resources
 
 ** Request resources for containers
@@ -2413,6 +2414,208 @@ When 100% of the node's resources are used up, certain containers will _need to 
   - /sys/fs/cgroup/cpu/cpu.cfs_quota_us
   - /sys/fs/cgroup/cpu/cpu.cfs_period_us
 #+END_EXAMPLE
+
+
+** Pod QoS classes
+
+Kubernetes makes priority by categorizing pods into three Quality of Service (QoS) classes:
+- BestEffort (the lowest priority)
+- Burstable
+- Guaranteed (the highest)
+
+QoS class is not assignable to pods through a separate field in the manifest.
+It is *derived* from the combination of resource requests and limits for the pod's containers.
+
+[[file:img/k8s_qos_class.png]]
+
+#+BEGIN_EXAMPLE
+  QoS classes are a PROPERTY OF PODS, not containers.
+#+END_EXAMPLE
+
+*** Kill Pod according to QoS
+
+[[file:img/k8s_qos_kill.png]]
+
+
+** Set default requests/limits for pods per ns
+
+[[file:img/k8s_limit_range.png]]
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: LimitRange
+  metadata:
+    name: example
+  spec:
+    limits:
+    - type: Pod                   # Specifies the limits for a pod AS A WHOLE
+      min:
+        cpu: 50m                  # | Minimum CPU and memory all the pod's containers can request in total
+        memory: 5Mi               # |
+      max:
+        cpu: 1                    # | Maximum CPU and memory all the pod's containers can request (and limit)
+        memory: 1Gi               # |
+    - type: Container             # The container limits are specified below this line.
+      defaultRequest:             # Default requests for CPU and memory that will be applied to containers that don't specify them explicitly
+        cpu: 100m
+        memory: 10Mi
+      default:                    # | Default limits for containers that don't specify them
+        cpu: 200m                 # |
+        memory: 100Mi
+      min:                        # | Minimum and maximum requests/limits that a container can have
+        cpu: 50m                  # |
+        memory: 5Mi               # |
+      max:                        # |
+        cpu: 1                    # |
+        memory: 1Gi
+      maxLimitRequestRatio:       # | Maximum ratio between the limit and request for each resource
+        cpu: 4                    # |
+        memory: 10                # |
+    - type: PersistentVolumeClaim # A LimitRange can also set the minimum and maximum amount of storage a PVC can request.
+      min:
+        storage: 1Gi
+      max:
+        storage: 10Gi
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  LimitRange apply to the SUM of all the pod's containers' requests and limits.
+#+END_EXAMPLE
+
+
+** Limit total resources available in ns
+
+ResourceQuota Admission Control plugin checks whether the pod being created would cause the configured ResourceQuota to be exceeded. \\
+If that's the case, the pod's creation is rejected.
+
+A ResourceQuota limits the amount of computational resources the pods and the amount of storage PersistentVolumeClaims in a namespace can consume.
+
+[[file:img/k8s_resource_quota.png]]
+
+
+#+BEGIN_EXAMPLE
+  If ResourceQuota is created, LimitRange shall be also created ALONG WITH IT.
+#+END_EXAMPLE
+
+*** For CPU and Memory
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: ResourceQuota
+  metadata:
+    name: cpu-and-mem
+  spec:
+    hard:
+      requests.cpu: 400m
+      requests.memory: 200Mi
+      limits.cpu: 600m
+      limits.memory: 500Mi
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  When a quota for a specific resource (CPU or memory) is configured (request or limit),
+  pods need to have the request or limit (respectively) set for that same resource;
+  otherwise the API server will not accept the pod.
+  That's why having a LimitRange with defaults for those resources can make life a bit easier for people creating pods.
+#+END_EXAMPLE
+
+
+*** For persistent storage
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: ResourceQuota
+  metadata:
+    name: storage
+  spec:
+    hard:
+      requests.storage: 500Gi
+      ssd.storageclass.storage.k8s.io/requests.storage: 300Gi
+      standard.storageclass.storage.k8s.io/requests.storage: 1Ti
+#+END_SRC
+
+*** For number of objects
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: ResourceQuota
+  metadata:
+    name: objects
+  spec:
+    hard:
+      pods: 10
+      replicationcontrollers: 5
+      secrets: 10
+      configmaps: 10
+      persistentvolumeclaims: 5
+      services: 5
+      services.loadbalancers: 1
+      services.nodeports: 2
+      ssd.storageclass.storage.k8s.io/persistentvolumeclaims: 2
+#+END_SRC
+
+*** For specific pod states and/or QoS classes
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: ResourceQuota
+  metadata:
+    name: besteffort-notterminating-pods
+  spec:
+    scopes:
+    - BestEffort
+    - NotTerminating
+    hard:
+      pods: 4
+#+END_SRC
+
+
+** Resource usage Monitoring
+
+Kubelet itself contains an agent called _cAdvisor_, which performs the basic collection of resource consumption data for both
+*individual containers* running on the node and *the node* as a whole. \\
+Gathering those statistics *centrally* for the whole cluster requires you to run an additional component called _Heapster_.
+
+[[file:img/k8s_cadvisor_heapster.png]]
+
+It's Heapster that connects to all the cAdvisors, and it's the cAdvisors that collect the container and node usage data without
+having to talk to the processes running inside the pods' containers.
+
+Running Heapster in your cluster makes it possible to obtain resource usages for nodes and individual pods through the =kubectl top= command:
+(=kubectl top= command gets the metrics from Heapster, which aggregates the data over a few minutes and doesn't expose it immediately)
+
+#+BEGIN_SRC sh
+  $ kubectl top node
+  NAME       CPU(cores)   CPU%      MEMORY(bytes)   MEMORY%
+  minikube   170m         8%        556Mi           27%
+  # This shows the actual (current) CPU and memory usage of ALL THE PODS running on the node
+
+
+  # Displaying CPU and memory usage for individual pods
+  $ kubectl top pod --all-namespaces
+  NAMESPACE      NAME                          CPU(cores)   MEMORY(bytes)
+  kube-system    influxdb-grafana-2r2w9        1m           32Mi
+  kube-system    heapster-40j6d                0m           18Mi
+
+  # To see resource usages across individual containers
+  kubectl top pod --containers
+#+END_SRC
+
+*** Analyzing resource usage with Grafana
+
+#+BEGIN_SRC sh
+  $ kubectl cluster-info
+  monitoring-grafana is running at https://192.168.99.100:8443/api/v1/proxy/namespaces/kube-system/services/monitoring-grafana
+#+END_SRC
+
+or:
+
+#+BEGIN_SRC sh
+  $ minikube service monitoring-grafana -n kube-system
+  Opening kubernetes service kube-system/monitoring-grafana in default browser...
+#+END_SRC
+
+[[file:img/k8s_grafana_example.png]]
 
 * 核心原理
 
