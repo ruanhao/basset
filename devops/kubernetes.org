@@ -2354,6 +2354,7 @@ The CPU requests don't only affect scheduling, they also determine how the remai
 #+END_EXAMPLE
 
 
+
 ** Limit resources for containers
 
 Without limiting memory, a container (or a pod) running on a worker node may eat up all the available memory and
@@ -2416,6 +2417,7 @@ When 100% of the node's resources are used up, certain containers will _need to 
 #+END_EXAMPLE
 
 
+
 ** Pod QoS classes
 
 Kubernetes makes priority by categorizing pods into three Quality of Service (QoS) classes:
@@ -2435,6 +2437,7 @@ It is *derived* from the combination of resource requests and limits for the pod
 *** Kill Pod according to QoS
 
 [[file:img/k8s_qos_kill.png]]
+
 
 
 ** Set default requests/limits for pods per ns
@@ -2481,6 +2484,7 @@ It is *derived* from the combination of resource requests and limits for the pod
 #+BEGIN_EXAMPLE
   LimitRange apply to the SUM of all the pod's containers' requests and limits.
 #+END_EXAMPLE
+
 
 
 ** Limit total resources available in ns
@@ -2554,7 +2558,7 @@ A ResourceQuota limits the amount of computational resources the pods and the am
       ssd.storageclass.storage.k8s.io/persistentvolumeclaims: 2
 #+END_SRC
 
-*** For specific pod states and/or QoS classes
+*** For pod states and/or QoS classes
 
 #+BEGIN_SRC yaml
   apiVersion: v1
@@ -2568,6 +2572,7 @@ A ResourceQuota limits the amount of computational resources the pods and the am
     hard:
       pods: 4
 #+END_SRC
+
 
 
 ** Resource usage Monitoring
@@ -2616,6 +2621,125 @@ or:
 #+END_SRC
 
 [[file:img/k8s_grafana_example.png]]
+
+
+* AutoScaling
+
+** Horizontal pod autoscaling
+
+Horizontal pod autoscaling is the automatic scaling of the number of pod replicas managed by a controller. \\
+It's performed by the _Horizontal controller_, which is enabled and configured by creating a _HorizontalPodAutoscaler_ (HPA) resource.
+
+#+BEGIN_EXAMPLE
+  Pods' containers' memory consumption isn't a good metric for autoscaling.
+#+END_EXAMPLE
+
+*** Autoscaling process
+
+The autoscaling process can be split into *three steps*:
+1. Obtain metrics of all the pods managed by the scaled resource object.
+2. Calculate the number of pods required to bring the metrics to (or close to) the specified target value.
+3. Update the replicas field of the scaled resource.
+
+
+
+- Obtain pod metrics
+
+  [[file:img/k8s_auto_scaling_metrics.png]]
+  The horizontal pod autoscaler controller gets the metrics of all the pods by querying Heapster through REST calls.
+- Calculate required number of pods
+
+  [[file:img/k8s_auto_scaling_calc.png]]
+- Update desired replica count
+
+  [[file:img/k8s_auto_scaling_update.png]]
+  Currently the only objects you can attach an Autoscaler to:
+  1. Deployment
+  2. ReplicaSet
+  3. ReplicationController
+  4. StatefulSet
+
+**** Whole picture
+
+[[file:img/k8s_auto_scaling_whole.png]]
+
+
+
+
+
+**** CPU utilization
+
+As far as the Autoscaler is concerned, only the pod's guaranteed CPU amount (the CPU requests) is concerned when determining the CPU utilization of a pod.
+
+The Autoscaler *compares the pod's actual CPU consumption and its CPU requests*,
+which means the pods you're autoscaling _need to have CPU requests set_.
+
+
+**** Maximum rate of scaling
+
+The autoscaler will *at most* double the number of replicas in a single operation, _if more than two current replicas exist_. \\
+_If only one or two exist_, it will scale up to a maximum of four replicas in a single step.
+
+A scale-up will occur only if no rescaling event occurred *in the last three minutes*. \\
+A scale-down event is performed *every five minutes*.
+
+*** Create HorizontalPodAutoscaler
+
+#+BEGIN_SRC sh
+  kubectl autoscale deployment <name> --cpu-percent=30 --min=1 --max=5
+#+END_SRC
+
+
+** Horizontal node autoscaling
+
+*** ClusterAutoscaler
+
+Cluster Autoscaler looks out for such pods and asks the *cloud provider* to start up an additional node.
+
+**** Scaling up case
+
+[[file:img/k8s_cluster_auto_scaler.png]]
+
+
+When the new node starts up, the Kubelet on that node contacts the API server and registers the node by creating a Node resource. \\
+From then on, the node is part of the Kubernetes cluster and pods can be scheduled to it.
+
+**** Scaling down case
+
+A node will only be returned to the cloud provider if the Cluster Autoscaler knows
+the pods running on the node will be rescheduled to other nodes.
+
+When a node is selected to be shut down, the node is first _marked as unschedulable_ and then all the pods running on the node are _evicted_. \\
+Because all those pods belong to ReplicaSets or other controllers, their replacements are created and scheduled to the remaining nodes
+(that's why the node that's being shut down is first marked as unschedulable).
+
+
+*** Manually cordon and drain nodes
+
+A node can also be marked as =unschedulable= and =drained= manually.
+
+This is done with the following kubectl commands:
+
+- =kubectl cordon <node>=
+
+  Marks the node as unschedulable (*but doesn't do anything with pods running on that node*).
+- =kubectl drain <node>=
+
+  Marks the node as =unschedulable= and *then evicts* all the pods from the node.
+
+#+BEGIN_EXAMPLE
+  In both cases, no new pods are scheduled to the node UNTIL YOU UNCORDON IT AGAIN with `kubectl uncordon <node>`.
+#+END_EXAMPLE
+
+
+*** PodDisruptionBudget
+
+PodDisruptionBudget specifies *minimum number of pods* that need to keep running while performing scaling-down operations.
+
+As long as PodDisruptionBudget exists, both the =Cluster Autoscaler= and the =kubectl drain= command (*not including auto-scaling-down*) will adhere to it. \\
+For example, if there were four pods altogether and =minAvailable= was set to three, the pod eviction process would evict pods _one by one_,
+waiting for the evicted pod to be replaced with a new one by the ReplicaSet controller, before evicting another pod.
+
 
 * 核心原理
 
@@ -2973,6 +3097,12 @@ kubectl scale --replicas=6 replicaset <name>
 #+END_SRC
 
 
+** Expose pod through Service
+
+#+BEGIN_SRC sh
+  kubectl expose deployment <name> --port=80 --target-port=8080
+#+END_SRC
+
 ** Run Temporary Pod
 
 #+BEGIN_SRC sh
@@ -2981,6 +3111,7 @@ kubectl scale --replicas=6 replicaset <name>
 
 The command runs a _one-off_ pod (--restart=Never) called srvlookup,
 which is attached to the console (-it) and is deleted as soon as it terminates (--rm).
+
 
 ** Discover possible API object fields
 
