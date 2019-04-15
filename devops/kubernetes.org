@@ -2741,6 +2741,157 @@ For example, if there were four pods altogether and =minAvailable= was set to th
 waiting for the evicted pod to be replaced with a new one by the ReplicaSet controller, before evicting another pod.
 
 
+* Scheduling
+
+** Node Affinity
+
+*** Hard
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: kubia-gpu
+  spec:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: gpu
+              operator: In
+              values:
+              - "true"
+    containers:
+    - image: luksa/kubia
+      name: kubia
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  At this point, affinity currently only affects pod scheduling and NEVER causes a pod to be evicted from a node.
+  That's why all the rules right now always END WITH IgnoredDuringExecution.
+#+END_EXAMPLE
+
+
+*** Prioritizing
+
+#+BEGIN_SRC yaml
+  apiVersion: extensions/v1beta1
+  kind: Deployment
+  metadata:
+    name: pref
+  spec:
+    replicas: 5
+    template:
+      metadata:
+        labels:
+          app: pref
+      spec:
+        affinity:
+          nodeAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 80
+              preference:
+                matchExpressions:
+                - key: availability-zone
+                  operator: In
+                  values:
+                  - zone1
+            - weight: 20          # | You also prefer that your pods be scheduled to dedicated nodes,
+              preference:         # | but this is four times less important than your zone preference.
+                matchExpressions:
+                - key: share-type
+                  operator: In
+                  values:
+                  - dedicated
+        containers:
+        - args:
+          - sleep
+          - "99999"
+          image: busybox
+          name: main
+#+END_SRC
+
+[[file:img/k8s_node_affinity_prioritizing.png]]
+
+
+** Pod Affinity
+
+*** Hard
+
+#+BEGIN_SRC yaml
+  apiVersion: extensions/v1beta1
+  kind: Deployment
+  metadata:
+    name: frontend
+  spec:
+    replicas: 5
+    template:
+      metadata:
+        labels:
+          app: frontend
+      spec:
+        affinity:
+          podAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution: # Defining a hard requirement
+            - topologyKey: kubernetes.io/hostname           # The pods of this Deployment must be deployed on the same node as the pods that match the selector.
+              labelSelector:
+                matchLabels:
+                  app: backend
+        containers:
+        - name: main
+          image: busybox
+          args:
+          - sleep
+          - "99999"
+#+END_SRC
+
+The way =topologyKey= works is simple. The key used here isn't special. We can easily use our own =topologyKey=.
+The only prerequisite is to add a corresponding label to nodes.
+
+[[file:img/k8s_pod_affinity_hard.png]]
+
+#+BEGIN_EXAMPLE
+  Scheduler also takes other pods’ pod affinity rules into account when scheduling pod:
+
+  If you now delete the backend pod, the Scheduler will still reschedule the pod to node2.
+  This makes sense, because otherwise if the backend pod were to be deleted by accident and rescheduled to a different node,
+  the frontend pods' affinity rules would be broken.
+#+END_EXAMPLE
+
+
+
+*** Prioritizing
+
+#+BEGIN_SRC yaml
+  apiVersion: extensions/v1beta1
+  kind: Deployment
+  metadata:
+    name: frontend
+  spec:
+    replicas: 5
+    template:
+      metadata:
+        labels:
+          app: frontend
+      spec:
+        affinity:
+          podAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 80
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    app: backend
+        containers:
+        - name: main
+          image: busybox
+          args:
+          - sleep
+          - "99999"
+#+END_SRC
+
 * 核心原理
 
 ** 资源对象
