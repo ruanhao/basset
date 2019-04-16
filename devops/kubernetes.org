@@ -17,6 +17,11 @@
 
 * Resources
 
+** Overview
+
+[[file:img/k8s_whole_pic.png]]
+
+
 ** Pod
 
 
@@ -122,6 +127,89 @@ Kubernetes will periodically execute the probe and restart the container if the 
 
 
 
+*** Init Containers
+
+Pods can also include *init containers*. Tthey can be used to initialize the pod.
+
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: fortune-client
+  spec:
+    initContainers:               # defining an init container, not a regular container.
+    - name: init
+      image: busybox
+      command:
+      - sh
+      - -c
+      - 'while true; do echo "Waiting for fortune service to come up..."; wget http://fortune -q -T 1 -O /dev/null >/dev/null 2>/dev/null && break; sleep 1; done; echo "Service is up! Starting main container."' # The init container runs a loop that runs until the fortune Service is up.
+    containers:
+    - image: busybox
+      name: main
+      command:
+      - sh
+      - -c
+      - 'echo "Main container started. Reading fortune very 10 seconds."; while true; do echo "-------------"; wget -q -O - http://fortune; sleep 10; done'
+#+END_SRC
+
+
+*** Lifecycle hooks
+
+Lifecycle hooks are specified *per container*, unlike init containers, which apply to the whole pod. \\
+They're executed when the container starts and before it stops.
+
+Lifecycle hooks are similar to liveness and readiness probes in that they can either:
+
+- Execute a command inside the container
+- Perform an HTTP GET request against a URL
+
+
+#+BEGIN_EXAMPLE
+  Lifecycle hooks target containers, NOT PODS.
+#+END_EXAMPLE
+
+**** Post-Start hook
+
+A post-start hook is executed immediately after the container's main process is started.
+Post-start hooks allow you to run additional commands without having to touch the app.
+
+Until the hook completes, the container will stay in the =Waiting= state with the reason =ContainerCreating=. \\
+The pod's status will be =Pending= instead of =Running=. \\
+If the hook fails to run or returns a non-zero exit code, the main container will be killed.
+
+
+**** Pre-Stop hook
+
+A pre-stop hook is executed immediately before a container is terminated.
+
+Container will be terminated regardless of the result of the hook
+(error HTTP response code or non-zero exit code when using a command-based hook)
+will not prevent the container from being terminated.
+
+
+
+*** Shutdown
+
+Then the following sequence of events is performed when pod is shutdown:
+
+1. Run the pre-stop hook, if one is configured, and wait for it to finish.
+2. Send the SIGTERM signal to the main process of the container.
+3. Wait until the container shuts down cleanly or until the termination grace period runs out.
+4. Forcibly kill the process with SIGKILL, if it hasn't terminated gracefully yet.
+
+
+[[file:img/k8s_pod_shutdown.png]]
+
+
+You can force the API server to delete the resource immediately, without waiting for confirmation,
+by setting the grace period to zero and adding the =--force= option like this:
+
+#+BEGIN_SRC sh
+  kubectl delete po mypod --grace-period=0 --force
+#+END_SRC
+
+
 ** ReplicationController
 
 A ReplicationController’s job is to make sure that an exact number of pods always *matches its label selector.* \\
@@ -197,6 +285,11 @@ Four valid operators:
 + NotIn :: Label’s value must not match any of the specified _values_.
 + Exists :: Pod must include a label with the specified key (the value isn’t important). When using this operator, you shouldn’t specify the _values_ field.
 + DoesNotExist :: Pod must not include a label with the specified key. The _values_ property must not be specified.
+
+
+*** Only cares about number of pods
+
+[[file:img/k8s_rs_only_care_num.png]]
 
 
 ** DaemonSet
@@ -2395,7 +2488,7 @@ When 100% of the node's resources are used up, certain containers will _need to 
   When a CPU limit is set for a container, the process isn’t given more CPU time than the config- ured limit.
 - For Memory
 
-  When a process tries to allocate memory over its limit, the process is killed (_the container is OOMKilled_).
+  When a process tries to allocate memory over its limit, the process is killed ( _the container is OOMKilled_ ).
 
 #+BEGIN_EXAMPLE
   If the pod is killed and its restart policy is set to Always or OnFailure, the process is restarted immediately.
@@ -2892,6 +2985,7 @@ The only prerequisite is to add a corresponding label to nodes.
           - "99999"
 #+END_SRC
 
+
 * 核心原理
 
 ** 资源对象
@@ -3241,7 +3335,7 @@ kubectl scale --replicas=6 replicaset <name>
 #+END_SRC
 
 
-** Show all resources
+** Show all supported resources
 
 #+BEGIN_SRC sh
   kubectl get
@@ -3253,6 +3347,7 @@ kubectl scale --replicas=6 replicaset <name>
 #+BEGIN_SRC sh
   kubectl expose deployment <name> --port=80 --target-port=8080
 #+END_SRC
+
 
 ** Run Temporary Pod
 
@@ -3277,16 +3372,8 @@ You can then drill deeper to find out more about each attribute.
 #+END_SRC
 
 
-** Quickly switch to a different namespace
 
-#+BEGIN_SRC sh
-  alias kcd='kubectl config set-context $(kubectl config current- context) --namespace '
-#+END_SRC
-
-You can then switch between namespaces using =kcd <some-namespace>=
-
-
-** Forwarding a local network port to a port in the pod
+** Forward local network port to port in the pod
 
 Using port forwarding like this is an effective way to test an individual pod.
 
@@ -3295,7 +3382,7 @@ Using port forwarding like this is an effective way to test an individual pod.
 #+END_SRC
 
 
-** Communicating with Pods through API Server
+** Communicate with Pods through API Server
 
 One useful feature of the API server is the ability to proxy connections directly to individual pods. \\
 If you want to perform requests against your kubia-0 pod, you hit the following URL:
@@ -3304,7 +3391,7 @@ If you want to perform requests against your kubia-0 pod, you hit the following 
 #+END_SRC
 
 
-** Connecting to Cluster-Internal Services through API Server
+** Connect to Services through API Server
 
 Instead of using a piggyback pod to access the service from inside the cluster, \\
 you can use the same proxy feature provided by the API server to access the service:
@@ -3314,7 +3401,7 @@ you can use the same proxy feature provided by the API server to access the serv
 #+END_SRC
 
 
-** Obtaining the application log of a crashed container
+** Obtain the log of crashed container
 
 You can print the application’s log with kubectl logs. If your container is restarted, the kubectl logs command will show the log of the current container.
 
@@ -3367,7 +3454,7 @@ To learn more about how to use JSONPath with kubectl, refer to the [To learn mor
   [[file:img/k8s_api_server_ambassador.png]]
 
 
-** Ways of modifying Deployments and other resources
+** Modify Deployments and other resources
 
 *** edit
 
@@ -3411,7 +3498,7 @@ Changes the container image defined in a Pod, ReplicationController's template, 
 Example: =kubectl set image deployment kubia nodejs=luksa/kubia:v2=
 
 
-** Checking the status of the Control Plane components
+** Check status of Control Plane components
 
 #+BEGIN_SRC sh
 $ kubectl get componentstatuses
@@ -3441,4 +3528,91 @@ Watching events with the =--watch= option is much easier on the eyes and useful 
 
 #+BEGIN_SRC sh
   kubectl get events --watch
+#+END_SRC
+
+
+** Forcely shutdown pod
+
+#+BEGIN_SRC sh
+  kubectl delete po mypod --grace-period=0 --force
+#+END_SRC
+
+** Copy file from/to container
+
+#+BEGIN_SRC sh
+ kubectl cp foo-pod:/var/log/foo.log foo.log
+ kubectl cp localfile foo-pod:/etc/remotefile
+#+END_SRC
+
+
+** Mounting local files into the minikube vm
+
+You can mount your local filesystem into the Minikube VM using the =minikube mount= command and then
+mount it into your containers through a =hostPath= volume.
+
+See [[https://github.com/kubernetes/minikube/tree/master/docs][documentation]]
+
+
+** Using minikube docker daemon
+
+#+BEGIN_SRC sh
+  eval $(minikube docker-env)
+#+END_SRC
+
+** Build images locally and load remotely
+
+#+BEGIN_SRC sh
+  docker save <image> | (eval $(minikube docker-env) && docker load)
+#+END_SRC
+
+
+** =kubectl config=
+
+*** Location of kubeconfig file
+
+You can use multiple config files and have kubectl use them all at once by specifying all of them in the =KUBECONFIG= environment variable
+(separate them with a colon).
+
+*** Contents of kubeconfig file
+
+[[file:img/k8s_kubeconfig_file.png]]
+
+The kubeconfig file consists of four sections:
+
+1. A list of clusters
+2. A list of users
+3. A list of contexts
+4. The name of the current context
+
+#+BEGIN_EXAMPLE
+  A context ties together a cluster, a user, and the default namespace kubectl should use when performing commands.
+#+END_EXAMPLE
+
+While there can be multiple contexts defined in the kubeconfig file,
+at any given time _only one of them_ is the current context.
+
+*** Name of current context
+
+#+BEGIN_SRC sh
+  kubectl config current-context
+#+END_SRC
+*** Switch to different namespace
+
+#+BEGIN_SRC sh
+  alias kcd='kubectl config set-context $(kubectl config current-context) --namespace '
+#+END_SRC
+
+You can then switch between namespaces using =kcd <some-namespace>=
+
+*** Switching between contexts
+
+#+BEGIN_SRC sh
+  kubectl config use-context my-other-context
+#+END_SRC
+
+*** List contexts and clusters
+
+#+BEGIN_SRC sh
+  kubectl config get-contexts
+  kubectl config get-clusters
 #+END_SRC
