@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- 2019-04-17 Wed 13:54 -->
+<!-- 2019-04-17 Wed 17:32 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kubernetes</title>
@@ -234,452 +234,453 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org42630b1">1. Resources</a>
+<li><a href="#org4987591">1. Resources</a>
 <ul>
-<li><a href="#org53b992d">1.1. Overview</a></li>
-<li><a href="#org250426e">1.2. Pod</a>
+<li><a href="#orgc7d03dd">1.1. Overview</a></li>
+<li><a href="#orgda15ddc">1.2. Pod</a>
 <ul>
-<li><a href="#orgeb5f392">1.2.1. YAML Definition</a></li>
-<li><a href="#org82963f7">1.2.2. Label</a></li>
-<li><a href="#orgd7d48c2">1.2.3. Annotation</a></li>
-<li><a href="#orgc84fa16">1.2.4. Deleting</a></li>
-<li><a href="#orgf8e847f">1.2.5. Liveness probes</a></li>
-<li><a href="#org3722c61">1.2.6. Init Containers</a></li>
-<li><a href="#org3ade811">1.2.7. Lifecycle hooks</a>
+<li><a href="#org0909883">1.2.1. YAML Definition</a></li>
+<li><a href="#org5ca6240">1.2.2. Label</a></li>
+<li><a href="#orgaef10e7">1.2.3. Annotation</a></li>
+<li><a href="#org1c9192d">1.2.4. Deleting</a></li>
+<li><a href="#orgd599b95">1.2.5. Liveness probes</a></li>
+<li><a href="#org92ad489">1.2.6. Init Containers</a></li>
+<li><a href="#org1061ce9">1.2.7. Lifecycle hooks</a>
 <ul>
-<li><a href="#org443c592">1.2.7.1. Post-Start hook</a></li>
-<li><a href="#orgb720d6f">1.2.7.2. Pre-Stop hook</a></li>
+<li><a href="#orgbd20f76">1.2.7.1. Post-Start hook</a></li>
+<li><a href="#org75facc8">1.2.7.2. Pre-Stop hook</a></li>
 </ul>
 </li>
-<li><a href="#orgb94d077">1.2.8. Shutdown</a></li>
+<li><a href="#org11d72a7">1.2.8. Shutdown</a></li>
 </ul>
 </li>
-<li><a href="#org2f7cc16">1.3. ReplicationController</a>
+<li><a href="#orga92cdec">1.3. ReplicationController</a>
 <ul>
-<li><a href="#orgcb5025c">1.3.1. Three Parts Of A Replicationcontroller</a></li>
-<li><a href="#org4fa791b">1.3.2. Create</a></li>
-<li><a href="#org50d9f87">1.3.3. Change Pod Template</a></li>
-<li><a href="#orgb7fb252">1.3.4. Delete RC without deleting Pods</a></li>
+<li><a href="#org65b6bd7">1.3.1. Three Parts Of A Replicationcontroller</a></li>
+<li><a href="#org86221fc">1.3.2. Create</a></li>
+<li><a href="#org72d0925">1.3.3. Change Pod Template</a></li>
+<li><a href="#org85b58d3">1.3.4. Delete RC without deleting Pods</a></li>
 </ul>
 </li>
-<li><a href="#org3f29c54">1.4. ReplicaSet</a>
+<li><a href="#org109e32a">1.4. ReplicaSet</a>
 <ul>
-<li><a href="#orgd36f599">1.4.1. More Expressive Label Selectors</a></li>
-<li><a href="#orga22523b">1.4.2. Only cares about number of pods</a></li>
+<li><a href="#org550612f">1.4.1. More Expressive Label Selectors</a></li>
+<li><a href="#org6e36e88">1.4.2. Only cares about number of pods</a></li>
 </ul>
 </li>
-<li><a href="#org22a3394">1.5. DaemonSet</a></li>
-<li><a href="#org40f3fd9">1.6. Job</a>
+<li><a href="#orgb203143">1.5. DaemonSet</a></li>
+<li><a href="#orge8be5a9">1.6. Job</a>
 <ul>
-<li><a href="#orgb07bbca">1.6.1. Definition</a></li>
-<li><a href="#org8bcb3da">1.6.2. Limit time for Job pod to complete</a></li>
+<li><a href="#orgef52baa">1.6.1. Definition</a></li>
+<li><a href="#org5dee2cd">1.6.2. Limit time for Job pod to complete</a></li>
 </ul>
 </li>
-<li><a href="#org13a8ec0">1.7. CronJob</a></li>
-<li><a href="#orgae3875b">1.8. Service</a>
+<li><a href="#orgd146bb2">1.7. CronJob</a></li>
+<li><a href="#orga16ee13">1.8. Service</a>
 <ul>
-<li><a href="#org909ab49">1.8.1. Overall</a></li>
-<li><a href="#org9eed72b">1.8.2. Creation</a>
+<li><a href="#org4f17c25">1.8.1. Overall</a></li>
+<li><a href="#org9f8a620">1.8.2. Creation</a>
 <ul>
-<li><a href="#orgd7dcf89">1.8.2.1. By <code>kubectl expose</code></a></li>
-<li><a href="#orged3b818">1.8.2.2. By YAML</a>
+<li><a href="#org291a92f">1.8.2.1. By <code>kubectl expose</code></a></li>
+<li><a href="#org5a05330">1.8.2.2. By YAML</a>
 <ul>
-<li><a href="#orge7a2020">1.8.2.2.1. Expose ports in same Service</a></li>
-<li><a href="#org08aa7e7">1.8.2.2.2. Using Named Ports</a></li>
+<li><a href="#org1d6e67e">1.8.2.2.1. Expose ports in same Service</a></li>
+<li><a href="#org3aee454">1.8.2.2.2. Using Named Ports</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org2ae70ff">1.8.3. Session Affinity</a></li>
-<li><a href="#orga45ae35">1.8.4. Discovering Service</a>
+<li><a href="#org3afa982">1.8.3. Session Affinity</a></li>
+<li><a href="#org1e93746">1.8.4. Discovering Service</a>
 <ul>
-<li><a href="#orgef19b4f">1.8.4.1. Through ENV</a></li>
-<li><a href="#orgec5030f">1.8.4.2. Through DNS</a></li>
+<li><a href="#orgf351869">1.8.4.1. Through ENV</a></li>
+<li><a href="#orge742b2a">1.8.4.2. Through DNS</a></li>
 </ul>
 </li>
-<li><a href="#org79ca838">1.8.5. Endpoints</a>
+<li><a href="#org9b92510">1.8.5. Endpoints</a>
 <ul>
-<li><a href="#org4829801">1.8.5.1. Manually config service endpoints</a></li>
-<li><a href="#orgfd7376b">1.8.5.2. Creat alias for external service</a></li>
+<li><a href="#org626b718">1.8.5.1. Manually config service endpoints</a></li>
+<li><a href="#org65cb2f0">1.8.5.2. Creat alias for external service</a></li>
 </ul>
 </li>
-<li><a href="#org919b7bc">1.8.6. Exposing Services To External Clients</a>
+<li><a href="#org4cb0bd4">1.8.6. Exposing Services To External Clients</a>
 <ul>
-<li><a href="#org96fd140">1.8.6.1. NodePort</a>
+<li><a href="#org63e7dfb">1.8.6.1. NodePort</a>
 <ul>
-<li><a href="#orgd902172">1.8.6.1.1. YAML Definition</a></li>
+<li><a href="#org343a56b">1.8.6.1.1. YAML Definition</a></li>
 </ul>
 </li>
-<li><a href="#orgfede90f">1.8.6.2. LoadBalancer</a>
+<li><a href="#org848a8cb">1.8.6.2. LoadBalancer</a>
 <ul>
-<li><a href="#org49baa40">1.8.6.2.1. YAML Definition</a></li>
+<li><a href="#org7e6566a">1.8.6.2.1. YAML Definition</a></li>
 </ul>
 </li>
-<li><a href="#orgef898b4">1.8.6.3. Ingress</a>
+<li><a href="#org79df026">1.8.6.3. Ingress</a>
 <ul>
-<li><a href="#orgdee8f2f">1.8.6.3.1. YAML Definition</a></li>
+<li><a href="#orgfd5c66f">1.8.6.3.1. YAML Definition</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org1e579f4">1.8.7. Readiness Probe</a></li>
-<li><a href="#org74f59ca">1.8.8. Headless</a></li>
-<li><a href="#orgf98d397">1.8.9. External Traffic Issue</a>
+<li><a href="#org2c95538">1.8.7. Readiness Probe</a></li>
+<li><a href="#org4774ca0">1.8.8. Headless</a></li>
+<li><a href="#org178523a">1.8.9. External Traffic Issue</a>
 <ul>
-<li><a href="#org143451a">1.8.9.1. Non-Preservation Of The Client's IP Issue</a></li>
+<li><a href="#orgfea2713">1.8.9.1. Non-Preservation Of The Client's IP Issue</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org528e522">1.9. Volume</a>
+<li><a href="#org146ab95">1.9. Volume</a>
 <ul>
-<li><a href="#org324f098">1.9.1. Volume Types</a></li>
-<li><a href="#orgbdec445">1.9.2. emptyDir</a>
+<li><a href="#orgea65f65">1.9.1. Volume Types</a></li>
+<li><a href="#org95f47c2">1.9.2. emptyDir</a>
 <ul>
-<li><a href="#org76bfc33">1.9.2.1. The medium used</a></li>
+<li><a href="#org429ca36">1.9.2.1. The medium used</a></li>
 </ul>
 </li>
-<li><a href="#org4fed322">1.9.3. hostPath</a></li>
-<li><a href="#org5157ac8">1.9.4. PV/PVC</a>
+<li><a href="#orgb2bdcc9">1.9.3. hostPath</a></li>
+<li><a href="#orga754073">1.9.4. PV/PVC</a>
 <ul>
-<li><a href="#org0baca91">1.9.4.1. Creating PersistentVolume</a>
+<li><a href="#orgc8394bb">1.9.4.1. Creating PersistentVolume</a>
 <ul>
-<li><a href="#orgb14dad9">1.9.4.1.1. Access Mode</a></li>
+<li><a href="#orgcb61f33">1.9.4.1.1. Access Mode</a></li>
 </ul>
 </li>
-<li><a href="#org4d93f04">1.9.4.2. Creating PersistentVolumeClaim</a></li>
-<li><a href="#org22add29">1.9.4.3. Using PersistentVolumeClaim in Pod</a></li>
-<li><a href="#org37d3626">1.9.4.4. Dynamic Provisioning of PV</a>
+<li><a href="#org25421e8">1.9.4.2. Creating PersistentVolumeClaim</a></li>
+<li><a href="#orga80177a">1.9.4.3. Using PersistentVolumeClaim in Pod</a></li>
+<li><a href="#org452325e">1.9.4.4. Dynamic Provisioning of PV</a>
 <ul>
-<li><a href="#orgd8406fd">1.9.4.4.1. Defining StorageClass</a></li>
-<li><a href="#orgc4238c0">1.9.4.4.2. Requesting the SC in a PVC</a></li>
-<li><a href="#org368531d">1.9.4.4.3. Creating a PVC Without SC</a></li>
-<li><a href="#org3531bad">1.9.4.4.4. Forcing a PVC to Be Bound to One of The Pre-Provisioned PVs</a></li>
+<li><a href="#orge2722d8">1.9.4.4.1. Defining StorageClass</a></li>
+<li><a href="#org685de3a">1.9.4.4.2. Requesting the SC in a PVC</a></li>
+<li><a href="#org76fe302">1.9.4.4.3. Creating a PVC Without SC</a></li>
+<li><a href="#org4348d25">1.9.4.4.4. Forcing a PVC to Be Bound to One of The Pre-Provisioned PVs</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org9e4551d">1.10. ConfigMap &amp; Secret</a>
+<li><a href="#orgc5e664f">1.10. ConfigMap &amp; Secret</a>
 <ul>
-<li><a href="#org6a14c17">1.10.1. Basic</a>
+<li><a href="#org93a8601">1.10.1. Basic</a>
 <ul>
-<li><a href="#org928abf9">1.10.1.1. Overriding the command and arguments</a></li>
-<li><a href="#org2f44cea">1.10.1.2. Specifing env variables</a></li>
+<li><a href="#orgc6750d5">1.10.1.1. Overriding the command and arguments</a></li>
+<li><a href="#orgee5796a">1.10.1.2. Specifing env variables</a></li>
 </ul>
 </li>
-<li><a href="#orge8d0ff7">1.10.2. ConfigMap</a>
+<li><a href="#orgad1d172">1.10.2. ConfigMap</a>
 <ul>
-<li><a href="#org45da222">1.10.2.1. Creating</a>
+<li><a href="#org3ffa36b">1.10.2.1. Creating</a>
 <ul>
-<li><a href="#org01691ee">1.10.2.1.1. CLI</a></li>
-<li><a href="#org4e7dc92">1.10.2.1.2. YAML</a></li>
+<li><a href="#orge8e3c4d">1.10.2.1.1. CLI</a></li>
+<li><a href="#org87b96d1">1.10.2.1.2. YAML</a></li>
 </ul>
 </li>
-<li><a href="#org0c5b41a">1.10.2.2. Passing CM to Container</a>
+<li><a href="#org19e6196">1.10.2.2. Passing CM to Container</a>
 <ul>
-<li><a href="#orge84dc45">1.10.2.2.1. As ENV</a></li>
-<li><a href="#orgd3a7f1a">1.10.2.2.2. As Volume</a></li>
+<li><a href="#orgfc828ad">1.10.2.2.1. As ENV</a></li>
+<li><a href="#orgdfd2f27">1.10.2.2.2. As Volume</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgf5e8b67">1.10.3. Secret</a>
+<li><a href="#org3cacc13">1.10.3. Secret</a>
 <ul>
-<li><a href="#org74622b1">1.10.3.1. Default Token Secret</a></li>
-<li><a href="#org2c0cacb">1.10.3.2. Image Pull Secret</a></li>
-<li><a href="#orgc391910">1.10.3.3. Passing Secret to Container</a>
+<li><a href="#orgfe34329">1.10.3.1. Default Token Secret</a></li>
+<li><a href="#orgef8a43c">1.10.3.2. Image Pull Secret</a></li>
+<li><a href="#org7246230">1.10.3.3. Passing Secret to Container</a>
 <ul>
-<li><a href="#orgf4dd952">1.10.3.3.1. As Volume</a></li>
-<li><a href="#orge434101">1.10.3.3.2. As ENV</a></li>
+<li><a href="#orgf502ae1">1.10.3.3.1. As Volume</a></li>
+<li><a href="#org2ab1320">1.10.3.3.2. As ENV</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org27260a6">1.11. Deployment</a>
+<li><a href="#orgf52d9c6">1.11. Deployment</a>
 <ul>
-<li><a href="#org1c59ce8">1.11.1. Updating Strategies</a></li>
-<li><a href="#org5fe14aa">1.11.2. Performing RU with <code>kubectl</code></a>
+<li><a href="#org0645060">1.11.1. Updating Strategies</a></li>
+<li><a href="#orgd8cd8bf">1.11.2. Performing RU with <code>kubectl</code></a>
 <ul>
-<li><a href="#orgd1d1750">1.11.2.1. Steps Required Before RU</a></li>
+<li><a href="#orgb724368">1.11.2.1. Steps Required Before RU</a></li>
 </ul>
 </li>
-<li><a href="#org8c1b85b">1.11.3. Creating Deployment</a></li>
-<li><a href="#org6011a49">1.11.4. Updating Deployment</a></li>
-<li><a href="#org6326456">1.11.5. Rolling Back</a></li>
-<li><a href="#org5602269">1.11.6. maxSurge/maxUnavailable</a></li>
-<li><a href="#org89d157c">1.11.7. Pausing Rollout Process</a></li>
-<li><a href="#orgfc6da9d">1.11.8. Blocking Rollout (minReadySeconds)</a></li>
+<li><a href="#orgbb8b2ec">1.11.3. Creating Deployment</a></li>
+<li><a href="#org59793a3">1.11.4. Updating Deployment</a></li>
+<li><a href="#org9ac64c0">1.11.5. Rolling Back</a></li>
+<li><a href="#orgb75d525">1.11.6. maxSurge/maxUnavailable</a></li>
+<li><a href="#orgd7dbf58">1.11.7. Pausing Rollout Process</a></li>
+<li><a href="#orga160318">1.11.8. Blocking Rollout (minReadySeconds)</a></li>
 </ul>
 </li>
-<li><a href="#orgf101a39">1.12. StatefulSet</a>
+<li><a href="#org226a802">1.12. StatefulSet</a>
 <ul>
-<li><a href="#orgf623aa3">1.12.1. 设计思想</a>
+<li><a href="#org33dbd3f">1.12.1. 设计思想</a>
 <ul>
-<li><a href="#orga2929e2">1.12.1.1. Stable Identity</a>
+<li><a href="#orgb2b2cdc">1.12.1.1. Stable Identity</a>
 <ul>
-<li><a href="#orge629611">1.12.1.1.1. Governing Service</a></li>
-<li><a href="#org8dc32f7">1.12.1.1.2. Scaling</a></li>
+<li><a href="#orgaeb3d42">1.12.1.1.1. Governing Service</a></li>
+<li><a href="#orgf8ea64e">1.12.1.1.2. Scaling</a></li>
 </ul>
 </li>
-<li><a href="#org2e3e49e">1.12.1.2. Stable Dedicated Storage</a></li>
-<li><a href="#orgf0cbd6b">1.12.1.3. Guarantees</a></li>
+<li><a href="#org792929c">1.12.1.2. Stable Dedicated Storage</a></li>
+<li><a href="#orgbc890d4">1.12.1.3. Guarantees</a></li>
 </ul>
 </li>
-<li><a href="#orgabcba00">1.12.2. Deploying App through StatefulSet</a></li>
+<li><a href="#orgf4c6f95">1.12.2. Deploying App through StatefulSet</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org01aacc1">2. Internals</a>
+<li><a href="#org72f8014">2. Internals</a>
 <ul>
-<li><a href="#orgab56198">2.1. Architecture</a>
+<li><a href="#org2f2a1bd">2.1. Architecture</a>
 <ul>
-<li><a href="#org0d913fb">2.1.1. etcd</a>
+<li><a href="#org115ba12">2.1.1. etcd</a>
 <ul>
-<li><a href="#orgcde3343">2.1.1.1. Optimistic Concurrency Control</a></li>
-<li><a href="#orga5ce105">2.1.1.2. RAFT</a></li>
+<li><a href="#orgdd1d77e">2.1.1.1. Optimistic Concurrency Control</a></li>
+<li><a href="#orga12fc5f">2.1.1.2. RAFT</a></li>
 </ul>
 </li>
-<li><a href="#org7d2e4ed">2.1.2. API Server</a>
+<li><a href="#org364cf05">2.1.2. API Server</a>
 <ul>
-<li><a href="#org1841d3b">2.1.2.1. Resource Changes Notification</a></li>
+<li><a href="#orgcbba834">2.1.2.1. Resource Changes Notification</a></li>
 </ul>
 </li>
-<li><a href="#org07cb21a">2.1.3. Scheduler</a></li>
-<li><a href="#org09bed5d">2.1.4. Controller Manager</a></li>
-<li><a href="#orgc24ee15">2.1.5. Kublet</a>
+<li><a href="#orgc808eef">2.1.3. Scheduler</a></li>
+<li><a href="#org21206d6">2.1.4. Controller Manager</a></li>
+<li><a href="#orgd32346d">2.1.5. Kublet</a>
 <ul>
-<li><a href="#org7738edd">2.1.5.1. Run Static Pods without API Server</a></li>
+<li><a href="#orgd7c81b9">2.1.5.1. Run Static Pods without API Server</a></li>
 </ul>
 </li>
-<li><a href="#orga34727a">2.1.6. Kube-Proxy</a></li>
-<li><a href="#orgea44936">2.1.7. Add-on</a></li>
+<li><a href="#org694633c">2.1.6. Kube-Proxy</a></li>
+<li><a href="#orga375b87">2.1.7. Add-on</a></li>
 </ul>
 </li>
-<li><a href="#org6398b37">2.2. Cooperation between controllers</a></li>
-<li><a href="#orge36939a">2.3. Pod</a>
+<li><a href="#org161f2e3">2.2. Cooperation between controllers</a></li>
+<li><a href="#org2475264">2.3. Pod</a>
 <ul>
-<li><a href="#orgbe31135">2.3.1. Infrastructure Container</a></li>
-<li><a href="#org0696622">2.3.2. Inter-pod networking</a>
+<li><a href="#orgb4b7e6a">2.3.1. Infrastructure Container</a></li>
+<li><a href="#org48b16a3">2.3.2. Inter-pod networking</a>
 <ul>
-<li><a href="#org26af0e5">2.3.2.1. Pods are connected NAT-less</a></li>
-<li><a href="#org60e6816">2.3.2.2. Communication between nodes</a></li>
-<li><a href="#org2e9f7de">2.3.2.3. Container Network Interface</a></li>
+<li><a href="#orgfab8028">2.3.2.1. Pods are connected NAT-less</a></li>
+<li><a href="#org03e2460">2.3.2.2. Communication between nodes</a></li>
+<li><a href="#orgf0ce205">2.3.2.3. Container Network Interface</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgbb2510f">2.4. High Availability</a></li>
+<li><a href="#org0295093">2.4. High Availability</a></li>
 </ul>
 </li>
-<li><a href="#orga2de321">3. Security</a>
+<li><a href="#org8e4df26">3. Security</a>
 <ul>
-<li><a href="#org8fb071c">3.1. Understanding Authentication</a>
+<li><a href="#orgb73572d">3.1. Understanding Authentication</a>
 <ul>
-<li><a href="#org6ebc7ac">3.1.1. Users</a></li>
-<li><a href="#org580052c">3.1.2. Group</a></li>
-<li><a href="#org16248f3">3.1.3. Service Account</a>
+<li><a href="#orgb14a8f9">3.1.1. Users</a></li>
+<li><a href="#orgef07ca1">3.1.2. Group</a></li>
+<li><a href="#org1867615">3.1.3. Service Account</a>
 <ul>
-<li><a href="#org0920b6b">3.1.3.1. Mountable Secrets</a></li>
-<li><a href="#orgf933e17">3.1.3.2. Image Pull Secrets</a></li>
-<li><a href="#org2e948e5">3.1.3.3. Assigning ServiceAccount to Pod</a></li>
+<li><a href="#org485fce0">3.1.3.1. Mountable Secrets</a></li>
+<li><a href="#org1ddd39c">3.1.3.2. Image Pull Secrets</a></li>
+<li><a href="#org82703e3">3.1.3.3. Assigning ServiceAccount to Pod</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org1eb646f">3.2. RBAC</a>
+<li><a href="#org52019b0">3.2. RBAC</a>
 <ul>
-<li><a href="#orgc364231">3.2.1. Role/RoleBinding</a>
+<li><a href="#org7bf71d4">3.2.1. Role/RoleBinding</a>
 <ul>
-<li><a href="#org37bd54b">3.2.1.1. Create Role</a></li>
-<li><a href="#orga6abef9">3.2.1.2. Binding Role to ServiceAccount</a>
+<li><a href="#org746633a">3.2.1.1. Create Role</a></li>
+<li><a href="#orgcccc4c8">3.2.1.2. Binding Role to ServiceAccount</a>
 <ul>
-<li><a href="#orgdb67dc6">3.2.1.2.1. Including ServiceAccounts from other namespaces</a></li>
+<li><a href="#org6c2e10d">3.2.1.2.1. Including ServiceAccounts from other namespaces</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org4c81cc3">3.2.2. ClusterRole/ClusterRoleBinding</a>
+<li><a href="#org5caf098">3.2.2. ClusterRole/ClusterRoleBinding</a>
 <ul>
-<li><a href="#orgc037b6d">3.2.2.1. Access non-resource URLs</a></li>
-<li><a href="#orgfb69631">3.2.2.2. Access namespaced resources</a></li>
+<li><a href="#orga632973">3.2.2.1. Access non-resource URLs</a></li>
+<li><a href="#orge17f438">3.2.2.2. Access namespaced resources</a></li>
 </ul>
 </li>
-<li><a href="#org6988d87">3.2.3. Combinations of role/binding types</a></li>
-<li><a href="#org013e3ff">3.2.4. Default CRs/CRBs</a></li>
+<li><a href="#org1bbd8ad">3.2.3. Combinations of role/binding types</a></li>
+<li><a href="#orgca81cc7">3.2.4. Default CRs/CRBs</a></li>
 </ul>
 </li>
-<li><a href="#org88b711e">3.3. Use Node's namespaces</a>
+<li><a href="#orgba330b8">3.3. Use Node's namespaces</a>
 <ul>
-<li><a href="#org90a6b4b">3.3.1. Use node’s network namespace</a>
+<li><a href="#orgfa70a41">3.3.1. Use node’s network namespace</a>
 <ul>
-<li><a href="#orgea53170">3.3.1.1. Use host port (not in host's nw ns)</a></li>
+<li><a href="#orgc0b1edd">3.3.1.1. Use host port (not in host's nw ns)</a></li>
 </ul>
 </li>
-<li><a href="#org05f535b">3.3.2. Use node's PID/IPC namespaces</a></li>
+<li><a href="#orgf64adb2">3.3.2. Use node's PID/IPC namespaces</a></li>
 </ul>
 </li>
-<li><a href="#orge5e651c">3.4. Container security context</a>
+<li><a href="#orga4c959c">3.4. Container security context</a>
 <ul>
-<li><a href="#org9d44399">3.4.1. Run container as specific user</a></li>
-<li><a href="#org955d13c">3.4.2. Run container as non-root</a></li>
-<li><a href="#orgddba7ec">3.4.3. Run container in privileged mode</a></li>
-<li><a href="#org2082d48">3.4.4. Add individual kernel capabilities</a></li>
-<li><a href="#org1cb4890">3.4.5. Drop individual kernel capabilities</a></li>
-<li><a href="#orgdbcb349">3.4.6. Prevent writing to filesystem</a></li>
-<li><a href="#org5149d86">3.4.7. Share volume among different users</a></li>
+<li><a href="#orge8404e7">3.4.1. Run container as specific user</a></li>
+<li><a href="#org32df8ad">3.4.2. Run container as non-root</a></li>
+<li><a href="#org1b1503d">3.4.3. Run container in privileged mode</a></li>
+<li><a href="#orgbd291fb">3.4.4. Add individual kernel capabilities</a></li>
+<li><a href="#orgd0f0afb">3.4.5. Drop individual kernel capabilities</a></li>
+<li><a href="#orgfef95dc">3.4.6. Prevent writing to filesystem</a></li>
+<li><a href="#org63a108e">3.4.7. Share volume among different users</a></li>
 </ul>
 </li>
-<li><a href="#orgfb98666">3.5. PodSecurityPolicy</a></li>
-<li><a href="#org8c9aa60">3.6. Inter-Pod Network Isolation</a>
+<li><a href="#orgf83695b">3.5. PodSecurityPolicy</a></li>
+<li><a href="#orge02d2c1">3.6. Inter-Pod Network Isolation</a>
 <ul>
-<li><a href="#orge7ee46d">3.6.1. Network isolation in a namespace</a></li>
-<li><a href="#orgb5ec387">3.6.2. Allow some pods in a ns to connect</a></li>
-<li><a href="#orgdb36713">3.6.3. Isolate network between namespaces</a></li>
-<li><a href="#org17a55b4">3.6.4. Isolate by CIDR notation</a></li>
-<li><a href="#org8581edb">3.6.5. Limite outbound traffic</a></li>
+<li><a href="#org90819ac">3.6.1. Network isolation in a namespace</a></li>
+<li><a href="#org48ab6f8">3.6.2. Allow some pods in a ns to connect</a></li>
+<li><a href="#org842f1ee">3.6.3. Isolate network between namespaces</a></li>
+<li><a href="#org748778f">3.6.4. Isolate by CIDR notation</a></li>
+<li><a href="#org2feae6d">3.6.5. Limite outbound traffic</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org080a1e7">4. Computation Resources</a>
+<li><a href="#org094aa72">4. Computation Resources</a>
 <ul>
-<li><a href="#orgea915e4">4.1. Request resources for containers</a>
+<li><a href="#orgfe02889">4.1. Request resources for containers</a>
 <ul>
-<li><a href="#org6f5b0fa">4.1.1. Create pods with resource requests</a>
+<li><a href="#org519b9db">4.1.1. Create pods with resource requests</a>
 <ul>
-<li><a href="#org94e6340">4.1.1.1. How requests affect scheduling</a></li>
+<li><a href="#org93564a7">4.1.1.1. How requests affect scheduling</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org77c6e1d">4.2. Limit resources for containers</a>
+<li><a href="#orgcd889e9">4.2. Limit resources for containers</a>
 <ul>
-<li><a href="#org702bd96">4.2.1. Exceeding limits</a></li>
+<li><a href="#orgc4bcdcc">4.2.1. Exceeding limits</a></li>
 </ul>
 </li>
-<li><a href="#org0448b71">4.3. Pod QoS classes</a>
+<li><a href="#org692225c">4.3. Pod QoS classes</a>
 <ul>
-<li><a href="#org089d67f">4.3.1. Kill Pod according to QoS</a></li>
+<li><a href="#orga306a32">4.3.1. Kill Pod according to QoS</a></li>
 </ul>
 </li>
-<li><a href="#org2dfc009">4.4. Set default requests/limits for pods per ns</a></li>
-<li><a href="#org0462034">4.5. Limit total resources available in ns</a>
+<li><a href="#orgd1f4884">4.4. Set default requests/limits for pods per ns</a></li>
+<li><a href="#orgc3c5ff0">4.5. Limit total resources available in ns</a>
 <ul>
-<li><a href="#org7c25709">4.5.1. For CPU and Memory</a></li>
-<li><a href="#org0cedeac">4.5.2. For persistent storage</a></li>
-<li><a href="#org46219f2">4.5.3. For number of objects</a></li>
-<li><a href="#org225bb44">4.5.4. For pod states and/or QoS classes</a></li>
+<li><a href="#org3f75c31">4.5.1. For CPU and Memory</a></li>
+<li><a href="#org582304e">4.5.2. For persistent storage</a></li>
+<li><a href="#orgccb7293">4.5.3. For number of objects</a></li>
+<li><a href="#org2090663">4.5.4. For pod states and/or QoS classes</a></li>
 </ul>
 </li>
-<li><a href="#orgd5d3862">4.6. Resource usage Monitoring</a>
+<li><a href="#org8040b4f">4.6. Resource usage Monitoring</a>
 <ul>
-<li><a href="#org639c21c">4.6.1. Analyzing resource usage with Grafana</a></li>
+<li><a href="#orgbabeb77">4.6.1. Analyzing resource usage with Grafana</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgc994b5b">5. AutoScaling</a>
+<li><a href="#orgc59dda5">5. AutoScaling</a>
 <ul>
-<li><a href="#org1709f6b">5.1. Horizontal pod autoscaling</a>
+<li><a href="#org7a93781">5.1. Horizontal pod autoscaling</a>
 <ul>
-<li><a href="#orgcad1b4b">5.1.1. Autoscaling process</a>
+<li><a href="#org05db43d">5.1.1. Autoscaling process</a>
 <ul>
-<li><a href="#org4e9415b">5.1.1.1. Whole picture</a></li>
-<li><a href="#org095a4b7">5.1.1.2. CPU utilization</a></li>
-<li><a href="#org3a8f7f5">5.1.1.3. Maximum rate of scaling</a></li>
+<li><a href="#org17fca35">5.1.1.1. Whole picture</a></li>
+<li><a href="#org76e86d5">5.1.1.2. CPU utilization</a></li>
+<li><a href="#orge459d74">5.1.1.3. Maximum rate of scaling</a></li>
 </ul>
 </li>
-<li><a href="#org94e2774">5.1.2. Create HorizontalPodAutoscaler</a></li>
+<li><a href="#org18770f8">5.1.2. Create HorizontalPodAutoscaler</a></li>
 </ul>
 </li>
-<li><a href="#org40e4f1b">5.2. Horizontal node autoscaling</a>
+<li><a href="#orgb9056e3">5.2. Horizontal node autoscaling</a>
 <ul>
-<li><a href="#org5d6827c">5.2.1. ClusterAutoscaler</a>
+<li><a href="#org66d176a">5.2.1. ClusterAutoscaler</a>
 <ul>
-<li><a href="#org23201a4">5.2.1.1. Scaling up case</a></li>
-<li><a href="#org35f7318">5.2.1.2. Scaling down case</a></li>
+<li><a href="#org9d8f090">5.2.1.1. Scaling up case</a></li>
+<li><a href="#orgd7188b6">5.2.1.2. Scaling down case</a></li>
 </ul>
 </li>
-<li><a href="#orgaa56ff0">5.2.2. Manually cordon and drain nodes</a></li>
-<li><a href="#org32a02b7">5.2.3. PodDisruptionBudget</a></li>
+<li><a href="#org894ec90">5.2.2. Manually cordon and drain nodes</a></li>
+<li><a href="#org92a61e0">5.2.3. PodDisruptionBudget</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org8dcdd48">6. Scheduling</a>
+<li><a href="#orgb2fd07f">6. Scheduling</a>
 <ul>
-<li><a href="#org6b3a550">6.1. Node Affinity</a>
+<li><a href="#orgaa8f296">6.1. Node Affinity</a>
 <ul>
-<li><a href="#org510d376">6.1.1. Hard</a></li>
-<li><a href="#orgfa7e20b">6.1.2. Prioritizing</a></li>
+<li><a href="#org8fa12ae">6.1.1. Hard</a></li>
+<li><a href="#orgcf723c5">6.1.2. Prioritizing</a></li>
 </ul>
 </li>
-<li><a href="#org590fad9">6.2. Pod Affinity</a>
+<li><a href="#org7348ce5">6.2. Pod Affinity</a>
 <ul>
-<li><a href="#org6b52f47">6.2.1. Hard</a></li>
-<li><a href="#org17173bd">6.2.2. Prioritizing</a></li>
+<li><a href="#orgd9def05">6.2.1. Hard</a></li>
+<li><a href="#org2ded65c">6.2.2. Prioritizing</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org3e0e3a6">7. Utils</a>
+<li><a href="#org9fb4488">7. Utils</a>
 <ul>
-<li><a href="#org356d158">7.1. YAML Basic</a>
+<li><a href="#org56410e0">7.1. YAML Basic</a>
 <ul>
-<li><a href="#org7e9322d">7.1.1. Key Value Pair</a></li>
-<li><a href="#org3de5b46">7.1.2. Array / List</a></li>
-<li><a href="#orga8cc287">7.1.3. Dictionary / Map</a></li>
+<li><a href="#orgb48d767">7.1.1. Key Value Pair</a></li>
+<li><a href="#org120edac">7.1.2. Array / List</a></li>
+<li><a href="#orgcf3bf1f">7.1.3. Dictionary / Map</a></li>
 </ul>
 </li>
-<li><a href="#orgb805d1a">7.2. Bash completion</a></li>
-<li><a href="#org5ab86ba">7.3. Show all supported resources</a></li>
-<li><a href="#orgc889c7d">7.4. Expose pod through Service</a></li>
-<li><a href="#orgbaf370c">7.5. Run Temporary Pod</a></li>
-<li><a href="#org95a931a">7.6. Discover possible API object fields</a></li>
-<li><a href="#orge08b5ae">7.7. Forward local network port to port in the pod</a></li>
-<li><a href="#orga45345d">7.8. Communicate with Pods through API Server</a></li>
-<li><a href="#org02a853d">7.9. Connect to Services through API Server</a></li>
-<li><a href="#orgdf52bb3">7.10. Obtain the log of crashed container</a></li>
-<li><a href="#org70dc1e2">7.11. Get IPs of all nodes</a></li>
-<li><a href="#orgdd53410">7.12. Talking to API Server</a>
+<li><a href="#orgd85f4c2">7.2. Bash completion</a></li>
+<li><a href="#orgcb09c98">7.3. Show all supported resources</a></li>
+<li><a href="#org22bbc80">7.4. Expose pod through Service</a></li>
+<li><a href="#orgfee4145">7.5. Run Temporary Pod</a></li>
+<li><a href="#orga985415">7.6. Discover possible API object fields</a></li>
+<li><a href="#org7e0a10d">7.7. Forward local network port to port in the pod</a></li>
+<li><a href="#org6d859cc">7.8. Communicate with Pods through API Server</a></li>
+<li><a href="#orgb6545c6">7.9. Connect to Services through API Server</a></li>
+<li><a href="#orgd8d3281">7.10. Obtain the log of crashed container</a></li>
+<li><a href="#orgdb26896">7.11. Get IPs of all nodes</a></li>
+<li><a href="#orgf3070f8">7.12. Talking to API Server</a>
 <ul>
-<li><a href="#org8a433a8">7.12.1. kubectl proxy</a></li>
-<li><a href="#org49ca9db">7.12.2. From in POD</a></li>
+<li><a href="#orgd755a36">7.12.1. kubectl proxy</a></li>
+<li><a href="#org3fb027f">7.12.2. From in POD</a></li>
 </ul>
 </li>
-<li><a href="#orgec787b6">7.13. Modify Deployments and other resources</a>
+<li><a href="#org4c8a7da">7.13. Modify Deployments and other resources</a>
 <ul>
-<li><a href="#org9414882">7.13.1. edit</a></li>
-<li><a href="#orgd1b4b20">7.13.2. patch</a></li>
-<li><a href="#orgcf61daf">7.13.3. apply</a></li>
-<li><a href="#orgc245844">7.13.4. replace</a></li>
-<li><a href="#org95cb2cc">7.13.5. set image</a></li>
+<li><a href="#org3a73d9e">7.13.1. edit</a></li>
+<li><a href="#orgc322434">7.13.2. patch</a></li>
+<li><a href="#org8765ee2">7.13.3. apply</a></li>
+<li><a href="#orgf3238a3">7.13.4. replace</a></li>
+<li><a href="#orga7bca22">7.13.5. set image</a></li>
 </ul>
 </li>
-<li><a href="#orgc2fc12a">7.14. Check status of Control Plane components</a></li>
-<li><a href="#org9a9c30d">7.15. WATCHING Resources</a></li>
-<li><a href="#orgeb13f8c">7.16. Observing cluster events</a></li>
-<li><a href="#org19c4615">7.17. Forcely shutdown pod</a></li>
-<li><a href="#org88f8369">7.18. Copy file from/to container</a></li>
-<li><a href="#orgd17425d">7.19. Mounting local files into the minikube vm</a></li>
-<li><a href="#orgfd71a3e">7.20. Using minikube docker daemon</a></li>
-<li><a href="#orgc91a2cf">7.21. Build images locally and load remotely</a></li>
-<li><a href="#org1c27d24">7.22. <code>kubectl config</code></a>
+<li><a href="#org7f23508">7.14. Check status of Control Plane components</a></li>
+<li><a href="#org9ae5c96">7.15. WATCHING Resources</a></li>
+<li><a href="#orgcb2b057">7.16. Observing cluster events</a></li>
+<li><a href="#org0a431de">7.17. Forcely shutdown pod</a></li>
+<li><a href="#orgcb903bd">7.18. Copy file from/to container</a></li>
+<li><a href="#orge4f57c0">7.19. Mounting local files into the minikube vm</a></li>
+<li><a href="#org6003e64">7.20. Using minikube docker daemon</a></li>
+<li><a href="#orge583028">7.21. Build images locally and load remotely</a></li>
+<li><a href="#org94ae6d1">7.22. <code>kubectl config</code></a>
 <ul>
-<li><a href="#orge65e331">7.22.1. Location of kubeconfig file</a></li>
-<li><a href="#orgfb3fb78">7.22.2. Contents of kubeconfig file</a></li>
-<li><a href="#orge4c9f1d">7.22.3. Use cluster from local machine</a></li>
-<li><a href="#org2a6cf06">7.22.4. Name of current context</a></li>
-<li><a href="#orga2d8b20">7.22.5. Switch to different namespace</a></li>
-<li><a href="#orgbf03832">7.22.6. Switching between contexts</a></li>
-<li><a href="#org412839a">7.22.7. List contexts and clusters</a></li>
+<li><a href="#orgb619379">7.22.1. Location of kubeconfig file</a></li>
+<li><a href="#orgf865b23">7.22.2. Contents of kubeconfig file</a></li>
+<li><a href="#orgc3df5bb">7.22.3. Use cluster from local machine</a></li>
+<li><a href="#org1a0e68d">7.22.4. Name of current context</a></li>
+<li><a href="#org7538b4c">7.22.5. Switch to different namespace</a></li>
+<li><a href="#orga58779c">7.22.6. Switching between contexts</a></li>
+<li><a href="#orge3ef916">7.22.7. List contexts and clusters</a></li>
 </ul>
 </li>
+<li><a href="#org4bc6ebe">7.23. Setup AWS EKS</a></li>
 </ul>
 </li>
 </ul>
@@ -702,7 +703,7 @@ for the JavaScript code in this tag.
 
 <tr>
 <td class="org-left">Date</td>
-<td class="org-left">2019-04-17 13:54:19</td>
+<td class="org-left">2019-04-17 17:32:17</td>
 </tr>
 </tbody>
 </table>
@@ -711,452 +712,453 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org42630b1">1. Resources</a>
+<li><a href="#org4987591">1. Resources</a>
 <ul>
-<li><a href="#org53b992d">1.1. Overview</a></li>
-<li><a href="#org250426e">1.2. Pod</a>
+<li><a href="#orgc7d03dd">1.1. Overview</a></li>
+<li><a href="#orgda15ddc">1.2. Pod</a>
 <ul>
-<li><a href="#orgeb5f392">1.2.1. YAML Definition</a></li>
-<li><a href="#org82963f7">1.2.2. Label</a></li>
-<li><a href="#orgd7d48c2">1.2.3. Annotation</a></li>
-<li><a href="#orgc84fa16">1.2.4. Deleting</a></li>
-<li><a href="#orgf8e847f">1.2.5. Liveness probes</a></li>
-<li><a href="#org3722c61">1.2.6. Init Containers</a></li>
-<li><a href="#org3ade811">1.2.7. Lifecycle hooks</a>
+<li><a href="#org0909883">1.2.1. YAML Definition</a></li>
+<li><a href="#org5ca6240">1.2.2. Label</a></li>
+<li><a href="#orgaef10e7">1.2.3. Annotation</a></li>
+<li><a href="#org1c9192d">1.2.4. Deleting</a></li>
+<li><a href="#orgd599b95">1.2.5. Liveness probes</a></li>
+<li><a href="#org92ad489">1.2.6. Init Containers</a></li>
+<li><a href="#org1061ce9">1.2.7. Lifecycle hooks</a>
 <ul>
-<li><a href="#org443c592">1.2.7.1. Post-Start hook</a></li>
-<li><a href="#orgb720d6f">1.2.7.2. Pre-Stop hook</a></li>
+<li><a href="#orgbd20f76">1.2.7.1. Post-Start hook</a></li>
+<li><a href="#org75facc8">1.2.7.2. Pre-Stop hook</a></li>
 </ul>
 </li>
-<li><a href="#orgb94d077">1.2.8. Shutdown</a></li>
+<li><a href="#org11d72a7">1.2.8. Shutdown</a></li>
 </ul>
 </li>
-<li><a href="#org2f7cc16">1.3. ReplicationController</a>
+<li><a href="#orga92cdec">1.3. ReplicationController</a>
 <ul>
-<li><a href="#orgcb5025c">1.3.1. Three Parts Of A Replicationcontroller</a></li>
-<li><a href="#org4fa791b">1.3.2. Create</a></li>
-<li><a href="#org50d9f87">1.3.3. Change Pod Template</a></li>
-<li><a href="#orgb7fb252">1.3.4. Delete RC without deleting Pods</a></li>
+<li><a href="#org65b6bd7">1.3.1. Three Parts Of A Replicationcontroller</a></li>
+<li><a href="#org86221fc">1.3.2. Create</a></li>
+<li><a href="#org72d0925">1.3.3. Change Pod Template</a></li>
+<li><a href="#org85b58d3">1.3.4. Delete RC without deleting Pods</a></li>
 </ul>
 </li>
-<li><a href="#org3f29c54">1.4. ReplicaSet</a>
+<li><a href="#org109e32a">1.4. ReplicaSet</a>
 <ul>
-<li><a href="#orgd36f599">1.4.1. More Expressive Label Selectors</a></li>
-<li><a href="#orga22523b">1.4.2. Only cares about number of pods</a></li>
+<li><a href="#org550612f">1.4.1. More Expressive Label Selectors</a></li>
+<li><a href="#org6e36e88">1.4.2. Only cares about number of pods</a></li>
 </ul>
 </li>
-<li><a href="#org22a3394">1.5. DaemonSet</a></li>
-<li><a href="#org40f3fd9">1.6. Job</a>
+<li><a href="#orgb203143">1.5. DaemonSet</a></li>
+<li><a href="#orge8be5a9">1.6. Job</a>
 <ul>
-<li><a href="#orgb07bbca">1.6.1. Definition</a></li>
-<li><a href="#org8bcb3da">1.6.2. Limit time for Job pod to complete</a></li>
+<li><a href="#orgef52baa">1.6.1. Definition</a></li>
+<li><a href="#org5dee2cd">1.6.2. Limit time for Job pod to complete</a></li>
 </ul>
 </li>
-<li><a href="#org13a8ec0">1.7. CronJob</a></li>
-<li><a href="#orgae3875b">1.8. Service</a>
+<li><a href="#orgd146bb2">1.7. CronJob</a></li>
+<li><a href="#orga16ee13">1.8. Service</a>
 <ul>
-<li><a href="#org909ab49">1.8.1. Overall</a></li>
-<li><a href="#org9eed72b">1.8.2. Creation</a>
+<li><a href="#org4f17c25">1.8.1. Overall</a></li>
+<li><a href="#org9f8a620">1.8.2. Creation</a>
 <ul>
-<li><a href="#orgd7dcf89">1.8.2.1. By <code>kubectl expose</code></a></li>
-<li><a href="#orged3b818">1.8.2.2. By YAML</a>
+<li><a href="#org291a92f">1.8.2.1. By <code>kubectl expose</code></a></li>
+<li><a href="#org5a05330">1.8.2.2. By YAML</a>
 <ul>
-<li><a href="#orge7a2020">1.8.2.2.1. Expose ports in same Service</a></li>
-<li><a href="#org08aa7e7">1.8.2.2.2. Using Named Ports</a></li>
+<li><a href="#org1d6e67e">1.8.2.2.1. Expose ports in same Service</a></li>
+<li><a href="#org3aee454">1.8.2.2.2. Using Named Ports</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org2ae70ff">1.8.3. Session Affinity</a></li>
-<li><a href="#orga45ae35">1.8.4. Discovering Service</a>
+<li><a href="#org3afa982">1.8.3. Session Affinity</a></li>
+<li><a href="#org1e93746">1.8.4. Discovering Service</a>
 <ul>
-<li><a href="#orgef19b4f">1.8.4.1. Through ENV</a></li>
-<li><a href="#orgec5030f">1.8.4.2. Through DNS</a></li>
+<li><a href="#orgf351869">1.8.4.1. Through ENV</a></li>
+<li><a href="#orge742b2a">1.8.4.2. Through DNS</a></li>
 </ul>
 </li>
-<li><a href="#org79ca838">1.8.5. Endpoints</a>
+<li><a href="#org9b92510">1.8.5. Endpoints</a>
 <ul>
-<li><a href="#org4829801">1.8.5.1. Manually config service endpoints</a></li>
-<li><a href="#orgfd7376b">1.8.5.2. Creat alias for external service</a></li>
+<li><a href="#org626b718">1.8.5.1. Manually config service endpoints</a></li>
+<li><a href="#org65cb2f0">1.8.5.2. Creat alias for external service</a></li>
 </ul>
 </li>
-<li><a href="#org919b7bc">1.8.6. Exposing Services To External Clients</a>
+<li><a href="#org4cb0bd4">1.8.6. Exposing Services To External Clients</a>
 <ul>
-<li><a href="#org96fd140">1.8.6.1. NodePort</a>
+<li><a href="#org63e7dfb">1.8.6.1. NodePort</a>
 <ul>
-<li><a href="#orgd902172">1.8.6.1.1. YAML Definition</a></li>
+<li><a href="#org343a56b">1.8.6.1.1. YAML Definition</a></li>
 </ul>
 </li>
-<li><a href="#orgfede90f">1.8.6.2. LoadBalancer</a>
+<li><a href="#org848a8cb">1.8.6.2. LoadBalancer</a>
 <ul>
-<li><a href="#org49baa40">1.8.6.2.1. YAML Definition</a></li>
+<li><a href="#org7e6566a">1.8.6.2.1. YAML Definition</a></li>
 </ul>
 </li>
-<li><a href="#orgef898b4">1.8.6.3. Ingress</a>
+<li><a href="#org79df026">1.8.6.3. Ingress</a>
 <ul>
-<li><a href="#orgdee8f2f">1.8.6.3.1. YAML Definition</a></li>
+<li><a href="#orgfd5c66f">1.8.6.3.1. YAML Definition</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org1e579f4">1.8.7. Readiness Probe</a></li>
-<li><a href="#org74f59ca">1.8.8. Headless</a></li>
-<li><a href="#orgf98d397">1.8.9. External Traffic Issue</a>
+<li><a href="#org2c95538">1.8.7. Readiness Probe</a></li>
+<li><a href="#org4774ca0">1.8.8. Headless</a></li>
+<li><a href="#org178523a">1.8.9. External Traffic Issue</a>
 <ul>
-<li><a href="#org143451a">1.8.9.1. Non-Preservation Of The Client's IP Issue</a></li>
+<li><a href="#orgfea2713">1.8.9.1. Non-Preservation Of The Client's IP Issue</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org528e522">1.9. Volume</a>
+<li><a href="#org146ab95">1.9. Volume</a>
 <ul>
-<li><a href="#org324f098">1.9.1. Volume Types</a></li>
-<li><a href="#orgbdec445">1.9.2. emptyDir</a>
+<li><a href="#orgea65f65">1.9.1. Volume Types</a></li>
+<li><a href="#org95f47c2">1.9.2. emptyDir</a>
 <ul>
-<li><a href="#org76bfc33">1.9.2.1. The medium used</a></li>
+<li><a href="#org429ca36">1.9.2.1. The medium used</a></li>
 </ul>
 </li>
-<li><a href="#org4fed322">1.9.3. hostPath</a></li>
-<li><a href="#org5157ac8">1.9.4. PV/PVC</a>
+<li><a href="#orgb2bdcc9">1.9.3. hostPath</a></li>
+<li><a href="#orga754073">1.9.4. PV/PVC</a>
 <ul>
-<li><a href="#org0baca91">1.9.4.1. Creating PersistentVolume</a>
+<li><a href="#orgc8394bb">1.9.4.1. Creating PersistentVolume</a>
 <ul>
-<li><a href="#orgb14dad9">1.9.4.1.1. Access Mode</a></li>
+<li><a href="#orgcb61f33">1.9.4.1.1. Access Mode</a></li>
 </ul>
 </li>
-<li><a href="#org4d93f04">1.9.4.2. Creating PersistentVolumeClaim</a></li>
-<li><a href="#org22add29">1.9.4.3. Using PersistentVolumeClaim in Pod</a></li>
-<li><a href="#org37d3626">1.9.4.4. Dynamic Provisioning of PV</a>
+<li><a href="#org25421e8">1.9.4.2. Creating PersistentVolumeClaim</a></li>
+<li><a href="#orga80177a">1.9.4.3. Using PersistentVolumeClaim in Pod</a></li>
+<li><a href="#org452325e">1.9.4.4. Dynamic Provisioning of PV</a>
 <ul>
-<li><a href="#orgd8406fd">1.9.4.4.1. Defining StorageClass</a></li>
-<li><a href="#orgc4238c0">1.9.4.4.2. Requesting the SC in a PVC</a></li>
-<li><a href="#org368531d">1.9.4.4.3. Creating a PVC Without SC</a></li>
-<li><a href="#org3531bad">1.9.4.4.4. Forcing a PVC to Be Bound to One of The Pre-Provisioned PVs</a></li>
+<li><a href="#orge2722d8">1.9.4.4.1. Defining StorageClass</a></li>
+<li><a href="#org685de3a">1.9.4.4.2. Requesting the SC in a PVC</a></li>
+<li><a href="#org76fe302">1.9.4.4.3. Creating a PVC Without SC</a></li>
+<li><a href="#org4348d25">1.9.4.4.4. Forcing a PVC to Be Bound to One of The Pre-Provisioned PVs</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org9e4551d">1.10. ConfigMap &amp; Secret</a>
+<li><a href="#orgc5e664f">1.10. ConfigMap &amp; Secret</a>
 <ul>
-<li><a href="#org6a14c17">1.10.1. Basic</a>
+<li><a href="#org93a8601">1.10.1. Basic</a>
 <ul>
-<li><a href="#org928abf9">1.10.1.1. Overriding the command and arguments</a></li>
-<li><a href="#org2f44cea">1.10.1.2. Specifing env variables</a></li>
+<li><a href="#orgc6750d5">1.10.1.1. Overriding the command and arguments</a></li>
+<li><a href="#orgee5796a">1.10.1.2. Specifing env variables</a></li>
 </ul>
 </li>
-<li><a href="#orge8d0ff7">1.10.2. ConfigMap</a>
+<li><a href="#orgad1d172">1.10.2. ConfigMap</a>
 <ul>
-<li><a href="#org45da222">1.10.2.1. Creating</a>
+<li><a href="#org3ffa36b">1.10.2.1. Creating</a>
 <ul>
-<li><a href="#org01691ee">1.10.2.1.1. CLI</a></li>
-<li><a href="#org4e7dc92">1.10.2.1.2. YAML</a></li>
+<li><a href="#orge8e3c4d">1.10.2.1.1. CLI</a></li>
+<li><a href="#org87b96d1">1.10.2.1.2. YAML</a></li>
 </ul>
 </li>
-<li><a href="#org0c5b41a">1.10.2.2. Passing CM to Container</a>
+<li><a href="#org19e6196">1.10.2.2. Passing CM to Container</a>
 <ul>
-<li><a href="#orge84dc45">1.10.2.2.1. As ENV</a></li>
-<li><a href="#orgd3a7f1a">1.10.2.2.2. As Volume</a></li>
+<li><a href="#orgfc828ad">1.10.2.2.1. As ENV</a></li>
+<li><a href="#orgdfd2f27">1.10.2.2.2. As Volume</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgf5e8b67">1.10.3. Secret</a>
+<li><a href="#org3cacc13">1.10.3. Secret</a>
 <ul>
-<li><a href="#org74622b1">1.10.3.1. Default Token Secret</a></li>
-<li><a href="#org2c0cacb">1.10.3.2. Image Pull Secret</a></li>
-<li><a href="#orgc391910">1.10.3.3. Passing Secret to Container</a>
+<li><a href="#orgfe34329">1.10.3.1. Default Token Secret</a></li>
+<li><a href="#orgef8a43c">1.10.3.2. Image Pull Secret</a></li>
+<li><a href="#org7246230">1.10.3.3. Passing Secret to Container</a>
 <ul>
-<li><a href="#orgf4dd952">1.10.3.3.1. As Volume</a></li>
-<li><a href="#orge434101">1.10.3.3.2. As ENV</a></li>
+<li><a href="#orgf502ae1">1.10.3.3.1. As Volume</a></li>
+<li><a href="#org2ab1320">1.10.3.3.2. As ENV</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org27260a6">1.11. Deployment</a>
+<li><a href="#orgf52d9c6">1.11. Deployment</a>
 <ul>
-<li><a href="#org1c59ce8">1.11.1. Updating Strategies</a></li>
-<li><a href="#org5fe14aa">1.11.2. Performing RU with <code>kubectl</code></a>
+<li><a href="#org0645060">1.11.1. Updating Strategies</a></li>
+<li><a href="#orgd8cd8bf">1.11.2. Performing RU with <code>kubectl</code></a>
 <ul>
-<li><a href="#orgd1d1750">1.11.2.1. Steps Required Before RU</a></li>
+<li><a href="#orgb724368">1.11.2.1. Steps Required Before RU</a></li>
 </ul>
 </li>
-<li><a href="#org8c1b85b">1.11.3. Creating Deployment</a></li>
-<li><a href="#org6011a49">1.11.4. Updating Deployment</a></li>
-<li><a href="#org6326456">1.11.5. Rolling Back</a></li>
-<li><a href="#org5602269">1.11.6. maxSurge/maxUnavailable</a></li>
-<li><a href="#org89d157c">1.11.7. Pausing Rollout Process</a></li>
-<li><a href="#orgfc6da9d">1.11.8. Blocking Rollout (minReadySeconds)</a></li>
+<li><a href="#orgbb8b2ec">1.11.3. Creating Deployment</a></li>
+<li><a href="#org59793a3">1.11.4. Updating Deployment</a></li>
+<li><a href="#org9ac64c0">1.11.5. Rolling Back</a></li>
+<li><a href="#orgb75d525">1.11.6. maxSurge/maxUnavailable</a></li>
+<li><a href="#orgd7dbf58">1.11.7. Pausing Rollout Process</a></li>
+<li><a href="#orga160318">1.11.8. Blocking Rollout (minReadySeconds)</a></li>
 </ul>
 </li>
-<li><a href="#orgf101a39">1.12. StatefulSet</a>
+<li><a href="#org226a802">1.12. StatefulSet</a>
 <ul>
-<li><a href="#orgf623aa3">1.12.1. 设计思想</a>
+<li><a href="#org33dbd3f">1.12.1. 设计思想</a>
 <ul>
-<li><a href="#orga2929e2">1.12.1.1. Stable Identity</a>
+<li><a href="#orgb2b2cdc">1.12.1.1. Stable Identity</a>
 <ul>
-<li><a href="#orge629611">1.12.1.1.1. Governing Service</a></li>
-<li><a href="#org8dc32f7">1.12.1.1.2. Scaling</a></li>
+<li><a href="#orgaeb3d42">1.12.1.1.1. Governing Service</a></li>
+<li><a href="#orgf8ea64e">1.12.1.1.2. Scaling</a></li>
 </ul>
 </li>
-<li><a href="#org2e3e49e">1.12.1.2. Stable Dedicated Storage</a></li>
-<li><a href="#orgf0cbd6b">1.12.1.3. Guarantees</a></li>
+<li><a href="#org792929c">1.12.1.2. Stable Dedicated Storage</a></li>
+<li><a href="#orgbc890d4">1.12.1.3. Guarantees</a></li>
 </ul>
 </li>
-<li><a href="#orgabcba00">1.12.2. Deploying App through StatefulSet</a></li>
+<li><a href="#orgf4c6f95">1.12.2. Deploying App through StatefulSet</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org01aacc1">2. Internals</a>
+<li><a href="#org72f8014">2. Internals</a>
 <ul>
-<li><a href="#orgab56198">2.1. Architecture</a>
+<li><a href="#org2f2a1bd">2.1. Architecture</a>
 <ul>
-<li><a href="#org0d913fb">2.1.1. etcd</a>
+<li><a href="#org115ba12">2.1.1. etcd</a>
 <ul>
-<li><a href="#orgcde3343">2.1.1.1. Optimistic Concurrency Control</a></li>
-<li><a href="#orga5ce105">2.1.1.2. RAFT</a></li>
+<li><a href="#orgdd1d77e">2.1.1.1. Optimistic Concurrency Control</a></li>
+<li><a href="#orga12fc5f">2.1.1.2. RAFT</a></li>
 </ul>
 </li>
-<li><a href="#org7d2e4ed">2.1.2. API Server</a>
+<li><a href="#org364cf05">2.1.2. API Server</a>
 <ul>
-<li><a href="#org1841d3b">2.1.2.1. Resource Changes Notification</a></li>
+<li><a href="#orgcbba834">2.1.2.1. Resource Changes Notification</a></li>
 </ul>
 </li>
-<li><a href="#org07cb21a">2.1.3. Scheduler</a></li>
-<li><a href="#org09bed5d">2.1.4. Controller Manager</a></li>
-<li><a href="#orgc24ee15">2.1.5. Kublet</a>
+<li><a href="#orgc808eef">2.1.3. Scheduler</a></li>
+<li><a href="#org21206d6">2.1.4. Controller Manager</a></li>
+<li><a href="#orgd32346d">2.1.5. Kublet</a>
 <ul>
-<li><a href="#org7738edd">2.1.5.1. Run Static Pods without API Server</a></li>
+<li><a href="#orgd7c81b9">2.1.5.1. Run Static Pods without API Server</a></li>
 </ul>
 </li>
-<li><a href="#orga34727a">2.1.6. Kube-Proxy</a></li>
-<li><a href="#orgea44936">2.1.7. Add-on</a></li>
+<li><a href="#org694633c">2.1.6. Kube-Proxy</a></li>
+<li><a href="#orga375b87">2.1.7. Add-on</a></li>
 </ul>
 </li>
-<li><a href="#org6398b37">2.2. Cooperation between controllers</a></li>
-<li><a href="#orge36939a">2.3. Pod</a>
+<li><a href="#org161f2e3">2.2. Cooperation between controllers</a></li>
+<li><a href="#org2475264">2.3. Pod</a>
 <ul>
-<li><a href="#orgbe31135">2.3.1. Infrastructure Container</a></li>
-<li><a href="#org0696622">2.3.2. Inter-pod networking</a>
+<li><a href="#orgb4b7e6a">2.3.1. Infrastructure Container</a></li>
+<li><a href="#org48b16a3">2.3.2. Inter-pod networking</a>
 <ul>
-<li><a href="#org26af0e5">2.3.2.1. Pods are connected NAT-less</a></li>
-<li><a href="#org60e6816">2.3.2.2. Communication between nodes</a></li>
-<li><a href="#org2e9f7de">2.3.2.3. Container Network Interface</a></li>
+<li><a href="#orgfab8028">2.3.2.1. Pods are connected NAT-less</a></li>
+<li><a href="#org03e2460">2.3.2.2. Communication between nodes</a></li>
+<li><a href="#orgf0ce205">2.3.2.3. Container Network Interface</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgbb2510f">2.4. High Availability</a></li>
+<li><a href="#org0295093">2.4. High Availability</a></li>
 </ul>
 </li>
-<li><a href="#orga2de321">3. Security</a>
+<li><a href="#org8e4df26">3. Security</a>
 <ul>
-<li><a href="#org8fb071c">3.1. Understanding Authentication</a>
+<li><a href="#orgb73572d">3.1. Understanding Authentication</a>
 <ul>
-<li><a href="#org6ebc7ac">3.1.1. Users</a></li>
-<li><a href="#org580052c">3.1.2. Group</a></li>
-<li><a href="#org16248f3">3.1.3. Service Account</a>
+<li><a href="#orgb14a8f9">3.1.1. Users</a></li>
+<li><a href="#orgef07ca1">3.1.2. Group</a></li>
+<li><a href="#org1867615">3.1.3. Service Account</a>
 <ul>
-<li><a href="#org0920b6b">3.1.3.1. Mountable Secrets</a></li>
-<li><a href="#orgf933e17">3.1.3.2. Image Pull Secrets</a></li>
-<li><a href="#org2e948e5">3.1.3.3. Assigning ServiceAccount to Pod</a></li>
+<li><a href="#org485fce0">3.1.3.1. Mountable Secrets</a></li>
+<li><a href="#org1ddd39c">3.1.3.2. Image Pull Secrets</a></li>
+<li><a href="#org82703e3">3.1.3.3. Assigning ServiceAccount to Pod</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org1eb646f">3.2. RBAC</a>
+<li><a href="#org52019b0">3.2. RBAC</a>
 <ul>
-<li><a href="#orgc364231">3.2.1. Role/RoleBinding</a>
+<li><a href="#org7bf71d4">3.2.1. Role/RoleBinding</a>
 <ul>
-<li><a href="#org37bd54b">3.2.1.1. Create Role</a></li>
-<li><a href="#orga6abef9">3.2.1.2. Binding Role to ServiceAccount</a>
+<li><a href="#org746633a">3.2.1.1. Create Role</a></li>
+<li><a href="#orgcccc4c8">3.2.1.2. Binding Role to ServiceAccount</a>
 <ul>
-<li><a href="#orgdb67dc6">3.2.1.2.1. Including ServiceAccounts from other namespaces</a></li>
+<li><a href="#org6c2e10d">3.2.1.2.1. Including ServiceAccounts from other namespaces</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org4c81cc3">3.2.2. ClusterRole/ClusterRoleBinding</a>
+<li><a href="#org5caf098">3.2.2. ClusterRole/ClusterRoleBinding</a>
 <ul>
-<li><a href="#orgc037b6d">3.2.2.1. Access non-resource URLs</a></li>
-<li><a href="#orgfb69631">3.2.2.2. Access namespaced resources</a></li>
+<li><a href="#orga632973">3.2.2.1. Access non-resource URLs</a></li>
+<li><a href="#orge17f438">3.2.2.2. Access namespaced resources</a></li>
 </ul>
 </li>
-<li><a href="#org6988d87">3.2.3. Combinations of role/binding types</a></li>
-<li><a href="#org013e3ff">3.2.4. Default CRs/CRBs</a></li>
+<li><a href="#org1bbd8ad">3.2.3. Combinations of role/binding types</a></li>
+<li><a href="#orgca81cc7">3.2.4. Default CRs/CRBs</a></li>
 </ul>
 </li>
-<li><a href="#org88b711e">3.3. Use Node's namespaces</a>
+<li><a href="#orgba330b8">3.3. Use Node's namespaces</a>
 <ul>
-<li><a href="#org90a6b4b">3.3.1. Use node’s network namespace</a>
+<li><a href="#orgfa70a41">3.3.1. Use node’s network namespace</a>
 <ul>
-<li><a href="#orgea53170">3.3.1.1. Use host port (not in host's nw ns)</a></li>
+<li><a href="#orgc0b1edd">3.3.1.1. Use host port (not in host's nw ns)</a></li>
 </ul>
 </li>
-<li><a href="#org05f535b">3.3.2. Use node's PID/IPC namespaces</a></li>
+<li><a href="#orgf64adb2">3.3.2. Use node's PID/IPC namespaces</a></li>
 </ul>
 </li>
-<li><a href="#orge5e651c">3.4. Container security context</a>
+<li><a href="#orga4c959c">3.4. Container security context</a>
 <ul>
-<li><a href="#org9d44399">3.4.1. Run container as specific user</a></li>
-<li><a href="#org955d13c">3.4.2. Run container as non-root</a></li>
-<li><a href="#orgddba7ec">3.4.3. Run container in privileged mode</a></li>
-<li><a href="#org2082d48">3.4.4. Add individual kernel capabilities</a></li>
-<li><a href="#org1cb4890">3.4.5. Drop individual kernel capabilities</a></li>
-<li><a href="#orgdbcb349">3.4.6. Prevent writing to filesystem</a></li>
-<li><a href="#org5149d86">3.4.7. Share volume among different users</a></li>
+<li><a href="#orge8404e7">3.4.1. Run container as specific user</a></li>
+<li><a href="#org32df8ad">3.4.2. Run container as non-root</a></li>
+<li><a href="#org1b1503d">3.4.3. Run container in privileged mode</a></li>
+<li><a href="#orgbd291fb">3.4.4. Add individual kernel capabilities</a></li>
+<li><a href="#orgd0f0afb">3.4.5. Drop individual kernel capabilities</a></li>
+<li><a href="#orgfef95dc">3.4.6. Prevent writing to filesystem</a></li>
+<li><a href="#org63a108e">3.4.7. Share volume among different users</a></li>
 </ul>
 </li>
-<li><a href="#orgfb98666">3.5. PodSecurityPolicy</a></li>
-<li><a href="#org8c9aa60">3.6. Inter-Pod Network Isolation</a>
+<li><a href="#orgf83695b">3.5. PodSecurityPolicy</a></li>
+<li><a href="#orge02d2c1">3.6. Inter-Pod Network Isolation</a>
 <ul>
-<li><a href="#orge7ee46d">3.6.1. Network isolation in a namespace</a></li>
-<li><a href="#orgb5ec387">3.6.2. Allow some pods in a ns to connect</a></li>
-<li><a href="#orgdb36713">3.6.3. Isolate network between namespaces</a></li>
-<li><a href="#org17a55b4">3.6.4. Isolate by CIDR notation</a></li>
-<li><a href="#org8581edb">3.6.5. Limite outbound traffic</a></li>
+<li><a href="#org90819ac">3.6.1. Network isolation in a namespace</a></li>
+<li><a href="#org48ab6f8">3.6.2. Allow some pods in a ns to connect</a></li>
+<li><a href="#org842f1ee">3.6.3. Isolate network between namespaces</a></li>
+<li><a href="#org748778f">3.6.4. Isolate by CIDR notation</a></li>
+<li><a href="#org2feae6d">3.6.5. Limite outbound traffic</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org080a1e7">4. Computation Resources</a>
+<li><a href="#org094aa72">4. Computation Resources</a>
 <ul>
-<li><a href="#orgea915e4">4.1. Request resources for containers</a>
+<li><a href="#orgfe02889">4.1. Request resources for containers</a>
 <ul>
-<li><a href="#org6f5b0fa">4.1.1. Create pods with resource requests</a>
+<li><a href="#org519b9db">4.1.1. Create pods with resource requests</a>
 <ul>
-<li><a href="#org94e6340">4.1.1.1. How requests affect scheduling</a></li>
+<li><a href="#org93564a7">4.1.1.1. How requests affect scheduling</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org77c6e1d">4.2. Limit resources for containers</a>
+<li><a href="#orgcd889e9">4.2. Limit resources for containers</a>
 <ul>
-<li><a href="#org702bd96">4.2.1. Exceeding limits</a></li>
+<li><a href="#orgc4bcdcc">4.2.1. Exceeding limits</a></li>
 </ul>
 </li>
-<li><a href="#org0448b71">4.3. Pod QoS classes</a>
+<li><a href="#org692225c">4.3. Pod QoS classes</a>
 <ul>
-<li><a href="#org089d67f">4.3.1. Kill Pod according to QoS</a></li>
+<li><a href="#orga306a32">4.3.1. Kill Pod according to QoS</a></li>
 </ul>
 </li>
-<li><a href="#org2dfc009">4.4. Set default requests/limits for pods per ns</a></li>
-<li><a href="#org0462034">4.5. Limit total resources available in ns</a>
+<li><a href="#orgd1f4884">4.4. Set default requests/limits for pods per ns</a></li>
+<li><a href="#orgc3c5ff0">4.5. Limit total resources available in ns</a>
 <ul>
-<li><a href="#org7c25709">4.5.1. For CPU and Memory</a></li>
-<li><a href="#org0cedeac">4.5.2. For persistent storage</a></li>
-<li><a href="#org46219f2">4.5.3. For number of objects</a></li>
-<li><a href="#org225bb44">4.5.4. For pod states and/or QoS classes</a></li>
+<li><a href="#org3f75c31">4.5.1. For CPU and Memory</a></li>
+<li><a href="#org582304e">4.5.2. For persistent storage</a></li>
+<li><a href="#orgccb7293">4.5.3. For number of objects</a></li>
+<li><a href="#org2090663">4.5.4. For pod states and/or QoS classes</a></li>
 </ul>
 </li>
-<li><a href="#orgd5d3862">4.6. Resource usage Monitoring</a>
+<li><a href="#org8040b4f">4.6. Resource usage Monitoring</a>
 <ul>
-<li><a href="#org639c21c">4.6.1. Analyzing resource usage with Grafana</a></li>
+<li><a href="#orgbabeb77">4.6.1. Analyzing resource usage with Grafana</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgc994b5b">5. AutoScaling</a>
+<li><a href="#orgc59dda5">5. AutoScaling</a>
 <ul>
-<li><a href="#org1709f6b">5.1. Horizontal pod autoscaling</a>
+<li><a href="#org7a93781">5.1. Horizontal pod autoscaling</a>
 <ul>
-<li><a href="#orgcad1b4b">5.1.1. Autoscaling process</a>
+<li><a href="#org05db43d">5.1.1. Autoscaling process</a>
 <ul>
-<li><a href="#org4e9415b">5.1.1.1. Whole picture</a></li>
-<li><a href="#org095a4b7">5.1.1.2. CPU utilization</a></li>
-<li><a href="#org3a8f7f5">5.1.1.3. Maximum rate of scaling</a></li>
+<li><a href="#org17fca35">5.1.1.1. Whole picture</a></li>
+<li><a href="#org76e86d5">5.1.1.2. CPU utilization</a></li>
+<li><a href="#orge459d74">5.1.1.3. Maximum rate of scaling</a></li>
 </ul>
 </li>
-<li><a href="#org94e2774">5.1.2. Create HorizontalPodAutoscaler</a></li>
+<li><a href="#org18770f8">5.1.2. Create HorizontalPodAutoscaler</a></li>
 </ul>
 </li>
-<li><a href="#org40e4f1b">5.2. Horizontal node autoscaling</a>
+<li><a href="#orgb9056e3">5.2. Horizontal node autoscaling</a>
 <ul>
-<li><a href="#org5d6827c">5.2.1. ClusterAutoscaler</a>
+<li><a href="#org66d176a">5.2.1. ClusterAutoscaler</a>
 <ul>
-<li><a href="#org23201a4">5.2.1.1. Scaling up case</a></li>
-<li><a href="#org35f7318">5.2.1.2. Scaling down case</a></li>
+<li><a href="#org9d8f090">5.2.1.1. Scaling up case</a></li>
+<li><a href="#orgd7188b6">5.2.1.2. Scaling down case</a></li>
 </ul>
 </li>
-<li><a href="#orgaa56ff0">5.2.2. Manually cordon and drain nodes</a></li>
-<li><a href="#org32a02b7">5.2.3. PodDisruptionBudget</a></li>
+<li><a href="#org894ec90">5.2.2. Manually cordon and drain nodes</a></li>
+<li><a href="#org92a61e0">5.2.3. PodDisruptionBudget</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org8dcdd48">6. Scheduling</a>
+<li><a href="#orgb2fd07f">6. Scheduling</a>
 <ul>
-<li><a href="#org6b3a550">6.1. Node Affinity</a>
+<li><a href="#orgaa8f296">6.1. Node Affinity</a>
 <ul>
-<li><a href="#org510d376">6.1.1. Hard</a></li>
-<li><a href="#orgfa7e20b">6.1.2. Prioritizing</a></li>
+<li><a href="#org8fa12ae">6.1.1. Hard</a></li>
+<li><a href="#orgcf723c5">6.1.2. Prioritizing</a></li>
 </ul>
 </li>
-<li><a href="#org590fad9">6.2. Pod Affinity</a>
+<li><a href="#org7348ce5">6.2. Pod Affinity</a>
 <ul>
-<li><a href="#org6b52f47">6.2.1. Hard</a></li>
-<li><a href="#org17173bd">6.2.2. Prioritizing</a></li>
+<li><a href="#orgd9def05">6.2.1. Hard</a></li>
+<li><a href="#org2ded65c">6.2.2. Prioritizing</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org3e0e3a6">7. Utils</a>
+<li><a href="#org9fb4488">7. Utils</a>
 <ul>
-<li><a href="#org356d158">7.1. YAML Basic</a>
+<li><a href="#org56410e0">7.1. YAML Basic</a>
 <ul>
-<li><a href="#org7e9322d">7.1.1. Key Value Pair</a></li>
-<li><a href="#org3de5b46">7.1.2. Array / List</a></li>
-<li><a href="#orga8cc287">7.1.3. Dictionary / Map</a></li>
+<li><a href="#orgb48d767">7.1.1. Key Value Pair</a></li>
+<li><a href="#org120edac">7.1.2. Array / List</a></li>
+<li><a href="#orgcf3bf1f">7.1.3. Dictionary / Map</a></li>
 </ul>
 </li>
-<li><a href="#orgb805d1a">7.2. Bash completion</a></li>
-<li><a href="#org5ab86ba">7.3. Show all supported resources</a></li>
-<li><a href="#orgc889c7d">7.4. Expose pod through Service</a></li>
-<li><a href="#orgbaf370c">7.5. Run Temporary Pod</a></li>
-<li><a href="#org95a931a">7.6. Discover possible API object fields</a></li>
-<li><a href="#orge08b5ae">7.7. Forward local network port to port in the pod</a></li>
-<li><a href="#orga45345d">7.8. Communicate with Pods through API Server</a></li>
-<li><a href="#org02a853d">7.9. Connect to Services through API Server</a></li>
-<li><a href="#orgdf52bb3">7.10. Obtain the log of crashed container</a></li>
-<li><a href="#org70dc1e2">7.11. Get IPs of all nodes</a></li>
-<li><a href="#orgdd53410">7.12. Talking to API Server</a>
+<li><a href="#orgd85f4c2">7.2. Bash completion</a></li>
+<li><a href="#orgcb09c98">7.3. Show all supported resources</a></li>
+<li><a href="#org22bbc80">7.4. Expose pod through Service</a></li>
+<li><a href="#orgfee4145">7.5. Run Temporary Pod</a></li>
+<li><a href="#orga985415">7.6. Discover possible API object fields</a></li>
+<li><a href="#org7e0a10d">7.7. Forward local network port to port in the pod</a></li>
+<li><a href="#org6d859cc">7.8. Communicate with Pods through API Server</a></li>
+<li><a href="#orgb6545c6">7.9. Connect to Services through API Server</a></li>
+<li><a href="#orgd8d3281">7.10. Obtain the log of crashed container</a></li>
+<li><a href="#orgdb26896">7.11. Get IPs of all nodes</a></li>
+<li><a href="#orgf3070f8">7.12. Talking to API Server</a>
 <ul>
-<li><a href="#org8a433a8">7.12.1. kubectl proxy</a></li>
-<li><a href="#org49ca9db">7.12.2. From in POD</a></li>
+<li><a href="#orgd755a36">7.12.1. kubectl proxy</a></li>
+<li><a href="#org3fb027f">7.12.2. From in POD</a></li>
 </ul>
 </li>
-<li><a href="#orgec787b6">7.13. Modify Deployments and other resources</a>
+<li><a href="#org4c8a7da">7.13. Modify Deployments and other resources</a>
 <ul>
-<li><a href="#org9414882">7.13.1. edit</a></li>
-<li><a href="#orgd1b4b20">7.13.2. patch</a></li>
-<li><a href="#orgcf61daf">7.13.3. apply</a></li>
-<li><a href="#orgc245844">7.13.4. replace</a></li>
-<li><a href="#org95cb2cc">7.13.5. set image</a></li>
+<li><a href="#org3a73d9e">7.13.1. edit</a></li>
+<li><a href="#orgc322434">7.13.2. patch</a></li>
+<li><a href="#org8765ee2">7.13.3. apply</a></li>
+<li><a href="#orgf3238a3">7.13.4. replace</a></li>
+<li><a href="#orga7bca22">7.13.5. set image</a></li>
 </ul>
 </li>
-<li><a href="#orgc2fc12a">7.14. Check status of Control Plane components</a></li>
-<li><a href="#org9a9c30d">7.15. WATCHING Resources</a></li>
-<li><a href="#orgeb13f8c">7.16. Observing cluster events</a></li>
-<li><a href="#org19c4615">7.17. Forcely shutdown pod</a></li>
-<li><a href="#org88f8369">7.18. Copy file from/to container</a></li>
-<li><a href="#orgd17425d">7.19. Mounting local files into the minikube vm</a></li>
-<li><a href="#orgfd71a3e">7.20. Using minikube docker daemon</a></li>
-<li><a href="#orgc91a2cf">7.21. Build images locally and load remotely</a></li>
-<li><a href="#org1c27d24">7.22. <code>kubectl config</code></a>
+<li><a href="#org7f23508">7.14. Check status of Control Plane components</a></li>
+<li><a href="#org9ae5c96">7.15. WATCHING Resources</a></li>
+<li><a href="#orgcb2b057">7.16. Observing cluster events</a></li>
+<li><a href="#org0a431de">7.17. Forcely shutdown pod</a></li>
+<li><a href="#orgcb903bd">7.18. Copy file from/to container</a></li>
+<li><a href="#orge4f57c0">7.19. Mounting local files into the minikube vm</a></li>
+<li><a href="#org6003e64">7.20. Using minikube docker daemon</a></li>
+<li><a href="#orge583028">7.21. Build images locally and load remotely</a></li>
+<li><a href="#org94ae6d1">7.22. <code>kubectl config</code></a>
 <ul>
-<li><a href="#orge65e331">7.22.1. Location of kubeconfig file</a></li>
-<li><a href="#orgfb3fb78">7.22.2. Contents of kubeconfig file</a></li>
-<li><a href="#orge4c9f1d">7.22.3. Use cluster from local machine</a></li>
-<li><a href="#org2a6cf06">7.22.4. Name of current context</a></li>
-<li><a href="#orga2d8b20">7.22.5. Switch to different namespace</a></li>
-<li><a href="#orgbf03832">7.22.6. Switching between contexts</a></li>
-<li><a href="#org412839a">7.22.7. List contexts and clusters</a></li>
+<li><a href="#orgb619379">7.22.1. Location of kubeconfig file</a></li>
+<li><a href="#orgf865b23">7.22.2. Contents of kubeconfig file</a></li>
+<li><a href="#orgc3df5bb">7.22.3. Use cluster from local machine</a></li>
+<li><a href="#org1a0e68d">7.22.4. Name of current context</a></li>
+<li><a href="#org7538b4c">7.22.5. Switch to different namespace</a></li>
+<li><a href="#orga58779c">7.22.6. Switching between contexts</a></li>
+<li><a href="#orge3ef916">7.22.7. List contexts and clusters</a></li>
 </ul>
 </li>
+<li><a href="#org4bc6ebe">7.23. Setup AWS EKS</a></li>
 </ul>
 </li>
 </ul>
@@ -1165,12 +1167,12 @@ for the JavaScript code in this tag.
 
 
 
-<div id="outline-container-org42630b1" class="outline-2">
-<h2 id="org42630b1"><span class="section-number-2">1</span> Resources</h2>
+<div id="outline-container-org4987591" class="outline-2">
+<h2 id="org4987591"><span class="section-number-2">1</span> Resources</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org53b992d" class="outline-3">
-<h3 id="org53b992d"><span class="section-number-3">1.1</span> Overview</h3>
+<div id="outline-container-orgc7d03dd" class="outline-3">
+<h3 id="orgc7d03dd"><span class="section-number-3">1.1</span> Overview</h3>
 <div class="outline-text-3" id="text-1-1">
 
 <div class="figure">
@@ -1181,12 +1183,12 @@ for the JavaScript code in this tag.
 </div>
 
 
-<div id="outline-container-org250426e" class="outline-3">
-<h3 id="org250426e"><span class="section-number-3">1.2</span> Pod</h3>
+<div id="outline-container-orgda15ddc" class="outline-3">
+<h3 id="orgda15ddc"><span class="section-number-3">1.2</span> Pod</h3>
 <div class="outline-text-3" id="text-1-2">
 </div>
-<div id="outline-container-orgeb5f392" class="outline-4">
-<h4 id="orgeb5f392"><span class="section-number-4">1.2.1</span> YAML Definition</h4>
+<div id="outline-container-org0909883" class="outline-4">
+<h4 id="org0909883"><span class="section-number-4">1.2.1</span> YAML Definition</h4>
 <div class="outline-text-4" id="text-1-2-1">
 <p>
 定义文件主要包含：
@@ -1229,8 +1231,8 @@ Contains read-only runtime data that shows the state of the resource at a given 
 
 
 
-<div id="outline-container-org82963f7" class="outline-4">
-<h4 id="org82963f7"><span class="section-number-4">1.2.2</span> Label</h4>
+<div id="outline-container-org5ca6240" class="outline-4">
+<h4 id="org5ca6240"><span class="section-number-4">1.2.2</span> Label</h4>
 <div class="outline-text-4" id="text-1-2-2">
 <p>
 A label is an arbitrary key-value pair you attach to a resource, <br>
@@ -1257,8 +1259,8 @@ A label selector can select resources based on whether the resource:
 </div>
 
 
-<div id="outline-container-orgd7d48c2" class="outline-4">
-<h4 id="orgd7d48c2"><span class="section-number-4">1.2.3</span> Annotation</h4>
+<div id="outline-container-orgaef10e7" class="outline-4">
+<h4 id="orgaef10e7"><span class="section-number-4">1.2.3</span> Annotation</h4>
 <div class="outline-text-4" id="text-1-2-3">
 <p>
 Annotations are also key-value pairs, so in essence, they’re similar to labels,
@@ -1286,8 +1288,8 @@ For example, an annotation used to specify the name of the person who created th
 </div>
 
 
-<div id="outline-container-orgc84fa16" class="outline-4">
-<h4 id="orgc84fa16"><span class="section-number-4">1.2.4</span> Deleting</h4>
+<div id="outline-container-org1c9192d" class="outline-4">
+<h4 id="org1c9192d"><span class="section-number-4">1.2.4</span> Deleting</h4>
 <div class="outline-text-4" id="text-1-2-4">
 <p>
 By deleting a pod, you’re instructing Kubernetes to terminate all the containers that are part of that pod.
@@ -1305,8 +1307,8 @@ To make sure your processes are always shut down gracefully, they need to handle
 </div>
 
 
-<div id="outline-container-orgf8e847f" class="outline-4">
-<h4 id="orgf8e847f"><span class="section-number-4">1.2.5</span> Liveness probes</h4>
+<div id="outline-container-orgd599b95" class="outline-4">
+<h4 id="orgd599b95"><span class="section-number-4">1.2.5</span> Liveness probes</h4>
 <div class="outline-text-4" id="text-1-2-5">
 <p>
 As soon as a pod is scheduled to a node, the Kubelet on that node will run its containers and, from then on, <b>keep them running as long as the pod exists.</b>
@@ -1353,8 +1355,8 @@ The container is probed every 10 seconds (period=10s) and the container is resta
 
 
 
-<div id="outline-container-org3722c61" class="outline-4">
-<h4 id="org3722c61"><span class="section-number-4">1.2.6</span> Init Containers</h4>
+<div id="outline-container-org92ad489" class="outline-4">
+<h4 id="org92ad489"><span class="section-number-4">1.2.6</span> Init Containers</h4>
 <div class="outline-text-4" id="text-1-2-6">
 <p>
 Pods can also include <b>init containers</b>. Tthey can be used to initialize the pod.
@@ -1386,8 +1388,8 @@ Pods can also include <b>init containers</b>. Tthey can be used to initialize th
 </div>
 
 
-<div id="outline-container-org3ade811" class="outline-4">
-<h4 id="org3ade811"><span class="section-number-4">1.2.7</span> Lifecycle hooks</h4>
+<div id="outline-container-org1061ce9" class="outline-4">
+<h4 id="org1061ce9"><span class="section-number-4">1.2.7</span> Lifecycle hooks</h4>
 <div class="outline-text-4" id="text-1-2-7">
 <p>
 Lifecycle hooks are specified <b>per container</b>, unlike init containers, which apply to the whole pod. <br>
@@ -1409,8 +1411,8 @@ Lifecycle hooks target containers, NOT PODS.
 </pre>
 </div>
 
-<div id="outline-container-org443c592" class="outline-5">
-<h5 id="org443c592"><span class="section-number-5">1.2.7.1</span> Post-Start hook</h5>
+<div id="outline-container-orgbd20f76" class="outline-5">
+<h5 id="orgbd20f76"><span class="section-number-5">1.2.7.1</span> Post-Start hook</h5>
 <div class="outline-text-5" id="text-1-2-7-1">
 <p>
 A post-start hook is executed immediately after the container's main process is started.
@@ -1426,8 +1428,8 @@ If the hook fails to run or returns a non-zero exit code, the main container wil
 </div>
 
 
-<div id="outline-container-orgb720d6f" class="outline-5">
-<h5 id="orgb720d6f"><span class="section-number-5">1.2.7.2</span> Pre-Stop hook</h5>
+<div id="outline-container-org75facc8" class="outline-5">
+<h5 id="org75facc8"><span class="section-number-5">1.2.7.2</span> Pre-Stop hook</h5>
 <div class="outline-text-5" id="text-1-2-7-2">
 <p>
 A pre-stop hook is executed immediately before a container is terminated.
@@ -1444,8 +1446,8 @@ will not prevent the container from being terminated.
 
 
 
-<div id="outline-container-orgb94d077" class="outline-4">
-<h4 id="orgb94d077"><span class="section-number-4">1.2.8</span> Shutdown</h4>
+<div id="outline-container-org11d72a7" class="outline-4">
+<h4 id="org11d72a7"><span class="section-number-4">1.2.8</span> Shutdown</h4>
 <div class="outline-text-4" id="text-1-2-8">
 <p>
 Then the following sequence of events is performed when pod is shutdown:
@@ -1480,8 +1482,8 @@ by setting the grace period to zero and adding the <code>--force</code> option l
 </div>
 
 
-<div id="outline-container-org2f7cc16" class="outline-3">
-<h3 id="org2f7cc16"><span class="section-number-3">1.3</span> ReplicationController</h3>
+<div id="outline-container-orga92cdec" class="outline-3">
+<h3 id="orga92cdec"><span class="section-number-3">1.3</span> ReplicationController</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 A ReplicationController’s job is to make sure that an exact number of pods always <b>matches its label selector.</b> <br>
@@ -1496,8 +1498,8 @@ If it doesn’t, the ReplicationController takes the appropriate action to recon
 </div>
 
 
-<div id="outline-container-orgcb5025c" class="outline-4">
-<h4 id="orgcb5025c"><span class="section-number-4">1.3.1</span> Three Parts Of A Replicationcontroller</h4>
+<div id="outline-container-org65b6bd7" class="outline-4">
+<h4 id="org65b6bd7"><span class="section-number-4">1.3.1</span> Three Parts Of A Replicationcontroller</h4>
 <div class="outline-text-4" id="text-1-3-1">
 
 <div class="figure">
@@ -1514,8 +1516,8 @@ A ReplicationController’s replica count, the label selector, and even the pod 
 </div>
 
 
-<div id="outline-container-org4fa791b" class="outline-4">
-<h4 id="org4fa791b"><span class="section-number-4">1.3.2</span> Create</h4>
+<div id="outline-container-org86221fc" class="outline-4">
+<h4 id="org86221fc"><span class="section-number-4">1.3.2</span> Create</h4>
 <div class="outline-text-4" id="text-1-3-2">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -1565,8 +1567,8 @@ which you can use to easily find which ReplicationController a pod belongs to.
 </div>
 
 
-<div id="outline-container-org50d9f87" class="outline-4">
-<h4 id="org50d9f87"><span class="section-number-4">1.3.3</span> Change Pod Template</h4>
+<div id="outline-container-org72d0925" class="outline-4">
+<h4 id="org72d0925"><span class="section-number-4">1.3.3</span> Change Pod Template</h4>
 <div class="outline-text-4" id="text-1-3-3">
 <p>
 A ReplicationController’s pod template can be modified at any time. <br>
@@ -1584,8 +1586,8 @@ To modify the old pods, you’d need to delete them and let the ReplicationContr
 </div>
 
 
-<div id="outline-container-orgb7fb252" class="outline-4">
-<h4 id="orgb7fb252"><span class="section-number-4">1.3.4</span> Delete RC without deleting Pods</h4>
+<div id="outline-container-org85b58d3" class="outline-4">
+<h4 id="org85b58d3"><span class="section-number-4">1.3.4</span> Delete RC without deleting Pods</h4>
 <div class="outline-text-4" id="text-1-3-4">
 <p>
 When you delete a ReplicationController through kubectl delete, the pods are also deleted.<br>
@@ -1602,8 +1604,8 @@ But because pods created by a ReplicationController aren’t an integral part of
 </div>
 
 
-<div id="outline-container-org3f29c54" class="outline-3">
-<h3 id="org3f29c54"><span class="section-number-3">1.4</span> ReplicaSet</h3>
+<div id="outline-container-org109e32a" class="outline-3">
+<h3 id="org109e32a"><span class="section-number-3">1.4</span> ReplicaSet</h3>
 <div class="outline-text-3" id="text-1-4">
 <p>
 You usually won’t create them directly, but instead have them created automatically <b>when you create the higher-level Deployment resource.</b>
@@ -1614,8 +1616,8 @@ A ReplicaSet behaves exactly like a ReplicationController, but it has <b>more ex
 </p>
 </div>
 
-<div id="outline-container-orgd36f599" class="outline-4">
-<h4 id="orgd36f599"><span class="section-number-4">1.4.1</span> More Expressive Label Selectors</h4>
+<div id="outline-container-org550612f" class="outline-4">
+<h4 id="org550612f"><span class="section-number-4">1.4.1</span> More Expressive Label Selectors</h4>
 <div class="outline-text-4" id="text-1-4-1">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: apps/v1beta2
@@ -1656,8 +1658,8 @@ Four valid operators:
 </div>
 
 
-<div id="outline-container-orga22523b" class="outline-4">
-<h4 id="orga22523b"><span class="section-number-4">1.4.2</span> Only cares about number of pods</h4>
+<div id="outline-container-org6e36e88" class="outline-4">
+<h4 id="org6e36e88"><span class="section-number-4">1.4.2</span> Only cares about number of pods</h4>
 <div class="outline-text-4" id="text-1-4-2">
 
 <div class="figure">
@@ -1669,8 +1671,8 @@ Four valid operators:
 </div>
 
 
-<div id="outline-container-org22a3394" class="outline-3">
-<h3 id="org22a3394"><span class="section-number-3">1.5</span> DaemonSet</h3>
+<div id="outline-container-orgb203143" class="outline-3">
+<h3 id="orgb203143"><span class="section-number-3">1.5</span> DaemonSet</h3>
 <div class="outline-text-3" id="text-1-5">
 <p>
 DaemonSet is used when you want <b>a pod to run on each and every node in the cluster</b> <br>
@@ -1691,8 +1693,8 @@ except that pods created by a DaemonSet already have a target node specified and
 </div>
 
 
-<div id="outline-container-org40f3fd9" class="outline-3">
-<h3 id="org40f3fd9"><span class="section-number-3">1.6</span> Job</h3>
+<div id="outline-container-orge8be5a9" class="outline-3">
+<h3 id="orge8be5a9"><span class="section-number-3">1.6</span> Job</h3>
 <div class="outline-text-3" id="text-1-6">
 <p>
 <b>In the event of a node failure</b>, the pods on that node that are managed by a Job will be rescheduled to other nodes the way ReplicaSet pods are. <br>
@@ -1702,8 +1704,8 @@ the Job can be configured to either restart the container or not.
 </div>
 
 
-<div id="outline-container-orgb07bbca" class="outline-4">
-<h4 id="orgb07bbca"><span class="section-number-4">1.6.1</span> Definition</h4>
+<div id="outline-container-orgef52baa" class="outline-4">
+<h4 id="orgef52baa"><span class="section-number-4">1.6.1</span> Definition</h4>
 <div class="outline-text-4" id="text-1-6-1">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: batch/v1
@@ -1732,8 +1734,8 @@ Need to explicitly set the restart policy to either <code>OnFailure</code> or <c
 </div>
 
 
-<div id="outline-container-org8bcb3da" class="outline-4">
-<h4 id="org8bcb3da"><span class="section-number-4">1.6.2</span> Limit time for Job pod to complete</h4>
+<div id="outline-container-org5dee2cd" class="outline-4">
+<h4 id="org5dee2cd"><span class="section-number-4">1.6.2</span> Limit time for Job pod to complete</h4>
 <div class="outline-text-4" id="text-1-6-2">
 <p>
 A pod's time can be limited by setting the <code>activeDeadlineSeconds</code> property in the pod spec. <br>
@@ -1750,8 +1752,8 @@ If you don't explicitly specify it, it defaults to 6.
 
 
 
-<div id="outline-container-org13a8ec0" class="outline-3">
-<h3 id="org13a8ec0"><span class="section-number-3">1.7</span> CronJob</h3>
+<div id="outline-container-orgd146bb2" class="outline-3">
+<h3 id="orgd146bb2"><span class="section-number-3">1.7</span> CronJob</h3>
 <div class="outline-text-3" id="text-1-7">
 <p>
 A CronJob creates Job resources from the <code>jobTemplate</code> property configured in the CronJob spec. <br>
@@ -1761,12 +1763,12 @@ The Job then creates the pods.
 </div>
 
 
-<div id="outline-container-orgae3875b" class="outline-3">
-<h3 id="orgae3875b"><span class="section-number-3">1.8</span> Service</h3>
+<div id="outline-container-orga16ee13" class="outline-3">
+<h3 id="orga16ee13"><span class="section-number-3">1.8</span> Service</h3>
 <div class="outline-text-3" id="text-1-8">
 </div>
-<div id="outline-container-org909ab49" class="outline-4">
-<h4 id="org909ab49"><span class="section-number-4">1.8.1</span> Overall</h4>
+<div id="outline-container-org4f17c25" class="outline-4">
+<h4 id="org4f17c25"><span class="section-number-4">1.8.1</span> Overall</h4>
 <div class="outline-text-4" id="text-1-8-1">
 <p>
 Although the primary purpose of services is exposing groups of pods to other pods <b>in the cluster</b>, <br>
@@ -1792,17 +1794,17 @@ Although the primary purpose of services is exposing groups of pods to other pod
 </div>
 
 
-<div id="outline-container-org9eed72b" class="outline-4">
-<h4 id="org9eed72b"><span class="section-number-4">1.8.2</span> Creation</h4>
+<div id="outline-container-org9f8a620" class="outline-4">
+<h4 id="org9f8a620"><span class="section-number-4">1.8.2</span> Creation</h4>
 <div class="outline-text-4" id="text-1-8-2">
 </div>
-<div id="outline-container-orgd7dcf89" class="outline-5">
-<h5 id="orgd7dcf89"><span class="section-number-5">1.8.2.1</span> By <code>kubectl expose</code></h5>
+<div id="outline-container-org291a92f" class="outline-5">
+<h5 id="org291a92f"><span class="section-number-5">1.8.2.1</span> By <code>kubectl expose</code></h5>
 </div>
 
 
-<div id="outline-container-orged3b818" class="outline-5">
-<h5 id="orged3b818"><span class="section-number-5">1.8.2.2</span> By YAML</h5>
+<div id="outline-container-org5a05330" class="outline-5">
+<h5 id="org5a05330"><span class="section-number-5">1.8.2.2</span> By YAML</h5>
 <div class="outline-text-5" id="text-1-8-2-2">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -1819,8 +1821,8 @@ Although the primary purpose of services is exposing groups of pods to other pod
 </div>
 </div>
 
-<div id="outline-container-orge7a2020" class="outline-6">
-<h6 id="orge7a2020"><span class="section-number-6">1.8.2.2.1</span> Expose ports in same Service</h6>
+<div id="outline-container-org1d6e67e" class="outline-6">
+<h6 id="org1d6e67e"><span class="section-number-6">1.8.2.2.1</span> Expose ports in same Service</h6>
 <div class="outline-text-6" id="text-1-8-2-2-1">
 <pre class="example">
 When creating a service with multiple ports, you must specify a name for each port.
@@ -1846,8 +1848,8 @@ When creating a service with multiple ports, you must specify a name for each po
 </div>
 
 
-<div id="outline-container-org08aa7e7" class="outline-6">
-<h6 id="org08aa7e7"><span class="section-number-6">1.8.2.2.2</span> Using Named Ports</h6>
+<div id="outline-container-org3aee454" class="outline-6">
+<h6 id="org3aee454"><span class="section-number-6">1.8.2.2.2</span> Using Named Ports</h6>
 <div class="outline-text-6" id="text-1-8-2-2-2">
 
 <div class="figure">
@@ -1877,8 +1879,8 @@ The biggest benefit of doing so is that it enables you to change port numbers la
 
 
 
-<div id="outline-container-org2ae70ff" class="outline-4">
-<h4 id="org2ae70ff"><span class="section-number-4">1.8.3</span> Session Affinity</h4>
+<div id="outline-container-org3afa982" class="outline-4">
+<h4 id="org3afa982"><span class="section-number-4">1.8.3</span> Session Affinity</h4>
 <div class="outline-text-4" id="text-1-8-3">
 <p>
 If you want all requests made by a certain client to be redirected to the <b>same</b> pod every time, <br>
@@ -1905,12 +1907,12 @@ This makes the service proxy redirect all requests originating <b>from the same 
 
 
 
-<div id="outline-container-orga45ae35" class="outline-4">
-<h4 id="orga45ae35"><span class="section-number-4">1.8.4</span> Discovering Service</h4>
+<div id="outline-container-org1e93746" class="outline-4">
+<h4 id="org1e93746"><span class="section-number-4">1.8.4</span> Discovering Service</h4>
 <div class="outline-text-4" id="text-1-8-4">
 </div>
-<div id="outline-container-orgef19b4f" class="outline-5">
-<h5 id="orgef19b4f"><span class="section-number-5">1.8.4.1</span> Through ENV</h5>
+<div id="outline-container-orgf351869" class="outline-5">
+<h5 id="orgf351869"><span class="section-number-5">1.8.4.1</span> Through ENV</h5>
 <div class="outline-text-5" id="text-1-8-4-1">
 <pre class="example">
 Dashes in the service name are converted to underscores and all letters are uppercased
@@ -1919,8 +1921,8 @@ when the service name is used as the prefix in the environment variable's name.
 </div>
 </div>
 
-<div id="outline-container-orgec5030f" class="outline-5">
-<h5 id="orgec5030f"><span class="section-number-5">1.8.4.2</span> Through DNS</h5>
+<div id="outline-container-orge742b2a" class="outline-5">
+<h5 id="orge742b2a"><span class="section-number-5">1.8.4.2</span> Through DNS</h5>
 <div class="outline-text-5" id="text-1-8-4-2">
 <pre class="example">
 kubia        .default  .svc.cluster.local
@@ -1946,8 +1948,8 @@ Whether a pod uses the internal DNS server or not is configurable through the 'd
 </div>
 
 
-<div id="outline-container-org79ca838" class="outline-4">
-<h4 id="org79ca838"><span class="section-number-4">1.8.5</span> Endpoints</h4>
+<div id="outline-container-org9b92510" class="outline-4">
+<h4 id="org9b92510"><span class="section-number-4">1.8.5</span> Endpoints</h4>
 <div class="outline-text-4" id="text-1-8-5">
 <p>
 Services don't link to pods directly, but <b>Endpoints</b>. <br>
@@ -1971,8 +1973,8 @@ It's up to you to create the Endpoints resource to specify the list of endpoints
 </pre>
 </div>
 
-<div id="outline-container-org4829801" class="outline-5">
-<h5 id="org4829801"><span class="section-number-5">1.8.5.1</span> Manually config service endpoints</h5>
+<div id="outline-container-org626b718" class="outline-5">
+<h5 id="org626b718"><span class="section-number-5">1.8.5.1</span> Manually config service endpoints</h5>
 <div class="outline-text-5" id="text-1-8-5-1">
 <p>
 To create a service with manually managed endpoints, you need to create both a Service and an Endpoints resource.
@@ -2036,8 +2038,8 @@ This means a service IP address can remain constant while the actual implementat
 
 
 
-<div id="outline-container-orgfd7376b" class="outline-5">
-<h5 id="orgfd7376b"><span class="section-number-5">1.8.5.2</span> Creat alias for external service</h5>
+<div id="outline-container-org65cb2f0" class="outline-5">
+<h5 id="org65cb2f0"><span class="section-number-5">1.8.5.2</span> Creat alias for external service</h5>
 <div class="outline-text-5" id="text-1-8-5-2">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -2067,8 +2069,8 @@ For this reason, these types of services don't even get a cluster IP.
 
 
 
-<div id="outline-container-org919b7bc" class="outline-4">
-<h4 id="org919b7bc"><span class="section-number-4">1.8.6</span> Exposing Services To External Clients</h4>
+<div id="outline-container-org4cb0bd4" class="outline-4">
+<h4 id="org4cb0bd4"><span class="section-number-4">1.8.6</span> Exposing Services To External Clients</h4>
 <div class="outline-text-4" id="text-1-8-6">
 <p>
 A few ways to make a service accessible externally:
@@ -2081,8 +2083,8 @@ A few ways to make a service accessible externally:
 </ol>
 </div>
 
-<div id="outline-container-org96fd140" class="outline-5">
-<h5 id="org96fd140"><span class="section-number-5">1.8.6.1</span> NodePort</h5>
+<div id="outline-container-org63e7dfb" class="outline-5">
+<h5 id="org63e7dfb"><span class="section-number-5">1.8.6.1</span> NodePort</h5>
 <div class="outline-text-5" id="text-1-8-6-1">
 
 <div class="figure">
@@ -2101,8 +2103,8 @@ That's why it makes sense to put a load balancer in front of the nodes to make s
 </pre>
 </div>
 
-<div id="outline-container-orgd902172" class="outline-6">
-<h6 id="orgd902172"><span class="section-number-6">1.8.6.1.1</span> YAML Definition</h6>
+<div id="outline-container-org343a56b" class="outline-6">
+<h6 id="org343a56b"><span class="section-number-6">1.8.6.1.1</span> YAML Definition</h6>
 <div class="outline-text-6" id="text-1-8-6-1-1">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -2129,8 +2131,8 @@ Specifying the port isn't mandatory; Kubernetes will choose a random port if you
 
 
 
-<div id="outline-container-orgfede90f" class="outline-5">
-<h5 id="orgfede90f"><span class="section-number-5">1.8.6.2</span> LoadBalancer</h5>
+<div id="outline-container-org848a8cb" class="outline-5">
+<h5 id="org848a8cb"><span class="section-number-5">1.8.6.2</span> LoadBalancer</h5>
 <div class="outline-text-5" id="text-1-8-6-2">
 <p>
 Kubernetes clusters running on cloud providers usually support the automatic provision of a load balancer from the cloud infrastructure. <br>
@@ -2154,8 +2156,8 @@ That's because <b>a LoadBalancer service is an extension of a NodePort service.<
 </div>
 
 
-<div id="outline-container-org49baa40" class="outline-6">
-<h6 id="org49baa40"><span class="section-number-6">1.8.6.2.1</span> YAML Definition</h6>
+<div id="outline-container-org7e6566a" class="outline-6">
+<h6 id="org7e6566a"><span class="section-number-6">1.8.6.2.1</span> YAML Definition</h6>
 <div class="outline-text-6" id="text-1-8-6-2-1">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -2176,8 +2178,8 @@ That's because <b>a LoadBalancer service is an extension of a NodePort service.<
 </div>
 
 
-<div id="outline-container-orgef898b4" class="outline-5">
-<h5 id="orgef898b4"><span class="section-number-5">1.8.6.3</span> Ingress</h5>
+<div id="outline-container-org79df026" class="outline-5">
+<h5 id="org79df026"><span class="section-number-5">1.8.6.3</span> Ingress</h5>
 <div class="outline-text-5" id="text-1-8-6-3">
 <p>
 One important reason is that each LoadBalancer service requires its own load balancer with its own public IP address, <br>
@@ -2204,8 +2206,8 @@ Ingress controller provisions a load balancer behind the scenes.
 
 
 
-<div id="outline-container-orgdee8f2f" class="outline-6">
-<h6 id="orgdee8f2f"><span class="section-number-6">1.8.6.3.1</span> YAML Definition</h6>
+<div id="outline-container-orgfd5c66f" class="outline-6">
+<h6 id="orgfd5c66f"><span class="section-number-6">1.8.6.3.1</span> YAML Definition</h6>
 <div class="outline-text-6" id="text-1-8-6-3-1">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: extensions/v1beta1
@@ -2242,8 +2244,8 @@ which makes them preferred over Services in certain use cases.
 </div>
 
 
-<div id="outline-container-org1e579f4" class="outline-4">
-<h4 id="org1e579f4"><span class="section-number-4">1.8.7</span> Readiness Probe</h4>
+<div id="outline-container-org2c95538" class="outline-4">
+<h4 id="org2c95538"><span class="section-number-4">1.8.7</span> Readiness Probe</h4>
 <div class="outline-text-4" id="text-1-8-7">
 <p>
 Kubernetes invokes the probe periodically and acts based on the result of the readiness probe. <br>
@@ -2264,8 +2266,8 @@ The effect is the same as when the pod doesn’t match the service’s label sel
 </div>
 
 
-<div id="outline-container-org74f59ca" class="outline-4">
-<h4 id="org74f59ca"><span class="section-number-4">1.8.8</span> Headless</h4>
+<div id="outline-container-org4774ca0" class="outline-4">
+<h4 id="org4774ca0"><span class="section-number-4">1.8.8</span> Headless</h4>
 <div class="outline-text-4" id="text-1-8-8">
 <p>
 Kubernetes allows clients to <b>discover pod IPs</b> through DNS lookups. <br>
@@ -2285,8 +2287,8 @@ but through the DNS round-robin mechanism instead of through the service proxy.
 </div>
 </div>
 
-<div id="outline-container-orgf98d397" class="outline-4">
-<h4 id="orgf98d397"><span class="section-number-4">1.8.9</span> External Traffic Issue</h4>
+<div id="outline-container-org178523a" class="outline-4">
+<h4 id="org178523a"><span class="section-number-4">1.8.9</span> External Traffic Issue</h4>
 <div class="outline-text-4" id="text-1-8-9">
 <p>
 When an external client connects to a service through the node port (this also includes cases when it goes through the load balancer first), <br>
@@ -2313,8 +2315,8 @@ You therefore need to ensure the load balancer forwards connections only to node
 </p>
 </div>
 
-<div id="outline-container-org143451a" class="outline-5">
-<h5 id="org143451a"><span class="section-number-5">1.8.9.1</span> Non-Preservation Of The Client's IP Issue</h5>
+<div id="outline-container-orgfea2713" class="outline-5">
+<h5 id="orgfea2713"><span class="section-number-5">1.8.9.1</span> Non-Preservation Of The Client's IP Issue</h5>
 <div class="outline-text-5" id="text-1-8-9-1">
 <p>
 Usually, when clients inside the cluster connect to a service, the pods backing the service <b>can obtain the client's IP address</b>. <br>
@@ -2331,8 +2333,8 @@ because there's no additional hop between the node receiving the connection and 
 </div>
 
 
-<div id="outline-container-org528e522" class="outline-3">
-<h3 id="org528e522"><span class="section-number-3">1.9</span> Volume</h3>
+<div id="outline-container-org146ab95" class="outline-3">
+<h3 id="org146ab95"><span class="section-number-3">1.9</span> Volume</h3>
 <div class="outline-text-3" id="text-1-9">
 <p>
 Volumes aren't top-level resources like pods, but are instead defined as <b>a part of a pod</b> and <b>share the same lifecycle as the pod.</b> <br>
@@ -2351,8 +2353,8 @@ They aren't a standalone Kubernetes object and can not be created or deleted on 
 </div>
 </div>
 
-<div id="outline-container-org324f098" class="outline-4">
-<h4 id="org324f098"><span class="section-number-4">1.9.1</span> Volume Types</h4>
+<div id="outline-container-orgea65f65" class="outline-4">
+<h4 id="orgea65f65"><span class="section-number-4">1.9.1</span> Volume Types</h4>
 <div class="outline-text-4" id="text-1-9-1">
 <dl class="org-dl">
 <dt>emptyDir</dt><dd>A simple empty directory used for storing transient data.</dd>
@@ -2369,8 +2371,8 @@ They aren't a standalone Kubernetes object and can not be created or deleted on 
 </div>
 
 
-<div id="outline-container-orgbdec445" class="outline-4">
-<h4 id="orgbdec445"><span class="section-number-4">1.9.2</span> emptyDir</h4>
+<div id="outline-container-org95f47c2" class="outline-4">
+<h4 id="org95f47c2"><span class="section-number-4">1.9.2</span> emptyDir</h4>
 <div class="outline-text-4" id="text-1-9-2">
 <p>
 An <code>emptyDir</code> volume is especially useful for sharing files between containers running in the same pod.
@@ -2412,8 +2414,8 @@ An <code>emptyDir</code> volume is the simplest type of volume, but <b>other typ
 
 
 
-<div id="outline-container-org76bfc33" class="outline-5">
-<h5 id="org76bfc33"><span class="section-number-5">1.9.2.1</span> The medium used</h5>
+<div id="outline-container-org429ca36" class="outline-5">
+<h5 id="org429ca36"><span class="section-number-5">1.9.2.1</span> The medium used</h5>
 <div class="outline-text-5" id="text-1-9-2-1">
 <p>
 The <code>emptyDir</code> used as the volume was created on the actual disk of the worker node hosting the pod. <br>
@@ -2443,8 +2445,8 @@ To do this, set the <code>emptyDir</code>'s medium to <code>Memory</code>:
 
 
 
-<div id="outline-container-org4fed322" class="outline-4">
-<h4 id="org4fed322"><span class="section-number-4">1.9.3</span> hostPath</h4>
+<div id="outline-container-orgb2bdcc9" class="outline-4">
+<h4 id="orgb2bdcc9"><span class="section-number-4">1.9.3</span> hostPath</h4>
 <div class="outline-text-4" id="text-1-9-3">
 
 <div class="figure">
@@ -2464,8 +2466,8 @@ Remember to use hostPath volumes only if you need to read or write system files 
 
 
 
-<div id="outline-container-org5157ac8" class="outline-4">
-<h4 id="org5157ac8"><span class="section-number-4">1.9.4</span> PV/PVC</h4>
+<div id="outline-container-orga754073" class="outline-4">
+<h4 id="orga754073"><span class="section-number-4">1.9.4</span> PV/PVC</h4>
 <div class="outline-text-4" id="text-1-9-4">
 
 <div class="figure">
@@ -2492,8 +2494,8 @@ Other users cannot use the same PersistentVolume until it has been released by d
 </pre>
 </div>
 
-<div id="outline-container-org0baca91" class="outline-5">
-<h5 id="org0baca91"><span class="section-number-5">1.9.4.1</span> Creating PersistentVolume</h5>
+<div id="outline-container-orgc8394bb" class="outline-5">
+<h5 id="orgc8394bb"><span class="section-number-5">1.9.4.1</span> Creating PersistentVolume</h5>
 <div class="outline-text-5" id="text-1-9-4-1">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -2529,8 +2531,8 @@ PersistentVolumes don’t belong to any namespace. They’re cluster-level resou
 </div>
 
 
-<div id="outline-container-orgb14dad9" class="outline-6">
-<h6 id="orgb14dad9"><span class="section-number-6">1.9.4.1.1</span> Access Mode</h6>
+<div id="outline-container-orgcb61f33" class="outline-6">
+<h6 id="orgcb61f33"><span class="section-number-6">1.9.4.1.1</span> Access Mode</h6>
 <div class="outline-text-6" id="text-1-9-4-1-1">
 <dl class="org-dl">
 <dt>ReadWriteOnce</dt><dd>Only a single node can mount the volume for reading and writing.</dd>
@@ -2548,8 +2550,8 @@ RWO, ROX, and RWX pertain to the number of worker nodes that can use the volume 
 
 
 
-<div id="outline-container-org4d93f04" class="outline-5">
-<h5 id="org4d93f04"><span class="section-number-5">1.9.4.2</span> Creating PersistentVolumeClaim</h5>
+<div id="outline-container-org25421e8" class="outline-5">
+<h5 id="org25421e8"><span class="section-number-5">1.9.4.2</span> Creating PersistentVolumeClaim</h5>
 <div class="outline-text-5" id="text-1-9-4-2">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -2576,8 +2578,8 @@ Additionally, the volume’s access modes must <b>include</b> the access modes r
 </div>
 
 
-<div id="outline-container-org22add29" class="outline-5">
-<h5 id="org22add29"><span class="section-number-5">1.9.4.3</span> Using PersistentVolumeClaim in Pod</h5>
+<div id="outline-container-orga80177a" class="outline-5">
+<h5 id="orga80177a"><span class="section-number-5">1.9.4.3</span> Using PersistentVolumeClaim in Pod</h5>
 <div class="outline-text-5" id="text-1-9-4-3">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -2612,8 +2614,8 @@ Additionally, the volume’s access modes must <b>include</b> the access modes r
 </div>
 
 
-<div id="outline-container-org37d3626" class="outline-5">
-<h5 id="org37d3626"><span class="section-number-5">1.9.4.4</span> Dynamic Provisioning of PV</h5>
+<div id="outline-container-org452325e" class="outline-5">
+<h5 id="org452325e"><span class="section-number-5">1.9.4.4</span> Dynamic Provisioning of PV</h5>
 <div class="outline-text-5" id="text-1-9-4-4">
 <p>
 Cluster administrator can define <code>StorageClass</code> and let the system create a new PersistentVolume <b>each time</b> one is requested through a PersistentVolumeClaim.
@@ -2630,8 +2632,8 @@ Similar to PersistentVolumes, StorageClass resources aren’t namespaced.
 </div>
 </div>
 
-<div id="outline-container-orgd8406fd" class="outline-6">
-<h6 id="orgd8406fd"><span class="section-number-6">1.9.4.4.1</span> Defining StorageClass</h6>
+<div id="outline-container-orge2722d8" class="outline-6">
+<h6 id="orge2722d8"><span class="section-number-6">1.9.4.4.1</span> Defining StorageClass</h6>
 <div class="outline-text-6" id="text-1-9-4-4-1">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: storage.k8s.io/v1
@@ -2647,8 +2649,8 @@ Similar to PersistentVolumes, StorageClass resources aren’t namespaced.
 </div>
 
 
-<div id="outline-container-orgc4238c0" class="outline-6">
-<h6 id="orgc4238c0"><span class="section-number-6">1.9.4.4.2</span> Requesting the SC in a PVC</h6>
+<div id="outline-container-org685de3a" class="outline-6">
+<h6 id="org685de3a"><span class="section-number-6">1.9.4.4.2</span> Requesting the SC in a PVC</h6>
 <div class="outline-text-6" id="text-1-9-4-4-2">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -2672,8 +2674,8 @@ The provisioner is used even if an existing manually provisioned PersistentVolum
 </div>
 
 
-<div id="outline-container-org368531d" class="outline-6">
-<h6 id="org368531d"><span class="section-number-6">1.9.4.4.3</span> Creating a PVC Without SC</h6>
+<div id="outline-container-org76fe302" class="outline-6">
+<h6 id="org76fe302"><span class="section-number-6">1.9.4.4.3</span> Creating a PVC Without SC</h6>
 <div class="outline-text-6" id="text-1-9-4-4-3">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -2698,8 +2700,8 @@ The default storage class is what's used to dynamically provision a PersistentVo
 
 
 
-<div id="outline-container-org3531bad" class="outline-6">
-<h6 id="org3531bad"><span class="section-number-6">1.9.4.4.4</span> Forcing a PVC to Be Bound to One of The Pre-Provisioned PVs</h6>
+<div id="outline-container-org4348d25" class="outline-6">
+<h6 id="org4348d25"><span class="section-number-6">1.9.4.4.4</span> Forcing a PVC to Be Bound to One of The Pre-Provisioned PVs</h6>
 <div class="outline-text-6" id="text-1-9-4-4-4">
 <pre class="example">
 Explicitly set storageClassName to "" if you want the PVC to use a pre-provisioned PersistentVolume.
@@ -2715,16 +2717,16 @@ Explicitly set storageClassName to "" if you want the PVC to use a pre-provision
 
 
 
-<div id="outline-container-org9e4551d" class="outline-3">
-<h3 id="org9e4551d"><span class="section-number-3">1.10</span> ConfigMap &amp; Secret</h3>
+<div id="outline-container-orgc5e664f" class="outline-3">
+<h3 id="orgc5e664f"><span class="section-number-3">1.10</span> ConfigMap &amp; Secret</h3>
 <div class="outline-text-3" id="text-1-10">
 </div>
-<div id="outline-container-org6a14c17" class="outline-4">
-<h4 id="org6a14c17"><span class="section-number-4">1.10.1</span> Basic</h4>
+<div id="outline-container-org93a8601" class="outline-4">
+<h4 id="org93a8601"><span class="section-number-4">1.10.1</span> Basic</h4>
 <div class="outline-text-4" id="text-1-10-1">
 </div>
-<div id="outline-container-org928abf9" class="outline-5">
-<h5 id="org928abf9"><span class="section-number-5">1.10.1.1</span> Overriding the command and arguments</h5>
+<div id="outline-container-orgc6750d5" class="outline-5">
+<h5 id="orgc6750d5"><span class="section-number-5">1.10.1.1</span> Overriding the command and arguments</h5>
 <div class="outline-text-5" id="text-1-10-1-1">
 <p>
 In Kubernetes, when specifying a container, you can choose to override both <code>ENTRYPOINT</code> and <code>CMD</code>.
@@ -2749,8 +2751,8 @@ The command and args fields can’t be updated after the pod is created.
 </div>
 
 
-<div id="outline-container-org2f44cea" class="outline-5">
-<h5 id="org2f44cea"><span class="section-number-5">1.10.1.2</span> Specifing env variables</h5>
+<div id="outline-container-orgee5796a" class="outline-5">
+<h5 id="orgee5796a"><span class="section-number-5">1.10.1.2</span> Specifing env variables</h5>
 <div class="outline-text-5" id="text-1-10-1-2">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">kind</span>: Pod
@@ -2777,8 +2779,8 @@ The command and args fields can’t be updated after the pod is created.
 </div>
 
 
-<div id="outline-container-orge8d0ff7" class="outline-4">
-<h4 id="orge8d0ff7"><span class="section-number-4">1.10.2</span> ConfigMap</h4>
+<div id="outline-container-orgad1d172" class="outline-4">
+<h4 id="orgad1d172"><span class="section-number-4">1.10.2</span> ConfigMap</h4>
 <div class="outline-text-4" id="text-1-10-2">
 
 <div class="figure">
@@ -2788,12 +2790,12 @@ The command and args fields can’t be updated after the pod is created.
 </div>
 
 
-<div id="outline-container-org45da222" class="outline-5">
-<h5 id="org45da222"><span class="section-number-5">1.10.2.1</span> Creating</h5>
+<div id="outline-container-org3ffa36b" class="outline-5">
+<h5 id="org3ffa36b"><span class="section-number-5">1.10.2.1</span> Creating</h5>
 <div class="outline-text-5" id="text-1-10-2-1">
 </div>
-<div id="outline-container-org01691ee" class="outline-6">
-<h6 id="org01691ee"><span class="section-number-6">1.10.2.1.1</span> CLI</h6>
+<div id="outline-container-orge8e3c4d" class="outline-6">
+<h6 id="orge8e3c4d"><span class="section-number-6">1.10.2.1.1</span> CLI</h6>
 <div class="outline-text-6" id="text-1-10-2-1-1">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl create configmap my-config <span style="color: #87af5f;">\</span>
@@ -2815,8 +2817,8 @@ The command and args fields can’t be updated after the pod is created.
 
 
 
-<div id="outline-container-org4e7dc92" class="outline-6">
-<h6 id="org4e7dc92"><span class="section-number-6">1.10.2.1.2</span> YAML</h6>
+<div id="outline-container-org87b96d1" class="outline-6">
+<h6 id="org87b96d1"><span class="section-number-6">1.10.2.1.2</span> YAML</h6>
 <div class="outline-text-6" id="text-1-10-2-1-2">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -2834,12 +2836,12 @@ The command and args fields can’t be updated after the pod is created.
 
 
 
-<div id="outline-container-org0c5b41a" class="outline-5">
-<h5 id="org0c5b41a"><span class="section-number-5">1.10.2.2</span> Passing CM to Container</h5>
+<div id="outline-container-org19e6196" class="outline-5">
+<h5 id="org19e6196"><span class="section-number-5">1.10.2.2</span> Passing CM to Container</h5>
 <div class="outline-text-5" id="text-1-10-2-2">
 </div>
-<div id="outline-container-orge84dc45" class="outline-6">
-<h6 id="orge84dc45"><span class="section-number-6">1.10.2.2.1</span> As ENV</h6>
+<div id="outline-container-orgfc828ad" class="outline-6">
+<h6 id="orgfc828ad"><span class="section-number-6">1.10.2.2.1</span> As ENV</h6>
 <div class="outline-text-6" id="text-1-10-2-2-1">
 
 <div class="figure">
@@ -2891,8 +2893,8 @@ but you can first initialize an environment variable from the ConfigMap entry an
 
 
 
-<div id="outline-container-orgd3a7f1a" class="outline-6">
-<h6 id="orgd3a7f1a"><span class="section-number-6">1.10.2.2.2</span> As Volume</h6>
+<div id="outline-container-orgdfd2f27" class="outline-6">
+<h6 id="orgdfd2f27"><span class="section-number-6">1.10.2.2.2</span> As Volume</h6>
 <div class="outline-text-6" id="text-1-10-2-2-2">
 <p>
 A <code>configMap</code> volume will expose each entry of the ConfigMap <b>as a file.</b>
@@ -3041,8 +3043,8 @@ Setting the File Permissions for Files in a ConfigMap Volume
 </div>
 
 
-<div id="outline-container-orgf5e8b67" class="outline-4">
-<h4 id="orgf5e8b67"><span class="section-number-4">1.10.3</span> Secret</h4>
+<div id="outline-container-org3cacc13" class="outline-4">
+<h4 id="org3cacc13"><span class="section-number-4">1.10.3</span> Secret</h4>
 <div class="outline-text-4" id="text-1-10-3">
 <p>
 Kubernetes helps keep your Secrets safe by making sure each Secret <b>is only distributed to the nodes</b> that run the pods that need access to the Secret. <br>
@@ -3055,8 +3057,8 @@ The maximum size of a Secret is limited to 1MB.
 </div>
 
 
-<div id="outline-container-org74622b1" class="outline-5">
-<h5 id="org74622b1"><span class="section-number-5">1.10.3.1</span> Default Token Secret</h5>
+<div id="outline-container-orgfe34329" class="outline-5">
+<h5 id="orgfe34329"><span class="section-number-5">1.10.3.1</span> Default Token Secret</h5>
 <div class="outline-text-5" id="text-1-10-3-1">
 <p>
 <b>Every pod has a secret volume</b> attached to it automatically, which represent everything you need to securely talk to the Kubernetes API server from within your pods, should you need to do that.
@@ -3077,8 +3079,8 @@ by setting the automountServiceAccountToken field in the pod spec to false or by
 </div>
 
 
-<div id="outline-container-org2c0cacb" class="outline-5">
-<h5 id="org2c0cacb"><span class="section-number-5">1.10.3.2</span> Image Pull Secret</h5>
+<div id="outline-container-orgef8a43c" class="outline-5">
+<h5 id="orgef8a43c"><span class="section-number-5">1.10.3.2</span> Image Pull Secret</h5>
 <div class="outline-text-5" id="text-1-10-3-2">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl create secret docker-registry mydockerhubsecret <span style="color: #87af5f;">\</span>
@@ -3105,12 +3107,12 @@ by setting the automountServiceAccountToken field in the pod spec to false or by
 </div>
 </div>
 
-<div id="outline-container-orgc391910" class="outline-5">
-<h5 id="orgc391910"><span class="section-number-5">1.10.3.3</span> Passing Secret to Container</h5>
+<div id="outline-container-org7246230" class="outline-5">
+<h5 id="org7246230"><span class="section-number-5">1.10.3.3</span> Passing Secret to Container</h5>
 <div class="outline-text-5" id="text-1-10-3-3">
 </div>
-<div id="outline-container-orgf4dd952" class="outline-6">
-<h6 id="orgf4dd952"><span class="section-number-6">1.10.3.3.1</span> As Volume</h6>
+<div id="outline-container-orgf502ae1" class="outline-6">
+<h6 id="orgf502ae1"><span class="section-number-6">1.10.3.3.1</span> As Volume</h6>
 <div class="outline-text-6" id="text-1-10-3-3-1">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -3173,8 +3175,8 @@ by setting the automountServiceAccountToken field in the pod spec to false or by
 
 
 
-<div id="outline-container-orge434101" class="outline-6">
-<h6 id="orge434101"><span class="section-number-6">1.10.3.3.2</span> As ENV</h6>
+<div id="outline-container-org2ab1320" class="outline-6">
+<h6 id="org2ab1320"><span class="section-number-6">1.10.3.3.2</span> As ENV</h6>
 <div class="outline-text-6" id="text-1-10-3-3-2">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">env</span>:
@@ -3197,8 +3199,8 @@ To be safe, always use secret volumes for exposing Secrets.
 </div>
 
 
-<div id="outline-container-org27260a6" class="outline-3">
-<h3 id="org27260a6"><span class="section-number-3">1.11</span> Deployment</h3>
+<div id="outline-container-orgf52d9c6" class="outline-3">
+<h3 id="orgf52d9c6"><span class="section-number-3">1.11</span> Deployment</h3>
 <div class="outline-text-3" id="text-1-11">
 <p>
 Deployment sits <b>on top of ReplicaSets</b> and enables declarative application updates.
@@ -3215,8 +3217,8 @@ The ReplicaSet(created by Deployment)'s name also contains the hash value of its
 </div>
 </div>
 
-<div id="outline-container-org1c59ce8" class="outline-4">
-<h4 id="org1c59ce8"><span class="section-number-4">1.11.1</span> Updating Strategies</h4>
+<div id="outline-container-org0645060" class="outline-4">
+<h4 id="org0645060"><span class="section-number-4">1.11.1</span> Updating Strategies</h4>
 <div class="outline-text-4" id="text-1-11-1">
 <p>
 You have two ways of updating all those pods. You can do one of the following:
@@ -3280,8 +3282,8 @@ Should use this strategy only when your app can handle running both the old and 
 
 
 
-<div id="outline-container-org5fe14aa" class="outline-4">
-<h4 id="org5fe14aa"><span class="section-number-4">1.11.2</span> Performing RU with <code>kubectl</code></h4>
+<div id="outline-container-orgd8cd8bf" class="outline-4">
+<h4 id="orgd8cd8bf"><span class="section-number-4">1.11.2</span> Performing RU with <code>kubectl</code></h4>
 <div class="outline-text-4" id="text-1-11-2">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl rolling-update   kubia-v1      kubia-v2   --image=luksa/kubia:v2
@@ -3290,8 +3292,8 @@ Should use this strategy only when your app can handle running both the old and 
 </div>
 </div>
 
-<div id="outline-container-orgd1d1750" class="outline-5">
-<h5 id="orgd1d1750"><span class="section-number-5">1.11.2.1</span> Steps Required Before RU</h5>
+<div id="outline-container-orgb724368" class="outline-5">
+<h5 id="orgb724368"><span class="section-number-5">1.11.2.1</span> Steps Required Before RU</h5>
 <div class="outline-text-5" id="text-1-11-2-1">
 <ol class="org-ol">
 <li>Copying old controller to new controller and changing the image in its pod template.</li>
@@ -3333,8 +3335,8 @@ kubectl then scales down the old ReplicationController by 1.
 
 
 
-<div id="outline-container-org8c1b85b" class="outline-4">
-<h4 id="org8c1b85b"><span class="section-number-4">1.11.3</span> Creating Deployment</h4>
+<div id="outline-container-orgbb8b2ec" class="outline-4">
+<h4 id="orgbb8b2ec"><span class="section-number-4">1.11.3</span> Creating Deployment</h4>
 <div class="outline-text-4" id="text-1-11-3">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: apps/v1beta1        <span style="color: #707070; font-style: italic;"># </span><span style="color: #707070; font-style: italic;">Deployments are in the apps API group, version v1beta1.</span>
@@ -3367,8 +3369,8 @@ Be sure to include the --record command-line option when creating it. This recor
 </div>
 
 
-<div id="outline-container-org6011a49" class="outline-4">
-<h4 id="org6011a49"><span class="section-number-4">1.11.4</span> Updating Deployment</h4>
+<div id="outline-container-org59793a3" class="outline-4">
+<h4 id="org59793a3"><span class="section-number-4">1.11.4</span> Updating Deployment</h4>
 <div class="outline-text-4" id="text-1-11-4">
 <p>
 The only thing you need to do is modify the pod template defined in the Deployment resource and
@@ -3390,8 +3392,8 @@ Kubernetes will take all the steps necessary to get the actual system state to w
 </div>
 </div>
 
-<div id="outline-container-org6326456" class="outline-4">
-<h4 id="org6326456"><span class="section-number-4">1.11.5</span> Rolling Back</h4>
+<div id="outline-container-org9ac64c0" class="outline-4">
+<h4 id="org9ac64c0"><span class="section-number-4">1.11.5</span> Rolling Back</h4>
 <div class="outline-text-4" id="text-1-11-5">
 <p>
 Deployments make it easy to roll back to the previously deployed version by telling Kubernetes to undo the last rollout of a Deployment:
@@ -3422,8 +3424,8 @@ The length of the revision history is limited by the <code>revisionHistoryLimit<
 
 
 
-<div id="outline-container-org5602269" class="outline-4">
-<h4 id="org5602269"><span class="section-number-4">1.11.6</span> maxSurge/maxUnavailable</h4>
+<div id="outline-container-orgb75d525" class="outline-4">
+<h4 id="orgb75d525"><span class="section-number-4">1.11.6</span> maxSurge/maxUnavailable</h4>
 <div class="outline-text-4" id="text-1-11-6">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">spec</span>:
@@ -3466,8 +3468,8 @@ Can also specify an absolute value instead of a percentage.
 </div>
 
 
-<div id="outline-container-org89d157c" class="outline-4">
-<h4 id="org89d157c"><span class="section-number-4">1.11.7</span> Pausing Rollout Process</h4>
+<div id="outline-container-orgd7dbf58" class="outline-4">
+<h4 id="orgd7dbf58"><span class="section-number-4">1.11.7</span> Pausing Rollout Process</h4>
 <div class="outline-text-4" id="text-1-11-7">
 <p>
 A Deployment can also be paused during the rollout process. <br>
@@ -3497,8 +3499,8 @@ If a Deployment is paused, the 'undo' command won't undo it until you resume the
 </div>
 
 
-<div id="outline-container-orgfc6da9d" class="outline-4">
-<h4 id="orgfc6da9d"><span class="section-number-4">1.11.8</span> Blocking Rollout (minReadySeconds)</h4>
+<div id="outline-container-orga160318" class="outline-4">
+<h4 id="orga160318"><span class="section-number-4">1.11.8</span> Blocking Rollout (minReadySeconds)</h4>
 <div class="outline-text-4" id="text-1-11-8">
 <p>
 <code>minReadySeconds</code> can be used to slow down the rollout, so you could see it was indeed performing a rolling update and not replacing all the pods at once. <br>
@@ -3536,8 +3538,8 @@ deployment <span style="color: #87af5f;">"kubia"</span> rolled back
 </div>
 
 
-<div id="outline-container-orgf101a39" class="outline-3">
-<h3 id="orgf101a39"><span class="section-number-3">1.12</span> StatefulSet</h3>
+<div id="outline-container-org226a802" class="outline-3">
+<h3 id="org226a802"><span class="section-number-3">1.12</span> StatefulSet</h3>
 <div class="outline-text-3" id="text-1-12">
 <p>
 StatefulSet makes sure pods are rescheduled in such a way that they retain their identity and state.
@@ -3553,12 +3555,12 @@ See the StatefulSet's spec.updateStrategy field documentation using kubectl expl
 </pre>
 </div>
 
-<div id="outline-container-orgf623aa3" class="outline-4">
-<h4 id="orgf623aa3"><span class="section-number-4">1.12.1</span> 设计思想</h4>
+<div id="outline-container-org33dbd3f" class="outline-4">
+<h4 id="org33dbd3f"><span class="section-number-4">1.12.1</span> 设计思想</h4>
 <div class="outline-text-4" id="text-1-12-1">
 </div>
-<div id="outline-container-orga2929e2" class="outline-5">
-<h5 id="orga2929e2"><span class="section-number-5">1.12.1.1</span> Stable Identity</h5>
+<div id="outline-container-orgb2b2cdc" class="outline-5">
+<h5 id="orgb2b2cdc"><span class="section-number-5">1.12.1.1</span> Stable Identity</h5>
 <div class="outline-text-5" id="text-1-12-1-1">
 <p>
 Each pod created by a StatefulSet is assigned an ordinal index (zero-based),
@@ -3574,8 +3576,8 @@ The names of the pods are thus <b>predictable</b>.
 </div>
 
 
-<div id="outline-container-orge629611" class="outline-6">
-<h6 id="orge629611"><span class="section-number-6">1.12.1.1.1</span> Governing Service</h6>
+<div id="outline-container-orgaeb3d42" class="outline-6">
+<h6 id="orgaeb3d42"><span class="section-number-6">1.12.1.1.1</span> Governing Service</h6>
 <div class="outline-text-6" id="text-1-12-1-1-1">
 <p>
 StatefulSet requires to create a corresponding <b>governing headless Service</b> that's used to provide the actual network identity to each pod. <br>
@@ -3600,8 +3602,8 @@ Kubernetes creates SRV records to point to the hostnames of the pods backing a H
 </div>
 
 
-<div id="outline-container-org8dc32f7" class="outline-6">
-<h6 id="org8dc32f7"><span class="section-number-6">1.12.1.1.2</span> Scaling</h6>
+<div id="outline-container-orgf8ea64e" class="outline-6">
+<h6 id="orgf8ea64e"><span class="section-number-6">1.12.1.1.2</span> Scaling</h6>
 <div class="outline-text-6" id="text-1-12-1-1-2">
 <ul class="org-ul">
 <li>Scaling the StatefulSet creates a new pod instance with the <b>next unused ordinal index.</b></li>
@@ -3628,8 +3630,8 @@ If an instance is unhealthy, and you scale down by one at the same time, you've 
 
 
 
-<div id="outline-container-org2e3e49e" class="outline-5">
-<h5 id="org2e3e49e"><span class="section-number-5">1.12.1.2</span> Stable Dedicated Storage</h5>
+<div id="outline-container-org792929c" class="outline-5">
+<h5 id="org792929c"><span class="section-number-5">1.12.1.2</span> Stable Dedicated Storage</h5>
 <div class="outline-text-5" id="text-1-12-1-2">
 <p>
 Each stateful pod instance needs to use its <b>own</b> storage, if a stateful pod is rescheduled
@@ -3659,8 +3661,8 @@ PersistentVolumeClaim remains after a scale-down:
 </div>
 
 
-<div id="outline-container-orgf0cbd6b" class="outline-5">
-<h5 id="orgf0cbd6b"><span class="section-number-5">1.12.1.3</span> Guarantees</h5>
+<div id="outline-container-orgbc890d4" class="outline-5">
+<h5 id="orgbc890d4"><span class="section-number-5">1.12.1.3</span> Guarantees</h5>
 <div class="outline-text-5" id="text-1-12-1-3">
 <p>
 A StatefulSet must guarantee <b>at-most-one semantics</b> for stateful pod instances. <br>
@@ -3686,8 +3688,8 @@ kubectl delete po &lt;name&gt; --force --grace-period 0
 </div>
 
 
-<div id="outline-container-orgabcba00" class="outline-4">
-<h4 id="orgabcba00"><span class="section-number-4">1.12.2</span> Deploying App through StatefulSet</h4>
+<div id="outline-container-orgf4c6f95" class="outline-4">
+<h4 id="orgf4c6f95"><span class="section-number-4">1.12.2</span> Deploying App through StatefulSet</h4>
 <div class="outline-text-4" id="text-1-12-2">
 <p>
 To deploy app, you'll need to create two (or three) different types of objects:
@@ -3710,12 +3712,12 @@ Need to create these <b>only if</b> the cluster doesn't support dynamic provisio
 
 
 
-<div id="outline-container-org01aacc1" class="outline-2">
-<h2 id="org01aacc1"><span class="section-number-2">2</span> Internals</h2>
+<div id="outline-container-org72f8014" class="outline-2">
+<h2 id="org72f8014"><span class="section-number-2">2</span> Internals</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orgab56198" class="outline-3">
-<h3 id="orgab56198"><span class="section-number-3">2.1</span> Architecture</h3>
+<div id="outline-container-org2f2a1bd" class="outline-3">
+<h3 id="org2f2a1bd"><span class="section-number-3">2.1</span> Architecture</h3>
 <div class="outline-text-3" id="text-2-1">
 
 <div class="figure">
@@ -3761,16 +3763,16 @@ the components of the Control Plane can easily be split <b>across multiple serve
 </div>
 
 
-<div id="outline-container-org0d913fb" class="outline-4">
-<h4 id="org0d913fb"><span class="section-number-4">2.1.1</span> etcd</h4>
+<div id="outline-container-org115ba12" class="outline-4">
+<h4 id="org115ba12"><span class="section-number-4">2.1.1</span> etcd</h4>
 <div class="outline-text-4" id="text-2-1-1">
 <p>
 Kubernetes stores all its data in etcd under <code>/registry</code>.
 </p>
 </div>
 
-<div id="outline-container-orgcde3343" class="outline-5">
-<h5 id="orgcde3343"><span class="section-number-5">2.1.1.1</span> Optimistic Concurrency Control</h5>
+<div id="outline-container-orgdd1d77e" class="outline-5">
+<h5 id="orgdd1d77e"><span class="section-number-5">2.1.1.1</span> Optimistic Concurrency Control</h5>
 <div class="outline-text-5" id="text-2-1-1-1">
 <img src="https://img.mukewang.com/5b5c698900010e0004970285.jpg"/>
 
@@ -3782,8 +3784,8 @@ If the version doesn't match the one stored in etcd, the API server rejects the 
 </div>
 
 
-<div id="outline-container-orga5ce105" class="outline-5">
-<h5 id="orga5ce105"><span class="section-number-5">2.1.1.2</span> RAFT</h5>
+<div id="outline-container-orga12fc5f" class="outline-5">
+<h5 id="orga12fc5f"><span class="section-number-5">2.1.1.2</span> RAFT</h5>
 <div class="outline-text-5" id="text-2-1-1-2">
 <p>
 <a href="http://thesecretlivesofdata.com/raft/">Understandable Distributed Consensus by Animation</a>
@@ -3795,8 +3797,8 @@ If the version doesn't match the one stored in etcd, the API server rejects the 
 
 
 
-<div id="outline-container-org7d2e4ed" class="outline-4">
-<h4 id="org7d2e4ed"><span class="section-number-4">2.1.2</span> API Server</h4>
+<div id="outline-container-org364cf05" class="outline-4">
+<h4 id="org364cf05"><span class="section-number-4">2.1.2</span> API Server</h4>
 <div class="outline-text-4" id="text-2-1-2">
 
 <div class="figure">
@@ -3830,8 +3832,8 @@ When the request is <span class="underline">only trying to read data</span>, the
 </div>
 
 
-<div id="outline-container-org1841d3b" class="outline-5">
-<h5 id="org1841d3b"><span class="section-number-5">2.1.2.1</span> Resource Changes Notification</h5>
+<div id="outline-container-orgcbba834" class="outline-5">
+<h5 id="orgcbba834"><span class="section-number-5">2.1.2.1</span> Resource Changes Notification</h5>
 <div class="outline-text-5" id="text-2-1-2-1">
 <p>
 API server doesn't create resources. That's what <b>controllers in the Controller Manager</b> do. <br>
@@ -3852,8 +3854,8 @@ Control Plane components can request <b>to be notified</b> when a resource is cr
 
 
 
-<div id="outline-container-org07cb21a" class="outline-4">
-<h4 id="org07cb21a"><span class="section-number-4">2.1.3</span> Scheduler</h4>
+<div id="outline-container-orgc808eef" class="outline-4">
+<h4 id="orgc808eef"><span class="section-number-4">2.1.3</span> Scheduler</h4>
 <div class="outline-text-4" id="text-2-1-3">
 <p>
 Scheduler <b>doesn't instruct the selected node</b> (or the Kubelet running on that node) to run the pod. <br>
@@ -3864,8 +3866,8 @@ All the Scheduler does is update the pod definition through the API server. The 
 </div>
 
 
-<div id="outline-container-org09bed5d" class="outline-4">
-<h4 id="org09bed5d"><span class="section-number-4">2.1.4</span> Controller Manager</h4>
+<div id="outline-container-org21206d6" class="outline-4">
+<h4 id="org21206d6"><span class="section-number-4">2.1.4</span> Controller Manager</h4>
 <div class="outline-text-4" id="text-2-1-4">
 <p>
 Actual work (create, update, delete&#x2026;) is done by controllers running inside the Controller Manager.
@@ -3884,8 +3886,8 @@ Actual work (create, update, delete&#x2026;) is done by controllers running insi
 </div>
 
 
-<div id="outline-container-orgc24ee15" class="outline-4">
-<h4 id="orgc24ee15"><span class="section-number-4">2.1.5</span> Kublet</h4>
+<div id="outline-container-orgd32346d" class="outline-4">
+<h4 id="orgd32346d"><span class="section-number-4">2.1.5</span> Kublet</h4>
 <div class="outline-text-4" id="text-2-1-5">
 <p>
 Kubelet is the component responsible for <b>everything</b> running on a worker node:
@@ -3898,8 +3900,8 @@ Kubelet is the component responsible for <b>everything</b> running on a worker n
 </ul>
 </div>
 
-<div id="outline-container-org7738edd" class="outline-5">
-<h5 id="org7738edd"><span class="section-number-5">2.1.5.1</span> Run Static Pods without API Server</h5>
+<div id="outline-container-orgd7c81b9" class="outline-5">
+<h5 id="orgd7c81b9"><span class="section-number-5">2.1.5.1</span> Run Static Pods without API Server</h5>
 <div class="outline-text-5" id="text-2-1-5-1">
 <p>
 Instead of running Kubernetes system components natively, you can put their pod manifests into the Kubelet's manifest directory
@@ -3920,8 +3922,8 @@ You can also use the same method to run your custom system containers, but doing
 </div>
 
 
-<div id="outline-container-orga34727a" class="outline-4">
-<h4 id="orga34727a"><span class="section-number-4">2.1.6</span> Kube-Proxy</h4>
+<div id="outline-container-org694633c" class="outline-4">
+<h4 id="org694633c"><span class="section-number-4">2.1.6</span> Kube-Proxy</h4>
 <div class="outline-text-4" id="text-2-1-6">
 <p>
 kube-proxy's purpose is to make sure clients can connect to the services you define through the Kubernetes API.
@@ -3937,8 +3939,8 @@ kube-proxy's purpose is to make sure clients can connect to the services you def
 
 
 
-<div id="outline-container-orgea44936" class="outline-4">
-<h4 id="orgea44936"><span class="section-number-4">2.1.7</span> Add-on</h4>
+<div id="outline-container-orga375b87" class="outline-4">
+<h4 id="orga375b87"><span class="section-number-4">2.1.7</span> Add-on</h4>
 <div class="outline-text-4" id="text-2-1-7">
 <p>
 Add-on components are deployed as pods by submitting YAML manifests to the API server. <br>
@@ -3952,8 +3954,8 @@ Some of these components are deployed through a Deployment resource or a Replica
 
 
 
-<div id="outline-container-org6398b37" class="outline-3">
-<h3 id="org6398b37"><span class="section-number-3">2.2</span> Cooperation between controllers</h3>
+<div id="outline-container-org161f2e3" class="outline-3">
+<h3 id="org161f2e3"><span class="section-number-3">2.2</span> Cooperation between controllers</h3>
 <div class="outline-text-3" id="text-2-2">
 
 <div class="figure">
@@ -3973,12 +3975,12 @@ Some of these components are deployed through a Deployment resource or a Replica
 
 
 
-<div id="outline-container-orge36939a" class="outline-3">
-<h3 id="orge36939a"><span class="section-number-3">2.3</span> Pod</h3>
+<div id="outline-container-org2475264" class="outline-3">
+<h3 id="org2475264"><span class="section-number-3">2.3</span> Pod</h3>
 <div class="outline-text-3" id="text-2-3">
 </div>
-<div id="outline-container-orgbe31135" class="outline-4">
-<h4 id="orgbe31135"><span class="section-number-4">2.3.1</span> Infrastructure Container</h4>
+<div id="outline-container-orgb4b7e6a" class="outline-4">
+<h4 id="orgb4b7e6a"><span class="section-number-4">2.3.1</span> Infrastructure Container</h4>
 <div class="outline-text-4" id="text-2-3-1">
 <p>
 The <span class="underline">pause container</span> is the infrastructure container that holds all the containers of a pod together. <br>
@@ -3998,16 +4000,16 @@ If the infrastructure pod is killed in the meantime, the Kubelet <b>recreates it
 </div>
 </div>
 
-<div id="outline-container-org0696622" class="outline-4">
-<h4 id="org0696622"><span class="section-number-4">2.3.2</span> Inter-pod networking</h4>
+<div id="outline-container-org48b16a3" class="outline-4">
+<h4 id="org48b16a3"><span class="section-number-4">2.3.2</span> Inter-pod networking</h4>
 <div class="outline-text-4" id="text-2-3-2">
 <p>
 The network is set up by Container Network Interface (CNI) plugin, not by Kubernetes itself.
 </p>
 </div>
 
-<div id="outline-container-org26af0e5" class="outline-5">
-<h5 id="org26af0e5"><span class="section-number-5">2.3.2.1</span> Pods are connected NAT-less</h5>
+<div id="outline-container-orgfab8028" class="outline-5">
+<h5 id="orgfab8028"><span class="section-number-5">2.3.2.1</span> Pods are connected NAT-less</h5>
 <div class="outline-text-5" id="text-2-3-2-1">
 
 <div class="figure">
@@ -4018,8 +4020,8 @@ The network is set up by Container Network Interface (CNI) plugin, not by Kubern
 </div>
 
 
-<div id="outline-container-org60e6816" class="outline-5">
-<h5 id="org60e6816"><span class="section-number-5">2.3.2.2</span> Communication between nodes</h5>
+<div id="outline-container-org03e2460" class="outline-5">
+<h5 id="org03e2460"><span class="section-number-5">2.3.2.2</span> Communication between nodes</h5>
 <div class="outline-text-5" id="text-2-3-2-2">
 <p>
 Bridges across the nodes must use non-overlapping address ranges to prevent pods on different nodes from getting the same IP.
@@ -4048,8 +4050,8 @@ where they are de-encapsulated and delivered to the pod in their original form.
 </div>
 </div>
 
-<div id="outline-container-org2e9f7de" class="outline-5">
-<h5 id="org2e9f7de"><span class="section-number-5">2.3.2.3</span> Container Network Interface</h5>
+<div id="outline-container-orgf0ce205" class="outline-5">
+<h5 id="orgf0ce205"><span class="section-number-5">2.3.2.3</span> Container Network Interface</h5>
 <div class="outline-text-5" id="text-2-3-2-3">
 <p>
 To make it easier to connect containers into a network, a project called Container Network Interface (CNI) was started. <br>
@@ -4073,8 +4075,8 @@ See <a href="https://kubernetes.io/docs/concepts/cluster-administration/addons/"
 
 
 
-<div id="outline-container-orgbb2510f" class="outline-3">
-<h3 id="orgbb2510f"><span class="section-number-3">2.4</span> High Availability</h3>
+<div id="outline-container-org0295093" class="outline-3">
+<h3 id="org0295093"><span class="section-number-3">2.4</span> High Availability</h3>
 <div class="outline-text-3" id="text-2-4">
 
 <div class="figure">
@@ -4094,12 +4096,12 @@ See <a href="https://kubernetes.io/docs/concepts/cluster-administration/addons/"
 
 
 
-<div id="outline-container-orga2de321" class="outline-2">
-<h2 id="orga2de321"><span class="section-number-2">3</span> Security</h2>
+<div id="outline-container-org8e4df26" class="outline-2">
+<h2 id="org8e4df26"><span class="section-number-2">3</span> Security</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org8fb071c" class="outline-3">
-<h3 id="org8fb071c"><span class="section-number-3">3.1</span> Understanding Authentication</h3>
+<div id="outline-container-orgb73572d" class="outline-3">
+<h3 id="orgb73572d"><span class="section-number-3">3.1</span> Understanding Authentication</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 When a request is received by the API server, it goes through the list of authentication plugins, so they can each examine the request and try to determine <b>who</b> is sending the request.
@@ -4121,8 +4123,8 @@ Several authentication plugins are available. They obtain the identity of the cl
 </ol>
 </div>
 
-<div id="outline-container-org6ebc7ac" class="outline-4">
-<h4 id="org6ebc7ac"><span class="section-number-4">3.1.1</span> Users</h4>
+<div id="outline-container-orgb14a8f9" class="outline-4">
+<h4 id="orgb14a8f9"><span class="section-number-4">3.1.1</span> Users</h4>
 <div class="outline-text-4" id="text-3-1-1">
 <p>
 Kubernetes distinguishes between two kinds of clients connecting to the API server:
@@ -4145,8 +4147,8 @@ In contrast, no resource represents user accounts, which means you can’t creat
 </div>
 
 
-<div id="outline-container-org580052c" class="outline-4">
-<h4 id="org580052c"><span class="section-number-4">3.1.2</span> Group</h4>
+<div id="outline-container-orgef07ca1" class="outline-4">
+<h4 id="orgef07ca1"><span class="section-number-4">3.1.2</span> Group</h4>
 <div class="outline-text-4" id="text-3-1-2">
 <p>
 Both human users and ServiceAccounts can belong to one or more groups.
@@ -4165,8 +4167,8 @@ Both human users and ServiceAccounts can belong to one or more groups.
 
 
 
-<div id="outline-container-org16248f3" class="outline-4">
-<h4 id="org16248f3"><span class="section-number-4">3.1.3</span> Service Account</h4>
+<div id="outline-container-org1867615" class="outline-4">
+<h4 id="org1867615"><span class="section-number-4">3.1.3</span> Service Account</h4>
 <div class="outline-text-4" id="text-3-1-3">
 <p>
 ServiceAccounts are resources just like Pods, Secrets, ConfigMaps, and so on, and are scoped to individual namespaces.
@@ -4201,8 +4203,8 @@ The authentication tokens used in ServiceAccounts are JWT tokens.
 </pre>
 </div>
 
-<div id="outline-container-org0920b6b" class="outline-5">
-<h5 id="org0920b6b"><span class="section-number-5">3.1.3.1</span> Mountable Secrets</h5>
+<div id="outline-container-org485fce0" class="outline-5">
+<h5 id="org485fce0"><span class="section-number-5">3.1.3.1</span> Mountable Secrets</h5>
 <div class="outline-text-5" id="text-3-1-3-1">
 <p>
 By default, a pod can mount any Secret it wants. But the pod’s ServiceAccount can be configured to only allow the pod to mount Secrets that are listed as mountable Secrets on the ServiceAccount. <br>
@@ -4212,8 +4214,8 @@ To enable this feature, the ServiceAccount must contain the following annotation
 </div>
 
 
-<div id="outline-container-orgf933e17" class="outline-5">
-<h5 id="orgf933e17"><span class="section-number-5">3.1.3.2</span> Image Pull Secrets</h5>
+<div id="outline-container-org1ddd39c" class="outline-5">
+<h5 id="org1ddd39c"><span class="section-number-5">3.1.3.2</span> Image Pull Secrets</h5>
 <div class="outline-text-5" id="text-3-1-3-2">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -4232,8 +4234,8 @@ Adding image pull Secrets to a ServiceAccount <b>saves you from having to add th
 </div>
 
 
-<div id="outline-container-org2e948e5" class="outline-5">
-<h5 id="org2e948e5"><span class="section-number-5">3.1.3.3</span> Assigning ServiceAccount to Pod</h5>
+<div id="outline-container-org82703e3" class="outline-5">
+<h5 id="org82703e3"><span class="section-number-5">3.1.3.3</span> Assigning ServiceAccount to Pod</h5>
 <div class="outline-text-5" id="text-3-1-3-3">
 <pre class="example">
 A pod’s ServiceAccount must be set when creating the pod. It can’t be changed later.
@@ -4266,8 +4268,8 @@ since even the default ServiceAccount is allowed to do anything.
 
 
 
-<div id="outline-container-org1eb646f" class="outline-3">
-<h3 id="org1eb646f"><span class="section-number-3">3.2</span> RBAC</h3>
+<div id="outline-container-org52019b0" class="outline-3">
+<h3 id="org52019b0"><span class="section-number-3">3.2</span> RBAC</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 RBAC prevents unauthorized users from viewing or modifying the cluster state. <br>
@@ -4328,12 +4330,12 @@ RoleBinding can’t grant access to cluster-level resources, even if it referenc
 </pre>
 </div>
 
-<div id="outline-container-orgc364231" class="outline-4">
-<h4 id="orgc364231"><span class="section-number-4">3.2.1</span> Role/RoleBinding</h4>
+<div id="outline-container-org7bf71d4" class="outline-4">
+<h4 id="org7bf71d4"><span class="section-number-4">3.2.1</span> Role/RoleBinding</h4>
 <div class="outline-text-4" id="text-3-2-1">
 </div>
-<div id="outline-container-org37bd54b" class="outline-5">
-<h5 id="org37bd54b"><span class="section-number-5">3.2.1.1</span> Create Role</h5>
+<div id="outline-container-org746633a" class="outline-5">
+<h5 id="org746633a"><span class="section-number-5">3.2.1.1</span> Create Role</h5>
 <div class="outline-text-5" id="text-3-2-1-1">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: rbac.authorization.k8s.io/v1
@@ -4355,8 +4357,8 @@ The plural form must be used when specifying resources.
 </div>
 </div>
 
-<div id="outline-container-orga6abef9" class="outline-5">
-<h5 id="orga6abef9"><span class="section-number-5">3.2.1.2</span> Binding Role to ServiceAccount</h5>
+<div id="outline-container-orgcccc4c8" class="outline-5">
+<h5 id="orgcccc4c8"><span class="section-number-5">3.2.1.2</span> Binding Role to ServiceAccount</h5>
 <div class="outline-text-5" id="text-3-2-1-2">
 <p>
 A Role defines what actions can be performed, but it doesn't specify who can perform them. <br>
@@ -4382,8 +4384,8 @@ To bind it to a group, use --group.
 </div>
 
 
-<div id="outline-container-orgdb67dc6" class="outline-6">
-<h6 id="orgdb67dc6"><span class="section-number-6">3.2.1.2.1</span> Including ServiceAccounts from other namespaces</h6>
+<div id="outline-container-org6c2e10d" class="outline-6">
+<h6 id="org6c2e10d"><span class="section-number-6">3.2.1.2.1</span> Including ServiceAccounts from other namespaces</h6>
 <div class="outline-text-6" id="text-3-2-1-2-1">
 <p>
 RoleBinding can add the other pod's ServiceAccount, <b>even though it's in a different namespace</b>:
@@ -4401,8 +4403,8 @@ RoleBinding can add the other pod's ServiceAccount, <b>even though it's in a dif
 
 
 
-<div id="outline-container-org4c81cc3" class="outline-4">
-<h4 id="org4c81cc3"><span class="section-number-4">3.2.2</span> ClusterRole/ClusterRoleBinding</h4>
+<div id="outline-container-org5caf098" class="outline-4">
+<h4 id="org5caf098"><span class="section-number-4">3.2.2</span> ClusterRole/ClusterRoleBinding</h4>
 <div class="outline-text-4" id="text-3-2-2">
 <p>
 Regular Role only allows access to resources in the same namespace the Role is in,
@@ -4431,8 +4433,8 @@ To grant access to cluster-level resources, you must always use a ClusterRoleBin
 </div>
 </div>
 
-<div id="outline-container-orgc037b6d" class="outline-5">
-<h5 id="orgc037b6d"><span class="section-number-5">3.2.2.1</span> Access non-resource URLs</h5>
+<div id="outline-container-orga632973" class="outline-5">
+<h5 id="orga632973"><span class="section-number-5">3.2.2.1</span> Access non-resource URLs</h5>
 <div class="outline-text-5" id="text-3-2-2-1">
 <p>
 API server also exposes non-resource URLs. <br>
@@ -4462,8 +4464,8 @@ rules:
 </div>
 </div>
 
-<div id="outline-container-orgfb69631" class="outline-5">
-<h5 id="orgfb69631"><span class="section-number-5">3.2.2.2</span> Access namespaced resources</h5>
+<div id="outline-container-orge17f438" class="outline-5">
+<h5 id="orge17f438"><span class="section-number-5">3.2.2.2</span> Access namespaced resources</h5>
 <div class="outline-text-5" id="text-3-2-2-2">
 <p>
 If you create a ClusterRoleBinding and reference the ClusterRole in it, the subjects listed in the binding can view the specified resources across all namespaces. <br>
@@ -4489,8 +4491,8 @@ If, on the other hand, you create a RoleBinding, the subjects listed in the bind
 
 
 
-<div id="outline-container-org6988d87" class="outline-4">
-<h4 id="org6988d87"><span class="section-number-4">3.2.3</span> Combinations of role/binding types</h4>
+<div id="outline-container-org1bbd8ad" class="outline-4">
+<h4 id="org1bbd8ad"><span class="section-number-4">3.2.3</span> Combinations of role/binding types</h4>
 <div class="outline-text-4" id="text-3-2-3">
 
 <div class="figure">
@@ -4501,8 +4503,8 @@ If, on the other hand, you create a RoleBinding, the subjects listed in the bind
 </div>
 
 
-<div id="outline-container-org013e3ff" class="outline-4">
-<h4 id="org013e3ff"><span class="section-number-4">3.2.4</span> Default CRs/CRBs</h4>
+<div id="outline-container-orgca81cc7" class="outline-4">
+<h4 id="orgca81cc7"><span class="section-number-4">3.2.4</span> Default CRs/CRBs</h4>
 <div class="outline-text-4" id="text-3-2-4">
 <p>
 The most important roles are the <code>view</code>, <code>edit</code>, <code>admin</code>, and <code>cluster-admin</code> ClusterRoles. <br>
@@ -4552,12 +4554,12 @@ Complete control of the Kubernetes cluster.
 
 
 
-<div id="outline-container-org88b711e" class="outline-3">
-<h3 id="org88b711e"><span class="section-number-3">3.3</span> Use Node's namespaces</h3>
+<div id="outline-container-orgba330b8" class="outline-3">
+<h3 id="orgba330b8"><span class="section-number-3">3.3</span> Use Node's namespaces</h3>
 <div class="outline-text-3" id="text-3-3">
 </div>
-<div id="outline-container-org90a6b4b" class="outline-4">
-<h4 id="org90a6b4b"><span class="section-number-4">3.3.1</span> Use node’s network namespace</h4>
+<div id="outline-container-orgfa70a41" class="outline-4">
+<h4 id="orgfa70a41"><span class="section-number-4">3.3.1</span> Use node’s network namespace</h4>
 <div class="outline-text-4" id="text-3-3-1">
 <p>
 Certain pods (usually system pods) need to operate in the host’s default namespaces, allowing them to see and manipulate node-level resources and devices.
@@ -4585,8 +4587,8 @@ Certain pods (usually system pods) need to operate in the host’s default names
 </div>
 </div>
 
-<div id="outline-container-orgea53170" class="outline-5">
-<h5 id="orgea53170"><span class="section-number-5">3.3.1.1</span> Use host port (not in host's nw ns)</h5>
+<div id="outline-container-orgc0b1edd" class="outline-5">
+<h5 id="orgc0b1edd"><span class="section-number-5">3.3.1.1</span> Use host port (not in host's nw ns)</h5>
 <div class="outline-text-5" id="text-3-3-1-1">
 <p>
 Bind to a port in the node’s default namespace, but <span class="underline">still have their own network namespace</span>. <br>
@@ -4641,8 +4643,8 @@ People also used it to ensure two replicas of the same pod were never scheduled 
 </div>
 
 
-<div id="outline-container-org05f535b" class="outline-4">
-<h4 id="org05f535b"><span class="section-number-4">3.3.2</span> Use node's PID/IPC namespaces</h4>
+<div id="outline-container-orgf64adb2" class="outline-4">
+<h4 id="orgf64adb2"><span class="section-number-4">3.3.2</span> Use node's PID/IPC namespaces</h4>
 <div class="outline-text-4" id="text-3-3-2">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -4663,12 +4665,12 @@ People also used it to ensure two replicas of the same pod were never scheduled 
 </div>
 
 
-<div id="outline-container-orge5e651c" class="outline-3">
-<h3 id="orge5e651c"><span class="section-number-3">3.4</span> Container security context</h3>
+<div id="outline-container-orga4c959c" class="outline-3">
+<h3 id="orga4c959c"><span class="section-number-3">3.4</span> Container security context</h3>
 <div class="outline-text-3" id="text-3-4">
 </div>
-<div id="outline-container-org9d44399" class="outline-4">
-<h4 id="org9d44399"><span class="section-number-4">3.4.1</span> Run container as specific user</h4>
+<div id="outline-container-orge8404e7" class="outline-4">
+<h4 id="orge8404e7"><span class="section-number-4">3.4.1</span> Run container as specific user</h4>
 <div class="outline-text-4" id="text-3-4-1">
 <pre class="example">
 What user the container runs as is specified in the container image.
@@ -4694,8 +4696,8 @@ If omitted, the container runs as root.
 </div>
 
 
-<div id="outline-container-org955d13c" class="outline-4">
-<h4 id="org955d13c"><span class="section-number-4">3.4.2</span> Run container as non-root</h4>
+<div id="outline-container-org32df8ad" class="outline-4">
+<h4 id="org32df8ad"><span class="section-number-4">3.4.2</span> Run container as non-root</h4>
 <div class="outline-text-4" id="text-3-4-2">
 <p>
 For example, when a host directory is mounted into the container, if the process running in the container is running as root, <br>
@@ -4725,8 +4727,8 @@ So if anyone tampers with your container images, they won't get far.
 </div>
 
 
-<div id="outline-container-orgddba7ec" class="outline-4">
-<h4 id="orgddba7ec"><span class="section-number-4">3.4.3</span> Run container in privileged mode</h4>
+<div id="outline-container-org1b1503d" class="outline-4">
+<h4 id="org1b1503d"><span class="section-number-4">3.4.3</span> Run container in privileged mode</h4>
 <div class="outline-text-4" id="text-3-4-3">
 <p>
 To get full access to the node's kernel, the pod's container shall run in privileged mode.
@@ -4750,8 +4752,8 @@ To get full access to the node's kernel, the pod's container shall run in privil
 </div>
 
 
-<div id="outline-container-org2082d48" class="outline-4">
-<h4 id="org2082d48"><span class="section-number-4">3.4.4</span> Add individual kernel capabilities</h4>
+<div id="outline-container-orgbd291fb" class="outline-4">
+<h4 id="orgbd291fb"><span class="section-number-4">3.4.4</span> Add individual kernel capabilities</h4>
 <div class="outline-text-4" id="text-3-4-4">
 <p>
 Instead of making a container privileged and giving it unlimited permissions,
@@ -4779,8 +4781,8 @@ a <b>much safer</b> method (from a security perspective) is to give it access on
 </div>
 
 
-<div id="outline-container-org1cb4890" class="outline-4">
-<h4 id="org1cb4890"><span class="section-number-4">3.4.5</span> Drop individual kernel capabilities</h4>
+<div id="outline-container-orgd0f0afb" class="outline-4">
+<h4 id="orgd0f0afb"><span class="section-number-4">3.4.5</span> Drop individual kernel capabilities</h4>
 <div class="outline-text-4" id="text-3-4-5">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -4802,8 +4804,8 @@ a <b>much safer</b> method (from a security perspective) is to give it access on
 </div>
 </div>
 
-<div id="outline-container-orgdbcb349" class="outline-4">
-<h4 id="orgdbcb349"><span class="section-number-4">3.4.6</span> Prevent writing to filesystem</h4>
+<div id="outline-container-orgfef95dc" class="outline-4">
+<h4 id="orgfef95dc"><span class="section-number-4">3.4.6</span> Prevent writing to filesystem</h4>
 <div class="outline-text-4" id="text-3-4-6">
 <p>
 Prevent the processes running in the container from writing to the container’s filesystem, and <b>only allow</b> them to write to mounted volumes.
@@ -4834,8 +4836,8 @@ Prevent the processes running in the container from writing to the container’s
 </div>
 
 
-<div id="outline-container-org5149d86" class="outline-4">
-<h4 id="org5149d86"><span class="section-number-4">3.4.7</span> Share volume among different users</h4>
+<div id="outline-container-org63a108e" class="outline-4">
+<h4 id="org63a108e"><span class="section-number-4">3.4.7</span> Share volume among different users</h4>
 <div class="outline-text-4" id="text-3-4-7">
 <p>
 Kubernetes allows you to specify supplemental groups for all the pods running in the container, allowing them to share files,
@@ -4884,8 +4886,8 @@ fsGroup security context property is used when the process creates files IN A VO
 </div>
 
 
-<div id="outline-container-orgfb98666" class="outline-3">
-<h3 id="orgfb98666"><span class="section-number-3">3.5</span> PodSecurityPolicy</h3>
+<div id="outline-container-orgf83695b" class="outline-3">
+<h3 id="orgf83695b"><span class="section-number-3">3.5</span> PodSecurityPolicy</h3>
 <div class="outline-text-3" id="text-3-5">
 <p>
 PodSecurityPolicy is a <b>cluster-level</b> resource, which defines what security-related features users can or can’t use in their pods.
@@ -4948,12 +4950,12 @@ When creating pods, if ANY POLICY allows you to deploy a pod with certain featur
 </div>
 
 
-<div id="outline-container-org8c9aa60" class="outline-3">
-<h3 id="org8c9aa60"><span class="section-number-3">3.6</span> Inter-Pod Network Isolation</h3>
+<div id="outline-container-orge02d2c1" class="outline-3">
+<h3 id="orge02d2c1"><span class="section-number-3">3.6</span> Inter-Pod Network Isolation</h3>
 <div class="outline-text-3" id="text-3-6">
 </div>
-<div id="outline-container-orge7ee46d" class="outline-4">
-<h4 id="orge7ee46d"><span class="section-number-4">3.6.1</span> Network isolation in a namespace</h4>
+<div id="outline-container-org90819ac" class="outline-4">
+<h4 id="org90819ac"><span class="section-number-4">3.6.1</span> Network isolation in a namespace</h4>
 <div class="outline-text-4" id="text-3-6-1">
 <p>
 When you create this NetworkPolicy in a certain namespace, no one can connect to any pod in that namespace:
@@ -4972,8 +4974,8 @@ When you create this NetworkPolicy in a certain namespace, no one can connect to
 </div>
 
 
-<div id="outline-container-orgb5ec387" class="outline-4">
-<h4 id="orgb5ec387"><span class="section-number-4">3.6.2</span> Allow some pods in a ns to connect</h4>
+<div id="outline-container-org48ab6f8" class="outline-4">
+<h4 id="org48ab6f8"><span class="section-number-4">3.6.2</span> Allow some pods in a ns to connect</h4>
 <div class="outline-text-4" id="text-3-6-2">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: networking.k8s.io/v1
@@ -5011,8 +5013,8 @@ The NetworkPolicy is enforced when con- necting through a Service, AS WELL.
 
 
 
-<div id="outline-container-orgdb36713" class="outline-4">
-<h4 id="orgdb36713"><span class="section-number-4">3.6.3</span> Isolate network between namespaces</h4>
+<div id="outline-container-org842f1ee" class="outline-4">
+<h4 id="org842f1ee"><span class="section-number-4">3.6.3</span> Isolate network between namespaces</h4>
 <div class="outline-text-4" id="text-3-6-3">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: networking.k8s.io/v1
@@ -5042,8 +5044,8 @@ The NetworkPolicy is enforced when con- necting through a Service, AS WELL.
 </div>
 
 
-<div id="outline-container-org17a55b4" class="outline-4">
-<h4 id="org17a55b4"><span class="section-number-4">3.6.4</span> Isolate by CIDR notation</h4>
+<div id="outline-container-org748778f" class="outline-4">
+<h4 id="org748778f"><span class="section-number-4">3.6.4</span> Isolate by CIDR notation</h4>
 <div class="outline-text-4" id="text-3-6-4">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: networking.k8s.io/v1
@@ -5064,8 +5066,8 @@ The NetworkPolicy is enforced when con- necting through a Service, AS WELL.
 </div>
 
 
-<div id="outline-container-org8581edb" class="outline-4">
-<h4 id="org8581edb"><span class="section-number-4">3.6.5</span> Limite outbound traffic</h4>
+<div id="outline-container-org2feae6d" class="outline-4">
+<h4 id="org2feae6d"><span class="section-number-4">3.6.5</span> Limite outbound traffic</h4>
 <div class="outline-text-4" id="text-3-6-5">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">spec</span>:
@@ -5085,12 +5087,12 @@ The NetworkPolicy is enforced when con- necting through a Service, AS WELL.
 </div>
 
 
-<div id="outline-container-org080a1e7" class="outline-2">
-<h2 id="org080a1e7"><span class="section-number-2">4</span> Computation Resources</h2>
+<div id="outline-container-org094aa72" class="outline-2">
+<h2 id="org094aa72"><span class="section-number-2">4</span> Computation Resources</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-orgea915e4" class="outline-3">
-<h3 id="orgea915e4"><span class="section-number-3">4.1</span> Request resources for containers</h3>
+<div id="outline-container-orgfe02889" class="outline-3">
+<h3 id="orgfe02889"><span class="section-number-3">4.1</span> Request resources for containers</h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 When creating a pod, you can specify the amount of CPU and memory that a container needs (these are called <b>requests</b>) and
@@ -5101,8 +5103,8 @@ The pod's resource requests and limits are the <b>sum of the requests and limits
 </div>
 
 
-<div id="outline-container-org6f5b0fa" class="outline-4">
-<h4 id="org6f5b0fa"><span class="section-number-4">4.1.1</span> Create pods with resource requests</h4>
+<div id="outline-container-org519b9db" class="outline-4">
+<h4 id="org519b9db"><span class="section-number-4">4.1.1</span> Create pods with resource requests</h4>
 <div class="outline-text-4" id="text-4-1-1">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -5126,8 +5128,8 @@ REQUESTS don't limit the amount of CPU a container can use.
 </pre>
 </div>
 
-<div id="outline-container-org94e6340" class="outline-5">
-<h5 id="org94e6340"><span class="section-number-5">4.1.1.1</span> How requests affect scheduling</h5>
+<div id="outline-container-org93564a7" class="outline-5">
+<h5 id="org93564a7"><span class="section-number-5">4.1.1.1</span> How requests affect scheduling</h5>
 <div class="outline-text-5" id="text-4-1-1-1">
 <p>
 By specifying resource requests, you're specifying the minimum amount of resources your pod needs.
@@ -5162,8 +5164,8 @@ As soon as the second container needs CPU time, it will get it and the first con
 
 
 
-<div id="outline-container-org77c6e1d" class="outline-3">
-<h3 id="org77c6e1d"><span class="section-number-3">4.2</span> Limit resources for containers</h3>
+<div id="outline-container-orgcd889e9" class="outline-3">
+<h3 id="orgcd889e9"><span class="section-number-3">4.2</span> Limit resources for containers</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
 Without limiting memory, a container (or a pod) running on a worker node may eat up all the available memory and
@@ -5192,8 +5194,8 @@ If you haven’t specified any resource requests, they’ll be set to the SAME V
 </pre>
 </div>
 
-<div id="outline-container-org702bd96" class="outline-4">
-<h4 id="org702bd96"><span class="section-number-4">4.2.1</span> Exceeding limits</h4>
+<div id="outline-container-orgc4bcdcc" class="outline-4">
+<h4 id="orgc4bcdcc"><span class="section-number-4">4.2.1</span> Exceeding limits</h4>
 <div class="outline-text-4" id="text-4-2-1">
 <p>
 Unlike resource requests, resource limits <b>aren't constrained</b> by the node's allocatable resource amounts. <br>
@@ -5252,8 +5254,8 @@ You get the configured CPU limit by reading the following files:
 
 
 
-<div id="outline-container-org0448b71" class="outline-3">
-<h3 id="org0448b71"><span class="section-number-3">4.3</span> Pod QoS classes</h3>
+<div id="outline-container-org692225c" class="outline-3">
+<h3 id="org692225c"><span class="section-number-3">4.3</span> Pod QoS classes</h3>
 <div class="outline-text-3" id="text-4-3">
 <p>
 Kubernetes makes priority by categorizing pods into three Quality of Service (QoS) classes:
@@ -5280,8 +5282,8 @@ QoS classes are a PROPERTY OF PODS, not containers.
 </pre>
 </div>
 
-<div id="outline-container-org089d67f" class="outline-4">
-<h4 id="org089d67f"><span class="section-number-4">4.3.1</span> Kill Pod according to QoS</h4>
+<div id="outline-container-orga306a32" class="outline-4">
+<h4 id="orga306a32"><span class="section-number-4">4.3.1</span> Kill Pod according to QoS</h4>
 <div class="outline-text-4" id="text-4-3-1">
 
 <div class="figure">
@@ -5294,8 +5296,8 @@ QoS classes are a PROPERTY OF PODS, not containers.
 
 
 
-<div id="outline-container-org2dfc009" class="outline-3">
-<h3 id="org2dfc009"><span class="section-number-3">4.4</span> Set default requests/limits for pods per ns</h3>
+<div id="outline-container-orgd1f4884" class="outline-3">
+<h3 id="orgd1f4884"><span class="section-number-3">4.4</span> Set default requests/limits for pods per ns</h3>
 <div class="outline-text-3" id="text-4-4">
 
 <div class="figure">
@@ -5349,8 +5351,8 @@ LimitRange apply to the SUM of all the pod's containers' requests and limits.
 
 
 
-<div id="outline-container-org0462034" class="outline-3">
-<h3 id="org0462034"><span class="section-number-3">4.5</span> Limit total resources available in ns</h3>
+<div id="outline-container-orgc3c5ff0" class="outline-3">
+<h3 id="orgc3c5ff0"><span class="section-number-3">4.5</span> Limit total resources available in ns</h3>
 <div class="outline-text-3" id="text-4-5">
 <p>
 ResourceQuota Admission Control plugin checks whether the pod being created would cause the configured ResourceQuota to be exceeded. <br>
@@ -5373,8 +5375,8 @@ If ResourceQuota is created, LimitRange shall be also created ALONG WITH IT.
 </pre>
 </div>
 
-<div id="outline-container-org7c25709" class="outline-4">
-<h4 id="org7c25709"><span class="section-number-4">4.5.1</span> For CPU and Memory</h4>
+<div id="outline-container-org3f75c31" class="outline-4">
+<h4 id="org3f75c31"><span class="section-number-4">4.5.1</span> For CPU and Memory</h4>
 <div class="outline-text-4" id="text-4-5-1">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -5400,8 +5402,8 @@ That's why having a LimitRange with defaults for those resources can make life a
 </div>
 
 
-<div id="outline-container-org0cedeac" class="outline-4">
-<h4 id="org0cedeac"><span class="section-number-4">4.5.2</span> For persistent storage</h4>
+<div id="outline-container-org582304e" class="outline-4">
+<h4 id="org582304e"><span class="section-number-4">4.5.2</span> For persistent storage</h4>
 <div class="outline-text-4" id="text-4-5-2">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -5418,8 +5420,8 @@ That's why having a LimitRange with defaults for those resources can make life a
 </div>
 </div>
 
-<div id="outline-container-org46219f2" class="outline-4">
-<h4 id="org46219f2"><span class="section-number-4">4.5.3</span> For number of objects</h4>
+<div id="outline-container-orgccb7293" class="outline-4">
+<h4 id="orgccb7293"><span class="section-number-4">4.5.3</span> For number of objects</h4>
 <div class="outline-text-4" id="text-4-5-3">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -5442,8 +5444,8 @@ That's why having a LimitRange with defaults for those resources can make life a
 </div>
 </div>
 
-<div id="outline-container-org225bb44" class="outline-4">
-<h4 id="org225bb44"><span class="section-number-4">4.5.4</span> For pod states and/or QoS classes</h4>
+<div id="outline-container-org2090663" class="outline-4">
+<h4 id="org2090663"><span class="section-number-4">4.5.4</span> For pod states and/or QoS classes</h4>
 <div class="outline-text-4" id="text-4-5-4">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -5464,8 +5466,8 @@ That's why having a LimitRange with defaults for those resources can make life a
 
 
 
-<div id="outline-container-orgd5d3862" class="outline-3">
-<h3 id="orgd5d3862"><span class="section-number-3">4.6</span> Resource usage Monitoring</h3>
+<div id="outline-container-org8040b4f" class="outline-3">
+<h3 id="org8040b4f"><span class="section-number-3">4.6</span> Resource usage Monitoring</h3>
 <div class="outline-text-3" id="text-4-6">
 <p>
 Kubelet itself contains an agent called <span class="underline">cAdvisor</span>, which performs the basic collection of resource consumption data for both
@@ -5508,8 +5510,8 @@ kubectl top pod --containers
 </div>
 </div>
 
-<div id="outline-container-org639c21c" class="outline-4">
-<h4 id="org639c21c"><span class="section-number-4">4.6.1</span> Analyzing resource usage with Grafana</h4>
+<div id="outline-container-orgbabeb77" class="outline-4">
+<h4 id="orgbabeb77"><span class="section-number-4">4.6.1</span> Analyzing resource usage with Grafana</h4>
 <div class="outline-text-4" id="text-4-6-1">
 <div class="org-src-container">
 <pre class="src src-sh">$ kubectl cluster-info
@@ -5538,12 +5540,12 @@ Opening kubernetes service kube-system/monitoring-grafana<span style="color: #d7
 </div>
 
 
-<div id="outline-container-orgc994b5b" class="outline-2">
-<h2 id="orgc994b5b"><span class="section-number-2">5</span> AutoScaling</h2>
+<div id="outline-container-orgc59dda5" class="outline-2">
+<h2 id="orgc59dda5"><span class="section-number-2">5</span> AutoScaling</h2>
 <div class="outline-text-2" id="text-5">
 </div>
-<div id="outline-container-org1709f6b" class="outline-3">
-<h3 id="org1709f6b"><span class="section-number-3">5.1</span> Horizontal pod autoscaling</h3>
+<div id="outline-container-org7a93781" class="outline-3">
+<h3 id="org7a93781"><span class="section-number-3">5.1</span> Horizontal pod autoscaling</h3>
 <div class="outline-text-3" id="text-5-1">
 <p>
 Horizontal pod autoscaling is the automatic scaling of the number of pod replicas managed by a controller. <br>
@@ -5555,8 +5557,8 @@ Pods' containers' memory consumption isn't a good metric for autoscaling.
 </pre>
 </div>
 
-<div id="outline-container-orgcad1b4b" class="outline-4">
-<h4 id="orgcad1b4b"><span class="section-number-4">5.1.1</span> Autoscaling process</h4>
+<div id="outline-container-org05db43d" class="outline-4">
+<h4 id="org05db43d"><span class="section-number-4">5.1.1</span> Autoscaling process</h4>
 <div class="outline-text-4" id="text-5-1-1">
 <p>
 The autoscaling process can be split into <b>three steps</b>:
@@ -5604,8 +5606,8 @@ Currently the only objects you can attach an Autoscaler to:
 </ul>
 </div>
 
-<div id="outline-container-org4e9415b" class="outline-5">
-<h5 id="org4e9415b"><span class="section-number-5">5.1.1.1</span> Whole picture</h5>
+<div id="outline-container-org17fca35" class="outline-5">
+<h5 id="org17fca35"><span class="section-number-5">5.1.1.1</span> Whole picture</h5>
 <div class="outline-text-5" id="text-5-1-1-1">
 
 <div class="figure">
@@ -5619,8 +5621,8 @@ Currently the only objects you can attach an Autoscaler to:
 
 
 
-<div id="outline-container-org095a4b7" class="outline-5">
-<h5 id="org095a4b7"><span class="section-number-5">5.1.1.2</span> CPU utilization</h5>
+<div id="outline-container-org76e86d5" class="outline-5">
+<h5 id="org76e86d5"><span class="section-number-5">5.1.1.2</span> CPU utilization</h5>
 <div class="outline-text-5" id="text-5-1-1-2">
 <p>
 As far as the Autoscaler is concerned, only the pod's guaranteed CPU amount (the CPU requests) is concerned when determining the CPU utilization of a pod.
@@ -5634,8 +5636,8 @@ which means the pods you're autoscaling <span class="underline">need to have CPU
 </div>
 
 
-<div id="outline-container-org3a8f7f5" class="outline-5">
-<h5 id="org3a8f7f5"><span class="section-number-5">5.1.1.3</span> Maximum rate of scaling</h5>
+<div id="outline-container-orge459d74" class="outline-5">
+<h5 id="orge459d74"><span class="section-number-5">5.1.1.3</span> Maximum rate of scaling</h5>
 <div class="outline-text-5" id="text-5-1-1-3">
 <p>
 The autoscaler will <b>at most</b> double the number of replicas in a single operation, <span class="underline">if more than two current replicas exist</span>. <br>
@@ -5650,8 +5652,8 @@ A scale-down event is performed <b>every five minutes</b>.
 </div>
 </div>
 
-<div id="outline-container-org94e2774" class="outline-4">
-<h4 id="org94e2774"><span class="section-number-4">5.1.2</span> Create HorizontalPodAutoscaler</h4>
+<div id="outline-container-org18770f8" class="outline-4">
+<h4 id="org18770f8"><span class="section-number-4">5.1.2</span> Create HorizontalPodAutoscaler</h4>
 <div class="outline-text-4" id="text-5-1-2">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl autoscale deployment &lt;name&gt; --cpu-percent=30 --min=1 --max=5
@@ -5662,20 +5664,20 @@ A scale-down event is performed <b>every five minutes</b>.
 </div>
 
 
-<div id="outline-container-org40e4f1b" class="outline-3">
-<h3 id="org40e4f1b"><span class="section-number-3">5.2</span> Horizontal node autoscaling</h3>
+<div id="outline-container-orgb9056e3" class="outline-3">
+<h3 id="orgb9056e3"><span class="section-number-3">5.2</span> Horizontal node autoscaling</h3>
 <div class="outline-text-3" id="text-5-2">
 </div>
-<div id="outline-container-org5d6827c" class="outline-4">
-<h4 id="org5d6827c"><span class="section-number-4">5.2.1</span> ClusterAutoscaler</h4>
+<div id="outline-container-org66d176a" class="outline-4">
+<h4 id="org66d176a"><span class="section-number-4">5.2.1</span> ClusterAutoscaler</h4>
 <div class="outline-text-4" id="text-5-2-1">
 <p>
 Cluster Autoscaler looks out for such pods and asks the <b>cloud provider</b> to start up an additional node.
 </p>
 </div>
 
-<div id="outline-container-org23201a4" class="outline-5">
-<h5 id="org23201a4"><span class="section-number-5">5.2.1.1</span> Scaling up case</h5>
+<div id="outline-container-org9d8f090" class="outline-5">
+<h5 id="org9d8f090"><span class="section-number-5">5.2.1.1</span> Scaling up case</h5>
 <div class="outline-text-5" id="text-5-2-1-1">
 
 <div class="figure">
@@ -5691,8 +5693,8 @@ From then on, the node is part of the Kubernetes cluster and pods can be schedul
 </div>
 </div>
 
-<div id="outline-container-org35f7318" class="outline-5">
-<h5 id="org35f7318"><span class="section-number-5">5.2.1.2</span> Scaling down case</h5>
+<div id="outline-container-orgd7188b6" class="outline-5">
+<h5 id="orgd7188b6"><span class="section-number-5">5.2.1.2</span> Scaling down case</h5>
 <div class="outline-text-5" id="text-5-2-1-2">
 <p>
 A node will only be returned to the cloud provider if the Cluster Autoscaler knows
@@ -5709,8 +5711,8 @@ Because all those pods belong to ReplicaSets or other controllers, their replace
 </div>
 
 
-<div id="outline-container-orgaa56ff0" class="outline-4">
-<h4 id="orgaa56ff0"><span class="section-number-4">5.2.2</span> Manually cordon and drain nodes</h4>
+<div id="outline-container-org894ec90" class="outline-4">
+<h4 id="org894ec90"><span class="section-number-4">5.2.2</span> Manually cordon and drain nodes</h4>
 <div class="outline-text-4" id="text-5-2-2">
 <p>
 A node can also be marked as <code>unschedulable</code> and <code>drained</code> manually.
@@ -5744,8 +5746,8 @@ In both cases, no new pods are scheduled to the node UNTIL YOU UNCORDON IT AGAIN
 </div>
 
 
-<div id="outline-container-org32a02b7" class="outline-4">
-<h4 id="org32a02b7"><span class="section-number-4">5.2.3</span> PodDisruptionBudget</h4>
+<div id="outline-container-org92a61e0" class="outline-4">
+<h4 id="org92a61e0"><span class="section-number-4">5.2.3</span> PodDisruptionBudget</h4>
 <div class="outline-text-4" id="text-5-2-3">
 <p>
 PodDisruptionBudget specifies <b>minimum number of pods</b> that need to keep running while performing scaling-down operations.
@@ -5762,16 +5764,16 @@ waiting for the evicted pod to be replaced with a new one by the ReplicaSet cont
 </div>
 
 
-<div id="outline-container-org8dcdd48" class="outline-2">
-<h2 id="org8dcdd48"><span class="section-number-2">6</span> Scheduling</h2>
+<div id="outline-container-orgb2fd07f" class="outline-2">
+<h2 id="orgb2fd07f"><span class="section-number-2">6</span> Scheduling</h2>
 <div class="outline-text-2" id="text-6">
 </div>
-<div id="outline-container-org6b3a550" class="outline-3">
-<h3 id="org6b3a550"><span class="section-number-3">6.1</span> Node Affinity</h3>
+<div id="outline-container-orgaa8f296" class="outline-3">
+<h3 id="orgaa8f296"><span class="section-number-3">6.1</span> Node Affinity</h3>
 <div class="outline-text-3" id="text-6-1">
 </div>
-<div id="outline-container-org510d376" class="outline-4">
-<h4 id="org510d376"><span class="section-number-4">6.1.1</span> Hard</h4>
+<div id="outline-container-org8fa12ae" class="outline-4">
+<h4 id="org8fa12ae"><span class="section-number-4">6.1.1</span> Hard</h4>
 <div class="outline-text-4" id="text-6-1-1">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: v1
@@ -5802,8 +5804,8 @@ That's why all the rules right now always END WITH IgnoredDuringExecution.
 </div>
 
 
-<div id="outline-container-orgfa7e20b" class="outline-4">
-<h4 id="orgfa7e20b"><span class="section-number-4">6.1.2</span> Prioritizing</h4>
+<div id="outline-container-orgcf723c5" class="outline-4">
+<h4 id="orgcf723c5"><span class="section-number-4">6.1.2</span> Prioritizing</h4>
 <div class="outline-text-4" id="text-6-1-2">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: extensions/v1beta1
@@ -5853,12 +5855,12 @@ That's why all the rules right now always END WITH IgnoredDuringExecution.
 </div>
 
 
-<div id="outline-container-org590fad9" class="outline-3">
-<h3 id="org590fad9"><span class="section-number-3">6.2</span> Pod Affinity</h3>
+<div id="outline-container-org7348ce5" class="outline-3">
+<h3 id="org7348ce5"><span class="section-number-3">6.2</span> Pod Affinity</h3>
 <div class="outline-text-3" id="text-6-2">
 </div>
-<div id="outline-container-org6b52f47" class="outline-4">
-<h4 id="org6b52f47"><span class="section-number-4">6.2.1</span> Hard</h4>
+<div id="outline-container-orgd9def05" class="outline-4">
+<h4 id="orgd9def05"><span class="section-number-4">6.2.1</span> Hard</h4>
 <div class="outline-text-4" id="text-6-2-1">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: extensions/v1beta1
@@ -5911,8 +5913,8 @@ the frontend pods' affinity rules would be broken.
 
 
 
-<div id="outline-container-org17173bd" class="outline-4">
-<h4 id="org17173bd"><span class="section-number-4">6.2.2</span> Prioritizing</h4>
+<div id="outline-container-org2ded65c" class="outline-4">
+<h4 id="org2ded65c"><span class="section-number-4">6.2.2</span> Prioritizing</h4>
 <div class="outline-text-4" id="text-6-2-2">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">apiVersion</span>: extensions/v1beta1
@@ -5949,20 +5951,20 @@ the frontend pods' affinity rules would be broken.
 </div>
 
 
-<div id="outline-container-org3e0e3a6" class="outline-2">
-<h2 id="org3e0e3a6"><span class="section-number-2">7</span> Utils</h2>
+<div id="outline-container-org9fb4488" class="outline-2">
+<h2 id="org9fb4488"><span class="section-number-2">7</span> Utils</h2>
 <div class="outline-text-2" id="text-7">
 </div>
-<div id="outline-container-org356d158" class="outline-3">
-<h3 id="org356d158"><span class="section-number-3">7.1</span> YAML Basic</h3>
+<div id="outline-container-org56410e0" class="outline-3">
+<h3 id="org56410e0"><span class="section-number-3">7.1</span> YAML Basic</h3>
 <div class="outline-text-3" id="text-7-1">
 <p>
 <a href="https://plugins.jetbrains.com/plugin/9354-kubernetes-and-openshift-resource-support">IDEA Kubernetes YAML 插件</a>
 </p>
 </div>
 
-<div id="outline-container-org7e9322d" class="outline-4">
-<h4 id="org7e9322d"><span class="section-number-4">7.1.1</span> Key Value Pair</h4>
+<div id="outline-container-orgb48d767" class="outline-4">
+<h4 id="orgb48d767"><span class="section-number-4">7.1.1</span> Key Value Pair</h4>
 <div class="outline-text-4" id="text-7-1-1">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">fruit</span>: apple
@@ -5975,8 +5977,8 @@ the frontend pods' affinity rules would be broken.
 </div>
 
 
-<div id="outline-container-org3de5b46" class="outline-4">
-<h4 id="org3de5b46"><span class="section-number-4">7.1.2</span> Array / List</h4>
+<div id="outline-container-org120edac" class="outline-4">
+<h4 id="org120edac"><span class="section-number-4">7.1.2</span> Array / List</h4>
 <div class="outline-text-4" id="text-7-1-2">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">fruits</span>:
@@ -5994,8 +5996,8 @@ the frontend pods' affinity rules would be broken.
 </div>
 
 
-<div id="outline-container-orga8cc287" class="outline-4">
-<h4 id="orga8cc287"><span class="section-number-4">7.1.3</span> Dictionary / Map</h4>
+<div id="outline-container-orgcf3bf1f" class="outline-4">
+<h4 id="orgcf3bf1f"><span class="section-number-4">7.1.3</span> Dictionary / Map</h4>
 <div class="outline-text-4" id="text-7-1-3">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">banana</span>:
@@ -6016,8 +6018,8 @@ the frontend pods' affinity rules would be broken.
 
 
 
-<div id="outline-container-orgb805d1a" class="outline-3">
-<h3 id="orgb805d1a"><span class="section-number-3">7.2</span> Bash completion</h3>
+<div id="outline-container-orgd85f4c2" class="outline-3">
+<h3 id="orgd85f4c2"><span class="section-number-3">7.2</span> Bash completion</h3>
 <div class="outline-text-3" id="text-7-2">
 <div class="org-src-container">
 <pre class="src src-sh"><span style="color: #5fafff; font-weight: bold;">source</span> &lt;<span style="color: #ff8c00; font-size: 150%;">(</span>kubectl completion bash | sed s/kubectl/&lt;your_alias&gt;/g<span style="color: #ff8c00; font-size: 150%;">)</span>
@@ -6027,8 +6029,8 @@ the frontend pods' affinity rules would be broken.
 </div>
 
 
-<div id="outline-container-org5ab86ba" class="outline-3">
-<h3 id="org5ab86ba"><span class="section-number-3">7.3</span> Show all supported resources</h3>
+<div id="outline-container-orgcb09c98" class="outline-3">
+<h3 id="orgcb09c98"><span class="section-number-3">7.3</span> Show all supported resources</h3>
 <div class="outline-text-3" id="text-7-3">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl get
@@ -6038,8 +6040,8 @@ the frontend pods' affinity rules would be broken.
 </div>
 
 
-<div id="outline-container-orgc889c7d" class="outline-3">
-<h3 id="orgc889c7d"><span class="section-number-3">7.4</span> Expose pod through Service</h3>
+<div id="outline-container-org22bbc80" class="outline-3">
+<h3 id="org22bbc80"><span class="section-number-3">7.4</span> Expose pod through Service</h3>
 <div class="outline-text-3" id="text-7-4">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl expose deployment &lt;name&gt; --port=80 --target-port=8080
@@ -6049,8 +6051,8 @@ the frontend pods' affinity rules would be broken.
 </div>
 
 
-<div id="outline-container-orgbaf370c" class="outline-3">
-<h3 id="orgbaf370c"><span class="section-number-3">7.5</span> Run Temporary Pod</h3>
+<div id="outline-container-orgfee4145" class="outline-3">
+<h3 id="orgfee4145"><span class="section-number-3">7.5</span> Run Temporary Pod</h3>
 <div class="outline-text-3" id="text-7-5">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl run -it srvlookup --image=tutum/dnsutils --rm --restart=Never -- dig SRV kubia.default.svc.cluster.local
@@ -6065,8 +6067,8 @@ which is attached to the console (-it) and is deleted as soon as it terminates (
 </div>
 
 
-<div id="outline-container-org95a931a" class="outline-3">
-<h3 id="org95a931a"><span class="section-number-3">7.6</span> Discover possible API object fields</h3>
+<div id="outline-container-orga985415" class="outline-3">
+<h3 id="orga985415"><span class="section-number-3">7.6</span> Discover possible API object fields</h3>
 <div class="outline-text-3" id="text-7-6">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl explain pods
@@ -6086,8 +6088,8 @@ You can then drill deeper to find out more about each attribute.
 
 
 
-<div id="outline-container-orge08b5ae" class="outline-3">
-<h3 id="orge08b5ae"><span class="section-number-3">7.7</span> Forward local network port to port in the pod</h3>
+<div id="outline-container-org7e0a10d" class="outline-3">
+<h3 id="org7e0a10d"><span class="section-number-3">7.7</span> Forward local network port to port in the pod</h3>
 <div class="outline-text-3" id="text-7-7">
 <p>
 Using port forwarding like this is an effective way to test an individual pod.
@@ -6101,8 +6103,8 @@ Using port forwarding like this is an effective way to test an individual pod.
 </div>
 
 
-<div id="outline-container-orga45345d" class="outline-3">
-<h3 id="orga45345d"><span class="section-number-3">7.8</span> Communicate with Pods through API Server</h3>
+<div id="outline-container-org6d859cc" class="outline-3">
+<h3 id="org6d859cc"><span class="section-number-3">7.8</span> Communicate with Pods through API Server</h3>
 <div class="outline-text-3" id="text-7-8">
 <p>
 One useful feature of the API server is the ability to proxy connections directly to individual pods. <br>
@@ -6116,8 +6118,8 @@ If you want to perform requests against your kubia-0 pod, you hit the following 
 </div>
 
 
-<div id="outline-container-org02a853d" class="outline-3">
-<h3 id="org02a853d"><span class="section-number-3">7.9</span> Connect to Services through API Server</h3>
+<div id="outline-container-orgb6545c6" class="outline-3">
+<h3 id="orgb6545c6"><span class="section-number-3">7.9</span> Connect to Services through API Server</h3>
 <div class="outline-text-3" id="text-7-9">
 <p>
 Instead of using a piggyback pod to access the service from inside the cluster, <br>
@@ -6132,8 +6134,8 @@ you can use the same proxy feature provided by the API server to access the serv
 </div>
 
 
-<div id="outline-container-orgdf52bb3" class="outline-3">
-<h3 id="orgdf52bb3"><span class="section-number-3">7.10</span> Obtain the log of crashed container</h3>
+<div id="outline-container-orgd8d3281" class="outline-3">
+<h3 id="orgd8d3281"><span class="section-number-3">7.10</span> Obtain the log of crashed container</h3>
 <div class="outline-text-3" id="text-7-10">
 <p>
 You can print the application’s log with kubectl logs. If your container is restarted, the kubectl logs command will show the log of the current container.
@@ -6152,8 +6154,8 @@ This can be done by using the <code>--previous</code> option:
 </div>
 
 
-<div id="outline-container-org70dc1e2" class="outline-3">
-<h3 id="org70dc1e2"><span class="section-number-3">7.11</span> Get IPs of all nodes</h3>
+<div id="outline-container-orgdb26896" class="outline-3">
+<h3 id="orgdb26896"><span class="section-number-3">7.11</span> Get IPs of all nodes</h3>
 <div class="outline-text-3" id="text-7-11">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl get nodes -o <span style="color: #5fafff;">jsonpath</span>=<span style="color: #87af5f;">'{.items[*].status.addresses[?(@.type=="ExternalIP")].address}'</span>
@@ -6167,12 +6169,12 @@ To learn more about how to use JSONPath with kubectl, refer to the [To learn mor
 </div>
 
 
-<div id="outline-container-orgdd53410" class="outline-3">
-<h3 id="orgdd53410"><span class="section-number-3">7.12</span> Talking to API Server</h3>
+<div id="outline-container-orgf3070f8" class="outline-3">
+<h3 id="orgf3070f8"><span class="section-number-3">7.12</span> Talking to API Server</h3>
 <div class="outline-text-3" id="text-7-12">
 </div>
-<div id="outline-container-org8a433a8" class="outline-4">
-<h4 id="org8a433a8"><span class="section-number-4">7.12.1</span> kubectl proxy</h4>
+<div id="outline-container-orgd755a36" class="outline-4">
+<h4 id="orgd755a36"><span class="section-number-4">7.12.1</span> kubectl proxy</h4>
 <div class="outline-text-4" id="text-7-12-1">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl proxy --port 8081
@@ -6187,8 +6189,8 @@ To learn more about how to use JSONPath with kubectl, refer to the [To learn mor
 </div>
 
 
-<div id="outline-container-org49ca9db" class="outline-4">
-<h4 id="org49ca9db"><span class="section-number-4">7.12.2</span> From in POD</h4>
+<div id="outline-container-org3fb027f" class="outline-4">
+<h4 id="org3fb027f"><span class="section-number-4">7.12.2</span> From in POD</h4>
 <div class="outline-text-4" id="text-7-12-2">
 <div class="org-src-container">
 <pre class="src src-sh"><span style="color: #5fafff; font-weight: bold;">export</span> <span style="color: #5fafff;">CURL_CA_BUNDLE</span>=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
@@ -6223,12 +6225,12 @@ Using Ambassador Container
 </div>
 
 
-<div id="outline-container-orgec787b6" class="outline-3">
-<h3 id="orgec787b6"><span class="section-number-3">7.13</span> Modify Deployments and other resources</h3>
+<div id="outline-container-org4c8a7da" class="outline-3">
+<h3 id="org4c8a7da"><span class="section-number-3">7.13</span> Modify Deployments and other resources</h3>
 <div class="outline-text-3" id="text-7-13">
 </div>
-<div id="outline-container-org9414882" class="outline-4">
-<h4 id="org9414882"><span class="section-number-4">7.13.1</span> edit</h4>
+<div id="outline-container-org3a73d9e" class="outline-4">
+<h4 id="org3a73d9e"><span class="section-number-4">7.13.1</span> edit</h4>
 <div class="outline-text-4" id="text-7-13-1">
 <p>
 Opens the object's manifest in your default editor. <br>
@@ -6242,8 +6244,8 @@ Example: <code>kubectl edit deployment kubia</code>
 </div>
 
 
-<div id="outline-container-orgd1b4b20" class="outline-4">
-<h4 id="orgd1b4b20"><span class="section-number-4">7.13.2</span> patch</h4>
+<div id="outline-container-orgc322434" class="outline-4">
+<h4 id="orgc322434"><span class="section-number-4">7.13.2</span> patch</h4>
 <div class="outline-text-4" id="text-7-13-2">
 <p>
 Modifies individual properties of an object. <br>
@@ -6258,8 +6260,8 @@ Example:
 </div>
 
 
-<div id="outline-container-orgcf61daf" class="outline-4">
-<h4 id="orgcf61daf"><span class="section-number-4">7.13.3</span> apply</h4>
+<div id="outline-container-org8765ee2" class="outline-4">
+<h4 id="org8765ee2"><span class="section-number-4">7.13.3</span> apply</h4>
 <div class="outline-text-4" id="text-7-13-3">
 <p>
 Modifies the object by applying property values from a full YAML or JSON file. <br>
@@ -6275,8 +6277,8 @@ Example: <code>kubectl apply -f kubia-deployment-v2.yaml</code>
 </div>
 
 
-<div id="outline-container-orgc245844" class="outline-4">
-<h4 id="orgc245844"><span class="section-number-4">7.13.4</span> replace</h4>
+<div id="outline-container-orgf3238a3" class="outline-4">
+<h4 id="orgf3238a3"><span class="section-number-4">7.13.4</span> replace</h4>
 <div class="outline-text-4" id="text-7-13-4">
 <p>
 Replaces the object with a new one from a YAML/JSON file. <br>
@@ -6289,8 +6291,8 @@ Example: <code>kubectl replace -f kubia-deployment-v2.yaml</code>
 </div>
 </div>
 
-<div id="outline-container-org95cb2cc" class="outline-4">
-<h4 id="org95cb2cc"><span class="section-number-4">7.13.5</span> set image</h4>
+<div id="outline-container-orga7bca22" class="outline-4">
+<h4 id="orga7bca22"><span class="section-number-4">7.13.5</span> set image</h4>
 <div class="outline-text-4" id="text-7-13-5">
 <p>
 Changes the container image defined in a Pod, ReplicationController's template, Deployment, DaemonSet, Job, or ReplicaSet.
@@ -6304,8 +6306,8 @@ Example: <code>kubectl set image deployment kubia nodejs=luksa/kubia:v2</code>
 </div>
 
 
-<div id="outline-container-orgc2fc12a" class="outline-3">
-<h3 id="orgc2fc12a"><span class="section-number-3">7.14</span> Check status of Control Plane components</h3>
+<div id="outline-container-org7f23508" class="outline-3">
+<h3 id="org7f23508"><span class="section-number-3">7.14</span> Check status of Control Plane components</h3>
 <div class="outline-text-3" id="text-7-14">
 <div class="org-src-container">
 <pre class="src src-sh">$ kubectl get componentstatuses
@@ -6320,8 +6322,8 @@ etcd-0               Healthy   <span style="color: #ff8c00; font-size: 150%;">{<
 </div>
 
 
-<div id="outline-container-org9a9c30d" class="outline-3">
-<h3 id="org9a9c30d"><span class="section-number-3">7.15</span> WATCHING Resources</h3>
+<div id="outline-container-org9ae5c96" class="outline-3">
+<h3 id="org9ae5c96"><span class="section-number-3">7.15</span> WATCHING Resources</h3>
 <div class="outline-text-3" id="text-7-15">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl get po --watch
@@ -6331,8 +6333,8 @@ etcd-0               Healthy   <span style="color: #ff8c00; font-size: 150%;">{<
 </div>
 
 
-<div id="outline-container-orgeb13f8c" class="outline-3">
-<h3 id="orgeb13f8c"><span class="section-number-3">7.16</span> Observing cluster events</h3>
+<div id="outline-container-orgcb2b057" class="outline-3">
+<h3 id="orgcb2b057"><span class="section-number-3">7.16</span> Observing cluster events</h3>
 <div class="outline-text-3" id="text-7-16">
 <p>
 Both the Control Plane components and the Kubelet <b>emit events to the API server as they perform these actions.</b>
@@ -6355,8 +6357,8 @@ Watching events with the <code>--watch</code> option is much easier on the eyes 
 </div>
 
 
-<div id="outline-container-org19c4615" class="outline-3">
-<h3 id="org19c4615"><span class="section-number-3">7.17</span> Forcely shutdown pod</h3>
+<div id="outline-container-org0a431de" class="outline-3">
+<h3 id="org0a431de"><span class="section-number-3">7.17</span> Forcely shutdown pod</h3>
 <div class="outline-text-3" id="text-7-17">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl delete po mypod --grace-period=0 --force
@@ -6365,8 +6367,8 @@ Watching events with the <code>--watch</code> option is much easier on the eyes 
 </div>
 </div>
 
-<div id="outline-container-org88f8369" class="outline-3">
-<h3 id="org88f8369"><span class="section-number-3">7.18</span> Copy file from/to container</h3>
+<div id="outline-container-orgcb903bd" class="outline-3">
+<h3 id="orgcb903bd"><span class="section-number-3">7.18</span> Copy file from/to container</h3>
 <div class="outline-text-3" id="text-7-18">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl cp foo-pod:/var/log/foo.log foo.log
@@ -6377,8 +6379,8 @@ kubectl cp localfile foo-pod:/etc/remotefile
 </div>
 
 
-<div id="outline-container-orgd17425d" class="outline-3">
-<h3 id="orgd17425d"><span class="section-number-3">7.19</span> Mounting local files into the minikube vm</h3>
+<div id="outline-container-orge4f57c0" class="outline-3">
+<h3 id="orge4f57c0"><span class="section-number-3">7.19</span> Mounting local files into the minikube vm</h3>
 <div class="outline-text-3" id="text-7-19">
 <p>
 You can mount your local filesystem into the Minikube VM using the <code>minikube mount</code> command and then
@@ -6392,8 +6394,8 @@ See <a href="https://github.com/kubernetes/minikube/tree/master/docs">documentat
 </div>
 
 
-<div id="outline-container-orgfd71a3e" class="outline-3">
-<h3 id="orgfd71a3e"><span class="section-number-3">7.20</span> Using minikube docker daemon</h3>
+<div id="outline-container-org6003e64" class="outline-3">
+<h3 id="org6003e64"><span class="section-number-3">7.20</span> Using minikube docker daemon</h3>
 <div class="outline-text-3" id="text-7-20">
 <div class="org-src-container">
 <pre class="src src-sh"><span style="color: #5fafff; font-weight: bold;">eval</span> $<span style="color: #ff8c00; font-size: 150%;">(</span><span style="color: #fa8072;">minikube</span> docker-env<span style="color: #ff8c00; font-size: 150%;">)</span>
@@ -6402,8 +6404,8 @@ See <a href="https://github.com/kubernetes/minikube/tree/master/docs">documentat
 </div>
 </div>
 
-<div id="outline-container-orgc91a2cf" class="outline-3">
-<h3 id="orgc91a2cf"><span class="section-number-3">7.21</span> Build images locally and load remotely</h3>
+<div id="outline-container-orge583028" class="outline-3">
+<h3 id="orge583028"><span class="section-number-3">7.21</span> Build images locally and load remotely</h3>
 <div class="outline-text-3" id="text-7-21">
 <div class="org-src-container">
 <pre class="src src-sh">docker save &lt;image&gt; | <span style="color: #ff8c00; font-size: 150%;">(</span><span style="color: #5fafff; font-weight: bold;">eval</span> $<span style="color: #ff1493; font-size: 140%;">(</span><span style="color: #fa8072;">minikube</span> docker-env<span style="color: #ff1493; font-size: 140%;">)</span> &amp;&amp; docker load<span style="color: #ff8c00; font-size: 150%;">)</span>
@@ -6413,12 +6415,12 @@ See <a href="https://github.com/kubernetes/minikube/tree/master/docs">documentat
 </div>
 
 
-<div id="outline-container-org1c27d24" class="outline-3">
-<h3 id="org1c27d24"><span class="section-number-3">7.22</span> <code>kubectl config</code></h3>
+<div id="outline-container-org94ae6d1" class="outline-3">
+<h3 id="org94ae6d1"><span class="section-number-3">7.22</span> <code>kubectl config</code></h3>
 <div class="outline-text-3" id="text-7-22">
 </div>
-<div id="outline-container-orge65e331" class="outline-4">
-<h4 id="orge65e331"><span class="section-number-4">7.22.1</span> Location of kubeconfig file</h4>
+<div id="outline-container-orgb619379" class="outline-4">
+<h4 id="orgb619379"><span class="section-number-4">7.22.1</span> Location of kubeconfig file</h4>
 <div class="outline-text-4" id="text-7-22-1">
 <p>
 You can use multiple config files and have kubectl use them all at once by specifying all of them in the <code>KUBECONFIG</code> environment variable
@@ -6427,8 +6429,8 @@ You can use multiple config files and have kubectl use them all at once by speci
 </div>
 </div>
 
-<div id="outline-container-orgfb3fb78" class="outline-4">
-<h4 id="orgfb3fb78"><span class="section-number-4">7.22.2</span> Contents of kubeconfig file</h4>
+<div id="outline-container-orgf865b23" class="outline-4">
+<h4 id="orgf865b23"><span class="section-number-4">7.22.2</span> Contents of kubeconfig file</h4>
 <div class="outline-text-4" id="text-7-22-2">
 
 <div class="figure">
@@ -6458,8 +6460,8 @@ at any given time <span class="underline">only one of them</span> is the current
 </div>
 </div>
 
-<div id="outline-container-orge4c9f1d" class="outline-4">
-<h4 id="orge4c9f1d"><span class="section-number-4">7.22.3</span> Use cluster from local machine</h4>
+<div id="outline-container-orgc3df5bb" class="outline-4">
+<h4 id="orgc3df5bb"><span class="section-number-4">7.22.3</span> Use cluster from local machine</h4>
 <div class="outline-text-4" id="text-7-22-3">
 <div class="org-src-container">
 <pre class="src src-sh">scp root@&lt;master-ip&gt;:/etc/kubernetes/admin.conf ~/.kube/config2
@@ -6469,8 +6471,8 @@ at any given time <span class="underline">only one of them</span> is the current
 </div>
 </div>
 
-<div id="outline-container-org2a6cf06" class="outline-4">
-<h4 id="org2a6cf06"><span class="section-number-4">7.22.4</span> Name of current context</h4>
+<div id="outline-container-org1a0e68d" class="outline-4">
+<h4 id="org1a0e68d"><span class="section-number-4">7.22.4</span> Name of current context</h4>
 <div class="outline-text-4" id="text-7-22-4">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl config current-context
@@ -6481,8 +6483,8 @@ at any given time <span class="underline">only one of them</span> is the current
 
 
 
-<div id="outline-container-orga2d8b20" class="outline-4">
-<h4 id="orga2d8b20"><span class="section-number-4">7.22.5</span> Switch to different namespace</h4>
+<div id="outline-container-org7538b4c" class="outline-4">
+<h4 id="org7538b4c"><span class="section-number-4">7.22.5</span> Switch to different namespace</h4>
 <div class="outline-text-4" id="text-7-22-5">
 <div class="org-src-container">
 <pre class="src src-sh"><span style="color: #5fafff; font-weight: bold;">alias</span> <span style="color: #5fafff;">kcd</span>=<span style="color: #87af5f;">'kubectl config set-context $(</span><span style="color: #fa8072;">kubectl</span><span style="color: #87af5f;"> config current-context) --namespace '</span>
@@ -6495,8 +6497,8 @@ You can then switch between namespaces using <code>kcd &lt;some-namespace&gt;</c
 </div>
 </div>
 
-<div id="outline-container-orgbf03832" class="outline-4">
-<h4 id="orgbf03832"><span class="section-number-4">7.22.6</span> Switching between contexts</h4>
+<div id="outline-container-orga58779c" class="outline-4">
+<h4 id="orga58779c"><span class="section-number-4">7.22.6</span> Switching between contexts</h4>
 <div class="outline-text-4" id="text-7-22-6">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl config use-context my-other-context
@@ -6505,8 +6507,8 @@ You can then switch between namespaces using <code>kcd &lt;some-namespace&gt;</c
 </div>
 </div>
 
-<div id="outline-container-org412839a" class="outline-4">
-<h4 id="org412839a"><span class="section-number-4">7.22.7</span> List contexts and clusters</h4>
+<div id="outline-container-orge3ef916" class="outline-4">
+<h4 id="orge3ef916"><span class="section-number-4">7.22.7</span> List contexts and clusters</h4>
 <div class="outline-text-4" id="text-7-22-7">
 <div class="org-src-container">
 <pre class="src src-sh">kubectl config get-contexts
@@ -6514,6 +6516,26 @@ kubectl config get-clusters
 </pre>
 </div>
 </div>
+</div>
+</div>
+
+<div id="outline-container-org4bc6ebe" class="outline-3">
+<h3 id="org4bc6ebe"><span class="section-number-3">7.23</span> Setup AWS EKS</h3>
+<div class="outline-text-3" id="text-7-23">
+<ol class="org-ol">
+<li>prepare vpc</li>
+<li>prepare subnets</li>
+<li><a href="https://console.aws.amazon.com/iam/">create Amazon EKS service role</a></li>
+<li><a href="https://us-east-2.console.aws.amazon.com/eks/home?region=us-east-2#/clusters">create EKS cluster</a></li>
+<li><p>
+update kube config
+</p>
+
+<p>
+<code>aws eks --region us-east-2 update-kubeconfig --name &lt;cluster-name&gt;</code>
+</p></li>
+<li><a href="https://docs.aws.amazon.com/en_us/eks/latest/userguide/launch-workers.html">launch worker nodes</a></li>
+</ol>
 </div>
 </div>
 </div>
