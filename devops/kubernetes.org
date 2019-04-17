@@ -40,7 +40,19 @@
    *When creating a new pod, you never need to provide the status part.*
 
 
-[[file:img/k8s_pod_def.png]]
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: kubia-manual
+  spec:
+    containers:
+    - image: luksa/kubia
+      name: kubia
+      ports:
+      - containerPort: 8080       # the port the app is listening on
+        protocol: TCP
+#+END_SRC
 
 
 #+BEGIN_EXAMPLE
@@ -229,7 +241,28 @@ A ReplicationController’s replica count, the label selector, and even the pod 
 
 *** Create
 
-[[file:img/k8s_rc_def.png]]
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: ReplicationController
+  metadata:
+    name: kubia
+  spec:
+    replicas: 3
+    selector:
+      app: kubia                  # what pods the RC is operating on
+    template:                     # pod templat for creating new pod
+      metadata:
+        labels:
+          app: kubia
+      spec:
+        containers:
+        - name: kubia
+          image: luksa/kubia
+          ports:
+          - containerPort: 8080
+#+END_SRC
+
+
 
 The pod labels in the template must obviously match the label selector of the ReplicationController;
 otherwise the controller would create new pods indefinitely, because spinning up a new pod wouldn’t bring the actual replica count any closer to the desired number of replicas.
@@ -257,7 +290,7 @@ To modify the old pods, you’d need to delete them and let the ReplicationContr
 [[file:img/k8s_rc_change_pod_tmpl.png]]
 
 
-*** Deleting a ReplicationController Without Deleting Pods
+*** Delete RC without deleting Pods
 
 When you delete a ReplicationController through kubectl delete, the pods are also deleted.\\
 But because pods created by a ReplicationController aren’t an integral part of the ReplicationController, and are only managed by it, \\
@@ -276,7 +309,28 @@ A ReplicaSet behaves exactly like a ReplicationController, but it has *more expr
 
 *** More Expressive Label Selectors
 
-[[file:img/k8s_rs_label_selector.png]]
+#+BEGIN_SRC yaml
+  apiVersion: apps/v1beta2
+  kind: ReplicaSet
+  metadata:
+    name: kubia
+  spec:
+    replicas: 3
+    selector:
+      matchExpressions:
+        - key: app                # this selector requires the pod to contain a label with the 'app' key
+          operator: In
+          values:
+           - kubia
+    template:
+      metadata:
+        labels:
+          app: kubia
+      spec:
+        containers:
+        - name: kubia
+          image: luksa/kubia
+#+END_SRC
 
 Each expression must contain _a key_, _an operator_, and possibly (depending on the operator) _a list of values_. \\
 Four valid operators:
@@ -312,14 +366,29 @@ the Job can be configured to either restart the container or not.
 
 *** Definition
 
-[[file:img/k8s_job_def.png]]
+#+BEGIN_SRC yaml
+  apiVersion: batch/v1
+  kind: Job
+  metadata:
+    name: batch-job
+  spec:
+    template:
+      metadata:
+        labels:
+          app: batch-job
+      spec:
+        restartPolicy: OnFailure  # Jobs can't use the default restart policy, which is Always
+        containers:
+        - name: main
+          image: luksa/batch-job
+#+END_SRC
 
 
 Job pods can't use the default policy, because they're not meant to run indefinitely. \\
 Need to explicitly set the restart policy to either =OnFailure= or =Never=.
 
 
-*** Limiting the time allowed for a Job pod to complete
+*** Limit time for Job pod to complete
 
 A pod's time can be limited by setting the =activeDeadlineSeconds= property in the pod spec. \\
 If the pod runs longer than that, the system will try to terminate it and will mark the Job as failed.
@@ -358,9 +427,20 @@ Although the primary purpose of services is exposing groups of pods to other pod
 
 **** By YAML
 
-[[file:img/k8s_svc_def.png]]
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: kubia
+  spec:
+    ports:
+    - port: 80                    # the port this service will be available on
+      targetPort: 8080            # the container port the service will forward to
+    selector:
+      app: kubia                  # all pods with the app=kubia label will be part of this service
+#+END_SRC
 
-***** Exposing Multiple Ports In The Same Service
+***** Expose ports in same Service
 
 #+BEGIN_EXAMPLE
   When creating a service with multiple ports, you must specify a name for each port.
@@ -466,18 +546,37 @@ An Endpoints resource (plural) is *a list of IP addresses and ports* exposing a 
   It's up to you to create the Endpoints resource to specify the list of endpoints for the service.
 #+END_EXAMPLE
 
-**** Manually configuring service endpoints
+**** Manually config service endpoints
 
 To create a service with manually managed endpoints, you need to create both a Service and an Endpoints resource.
 
 Define a service called external-service that will accept incoming connections on port 80 (didn't define a pod selector for the service):
 
-[[file:img/k8s_svc_manual_ep_svc.png]]
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: external-service        # the name of the service must match the name of the Endpoints object
+  spec:                           # this service has no selector defined
+    ports:
+    - port: 80
+#+END_SRC
 
 
 The Endpoints object needs to *have the same name as the service* and contain the list of target IP addresses and ports for the service:
 
-[[file:img/k8s_svc_manual_ep_ep.png]]
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Endpoints
+  metadata:
+    name: external-service        # the name of the Endpoints object must match the name of the service
+  subsets:
+    - addresses:
+      - ip: 11.11.11.11           # | IPs of the endpoints that the service will forward connections to
+      - ip: 22.22.22.22           # |
+      ports:
+      - port: 80                  # target port of the endpoints
+#+END_SRC
 
 After both the Service and the Endpoints resource are posted to the server, \\
 the service is ready to be used like any regular service with a pod selector:
@@ -493,9 +592,19 @@ This means a service IP address can remain constant while the actual implementat
 
 
 
-**** Creating an alias for an external service
+**** Creat alias for external service
 
-[[file:img/k8s_svc_external_name.png]]
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: external-service
+  spec:
+    type: ExternalName
+    externalName: api.somecompany.com # fully qualified domain name of the actual service
+    ports:
+    - port: 80
+#+END_SRC
 
 After the service is created, pods can connect to the external service through the =external-service.default.svc.cluster.local= domain name.
 
@@ -529,7 +638,20 @@ which may or may not be the one running on the node the connection is being made
 
 ***** YAML Definition
 
-[[file:img/k8s_svc_node_port_def.png]]
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: kubia-nodeport
+  spec:
+    type: NodePort
+    ports:
+    - port: 80                    # port of the service's internal cluster IP
+      targetPort: 8080            # target port of the backing pods
+      nodePort: 30123             # service will be accessible through port 30123 of each of cluster nodes
+    selector:
+      app: kubia
+#+END_SRC
 
 #+BEGIN_EXAMPLE
   Specifying the port isn't mandatory; Kubernetes will choose a random port if you omit it.
@@ -554,7 +676,19 @@ That's because *a LoadBalancer service is an extension of a NodePort service.* \
 
 ***** YAML Definition
 
-[[file:img/k8s_svc_lb_def.png]]
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: kubia-loadbalancer
+  spec:
+    type: LoadBalancer            # this type of service obtains a load balancer from the infrastructur hosting the Kubernetes cluster
+    ports:
+    - port: 80
+      targetPort: 8080
+    selector:
+      app: kubia
+#+END_SRC
 
 
 **** Ingress
@@ -577,7 +711,21 @@ which services can’t.
 
 ***** YAML Definition
 
-[[file:img/k8s_svc_ingress_def.png]]
+#+BEGIN_SRC yaml
+  apiVersion: extensions/v1beta1
+  kind: Ingress
+  metadata:
+    name: kubia
+  spec:
+    rules:
+    - host: kubia.example.com     # maps 'kubia.example.com' domain name to your service
+      http:
+        paths:
+        - path: /                       # | all requests will be sent to port 80 of the kubia-nodeport service
+          backend:                      # |
+            serviceName: kubia-nodeport # |
+            servicePort: 80             # |
+#+END_SRC
 
 [[file:img/k8s_svc_ingress_process.png]]
 
@@ -670,7 +818,31 @@ An =emptyDir= volume is especially useful for sharing files between containers r
 
 An =emptyDir= volume is the simplest type of volume, but *other types build upon it*. (After the empty directory is created, they then populate it with data)
 
-[[file:img/k8s_vol_empty_def.png]]
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: fortune
+  spec:
+    containers:
+    - image: luksa/fortune
+      name: html-generator
+      volumeMounts:
+      - name: html
+        mountPath: /var/htdocs
+    - image: nginx:alpine
+      name: web-server
+      volumeMounts:
+      - name: html
+        mountPath: /usr/share/nginx/html # the same volume as above is mounted at /usr/share/nginx/html as read-only
+        readOnly: true
+      ports:
+      - containerPort: 80
+        protocol: TCP
+    volumes:
+    - name: html                  # mounted in the two containers above
+      emptyDir: {}
+#+END_SRC
 
 
 
@@ -1014,14 +1186,90 @@ In most cases, you’ll only set custom arguments and rarely override the comman
 A =configMap= volume will expose each entry of the ConfigMap *as a file.*
 The process running in the container can obtain the entry’s value by reading the contents of the file.
 
-[[file:img/k8s_config_map_vol_yaml.png]]
+#+BEGIN_SRC yaml
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: fortune-configmap-volume
+  spec:
+    containers:
+    - image: luksa/fortune:env
+      env:
+      - name: INTERVAL
+        valueFrom:
+          configMapKeyRef:
+            name: fortune-config
+            key: sleep-interval
+      name: html-generator
+      volumeMounts:
+      - name: html
+        mountPath: /var/htdocs
+    - image: nginx:alpine
+      name: web-server
+      volumeMounts:
+      - name: html
+        mountPath: /usr/share/nginx/html
+        readOnly: true
+      - name: config
+        mountPath: /etc/nginx/conf.d #  mount configMap volume at this location
+        readOnly: true
+      - name: config
+        mountPath: /tmp/whole-fortune-config-volume
+        readOnly: true
+      ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+    volumes:
+    - name: html
+      emptyDir: {}
+    - name: config
+      configMap:                  # the volume refers to fortune-config ConfigMap
+        name: fortune-config
+#+END_SRC
 
 [[file:img/k8s_config_map_vol.png]]
 
 
 - Exposing Certain ConfigMap Entries in the Volume
 
-  [[file:img/k8s_config_map_vol_with_items.png]]
+  #+BEGIN_SRC yaml
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: fortune-configmap-volume-with-items
+    spec:
+      containers:
+      - image: luksa/fortune:env
+        name: html-generator
+        volumeMounts:
+        - name: html
+          mountPath: /var/htdocs
+      - image: nginx:alpine
+        name: web-server
+        volumeMounts:
+        - name: html
+          mountPath: /usr/share/nginx/html
+          readOnly: true
+        - name: config
+          mountPath: /etc/nginx/conf.d/
+          readOnly: true
+        ports:
+        - containerPort: 80
+          protocol: TCP
+      volumes:
+      - name: html
+        emptyDir: {}
+      - name: config
+        configMap:
+          name: fortune-config
+          items:                    # select which entries to include in the volume by listing them
+          - key: my-nginx-config.conf # entry under this key included
+            path: gzip.conf           # entry's value should be stored in this file
+
+  #+END_SRC
+
+
 
 
 - Mounting Individual ConfigMap Entries as Files without Hiding Other Files in the Directory
@@ -2983,300 +3231,6 @@ The only prerequisite is to add a corresponding label to nodes.
           args:
           - sleep
           - "99999"
-#+END_SRC
-
-
-* 核心原理
-
-** 资源对象
-
-*** POD
-
-**** 基本 YAML 定义
-
-
-
-*apiVersion, kind, metadata, spec 是必填项*
-
-#+BEGIN_SRC yaml
-  apiVersion: v1
-  kind: Pod
-  metadata:
-    name: nginx
-    labels:
-      app: nginx
-  spec:
-    containers:
-    - name: nginx
-      image: nginx
-      ports:
-      - containerPort: 80
-#+END_SRC
-
-
-
-
-
-
-#+BEGIN_SRC sh
-kubectl get pods
-kubectl describe pod <pod_name>
-#+END_SRC
-
-
-
-**** 设计理念
-
-Pod 是在 K8s 集群中运行部署应用或服务的最小单元，它是可以支持多容器的。
-
-Pod 的设计理念是支持多个容器在一个 Pod 中共享网络地址和文件系统，可以通过进程间通信和文件共享这种简单高效的方式组合完成服务。
-
-Pod 是 K8s 集群中所有业务类型的基础，不同类型的业务就需要不同类型的 *控制器* 去执行。
-
-目前 K8s 中的业务主要可以分为：
-
-- 长期伺服型 (long-running)
-- 批处理型 (batch)
-- 节点后台支撑型 (node-daemon)
-- 有状态应用型 (stateful application)
-
-分别对应的控制器类型为：
-
-- Deployment
-- Job
-- DaemonSet
-- StatefulSet
-
-直接创建的 Pod 一旦被调度后就跟 Node 绑定，即使 Node 挂掉也不会被重新调度（ *而是被自动删除* ），因此推荐使用 Deployment、Daemonset 等控制器来容错。
-
-
-
-**** 生命周期
-
-- Pending :: Pod 已经在 apiserver 中创建，但还没有调度到 Node 上面
-- Running :: Pod 已经调度到 Node 上面，所有容器都已经创建，并且至少有一个容器还在运行或者正在启动
-- Succeeded :: Pod 调度到 Node 上面后成功运行结束，并且不会重启
-- Failed :: Pod 调度到 Node 上面后至少有一个容器运行失败（即退出码不为 0 或者被系统终止）
-- Unknonwn :: 状态未知，通常是由于 apiserver 无法与 kubelet 通信导致
-
-
-
-**** 重启策略(restartPolicy)
-
-PodSpec 中的 =restartPolicy= 可以用来设置是否对退出的 Pod 重启，可选项包括:
-
-- Always :: 只要退出就重启
-- OnFailure :: 失败退出（exit code 不等于 0）时重启
-- Never :: 只要退出就不再重启
-
-*注意，这里的重启是指在 Pod 所在 Node 上面本地重启，并不会调度到其他 Node 上去。*
-
-- 单容器的 Pod ，容器成功退出时，不同 restartPolicy 时的动作为
-  - Always: 重启 Container; Pod phase 保持 Running.
-  - OnFailure: Pod phase 变成 Succeeded.
-  - Never: Pod phase 变成 Succeeded.
-
-- 单容器的 Pod ，容器失败退出时，不同 restartPolicy 时的动作为
-  - Always: 重启 Container; Pod phase 保持 Running.
-  - OnFailure: 重启 Container; Pod phase 保持 Running.
-  - Never: Pod phase 变成 Failed.
-
-- 2 个容器的 Pod，其中一个容器在运行而另一个失败退出时，不同 restartPolicy 时的动作为
-  - Always: 重启 Container; Pod phase 保持 Running.
-  - OnFailure: 重启 Container; Pod phase 保持 Running.
-  - Never: 不重启 Container; Pod phase 保持 Running.
-
-- 2 个容器的 Pod，其中一个容器停止而另一个失败退出时，不同 restartPolicy 时的动作为
-  - Always: 重启 Container; Pod phase 保持 Running.
-  - OnFailure: 重启 Container; Pod phase 保持 Running.
-  - Never: Pod phase 变成 Failed.
-
-- 单容器的 Pod，容器内存不足（OOM），不同 restartPolicy 时的动作为
-  - Always: 重启 Container; Pod phase 保持 Running.
-  - OnFailure: 重启 Container; Pod phase 保持 Running.
-  - Never: 记录失败事件; Pod phase 变成 Failed.
-
-其他情况的处理逻辑：
-
-- Pod 还在运行，但磁盘不可访问时
-  1. 终止所有容器
-  2. Pod phase 变成 Failed
-  3. 如果 Pod 是由某个控制器管理的，则重新创建一个 Pod 并调度到其他 Node 运行
-
-- Pod 还在运行，但由于网络分区故障导致 Node 无法访问
-  1. Node controller等待 Node 事件超时
-  2. Node controller 将 Pod phase 设置为 Failed.
-  3. 如果 Pod 是由某个控制器管理的，则重新创建一个 Pod 并调度到其他 Node 运行
-
-
-
-
-**** 使用 Volume
-
-#+BEGIN_SRC yaml
-  apiVersion: v1
-  kind: Pod
-  metadata:
-    name: redis
-  spec:
-    containers:
-    - name: redis
-      image: redis
-      volumeMounts:
-      - name: redis-storage
-        mountPath: /data/redis
-    volumes:
-    - name: redis-storage
-      emptyDir: {}
-
-#+END_SRC
-
-
-
-**** 环境变量
-
-Pod 的名字、命名空间、IP 以及容器的计算资源限制等可以通过 [[https://kubernetes.io/docs/tasks/inject-data-application/downward-api-volume-expose-pod-information/][Downward API]] 的方式获取并存储到环境变量中。
-
-
-
-**** 镜像拉取策略(ImagePullPolicy)
-
-支持三种 =ImagePullPolicy=:
-
-- Always :: 不管镜像是否存在都会进行一次拉取
-- Never :: 不管镜像是否存在都不会进行拉取
-- IfNotPresent :: 只有镜像不存在时，才会进行镜像拉取
-
-*注意：*
-
-默认为 =IfNotPresent= ，但 :latest 标签的镜像默认为 =Always= 。
-
-拉取镜像时 docker 会进行校验，如果镜像中的 MD5 码没有变，则不会拉取镜像数据。
-
-生产环境中应该尽量避免使用 :latest 标签，而开发环境中可以借助 :latest 标签自动拉取最新的镜像。
-
-
-**** DNS 策略
-
-通过设置 =dnsPolicy= 参数，设置 Pod 中容器访问 DNS 的策略：
-
-- ClusterFirst :: 优先基于 cluster domain （如 default.svc.cluster.local） 后缀，通过 kube-dns 查询 (默认策略)
-- Default :: 优先从 Node 中配置的 DNS 查询
-
-
-**** Health Probe
-
-为了确保容器在部署后确实处在正常运行状态，Kubernetes 提供了两种探针（Probe）来探测容器的状态：
-
-- LivenessProbe :: 探测应用是否处于健康状态，如果不健康则删除并重新创建容器
-- ReadinessProbe :: 探测应用是否启动完成并且处于正常服务状态，如果不正常则不会接收来自 Kubernetes Service 的流量
-
-Kubernetes 支持三种方式来执行探针：
-
-- exec :: 在容器中执行一个命令，如果 命令退出码 返回 0 则表示探测成功，否则表示失败
-- tcpSocket :: 对指定的容器 IP 及端口执行一个 TCP 检查，如果端口是开放的则表示探测成功，否则表示失败
-- httpGet :: 对指定的容器 IP、端口及路径执行一个 HTTP Get 请求，如果返回的 状态码 在 [200,400) 之间则表示探测成功，否则表示失败
-
-
-#+BEGIN_SRC yaml
-  apiVersion: v1
-  kind: Pod
-  metadata:
-    labels:
-      app: nginx
-    name: nginx
-  spec:
-      containers:
-      - image: nginx
-        imagePullPolicy: Always
-        name: http
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 80
-            httpHeaders:
-            - name: X-Custom-Header
-              value: Awesome
-          initialDelaySeconds: 15
-          timeoutSeconds: 1
-        readinessProbe:
-          exec:
-            command:
-            - cat
-            - /usr/share/nginx/html/index.html
-          initialDelaySeconds: 5
-          timeoutSeconds: 1
-      - name: goproxy
-        image: gcr.io/google_containers/goproxy:0.1
-        ports:
-        - containerPort: 8080
-        readinessProbe:
-          tcpSocket:
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        livenessProbe:
-          tcpSocket:
-            port: 8080
-          initialDelaySeconds: 15
-          periodSeconds: 20
-#+END_SRC
-
-
-**** 调度到指定 Node 上
-
-可以通过 =nodeSelector=, =nodeAffinity=, =podAffinity= 以及 =Taints= 和 =tolerations= 等来将 Pod 调度到需要的 Node 上。
-
-#+BEGIN_EXAMPLE yaml
-  apiVersion: v1
-  kind: Pod
-  metadata:
-    name: nginx
-    labels:
-      env: test
-  spec:
-    containers:
-    - name: nginx
-      image: nginx
-      imagePullPolicy: IfNotPresent
-    nodeSelector:
-      <label>: <value>
-#+END_EXAMPLE
-
-
-**** 常用命令
-
-***** 查看 Pod 状态
-
-=kubectl get pod <pod_name> -o jsonpath="{.status.phase}"=
-
-
-
-
-*** Replica Set
-
-ReplicaSet 跟 ReplicationController 没有本质的不同，只是名字不一样，
-并且 ReplicaSet 支持集合式的 selector（ReplicationController 仅支持等式）。
-
-Deployment 使用了 Replica Set ，是更高一层的概念。
-除非需要自定义升级功能或根本不需要升级 Pod ，一般情况下，推荐使用 Deployment 而不直接使用 Replica Set 。
-这样就无需担心跟其他机制的不兼容问题（比如 ReplicaSet 不支持 rolling-update 但 Deployment 支持），
-并且还支持版本记录、回滚、暂停升级等高级特性。
-
-
-**** YAML 定义
-
-=spec.template= 可以从 Pod 定义文件中复制过来：
-
-[[file:img/k8s_replica-set-tmpl.png]]
-
-
-**** 常用命令
-
-#+BEGIN_SRC sh
-kubectl replace -f rs-def.yml
-kubectl scale --replicas=6 -f rs-def.yml
-kubectl scale --replicas=6 replicaset <name>
 #+END_SRC
 
 
