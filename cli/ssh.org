@@ -61,6 +61,8 @@ hostB <.left. nat
 
 ** 外网访问内网 SSH 服务
 
+=ssh -f -N -R 8888:127.0.0.1:22 HostA=
+
 #+BEGIN_SRC plantuml :file img/ssh-remote.png :eval never-export
 
 skinparam rectangle {
@@ -157,6 +159,32 @@ hostB --^ hostC
 
 
 
+* Agent Forwarding
+
+Agent forwarding lets you authenticate with *the same key* you used to log in to the bastion host
+for further SSH logins initiated from the bastion host.
+
+#+BEGIN_SRC sh
+  # 先将 key 文件添加至 SSH Agent
+  [computer]$ ssh-add <path-to-key.pem>
+
+  # 先登录到第一台主机
+  [computer]$ ssh -A ec2-user@ec2-52-4-234-102.[...].com
+  Last login: Sat Apr 11 11:28:31 2015 from [...]
+
+  # 直接登录第二台主机
+  [bastionh]$ ssh ec2-52-4-125-194.compute-1.amazonaws.com
+  Last login: Sat Apr 11 11:28:43 2015 from [...]
+#+END_SRC
+
+更安全的做法是将堡垒机当作 Proxy :
+
+#+BEGIN_SRC sh
+  # establishes an SSH connection to instance 1 by using the bastion host as a proxy.
+  ssh -J ec2-user@BastionHostPublicName ec2-user@Instance1PublicName
+#+END_SRC
+
+
 * 指纹和公钥
 
 ** 删除指纹和公钥信息
@@ -179,6 +207,7 @@ hostB --^ hostC
   ssh-keygen -R <IP>
   ssh-keyscan -H <IP> >> ~/.ssh/known_hosts
 #+END_SRC
+
 
 * 在远程机器上运行脚本
 
