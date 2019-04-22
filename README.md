@@ -30,6 +30,7 @@
 - [Ansible](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/devops/ansible.html)
 - [Docker](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/devops/docker.html)
 - [K8S](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/devops/kubernetes.html)
+- [AWS](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/devops/aws.html)
 
 ## 常用命令
 

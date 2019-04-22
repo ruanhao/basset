@@ -1,0 +1,207 @@
+#+TITLE:     AWS
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS: h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
+ #+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+#+TOC: headlines 5
+
+
+
+
+
+* EC2
+
+** Instance Families
+
+[[file:img/aws_instance_family_format.png]]
+
+- T family
+  Cheap, moderate baseline performance with the ability to burst to higher performance for short periods of time
+- M family
+  General purpose, with a balanced ration of CPU and memory
+- C family
+  Computing optimized, high CPU performance
+- R family
+  Memory optimized, with more memory than CPU power compared to M family
+- D family
+  Storage optimized, offering huge HDD capacity
+- I family
+  Storage optimized, offering huge SSD capacity
+- X family
+  Extensive capacity with a focus on memory, up to 1952 GB memory and 128 virtual cores
+- F family
+  Accelerated computing based on FPGAs
+- P, G, and CG family
+  Accelerated computing based on GPUs
+
+
+** User Data
+
+The user data is always accessible from the VM with a HTTP GET request to =http://169.254.169.254/latest/user-data= .
+
+** CLI
+
+*** list of running instances
+
+#+BEGIN_SRC sh
+  aws ec2 describe-instances --filters "Name=instance-type,Values=m4.xlarge"
+#+END_SRC
+
+*** list of Images
+
+#+BEGIN_SRC sh
+  $ aws ec2 describe-images --query "Images[0].ImageId"
+  "ami-146e2a7c"
+  $ aws ec2 describe-images --query "Images[0].ImageId" --output text
+  ami-146e2a7c
+  $ aws ec2 describe-images --query "Images[*].State"
+  ["available", "available"]
+#+END_SRC
+
+
+* Cloud Formation
+
+A basic CloudFormation template is structured into five parts:
+
+1. Format version
+   The latest template format version is 2010-09-09
+2. Description
+   What is this template about?
+3. Parameters
+   Parameters are used to customize a template with values: for example, domain name, customer ID, and database password.
+4. Resources
+   A resource is the smallest block you can describe. Examples are a virtual machine, a load balancer, or an Elastic IP address.
+5. Outputs
+   An output returns something from your template, such as the public name of an EC2 instance.
+
+** [[https://docs.aws.amazon.com/en_us/AWSCloudFormation/latest/UserGuide/parameters-section-structure.html][Parameters]]
+
+
+#+BEGIN_SRC yaml
+  Parameters:
+    KeyName:
+      Description: 'Key Pair name'
+      Type: 'AWS::EC2::KeyPair::KeyName' # Only key pair names are allowed.
+    NumberOfVirtualMachines:
+      Description: 'How many virtual machine do you like?'
+      Type: Number
+      Default: 1 # The default is one virtual machine.
+      MinValue: 1
+      MaxValue: 5 # Prevent massive costs with an upper bound.
+    WordPressVersion:
+      Description: 'Which version of WordPress do you want?'
+      Type: String
+      AllowedValues: ['4.1.1', '4.0.1'] # Restricted to certain versions
+#+END_SRC
+
+*** Valid types
+
+- String
+- Number
+- AWS::EC2::AvailabilityZone::Name
+  such as =us-west-2a=
+- AWS::EC2::Image::Id
+- AWS::EC2::Instance::Id
+- AWS::EC2::KeyPair::KeyName
+- AWS::EC2::SecurityGroup::Id
+- AWS::EC2::Subnet::Id
+- AWS::EC2::Volume::Id
+  An EBS volume ID (network attached storage)
+- AWS::EC2::VPC::Id
+- AWS::Route53::HostedZone::Id
+  A DNS zone ID
+
+
+*** Constraints
+
+- Default
+- NoEcho
+- AllowedValues
+- AllowedPattern
+- MinLength, MaxLength
+- MinValue, MaxValue
+- ConstraintDescription
+
+
+** [[https://docs.aws.amazon.com/en_us/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html][Resources]]
+
+A resource has at least _a name_, _a type_, and _some properties_.
+
+
+
+* IAM
+
+IAM controls *who* (authentication) can do *what* (authorization) in your AWS account.
+
+[[file:img/aws_iam_concepts.png]]
+
+- IAM user
+  Used to authenticate people accessing your AWS account.
+- IAM group
+  A collection of IAM users.
+- IAM role
+  Used to _authenticate AWS resources_, for example an EC2 instance.
+- IAM policy
+  Used to define the permissions for a user, group, or role.
+
+** ARN
+
+
+[[file:img/aws_arn.png]]
+
+
+
+** CLIs
+
+*** Get account id
+
+#+BEGIN_SRC sh
+  aws iam get-user --query "User.Arn" --output text
+#+END_SRC
+
+*** Create groud and user
+
+#+BEGIN_SRC sh
+  aws iam create-group --group-name "admin"
+  aws iam attach-group-policy --group-name "admin" --policy-arn "arn:aws:iam::aws:policy/AdministratorAccess"
+  aws iam create-user --user-name "myuser"
+  aws iam add-user-to-group --group-name "admin" --user-name "myuser"
+  aws iam create-login-profile --user-name "myuser" --password "$Password"
+#+END_SRC
+
+
+* Security Group
+
+** Bastion Mode
+
+[[file:img/aws_bastion_mode.png]]
+
+
+* VPC
+
+** ACL
+
+Network ACLs restrict traffic that goes from one subnet to another, acting as a firewall. \\
+That's an additional layer of security on top of security groups, which control traffic to and from a virtual machine.
+
+#+BEGIN_EXAMPLE
+  There's an important difference between security groups and ACLs: security groups are STATEFUL, but ACLs aren't.
+  If you allow an inbound port on a security group, the corresponding response to requests on that port are allowed as well.
+  That's not true for ACLs.
+#+END_EXAMPLE
+
+*Recommend to start with using security groups to control traffic. If you want to add an extra layer of security, you should use ACL on top.*
+
+
+
+* 参考资料
+
+- [[https://github.com/AWSinAction/code2][AWS in Action]]
