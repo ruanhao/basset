@@ -202,6 +202,35 @@ Network ACLs restrict traffic that goes from one subnet to another, acting as a 
 *Recommend to start with using security groups to control traffic. If you want to add an extra layer of security, you should use ACL on top.*
 
 
+** NAT Gateway
+
+#+BEGIN_SRC plantuml :file img/aws_nat.png :eval never-export
+
+entity IGW
+
+
+node "VPC" {
+  package "PublicSubnet" {
+    [NATGateway]
+  }
+
+  package "PrivateSubnet" {
+    [Instance]
+  }
+}
+
+NATGateway <.left. PrivateSubnet
+NATGateway .up.> IGW
+
+#+END_SRC
+
+#+RESULTS:
+[[file:img/aws_nat.png]]
+
+
+- VPC 与 IGW 绑定
+- PrivateSubnet 默认路由指向 NATGateway
+- Instance 无需分配外网地址（即无法被外部访问）
 
 * 参考资料
 
