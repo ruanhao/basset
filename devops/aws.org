@@ -232,6 +232,11 @@ NATGateway .up.> IGW
 - PrivateSubnet 默认路由指向 NATGateway
 - Instance 无需分配外网地址（即无法被外部访问）
 
+#+BEGIN_EXAMPLE
+  创建 VPC 时会生成默认路由表，Subnet 默认情况下将继承这个路由表，该路由表只有一条记录（ VPC 网段的 local 路由）。
+  通常会自定义一个新的路由表给 Subnet 使用，该路由表被 attach 至 VPC （即包含 VPC 网段的 local 路由)，再添加一条指向 IGW 的 default 路由。
+#+END_EXAMPLE
+
 * 参考资料
 
 - [[https://github.com/AWSinAction/code2][AWS in Action]]
