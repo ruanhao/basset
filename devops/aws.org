@@ -47,6 +47,33 @@
 
 The user data is always accessible from the VM with a HTTP GET request to =http://169.254.169.254/latest/user-data= .
 
+
+** EBS
+
+Elastic Block Store (EBS) provides persistent block-level storage with *built-in data replication* (Replicate your data on multiple disks to
+prevent data loss due to hardware failures). \\
+An EBS volume is separate from an EC2 instance and connected over the network.
+
+#+BEGIN_EXAMPLE
+  EBS is either not attached to an EC2 instance or attached to exactly ONE EC2 instance at a time.
+  You can't attach the same EBS volume to multiple virtual machines!
+#+END_EXAMPLE
+
+Usually, EBS volumes can be found somewhere in the range of =/dev/xvdf= to =/dev/xvdp=. \\
+The root volume (=/dev/xvda=) is an exception: it's _based on the AMI_ you choose when you launch the EC2 instance,
+and contains everything needed to boot the instance (OS files).
+
+
+*** Snapshot
+
+A snapshot is a block-level _incremental backup_ that is stored in S3.
+
+#+BEGIN_EXAMPLE
+  If your volume is 5 GiB in size and you use 1 GiB of data, your first snapshot will be around 1 GiB in size.
+  After the first snapshot is created, only the changes will be saved to S3, to reduce the size of the backup.
+#+END_EXAMPLE
+
+
 ** CLI
 
 *** list of running instances
@@ -236,6 +263,8 @@ PublicSubnet .up.> IGW
   创建 VPC 时会生成默认路由表，Subnet 默认情况下将继承这个路由表，该路由表只有一条记录（ VPC 网段的 local 路由）。
   通常会自定义一个新的路由表给 Subnet 使用，该路由表被 attach 至 VPC （即包含 VPC 网段的 local 路由)，再添加一条指向 IGW 的 default 路由。
 #+END_EXAMPLE
+
+
 
 * 参考资料
 
