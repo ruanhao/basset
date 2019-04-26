@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- 2019-04-24 Wed 10:01 -->
+<!-- 2019-04-26 Fri 16:12 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AWS</title>
@@ -234,52 +234,58 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org9bdfac0">1. EC2</a>
+<li><a href="#org2743c13">1. EC2</a>
 <ul>
-<li><a href="#orgc46c31b">1.1. Instance Families</a></li>
-<li><a href="#org98a4ba8">1.2. User Data</a></li>
-<li><a href="#orgde10d77">1.3. CLI</a>
+<li><a href="#orge2a4a0d">1.1. Instance Families</a></li>
+<li><a href="#org383732f">1.2. User Data</a></li>
+<li><a href="#orga430680">1.3. EBS</a>
 <ul>
-<li><a href="#org78e0af7">1.3.1. list of running instances</a></li>
-<li><a href="#org4191454">1.3.2. list of Images</a></li>
+<li><a href="#orgc3e81b4">1.3.1. Snapshot</a></li>
+</ul>
+</li>
+<li><a href="#org1d8d751">1.4. Instance Store</a></li>
+<li><a href="#org2d2ed1e">1.5. CLI</a>
+<ul>
+<li><a href="#orgd916916">1.5.1. list of running instances</a></li>
+<li><a href="#orgf9e8760">1.5.2. list of Images</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgcd899b2">2. Cloud Formation</a>
+<li><a href="#org9a79737">2. Cloud Formation</a>
 <ul>
-<li><a href="#orge330732">2.1. Parameters</a>
+<li><a href="#org3ef9326">2.1. Parameters</a>
 <ul>
-<li><a href="#orgd608b7b">2.1.1. Valid types</a></li>
-<li><a href="#org6d6b5c6">2.1.2. Constraints</a></li>
+<li><a href="#org199fbb1">2.1.1. Valid types</a></li>
+<li><a href="#org148b57a">2.1.2. Constraints</a></li>
 </ul>
 </li>
-<li><a href="#orgae3f2f9">2.2. Resources</a></li>
+<li><a href="#org285f6bb">2.2. Resources</a></li>
 </ul>
 </li>
-<li><a href="#orgef390da">3. IAM</a>
+<li><a href="#org9a8b632">3. IAM</a>
 <ul>
-<li><a href="#orgd5720be">3.1. ARN</a></li>
-<li><a href="#orgf1f4187">3.2. CLIs</a>
+<li><a href="#orgcd66590">3.1. ARN</a></li>
+<li><a href="#orgf891571">3.2. CLIs</a>
 <ul>
-<li><a href="#orgcc53c0e">3.2.1. Get account id</a></li>
-<li><a href="#orgf45c896">3.2.2. Create groud and user</a></li>
+<li><a href="#org1fb9111">3.2.1. Get account id</a></li>
+<li><a href="#orgf605f23">3.2.2. Create groud and user</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgdeced26">4. Security Group</a>
+<li><a href="#org497334f">4. Security Group</a>
 <ul>
-<li><a href="#org8016ad1">4.1. Bastion Mode</a></li>
+<li><a href="#org3f78237">4.1. Bastion Mode</a></li>
 </ul>
 </li>
-<li><a href="#org585221e">5. VPC</a>
+<li><a href="#orge620a4b">5. VPC</a>
 <ul>
-<li><a href="#orgf1ccc6f">5.1. ACL</a></li>
-<li><a href="#org78099de">5.2. NAT Gateway</a></li>
+<li><a href="#org32ae43f">5.1. ACL</a></li>
+<li><a href="#org00b7893">5.2. NAT Gateway</a></li>
 </ul>
 </li>
-<li><a href="#org8961e52">6. 参考资料</a></li>
+<li><a href="#org0d47d42">6. 参考资料</a></li>
 </ul>
 </div>
 </div>
@@ -300,7 +306,7 @@ for the JavaScript code in this tag.
 
 <tr>
 <td class="org-left">Date</td>
-<td class="org-left">2019-04-24 10:01:14</td>
+<td class="org-left">2019-04-26 16:12:32</td>
 </tr>
 </tbody>
 </table>
@@ -309,52 +315,58 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org9bdfac0">1. EC2</a>
+<li><a href="#org2743c13">1. EC2</a>
 <ul>
-<li><a href="#orgc46c31b">1.1. Instance Families</a></li>
-<li><a href="#org98a4ba8">1.2. User Data</a></li>
-<li><a href="#orgde10d77">1.3. CLI</a>
+<li><a href="#orge2a4a0d">1.1. Instance Families</a></li>
+<li><a href="#org383732f">1.2. User Data</a></li>
+<li><a href="#orga430680">1.3. EBS</a>
 <ul>
-<li><a href="#org78e0af7">1.3.1. list of running instances</a></li>
-<li><a href="#org4191454">1.3.2. list of Images</a></li>
+<li><a href="#orgc3e81b4">1.3.1. Snapshot</a></li>
+</ul>
+</li>
+<li><a href="#org1d8d751">1.4. Instance Store</a></li>
+<li><a href="#org2d2ed1e">1.5. CLI</a>
+<ul>
+<li><a href="#orgd916916">1.5.1. list of running instances</a></li>
+<li><a href="#orgf9e8760">1.5.2. list of Images</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgcd899b2">2. Cloud Formation</a>
+<li><a href="#org9a79737">2. Cloud Formation</a>
 <ul>
-<li><a href="#orge330732">2.1. Parameters</a>
+<li><a href="#org3ef9326">2.1. Parameters</a>
 <ul>
-<li><a href="#orgd608b7b">2.1.1. Valid types</a></li>
-<li><a href="#org6d6b5c6">2.1.2. Constraints</a></li>
+<li><a href="#org199fbb1">2.1.1. Valid types</a></li>
+<li><a href="#org148b57a">2.1.2. Constraints</a></li>
 </ul>
 </li>
-<li><a href="#orgae3f2f9">2.2. Resources</a></li>
+<li><a href="#org285f6bb">2.2. Resources</a></li>
 </ul>
 </li>
-<li><a href="#orgef390da">3. IAM</a>
+<li><a href="#org9a8b632">3. IAM</a>
 <ul>
-<li><a href="#orgd5720be">3.1. ARN</a></li>
-<li><a href="#orgf1f4187">3.2. CLIs</a>
+<li><a href="#orgcd66590">3.1. ARN</a></li>
+<li><a href="#orgf891571">3.2. CLIs</a>
 <ul>
-<li><a href="#orgcc53c0e">3.2.1. Get account id</a></li>
-<li><a href="#orgf45c896">3.2.2. Create groud and user</a></li>
+<li><a href="#org1fb9111">3.2.1. Get account id</a></li>
+<li><a href="#orgf605f23">3.2.2. Create groud and user</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgdeced26">4. Security Group</a>
+<li><a href="#org497334f">4. Security Group</a>
 <ul>
-<li><a href="#org8016ad1">4.1. Bastion Mode</a></li>
+<li><a href="#org3f78237">4.1. Bastion Mode</a></li>
 </ul>
 </li>
-<li><a href="#org585221e">5. VPC</a>
+<li><a href="#orge620a4b">5. VPC</a>
 <ul>
-<li><a href="#orgf1ccc6f">5.1. ACL</a></li>
-<li><a href="#org78099de">5.2. NAT Gateway</a></li>
+<li><a href="#org32ae43f">5.1. ACL</a></li>
+<li><a href="#org00b7893">5.2. NAT Gateway</a></li>
 </ul>
 </li>
-<li><a href="#org8961e52">6. 参考资料</a></li>
+<li><a href="#org0d47d42">6. 参考资料</a></li>
 </ul>
 </div>
 </div>
@@ -363,12 +375,12 @@ for the JavaScript code in this tag.
 
 
 
-<div id="outline-container-org9bdfac0" class="outline-2">
-<h2 id="org9bdfac0"><span class="section-number-2">1</span> EC2</h2>
+<div id="outline-container-org2743c13" class="outline-2">
+<h2 id="org2743c13"><span class="section-number-2">1</span> EC2</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgc46c31b" class="outline-3">
-<h3 id="orgc46c31b"><span class="section-number-3">1.1</span> Instance Families</h3>
+<div id="outline-container-orge2a4a0d" class="outline-3">
+<h3 id="orge2a4a0d"><span class="section-number-3">1.1</span> Instance Families</h3>
 <div class="outline-text-3" id="text-1-1">
 
 <div class="figure">
@@ -400,8 +412,8 @@ Accelerated computing based on GPUs</li>
 </div>
 
 
-<div id="outline-container-org98a4ba8" class="outline-3">
-<h3 id="org98a4ba8"><span class="section-number-3">1.2</span> User Data</h3>
+<div id="outline-container-org383732f" class="outline-3">
+<h3 id="org383732f"><span class="section-number-3">1.2</span> User Data</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 The user data is always accessible from the VM with a HTTP GET request to <code>http://169.254.169.254/latest/user-data</code> .
@@ -409,13 +421,82 @@ The user data is always accessible from the VM with a HTTP GET request to <code>
 </div>
 </div>
 
-<div id="outline-container-orgde10d77" class="outline-3">
-<h3 id="orgde10d77"><span class="section-number-3">1.3</span> CLI</h3>
+
+<div id="outline-container-orga430680" class="outline-3">
+<h3 id="orga430680"><span class="section-number-3">1.3</span> EBS</h3>
 <div class="outline-text-3" id="text-1-3">
+<p>
+Elastic Block Store (EBS) provides persistent block-level storage with <b>built-in data replication</b> (Replicate your data on multiple disks to
+prevent data loss due to hardware failures). <br>
+An EBS volume is separate from an EC2 instance and connected over the network.
+</p>
+
+
+<pre class="example">
+EBS is either not attached to an EC2 instance or attached to exactly ONE EC2 instance at a time.
+You can't attach the same EBS volume to multiple virtual machines!
+</pre>
+
+
+<div class="figure">
+<p><img src="img/aws_ebs_attach.png" alt="aws_ebs_attach.png">
+</p>
 </div>
-<div id="outline-container-org78e0af7" class="outline-4">
-<h4 id="org78e0af7"><span class="section-number-4">1.3.1</span> list of running instances</h4>
+
+<p>
+Usually, EBS volumes can be found somewhere in the range of <code>/dev/xvdf</code> to <code>/dev/xvdp</code>. <br>
+The root volume (<code>/dev/xvda</code>) is an exception: it's <span class="underline">based on the AMI</span> you choose when you launch the EC2 instance,
+and contains everything needed to boot the instance (OS files).
+</p>
+</div>
+
+
+<div id="outline-container-orgc3e81b4" class="outline-4">
+<h4 id="orgc3e81b4"><span class="section-number-4">1.3.1</span> Snapshot</h4>
 <div class="outline-text-4" id="text-1-3-1">
+<p>
+A snapshot is a block-level <span class="underline">incremental backup</span> that is stored in S3.
+</p>
+
+<pre class="example">
+If your volume is 5 GiB in size and you use 1 GiB of data, your first snapshot will be around 1 GiB in size.
+After the first snapshot is created, only the changes will be saved to S3, to reduce the size of the backup.
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org1d8d751" class="outline-3">
+<h3 id="org1d8d751"><span class="section-number-3">1.4</span> Instance Store</h3>
+<div class="outline-text-3" id="text-1-4">
+<p>
+An instance store provides block-level storage <span class="underline">directly</span> attached to the machine hosting your VM. <br>
+It is part of an EC2 instance (not standalone resources like EBS volume) and available only if your instance is running;
+it won't persist your data if you stop or terminate the instance.
+</p>
+
+
+<div class="figure">
+<p><img src="img/aws_instance_store.png" alt="aws_instance_store.png">
+</p>
+</div>
+
+
+<pre class="example">
+Don't use an instance store for data that must not be lost; use it for caching, temporary processing.
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org2d2ed1e" class="outline-3">
+<h3 id="org2d2ed1e"><span class="section-number-3">1.5</span> CLI</h3>
+<div class="outline-text-3" id="text-1-5">
+</div>
+<div id="outline-container-orgd916916" class="outline-4">
+<h4 id="orgd916916"><span class="section-number-4">1.5.1</span> list of running instances</h4>
+<div class="outline-text-4" id="text-1-5-1">
 <div class="org-src-container">
 <pre class="src src-sh">aws ec2 describe-instances --filters <span style="color: #87af5f;">"Name=instance-type,Values=m4.xlarge"</span>
 </pre>
@@ -423,9 +504,9 @@ The user data is always accessible from the VM with a HTTP GET request to <code>
 </div>
 </div>
 
-<div id="outline-container-org4191454" class="outline-4">
-<h4 id="org4191454"><span class="section-number-4">1.3.2</span> list of Images</h4>
-<div class="outline-text-4" id="text-1-3-2">
+<div id="outline-container-orgf9e8760" class="outline-4">
+<h4 id="orgf9e8760"><span class="section-number-4">1.5.2</span> list of Images</h4>
+<div class="outline-text-4" id="text-1-5-2">
 <div class="org-src-container">
 <pre class="src src-sh">$ aws ec2 describe-images --query <span style="color: #87af5f;">"Images[0].ImageId"</span>
 <span style="color: #87af5f;">"ami-146e2a7c"</span>
@@ -441,8 +522,8 @@ $ aws ec2 describe-images --query <span style="color: #87af5f;">"Images[*].State
 </div>
 
 
-<div id="outline-container-orgcd899b2" class="outline-2">
-<h2 id="orgcd899b2"><span class="section-number-2">2</span> Cloud Formation</h2>
+<div id="outline-container-org9a79737" class="outline-2">
+<h2 id="org9a79737"><span class="section-number-2">2</span> Cloud Formation</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 A basic CloudFormation template is structured into five parts:
@@ -462,8 +543,8 @@ An output returns something from your template, such as the public name of an EC
 </ol>
 </div>
 
-<div id="outline-container-orge330732" class="outline-3">
-<h3 id="orge330732"><span class="section-number-3">2.1</span> <a href="https://docs.aws.amazon.com/en_us/AWSCloudFormation/latest/UserGuide/parameters-section-structure.html">Parameters</a></h3>
+<div id="outline-container-org3ef9326" class="outline-3">
+<h3 id="org3ef9326"><span class="section-number-3">2.1</span> <a href="https://docs.aws.amazon.com/en_us/AWSCloudFormation/latest/UserGuide/parameters-section-structure.html">Parameters</a></h3>
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
 <pre class="src src-yaml"><span style="color: #5fafff;">Parameters</span>:
@@ -484,8 +565,8 @@ An output returns something from your template, such as the public name of an EC
 </div>
 </div>
 
-<div id="outline-container-orgd608b7b" class="outline-4">
-<h4 id="orgd608b7b"><span class="section-number-4">2.1.1</span> Valid types</h4>
+<div id="outline-container-org199fbb1" class="outline-4">
+<h4 id="org199fbb1"><span class="section-number-4">2.1.1</span> Valid types</h4>
 <div class="outline-text-4" id="text-2-1-1">
 <ul class="org-ul">
 <li>String</li>
@@ -507,8 +588,8 @@ A DNS zone ID</li>
 </div>
 
 
-<div id="outline-container-org6d6b5c6" class="outline-4">
-<h4 id="org6d6b5c6"><span class="section-number-4">2.1.2</span> Constraints</h4>
+<div id="outline-container-org148b57a" class="outline-4">
+<h4 id="org148b57a"><span class="section-number-4">2.1.2</span> Constraints</h4>
 <div class="outline-text-4" id="text-2-1-2">
 <ul class="org-ul">
 <li>Default</li>
@@ -524,8 +605,8 @@ A DNS zone ID</li>
 </div>
 
 
-<div id="outline-container-orgae3f2f9" class="outline-3">
-<h3 id="orgae3f2f9"><span class="section-number-3">2.2</span> <a href="https://docs.aws.amazon.com/en_us/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html">Resources</a></h3>
+<div id="outline-container-org285f6bb" class="outline-3">
+<h3 id="org285f6bb"><span class="section-number-3">2.2</span> <a href="https://docs.aws.amazon.com/en_us/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html">Resources</a></h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 A resource has at least <span class="underline">a name</span>, <span class="underline">a type</span>, and <span class="underline">some properties</span>.
@@ -536,8 +617,8 @@ A resource has at least <span class="underline">a name</span>, <span class="unde
 
 
 
-<div id="outline-container-orgef390da" class="outline-2">
-<h2 id="orgef390da"><span class="section-number-2">3</span> IAM</h2>
+<div id="outline-container-org9a8b632" class="outline-2">
+<h2 id="org9a8b632"><span class="section-number-2">3</span> IAM</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 IAM controls <b>who</b> (authentication) can do <b>what</b> (authorization) in your AWS account.
@@ -561,8 +642,8 @@ Used to define the permissions for a user, group, or role.</li>
 </ul>
 </div>
 
-<div id="outline-container-orgd5720be" class="outline-3">
-<h3 id="orgd5720be"><span class="section-number-3">3.1</span> ARN</h3>
+<div id="outline-container-orgcd66590" class="outline-3">
+<h3 id="orgcd66590"><span class="section-number-3">3.1</span> ARN</h3>
 <div class="outline-text-3" id="text-3-1">
 
 <div class="figure">
@@ -574,12 +655,12 @@ Used to define the permissions for a user, group, or role.</li>
 
 
 
-<div id="outline-container-orgf1f4187" class="outline-3">
-<h3 id="orgf1f4187"><span class="section-number-3">3.2</span> CLIs</h3>
+<div id="outline-container-orgf891571" class="outline-3">
+<h3 id="orgf891571"><span class="section-number-3">3.2</span> CLIs</h3>
 <div class="outline-text-3" id="text-3-2">
 </div>
-<div id="outline-container-orgcc53c0e" class="outline-4">
-<h4 id="orgcc53c0e"><span class="section-number-4">3.2.1</span> Get account id</h4>
+<div id="outline-container-org1fb9111" class="outline-4">
+<h4 id="org1fb9111"><span class="section-number-4">3.2.1</span> Get account id</h4>
 <div class="outline-text-4" id="text-3-2-1">
 <div class="org-src-container">
 <pre class="src src-sh">aws iam get-user --query <span style="color: #87af5f;">"User.Arn"</span> --output text
@@ -588,8 +669,8 @@ Used to define the permissions for a user, group, or role.</li>
 </div>
 </div>
 
-<div id="outline-container-orgf45c896" class="outline-4">
-<h4 id="orgf45c896"><span class="section-number-4">3.2.2</span> Create groud and user</h4>
+<div id="outline-container-orgf605f23" class="outline-4">
+<h4 id="orgf605f23"><span class="section-number-4">3.2.2</span> Create groud and user</h4>
 <div class="outline-text-4" id="text-3-2-2">
 <div class="org-src-container">
 <pre class="src src-sh">aws iam create-group --group-name <span style="color: #87af5f;">"admin"</span>
@@ -605,12 +686,12 @@ aws iam create-login-profile --user-name <span style="color: #87af5f;">"myuser"<
 </div>
 
 
-<div id="outline-container-orgdeced26" class="outline-2">
-<h2 id="orgdeced26"><span class="section-number-2">4</span> Security Group</h2>
+<div id="outline-container-org497334f" class="outline-2">
+<h2 id="org497334f"><span class="section-number-2">4</span> Security Group</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-org8016ad1" class="outline-3">
-<h3 id="org8016ad1"><span class="section-number-3">4.1</span> Bastion Mode</h3>
+<div id="outline-container-org3f78237" class="outline-3">
+<h3 id="org3f78237"><span class="section-number-3">4.1</span> Bastion Mode</h3>
 <div class="outline-text-3" id="text-4-1">
 
 <div class="figure">
@@ -622,12 +703,12 @@ aws iam create-login-profile --user-name <span style="color: #87af5f;">"myuser"<
 </div>
 
 
-<div id="outline-container-org585221e" class="outline-2">
-<h2 id="org585221e"><span class="section-number-2">5</span> VPC</h2>
+<div id="outline-container-orge620a4b" class="outline-2">
+<h2 id="orge620a4b"><span class="section-number-2">5</span> VPC</h2>
 <div class="outline-text-2" id="text-5">
 </div>
-<div id="outline-container-orgf1ccc6f" class="outline-3">
-<h3 id="orgf1ccc6f"><span class="section-number-3">5.1</span> ACL</h3>
+<div id="outline-container-org32ae43f" class="outline-3">
+<h3 id="org32ae43f"><span class="section-number-3">5.1</span> ACL</h3>
 <div class="outline-text-3" id="text-5-1">
 <p>
 Network ACLs restrict traffic that goes from one subnet to another, acting as a firewall.
@@ -648,8 +729,8 @@ Security groups are tied to an instance, while Network ACL are tied to the subne
 </div>
 
 
-<div id="outline-container-org78099de" class="outline-3">
-<h3 id="org78099de"><span class="section-number-3">5.2</span> NAT Gateway</h3>
+<div id="outline-container-org00b7893" class="outline-3">
+<h3 id="org00b7893"><span class="section-number-3">5.2</span> NAT Gateway</h3>
 <div class="outline-text-3" id="text-5-2">
 
 <div class="figure">
@@ -672,8 +753,10 @@ Security groups are tied to an instance, while Network ACL are tied to the subne
 </div>
 </div>
 
-<div id="outline-container-org8961e52" class="outline-2">
-<h2 id="org8961e52"><span class="section-number-2">6</span> 参考资料</h2>
+
+
+<div id="outline-container-org0d47d42" class="outline-2">
+<h2 id="org0d47d42"><span class="section-number-2">6</span> 参考资料</h2>
 <div class="outline-text-2" id="text-6">
 <ul class="org-ul">
 <li><a href="https://github.com/AWSinAction/code2">AWS in Action</a></li>

@@ -54,10 +54,13 @@ Elastic Block Store (EBS) provides persistent block-level storage with *built-in
 prevent data loss due to hardware failures). \\
 An EBS volume is separate from an EC2 instance and connected over the network.
 
+
 #+BEGIN_EXAMPLE
   EBS is either not attached to an EC2 instance or attached to exactly ONE EC2 instance at a time.
   You can't attach the same EBS volume to multiple virtual machines!
 #+END_EXAMPLE
+
+[[file:img/aws_ebs_attach.png]]
 
 Usually, EBS volumes can be found somewhere in the range of =/dev/xvdf= to =/dev/xvdp=. \\
 The root volume (=/dev/xvda=) is an exception: it's _based on the AMI_ you choose when you launch the EC2 instance,
@@ -71,6 +74,20 @@ A snapshot is a block-level _incremental backup_ that is stored in S3.
 #+BEGIN_EXAMPLE
   If your volume is 5 GiB in size and you use 1 GiB of data, your first snapshot will be around 1 GiB in size.
   After the first snapshot is created, only the changes will be saved to S3, to reduce the size of the backup.
+#+END_EXAMPLE
+
+
+** Instance Store
+
+An instance store provides block-level storage _directly_ attached to the machine hosting your VM. \\
+It is part of an EC2 instance (not standalone resources like EBS volume) and available only if your instance is running;
+it won't persist your data if you stop or terminate the instance.
+
+[[file:img/aws_instance_store.png]]
+
+
+#+BEGIN_EXAMPLE
+  Don't use an instance store for data that must not be lost; use it for caching, temporary processing.
 #+END_EXAMPLE
 
 
