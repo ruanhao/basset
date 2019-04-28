@@ -60,6 +60,10 @@ An EBS volume is separate from an EC2 instance and connected over the network.
   You can't attach the same EBS volume to multiple virtual machines!
 #+END_EXAMPLE
 
+#+BEGIN_EXAMPLE
+  EBS volume is tied to a data center (also called an AZ) and can only be attached over the network to a single EC2 instance FROM THE SAME DATA CENTER.
+#+END_EXAMPLE
+
 [[file:img/aws_ebs_attach.png]]
 
 Usually, EBS volumes can be found somewhere in the range of =/dev/xvdf= to =/dev/xvdp=. \\
@@ -76,6 +80,31 @@ A snapshot is a block-level _incremental backup_ that is stored in S3.
   After the first snapshot is created, only the changes will be saved to S3, to reduce the size of the backup.
 #+END_EXAMPLE
 
+
+** EFS
+
+EFS filesystem can be used by multiple EC2 instances _from different data centers_.
+
+[[file:img/aws_ebs_efs_compare.png]]
+
+
+*** Filesystem and Mount target
+
+- Filesystem
+  Stores your data
+- Mount target
+  Makes your data accessible
+
+
+
+[[file:img/aws_efs_mount_target.png]]
+
+
+Filesystem is the resource that stores your data in an AWS region, but you can't access it directly. \\
+It is located in an AWS region and replicates your data under the covers *across multiple availability zones*. \\
+To do so, you must create an EFS mount target in a subnet.
+The mount target provides a *network endpoint* that you can use to mount the filesystem on an EC2 instance via NFSv4.1. \\
+The EC2 instance must be _in the same subnet_ as the EFS mount target (but you can create mount targets in multiple subnets).
 
 ** Instance Store
 
