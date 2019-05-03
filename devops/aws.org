@@ -106,6 +106,7 @@ To do so, you must create an EFS mount target in a subnet.
 The mount target provides a *network endpoint* that you can use to mount the filesystem on an EC2 instance via NFSv4.1. \\
 The EC2 instance must be _in the same subnet_ as the EFS mount target (but you can create mount targets in multiple subnets).
 
+
 ** Instance Store
 
 An instance store provides block-level storage _directly_ attached to the machine hosting your VM. \\
@@ -120,24 +121,35 @@ it won't persist your data if you stop or terminate the instance.
 #+END_EXAMPLE
 
 
-** CLI
+** Load Balancer
 
-*** list of running instances
+*** ALB
 
-#+BEGIN_SRC sh
-  aws ec2 describe-instances --filters "Name=instance-type,Values=m4.xlarge"
-#+END_SRC
+An ALB consists of three required parts and one optional part:
 
-*** list of Images
+- Load balancer
 
-#+BEGIN_SRC sh
-  $ aws ec2 describe-images --query "Images[0].ImageId"
-  "ami-146e2a7c"
-  $ aws ec2 describe-images --query "Images[0].ImageId" --output text
-  ami-146e2a7c
-  $ aws ec2 describe-images --query "Images[*].State"
-  ["available", "available"]
-#+END_SRC
+  Defines some core configurations, like the subnets the load balancer runs in,
+  whether the load balancer gets public IP addresses, whether it uses IPv4 or both IPv4 and IPv6, and additional attributes.
+- Listener
+
+  The listener defines the port and protocol that you can use to make requests to the load balancer. \\
+  If you like, the listener can also terminate TLS for you.
+  A listener links to a target group that is used as the default if no other listener rules match the request.
+- Target group
+
+  A target group defines your group of backends.
+  The target group is responsible for checking the backends by sending periodic health checks. \\
+  Usually backends are EC2 instances, but could also be a Docker container running on EC2 Container Service or
+  a machine in your data center paired with your VPC.
+- Listener rule
+
+  (_Optional_) \\
+  You can define a listener rule. The rule can choose a different target group based on the HTTP path or host. \\
+  Otherwise requests are forwarded to the default target group defined in the listener.
+
+
+[[file:img/aws_alb.png]]
 
 
 * Cloud Formation
