@@ -11,7 +11,7 @@
 | Author   | {{{author}}} ({{{email}}})    |
 | Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
 #+HTML: </div>
-#+TOC: headlines 3
+#+TOC: headlines 4
 
 
 * 消息标签
@@ -20,7 +20,9 @@
 - 在消息的路由过程中，消息的标签并没有随 payload 一起传递，如果需要明确知道是谁生产的 AMQP 消息的话，就要看生产者是否把发送方信息放入 payload 中。
 
 
-* AMQP
+* AMQP Protocol
+
+
 
 - 当队列拥有多个消费者，队列收到的消息将以循环的方式发送给消费者，每条消息只会发送给一个订阅的消费者。
 - 消费者接收到的每条消息都必须进行确认。
@@ -28,62 +30,154 @@
 - 如果消费者收到一条消息，在确认之前断开了连接（或者从队列上取消订阅），RabbitMQ 会认为这条消息没有分发，然后重新分发给下一个订阅的消费者。
 - 一个信道上可以创建多个订阅，使用 =consumer_tag= 来标识。
 
-** AMQP 0-9-1 模型
+** AMQP Frame
 
-#+HTML: <img src="https://www.rabbitmq.com/img/tutorials/intro/hello-world-example-routing.png"/>
+AMQP uses _classes_ and _methods_, referred to as *AMQP commands*, to create a common language between clients and servers.
+
+[[file:img/rabbit_frame.png]]
+
+[[file:img/rabbit_frame2.png]]
+
+*** Frame Types
+
+The AMQP specification defines five types of frames:
+
+- Protocol header frame
+  Only used once, when connecting to RabbitMQ.
+- Method frame
+  Carries with it the RPC request or response that's being sent to or received from RabbitMQ.
+- Content header frame
+  Contains the size and properties for a message.
+- Body frames
+  Contain the content of messages.
+- Heartbeat frame
+  Sent to and from RabbitMQ as a check to ensure that both sides of the connection are available and working properly.
+
+**** Method frame
+
+[[file:img/rabbit_method_frame.png]]
 
 
-** 订阅消息
+**** Content header frame
+
+[[file:img/rabbit_content_header_frame.png]]
 
 
+**** Body frame
 
-#+BEGIN_SRC plantuml :file img/rabbitmq_consume.png :eval never-export
+[[file:img/rabbit_body_frame.png]]
+
+
+** AMQP Model
+
+The AMQ model logically defines three abstract components in broker software that define the routing behavior of messages:
+
+- Exchange
+  The component of the message broker that routes messages to queues
+- Queue
+  A data structure on disk or in memory that stores messages
+- Binding
+  A rule that tells the exchange which queue the messages should be stored in
+
+
+** Protocol Implement
+
+*** Declaring exchange
+
+[[file:img/rabbit_declare_exchange.png]]
+
+
+If, for whatever reason, the command should fail, RabbitMQ will close the channel by sending a =Channel.Close= command. \\
+This response will include a numeric reply code and text value indicating why the =Exchange.Declare= failed and the channel was closed.
+
+*** Declaring queue
+
+#+BEGIN_SRC plantuml :file img/rabbitmq_create.png :eval never-export
   hide footbox
-  participant Consumer as c
-  database RabbitMQ as q
+  participant "Client" as c
+  database RabbitMQ as r
 
-  c -> q : basic.consume
+  c -> r : Queue.Declare
   note right
-  auto_ack：一旦消费者接收消息，RabbitMQ 自动视其确认了消息
+  exclusive:    设置私有队列，用于限制只有一个消费者的情况
+  auto-delete:  当最后一个消费者取消订阅的时候，队列自动移除
+  passive=true: 当队列存在，成功返回，否则返回错误，用于检测队列是否存在
   end note
-  ...
-  q -> c : msg
-  c --> q : basic.ack
+  r --> c : Queue.DeclareOk
 #+END_SRC
 
 #+RESULTS:
-[[file:img/rabbitmq_consume.png]]
+[[file:img/rabbitmq_create.png]]
 
 
+- 消费者和生产者都能使用 =Queue.Delare= 命令来创建队列。
+- 如果消费者在同一信道上已订阅了另一个信道的话，则无法再声明队列了，必须先取消订阅。
+- 当创建队列时，可以指定队列名称，如果不指定的话，RabbitMQ 会分配一个随机名称并在 =Queue.Declare= 命令的响应中返回。
+- 如果需要临时队列只为一个消费者服务的话，可以结合使用 =auto-delete= 和 =exclusive= ，当消费者断开连接时，队列就被移除了。
+- 发出去的消息如果路由到了不存在的队列的话，RabbitMQ 会忽略它们。因此，一般情况下，生产者和消费者都应该尝试创建队列。
+- Should the =Queue.Declare= command fail, the channel will be _closed_.
 
-** 获取消息
+#+BEGIN_EXAMPLE
+  When declaring a queue, there's no harm in issuing the same Queue.Declare command more than once.
+  RabbitMQ will consider subsequent queue declares to be PASSIVE and will return useful information about the queue,
+  such as the number of pending messages in the queue and the number of consumers subscribed to it.
+#+END_EXAMPLE
+
+
+*** Binding queue to exchange
+
+[[file:img/rabbit_bind_queue.png]]
+
+
+*** Publishing message
+
+[[file:img/rabbit_publish_msg.png]]
+
+*** Consuming message
+
+[[file:img/rabbit_comsume_msg.png]]
+
+
+**** =no_ack= argument for the =Basic.Consume= command
+
+When set to true, RabbitMQ will send messages continuously until the consumer sends a =Basic.Cancel= command or the consumer is disconnected. \\
+If the =no_ack= flag is set to false, a consumer must acknowledge each message that it receives by sending a =Basic.Ack= RPC request:
+
+[[file:img/rabbit_consume_ack.png]]
+
+
+When the =Basic.Ack= response frame is sent, the consumer must pass with it an argument from the =Basic.Deliver= method frame
+called the *delivery tag*. \\
+RabbitMQ uses the *delivery tag* along with the channel as a unique identifier to communicate message acknowledgement, rejection,
+and negative acknowledgement.
+
+*** 获取消息
 
 #+BEGIN_SRC plantuml :file img/rabbitmq_get.png :eval never-export
   hide footbox
-  participant Consumer as c
+  participant Client as c
   database RabbitMQ as q
 
-  c -> q : basic.get
+  c -> q : Basic.Get
   q -> c : msg
-  c --> q : basic.ack
+  c --> q : Basic.Ack
 #+END_SRC
 
 #+RESULTS:
 [[file:img/rabbitmq_get.png]]
 
-- =basic.get= 命令会订阅消息，获得单条消息，然后取消订阅，因此效率不高。
+=Basic.Get= 命令会订阅消息，获得单条消息，然后取消订阅，因此效率不高。
 
 
-
-** 拒绝消息
+*** 拒绝消息
 
 #+BEGIN_SRC plantuml :file img/rabbitmq_reject.png :eval never-export
   hide footbox
-  participant Consumer as c
+  participant Client as c
   database RabbitMQ as q
 
   q -> c : msg
-  c --> q : basic.reject
+  c --> q : Basic.Reject
   note right
   requeue=true:  RabbitMQ 将消息重新发送给下一个订阅的消费者
   requeue=false: 立即把消息从队列中移除，不会发送给新的消费者
@@ -99,31 +193,28 @@ dead letter 队列可以让管理者通过检测拒绝或未送达的消息来�
 因此，如果想使用 dead letter 队列功能的话，需要使用 =reject= 命令，并将其设为 false 。
 
 
-** 创建队列
-
-#+BEGIN_SRC plantuml :file img/rabbitmq_create.png :eval never-export
-  hide footbox
-  participant "Consumer/Producer" as c
-  database RabbitMQ as r
-
-  c -> r : queue.declare
-  note right
-  exclusive:    设置私有队列，用于限制只有一个消费者的情况
-  auto-delete:  当最后一个消费者取消订阅的时候，队列自动移除
-  passive=true: 当队列存在，成功返回，否则返回错误，用于检测队列是否存在
-  end note
-  r --> c : response
-#+END_SRC
-
-#+RESULTS:
-[[file:img/rabbitmq_create.png]]
 
 
-- 消费者和生产者都能使用 =queue.delare= 命令来创建队列。
-- 如果消费者在同一信道上已订阅了另一个信道的话，则无法再声明队列了，必须先取消订阅。
-- 当创建队列时，可以指定队列名称，如果不指定的话，RabbitMQ 会分配一个随机名称并在 =queue.declare= 命令的响应中返回。
-- 如果需要临时队列只为一个消费者服务的话，可以结合使用 =auto-delete= 和 =exclusive= ，当消费者断开连接时，队列就被移除了。
-- 发出去的消息如果路由到了不存在的队列的话，RabbitMQ 会忽略它们。因此，一般情况下，生产者和消费者都应该尝试创建队列。
+** =Basic.Properties=
+
+|------------------+--------------+-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Property         | Type         | For use by  | Suggested or specified use                                                                                                                                        |
+|------------------+--------------+-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| app-id           | short-string | Application | Useful for defining the application publishing the messages.                                                                                                      |
+| content-encoding | short-string | Application | Specify whether your message body is encoded in some special way, such as zlib, deflate, or Base64.                                                               |
+| content-type     | short-string | Application | If the message is in reference to some other message or uniquely identifiable item, the correlation-id is a good way to indicate what the message is referencing. |
+| delivery-mode    | octet        | RabbitMQ    | A value of 1 tells RabbitMQ it can keep the message in memory; 2 indicates it should also write it to disk.                                                       |
+| expiration       | short-string | RabbitMQ    | An epoch or Unix timestamp value as a text string that indicates when the message should expire.                                                                  |
+| headers          | table        | Both        | A free-form key/value table that you can use to add additional metadata about your mes- sage; RabbitMQ can route based upon this if desired.                      |
+| message-id       | short-string | Application | A unique identifier such as a UUID that your application can use to identify the message.                                                                         |
+| priority         | octet        | RabbitMQ    | A property for priority ordering in queues.                                                                                                                       |
+| timestamp        | timestamp    | Application | An epoch or Unix timestamp value that can be used to indicate when the message was created.                                                                       |
+| type             | short-string | Application | A text string your application can use to describe the message type or payload.                                                                                   |
+| user-id          | short-string | Both        | A free-form string that, if used, RabbitMQ will validate against the connected user and drop messages if they don't match.                                        |
+|------------------+--------------+-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+
+
+
 
 
 * 交换器
