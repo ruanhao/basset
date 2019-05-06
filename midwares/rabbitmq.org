@@ -214,7 +214,72 @@ dead letter 队列可以让管理者通过检测拒绝或未送达的消息来�
 |------------------+--------------+-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 
 
+** Guaranteed Publishing
 
+*** =mandatory= flag
+
+The =mandatory= flag is an argument that's passed along with the =Basic.Publish= RPC command and tells RabbitMQ that if a message isn't routable,
+it should send the message back to the publisher via a =Basic.Return= RPC.
+
+[[file:img/rabbit_publish_with_mandatory.png]]
+
+
+
+*** Publisher Confirm
+
+Prior to publishing any messages, a message publisher must issue a =Confirm.Select= RPC request to RabbitMQ and
+wait for a =Confirm.SelectOk= response to know that delivery confirmations are enabled.
+
+For each message that a publisher sends to RabbitMQ, the server will respond with an acknowledgement response (=Basic.Ack=) or
+a negative acknowledgement response (=Basic.Nack=).
+
+[[file:img/rabbit_publisher_confirm.png]]
+
+
+#+BEGIN_EXAMPLE
+  Any application that has enabled Publisher Confirms should be able to receive a confirmation at any point after sending the message.
+#+END_EXAMPLE
+
+
+*** Alternate exchange
+
+[[file:img/rabbit_alternate_exchange.png]]
+
+
+*** Transaction
+
+[[file:img/rabbit_transaction.png]]
+
+#+BEGIN_EXAMPLE
+  Transaction allows publishers more control over the SEQUENCE.
+  If you're considering transactions as a method of delivery confirmation, consider using Publisher Confirms as a LIGHTWEIGHT alternative.
+#+END_EXAMPLE
+
+
+*** HA queues
+
+Allows queues to have redundant copies across multiple servers.
+
+HA queues have a single primary server node, and all the other nodes are secondary.
+
+Should the primary node fail, one of the secondary nodes will take over the role of primary node. \\
+Should a secondary node be lost in an HA queue configuration, the other nodes would continue to operate as they were, sharing the state of operations that take place across all configured nodes.
+
+When a lost node is added back, or a new node is added to the cluster, _it won't contain any messages that are already in the queue across the existing nodes_. \\
+Instead, _it will receive all new messages_ and only be in sync once /all the previously published messages are consumed/.
+
+
+[[file:img/rabbit_ha_queues.png]]
+
+
+*** Delivery Mode 2
+
+In addition to =delivery-mode= of 2, for messages to truly survive a restart of a RabbitMQ broker,
+your queues must be declared as =durable= when they're created.
+
+#+BEGIN_EXAMPLE
+  It's a costly way to guarantee delivery.
+#+END_EXAMPLE
 
 
 * 交换器
