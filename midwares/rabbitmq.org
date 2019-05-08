@@ -20,7 +20,7 @@
 - 在消息的路由过程中，消息的标签并没有随 payload 一起传递，如果需要明确知道是谁生产的 AMQP 消息的话，就要看生产者是否把发送方信息放入 payload 中。
 
 
-* AMQP Protocol
+* AMQP
 
 
 
@@ -280,6 +280,40 @@ your queues must be declared as =durable= when they're created.
 #+BEGIN_EXAMPLE
   It's a costly way to guarantee delivery.
 #+END_EXAMPLE
+
+
+** =Basic.Consume=
+
+Consuming messages with =Basic.Consume= means your application _automatically_ receives messages from RabbitMQ as they become available
+until the client issues a =Basic.Cancel=.
+
+Application needs to _ACKNOWLEDGE_ the message to let RabbitMQ know the message has been processed.
+
+[[file:img/rabbit_basic_consume.png]]
+
+
+*** Consumer Tag
+
+When your application issues =Basic.Consume=, a unique string is created that identifies the application on the open channel with RabbitMQ.
+This string, called a *consumer tag*, is sent to your application with each message from RabbitMQ.
+
+The consumer tag can be used to _cancel_ any future receipt of messages from RabbitMQ by issuing a =Basic.Cancel= RPC command.
+
+*** No-ack mode
+
+There's a no-ack flag with =Basic.Consume= RPC request.
+When enabled, this flag tells RabbitMQ that your consumer won't acknowledge the receipt of messages and
+that RabbitMQ should just send them _as quickly as it is able_.
+
+*** Prefetching (QoS)
+
+prefetch 允许为每个 consumer 指定最大的 unacked messages 数目。
+
+简单来说就是用来指定一个 consumer 一次可以从 RabbitMQ 中获取多少条 message 并缓存在 client 中。 \\
+一旦缓冲区满了，RabbitMQ 将会停止投递新的 message 到该 consumer 中直到它发出 ack 。
+
+总的来说，consumer 负责不断处理消息，不断 ack ，然后只要 unacked 数少于 =prefetch * consumer= 数目，broker 就不断将消息投递过去。
+
 
 
 * 交换器
