@@ -315,6 +315,42 @@ prefetch 允许为每个 consumer 指定最大的 unacked messages 数目。
 总的来说，consumer 负责不断处理消息，不断 ack ，然后只要 unacked 数少于 =prefetch * consumer= 数目，broker 就不断将消息投递过去。
 
 
+*** =Basic.Reject=
+
+This RPC carries with it the _delivery tag_ created by RabbitMQ to uniquely identify the message. \\
+When a consumer rejects a message, you can instruct RabbitMQ to either _discard_ the message or to _requeue_ the message with the =requeue= flag.
+
+When a message is requeued, the =redelivered= flag is set in the message, informing the message's *next consumer* that it had been previously delivered.
+
+#+BEGIN_EXAMPLE
+  Basic.Reject allows for a single message to be rejected.
+  You can't reject multiple messages at the same time using Basic.Reject.
+#+END_EXAMPLE
+
+*** =Basic.Nack=
+
+=Basic.Nack= method implements _the same behavior_ as the =Basic.Reject=, but it adds "multiple-reject" behavior.
+
+*** Dead letter exchanges
+
+Dead letter exchange is actually a normal exchange.
+
+The only thing that makes an exchange a dead-letter exchange is the declared use of the exchange for rejected messages _when creating a queue_. \\
+Upon rejecting a message that isn't requeued, RabbitMQ will route the message to the exchanged specified in the queue's =x-dead-letter-exchange= argument.
+
+#+BEGIN_EXAMPLE
+  Dead-letter exchanges AREN'T THE SAME AS the alternate exchanges.
+  An expired or rejected message is delivered via a dead-letter exchange,
+  whereas an alternate exchange routes messages that otherwise couldn't be routed by RabbitMQ.
+#+END_EXAMPLE
+
+[[file:img/rabbit_dlx.png]]
+
+
+We can use the same exchange for dead-lettered messages as non-dead-lettered messages
+_but to ensure that the dead-lettered messages aren't delivered to the same queue_. \\
+Set =x-dead-letter-routing-key=  when declaring the queue.
+
 
 * 交换器
 
@@ -361,6 +397,7 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 ** 路由
 
 #+HTML: <img src="http://javasampleapproach.com/wp-content/uploads/2017/10/springboot-rabbitmq-exchange-to-exchange-architecture.png"/>
+
 
 * RabbitMQ 管理
 
