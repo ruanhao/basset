@@ -333,6 +333,7 @@ OPENSSLDIR: "/System/Library/OpenSSL"
 
 #+END_SRC
 
+
 ** 制作自签署证书
 
 自签署证书一般作为 CA 的证书，普通的证书由 CA 来签署，也可以按照该步骤制作自签署的普通证书（将自身作为 CA ）：
@@ -580,4 +581,13 @@ X509v3 extensions:
   # openssl dgst -sha256 /tmp/cert-body.bin
   openssl dgst -$hash_fun -verify /tmp/issuer-pub.pem \
           -signature /tmp/cert-sig.bin /tmp/cert-body.bin
+#+END_SRC
+
+*** Verify that a private key matches a certificate
+
+Compare the modulus of the public key in the certificate against the modulus of the private key.
+
+#+BEGIN_SRC sh
+  openssl rsa -modulus -noout -in <key.pem> | openssl md5
+  openssl x509 -modulus -noout -in <cert.pem> | openssl md5
 #+END_SRC
