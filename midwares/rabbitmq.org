@@ -11,24 +11,11 @@
 | Author   | {{{author}}} ({{{email}}})    |
 | Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
 #+HTML: </div>
-#+TOC: headlines 4
-
-
-* 消息标签
-
-- AMQP 用标签表述消息，由一个交换器名称和可选的主题标记组成。
-- 在消息的路由过程中，消息的标签并没有随 payload 一起传递，如果需要明确知道是谁生产的 AMQP 消息的话，就要看生产者是否把发送方信息放入 payload 中。
+#+TOC: headlines 5
 
 
 * AMQP
 
-
-
-- 当队列拥有多个消费者，队列收到的消息将以循环的方式发送给消费者，每条消息只会发送给一个订阅的消费者。
-- 消费者接收到的每条消息都必须进行确认。
-- 在上一条消息确认之前，RabbitMQ 会认为这个消费者并没有准备好接收下一条消息，因此不会再给该消费者发送更多消息。
-- 如果消费者收到一条消息，在确认之前断开了连接（或者从队列上取消订阅），RabbitMQ 会认为这条消息没有分发，然后重新分发给下一个订阅的消费者。
-- 一个信道上可以创建多个订阅，使用 =consumer_tag= 来标识。
 
 ** AMQP Frame
 
@@ -133,25 +120,125 @@ This response will include a numeric reply code and text value indicating why th
 
 [[file:img/rabbit_publish_msg.png]]
 
+
+**** =mandatory= flag
+
+The =mandatory= flag is an argument that's passed along with the =Basic.Publish= RPC command and tells RabbitMQ that if a message isn't routable,
+it should send the message back to the publisher via a =Basic.Return= RPC.
+
+[[file:img/rabbit_publish_with_mandatory.png]]
+
+
+
+**** Publisher Confirm
+
+Prior to publishing any messages, a message publisher must issue a =Confirm.Select= RPC request to RabbitMQ and
+wait for a =Confirm.SelectOk= response to know that delivery confirmations are enabled.
+
+For each message that a publisher sends to RabbitMQ, the server will respond with an acknowledgement response (=Basic.Ack=) or
+a negative acknowledgement response (=Basic.Nack=).
+
+[[file:img/rabbit_publisher_confirm.png]]
+
+
+#+BEGIN_EXAMPLE
+  Any application that has enabled Publisher Confirms should be able to receive a confirmation at any point after sending the message.
+#+END_EXAMPLE
+
+
+**** Alternate exchange
+
+[[file:img/rabbit_alternate_exchange.png]]
+
+
+**** Transaction
+
+[[file:img/rabbit_transaction.png]]
+
+#+BEGIN_EXAMPLE
+  Transaction allows publishers more control over the SEQUENCE.
+  If you're considering transactions as a method of delivery confirmation, consider using Publisher Confirms as a LIGHTWEIGHT alternative.
+#+END_EXAMPLE
+
+
+**** HA queues
+
+Allows queues to have redundant copies across multiple servers.
+
+HA queues have a single primary server node, and all the other nodes are secondary.
+
+Should the primary node fail, one of the secondary nodes will take over the role of primary node. \\
+Should a secondary node be lost in an HA queue configuration, the other nodes would continue to operate as they were, sharing the state of operations that take place across all configured nodes.
+
+When a lost node is added back, or a new node is added to the cluster, _it won't contain any messages that are already in the queue across the existing nodes_. \\
+Instead, _it will receive all new messages_ and only be in sync once /all the previously published messages are consumed/.
+
+
+[[file:img/rabbit_ha_queues.png]]
+
+
+**** Delivery Mode 2
+
+In addition to =delivery-mode= of 2, for messages to truly survive a restart of a RabbitMQ broker,
+your queues must be declared as =durable= when they're created.
+
+#+BEGIN_EXAMPLE
+  It's a costly way to guarantee delivery.
+#+END_EXAMPLE
+
+
+
 *** Consuming message
 
-[[file:img/rabbit_comsume_msg.png]]
+Consuming messages with =Basic.Consume= means your application _automatically_ receives messages from RabbitMQ as they become available
+until the client issues a =Basic.Cancel=.
+
+Application needs to _ACKNOWLEDGE_ the message to let RabbitMQ know the message has been processed.
 
 
-**** =no_ack= argument for the =Basic.Consume= command
+[[file:img/rabbit_basic_consume.png]]
 
-When set to true, RabbitMQ will send messages continuously until the consumer sends a =Basic.Cancel= command or the consumer is disconnected. \\
-If the =no_ack= flag is set to false, a consumer must acknowledge each message that it receives by sending a =Basic.Ack= RPC request:
+
+
+**** Consumer Tag
+
+When your application issues =Basic.Consume=, a unique string is created that identifies the application on the open channel with RabbitMQ.
+This string, called a *consumer tag*, is sent to your application with each message from RabbitMQ.
+
+The consumer tag can be used to _cancel_ any future receipt of messages from RabbitMQ by issuing a =Basic.Cancel= RPC command.
+
+
+**** =no-ack= argument
+
+There's a no-ack flag with =Basic.Consume= RPC request.
+When enabled, this flag tells RabbitMQ that your consumer won't acknowledge the receipt of messages and
+that RabbitMQ should just send them _as quickly as it is able_.
+
+
+
+If the =no_ack= flag is set to false, a consumer must acknowledge each message that it receives by sending a =Basic.Ack= RPC request.
 
 [[file:img/rabbit_consume_ack.png]]
 
+
+***** Delivery tag
 
 When the =Basic.Ack= response frame is sent, the consumer must pass with it an argument from the =Basic.Deliver= method frame
 called the *delivery tag*. \\
 RabbitMQ uses the *delivery tag* along with the channel as a unique identifier to communicate message acknowledgement, rejection,
 and negative acknowledgement.
 
-*** 获取消息
+**** Prefetching (QoS)
+
+prefetch 允许为每个 consumer 指定最大的 unacked messages 数目。
+
+简单来说就是用来指定一个 consumer 一次可以从 RabbitMQ 中获取多少条 message 并缓存在 client 中。 \\
+一旦缓冲区满了，RabbitMQ 将会停止投递新的 message 到该 consumer 中直到它发出 ack 。
+
+总的来说，consumer 负责不断处理消息，不断 ack ，然后只要 unacked 数少于 =prefetch * consumer= 数目，broker 就不断将消息投递过去。
+
+
+**** =Basic.Get=
 
 #+BEGIN_SRC plantuml :file img/rabbitmq_get.png :eval never-export
   hide footbox
@@ -169,153 +256,8 @@ and negative acknowledgement.
 =Basic.Get= 命令会订阅消息，获得单条消息，然后取消订阅，因此效率不高。
 
 
-*** 拒绝消息
 
-#+BEGIN_SRC plantuml :file img/rabbitmq_reject.png :eval never-export
-  hide footbox
-  participant Client as c
-  database RabbitMQ as q
-
-  q -> c : msg
-  c --> q : Basic.Reject
-  note right
-  requeue=true:  RabbitMQ 将消息重新发送给下一个订阅的消费者
-  requeue=false: 立即把消息从队列中移除，不会发送给新的消费者
-  end note
-#+END_SRC
-
-#+RESULTS:
-[[file:img/rabbitmq_reject.png]]
-
-
-=requeue=false= 的意义在于：RabbitMQ 会支持一个特殊的队列（dead letter）用来存放那些被拒绝而不重入队列的消息。
-dead letter 队列可以让管理者通过检测拒绝或未送达的消息来发现问题所在。
-因此，如果想使用 dead letter 队列功能的话，需要使用 =reject= 命令，并将其设为 false 。
-
-
-
-
-** =Basic.Properties=
-
-|------------------+--------------+-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Property         | Type         | For use by  | Suggested or specified use                                                                                                                                        |
-|------------------+--------------+-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| app-id           | short-string | Application | Useful for defining the application publishing the messages.                                                                                                      |
-| content-encoding | short-string | Application | Specify whether your message body is encoded in some special way, such as zlib, deflate, or Base64.                                                               |
-| content-type     | short-string | Application | If the message is in reference to some other message or uniquely identifiable item, the correlation-id is a good way to indicate what the message is referencing. |
-| delivery-mode    | octet        | RabbitMQ    | A value of 1 tells RabbitMQ it can keep the message in memory; 2 indicates it should also write it to disk.                                                       |
-| expiration       | short-string | RabbitMQ    | An epoch or Unix timestamp value as a text string that indicates when the message should expire.                                                                  |
-| headers          | table        | Both        | A free-form key/value table that you can use to add additional metadata about your mes- sage; RabbitMQ can route based upon this if desired.                      |
-| message-id       | short-string | Application | A unique identifier such as a UUID that your application can use to identify the message.                                                                         |
-| priority         | octet        | RabbitMQ    | A property for priority ordering in queues.                                                                                                                       |
-| timestamp        | timestamp    | Application | An epoch or Unix timestamp value that can be used to indicate when the message was created.                                                                       |
-| type             | short-string | Application | A text string your application can use to describe the message type or payload.                                                                                   |
-| user-id          | short-string | Both        | A free-form string that, if used, RabbitMQ will validate against the connected user and drop messages if they don't match.                                        |
-|------------------+--------------+-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-
-
-** Guaranteed Publishing
-
-*** =mandatory= flag
-
-The =mandatory= flag is an argument that's passed along with the =Basic.Publish= RPC command and tells RabbitMQ that if a message isn't routable,
-it should send the message back to the publisher via a =Basic.Return= RPC.
-
-[[file:img/rabbit_publish_with_mandatory.png]]
-
-
-
-*** Publisher Confirm
-
-Prior to publishing any messages, a message publisher must issue a =Confirm.Select= RPC request to RabbitMQ and
-wait for a =Confirm.SelectOk= response to know that delivery confirmations are enabled.
-
-For each message that a publisher sends to RabbitMQ, the server will respond with an acknowledgement response (=Basic.Ack=) or
-a negative acknowledgement response (=Basic.Nack=).
-
-[[file:img/rabbit_publisher_confirm.png]]
-
-
-#+BEGIN_EXAMPLE
-  Any application that has enabled Publisher Confirms should be able to receive a confirmation at any point after sending the message.
-#+END_EXAMPLE
-
-
-*** Alternate exchange
-
-[[file:img/rabbit_alternate_exchange.png]]
-
-
-*** Transaction
-
-[[file:img/rabbit_transaction.png]]
-
-#+BEGIN_EXAMPLE
-  Transaction allows publishers more control over the SEQUENCE.
-  If you're considering transactions as a method of delivery confirmation, consider using Publisher Confirms as a LIGHTWEIGHT alternative.
-#+END_EXAMPLE
-
-
-*** HA queues
-
-Allows queues to have redundant copies across multiple servers.
-
-HA queues have a single primary server node, and all the other nodes are secondary.
-
-Should the primary node fail, one of the secondary nodes will take over the role of primary node. \\
-Should a secondary node be lost in an HA queue configuration, the other nodes would continue to operate as they were, sharing the state of operations that take place across all configured nodes.
-
-When a lost node is added back, or a new node is added to the cluster, _it won't contain any messages that are already in the queue across the existing nodes_. \\
-Instead, _it will receive all new messages_ and only be in sync once /all the previously published messages are consumed/.
-
-
-[[file:img/rabbit_ha_queues.png]]
-
-
-*** Delivery Mode 2
-
-In addition to =delivery-mode= of 2, for messages to truly survive a restart of a RabbitMQ broker,
-your queues must be declared as =durable= when they're created.
-
-#+BEGIN_EXAMPLE
-  It's a costly way to guarantee delivery.
-#+END_EXAMPLE
-
-
-** =Basic.Consume=
-
-Consuming messages with =Basic.Consume= means your application _automatically_ receives messages from RabbitMQ as they become available
-until the client issues a =Basic.Cancel=.
-
-Application needs to _ACKNOWLEDGE_ the message to let RabbitMQ know the message has been processed.
-
-[[file:img/rabbit_basic_consume.png]]
-
-
-*** Consumer Tag
-
-When your application issues =Basic.Consume=, a unique string is created that identifies the application on the open channel with RabbitMQ.
-This string, called a *consumer tag*, is sent to your application with each message from RabbitMQ.
-
-The consumer tag can be used to _cancel_ any future receipt of messages from RabbitMQ by issuing a =Basic.Cancel= RPC command.
-
-*** No-ack mode
-
-There's a no-ack flag with =Basic.Consume= RPC request.
-When enabled, this flag tells RabbitMQ that your consumer won't acknowledge the receipt of messages and
-that RabbitMQ should just send them _as quickly as it is able_.
-
-*** Prefetching (QoS)
-
-prefetch 允许为每个 consumer 指定最大的 unacked messages 数目。
-
-简单来说就是用来指定一个 consumer 一次可以从 RabbitMQ 中获取多少条 message 并缓存在 client 中。 \\
-一旦缓冲区满了，RabbitMQ 将会停止投递新的 message 到该 consumer 中直到它发出 ack 。
-
-总的来说，consumer 负责不断处理消息，不断 ack ，然后只要 unacked 数少于 =prefetch * consumer= 数目，broker 就不断将消息投递过去。
-
-
-*** =Basic.Reject=
+**** =Basic.Reject=
 
 This RPC carries with it the _delivery tag_ created by RabbitMQ to uniquely identify the message. \\
 When a consumer rejects a message, you can instruct RabbitMQ to either _discard_ the message or to _requeue_ the message with the =requeue= flag.
@@ -327,11 +269,13 @@ When a message is requeued, the =redelivered= flag is set in the message, inform
   You can't reject multiple messages at the same time using Basic.Reject.
 #+END_EXAMPLE
 
-*** =Basic.Nack=
+
+**** =Basic.Nack=
 
 =Basic.Nack= method implements _the same behavior_ as the =Basic.Reject=, but it adds "multiple-reject" behavior.
 
-*** Dead letter exchanges
+
+**** Dead letter exchanges
 
 Dead letter exchange is actually a normal exchange.
 
@@ -350,6 +294,34 @@ Upon rejecting a message that isn't requeued, RabbitMQ will route the message to
 We can use the same exchange for dead-lettered messages as non-dead-lettered messages
 _but to ensure that the dead-lettered messages aren't delivered to the same queue_. \\
 Set =x-dead-letter-routing-key=  when declaring the queue.
+
+
+
+
+*** =Basic.Properties=
+
+|------------------+--------------+-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Property         | Type         | For use by  | Suggested or specified use                                                                                                                                        |
+|------------------+--------------+-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| app-id           | short-string | Application | Useful for defining the application publishing the messages.                                                                                                      |
+| content-encoding | short-string | Application | Specify whether your message body is encoded in some special way, such as zlib, deflate, or Base64.                                                               |
+| content-type     | short-string | Application | If the message is in reference to some other message or uniquely identifiable item, the correlation-id is a good way to indicate what the message is referencing. |
+| delivery-mode    | octet        | RabbitMQ    | A value of 1 tells RabbitMQ it can keep the message in memory; 2 indicates it should also write it to disk.                                                       |
+| expiration       | short-string | RabbitMQ    | An epoch or Unix timestamp value as a text string that indicates when the message should expire.                                                                  |
+| headers          | table        | Both        | A free-form key/value table that you can use to add additional metadata about your mes- sage; RabbitMQ can route based upon this if desired.                      |
+| message-id       | short-string | Application | A unique identifier such as a UUID that your application can use to identify the message.                                                                         |
+| priority         | octet        | RabbitMQ    | A property for priority ordering in queues.                                                                                                                       |
+| timestamp        | timestamp    | Application | An epoch or Unix timestamp value that can be used to indicate when the message was created.                                                                       |
+| type             | short-string | Application | A text string your application can use to describe the message type or payload.                                                                                   |
+| user-id          | short-string | Both        | A free-form string that, if used, RabbitMQ will validate against the connected user and drop messages if they don't match.                                        |
+|------------------+--------------+-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+
+
+
+
+
+
+
 
 
 * 交换器
@@ -744,17 +716,63 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 
 * 集群
 
-RabbitMQ 默认不会将队列的内容复制到整个集群上。
-如果不进行特别的配置，这些信息仅存在于队列所属的那个节点上。
-非所有者节点 *只知道队列的元数据* 和指向该队列存在的那个节点的指针。
+** Architecture
 
-#+CAPTION: 只有队列的元信息在节点间共享
-#+NAME: rabiit_cluster
-[[file:img/rabbit_cluster.png]]
+At all times RabbitMQ is keeping track of four kinds of internal metadata:
 
-#+CAPTION: 交换器中的路由信息在节点间共享
-#+NAME: rabiit_cluster_exchange
+- Queue metadata
+
+Queue names and their properties (durable or auto-delete)
+- Exchange metadata
+
+  The exchange's name, the type of exchange it is, and what the properties are (durable and so on)
+- Binding metadata
+
+  A simple table showing how to route messages to queues
+- Vhost metadata
+
+  Namespacing and security attributes for the queues, exchanges, and bindings within a vhost
+
+- Node location meatadata (clustering only)
+
+
+RabbitMQ stores all of this information _in memory_ while writing it to disk for any queues and exchanges (and their bindings) marked *durable*.
+
+
+*** Queue in cluster
+
+By default, not every node in cluster has a full copy of every queue.
+
+file:img/rabbit_cluster.png
+
+#+BEGIN_EXAMPLE
+  If the queues being recreated were marked as durable, redeclaring them from another node will get you an ugly 404 NOT_FOUND error.
+  This ensures messages in that queue on the failed node don't disappear when you restore it to the cluster.
+#+END_EXAMPLE
+
+*** Exchange in cluster
+
+Actually, exchanges are just a name and a list of queue bindings. \\
+The *channel* does the actual routing of the message to the queue as specified by the matching binding.
+
 file:img/rabbit_cluster_exchange.png
+
+*** RAM/DISK node
+
+When nodes join or leave a cluster, they need to be able to notify *at least one* disk node of the change.
+
+If you only have one disk node and that node happens to be down, your cluster can continue to route messages but you can't do any of the following:
+
+- Create queues
+- Create exchanges
+- Create bindings
+- Add users
+- Change permissions
+- Add or remove cluster nodes
+
+#+BEGIN_EXAMPLE
+  The only meatadata RAM nodes store to disk are the addresses of disk nodes in the cluster.
+#+END_EXAMPLE
 
 ** 集群管理
 

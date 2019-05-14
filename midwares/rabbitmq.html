@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- 2019-05-06 Mon 14:42 -->
+<!-- 2019-05-14 Tue 18:00 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RabbitMQ</title>
@@ -234,122 +234,135 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org2f5f8a7">1. 消息标签</a></li>
-<li><a href="#orgdb7ccba">2. AMQP Protocol</a>
+<li><a href="#org6384e22">1. AMQP</a>
 <ul>
-<li><a href="#org4feb0aa">2.1. AMQP Frame</a>
+<li><a href="#org4b87bce">1.1. AMQP Frame</a>
 <ul>
-<li><a href="#org56bd309">2.1.1. Frame Types</a>
+<li><a href="#orgc59b5d6">1.1.1. Frame Types</a>
 <ul>
-<li><a href="#org64c5fa7">2.1.1.1. Method frame</a></li>
-<li><a href="#orgd3fe35c">2.1.1.2. Content header frame</a></li>
-<li><a href="#org4a46e23">2.1.1.3. Body frame</a></li>
+<li><a href="#org769671f">1.1.1.1. Method frame</a></li>
+<li><a href="#orgd10f095">1.1.1.2. Content header frame</a></li>
+<li><a href="#org24ea523">1.1.1.3. Body frame</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org854c7cd">2.2. AMQP Model</a></li>
-<li><a href="#org0747194">2.3. Protocol Implement</a>
+<li><a href="#orgf109325">1.2. AMQP Model</a></li>
+<li><a href="#org9ea3aba">1.3. Protocol Implement</a>
 <ul>
-<li><a href="#org5d3d001">2.3.1. Declaring exchange</a></li>
-<li><a href="#org9edf901">2.3.2. Declaring queue</a></li>
-<li><a href="#org5086565">2.3.3. Binding queue to exchange</a></li>
-<li><a href="#orgc9f73c7">2.3.4. Publishing message</a></li>
-<li><a href="#org74a0bef">2.3.5. Consuming message</a>
+<li><a href="#orgf5ce879">1.3.1. Declaring exchange</a></li>
+<li><a href="#org4e2b888">1.3.2. Declaring queue</a></li>
+<li><a href="#org41af4cd">1.3.3. Binding queue to exchange</a></li>
+<li><a href="#org5132512">1.3.4. Publishing message</a>
 <ul>
-<li><a href="#org84611a1">2.3.5.1. <code>no_ack</code> argument for the <code>Basic.Consume</code> command</a></li>
+<li><a href="#orgbab0b4d">1.3.4.1. <code>mandatory</code> flag</a></li>
+<li><a href="#org946727c">1.3.4.2. Publisher Confirm</a></li>
+<li><a href="#orgb2f1322">1.3.4.3. Alternate exchange</a></li>
+<li><a href="#org2918113">1.3.4.4. Transaction</a></li>
+<li><a href="#orgaa43970">1.3.4.5. HA queues</a></li>
+<li><a href="#orgdcef4a6">1.3.4.6. Delivery Mode 2</a></li>
 </ul>
 </li>
-<li><a href="#orgff834dd">2.3.6. 获取消息</a></li>
-<li><a href="#org7048761">2.3.7. 拒绝消息</a></li>
-</ul>
-</li>
-<li><a href="#org3a01900">2.4. <code>Basic.Properties</code></a></li>
-<li><a href="#org2d61837">2.5. Guaranteed Publishing</a>
+<li><a href="#orgdc28493">1.3.5. Consuming message</a>
 <ul>
-<li><a href="#org68628ee">2.5.1. <code>mandatory</code> flag</a></li>
-<li><a href="#org76cf025">2.5.2. Publisher Confirm</a></li>
-<li><a href="#org26d4504">2.5.3. Alternate exchange</a></li>
-<li><a href="#orgecadd3b">2.5.4. Transaction</a></li>
-<li><a href="#org7a05cdd">2.5.5. HA queues</a></li>
-<li><a href="#orgafc282a">2.5.6. Delivery Mode 2</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#org30bf5b7">3. 交换器</a>
+<li><a href="#org44943f9">1.3.5.1. Consumer Tag</a></li>
+<li><a href="#org9d2e82b">1.3.5.2. <code>no-ack</code> argument</a>
 <ul>
-<li><a href="#orgd7c3cec">3.1. 属性</a></li>
-<li><a href="#orgfd39ef8">3.2. direct</a></li>
-<li><a href="#org74c82ae">3.3. fanout</a></li>
-<li><a href="#org7125f94">3.4. topic</a></li>
-<li><a href="#org2208b10">3.5. 路由</a></li>
+<li><a href="#org6fc0b2e">1.3.5.2.1. Delivery tag</a></li>
 </ul>
 </li>
-<li><a href="#orga355809">4. RabbitMQ 管理</a>
+<li><a href="#org5855fc2">1.3.5.3. Prefetching (QoS)</a></li>
+<li><a href="#org837c7cd">1.3.5.4. <code>Basic.Get</code></a></li>
+<li><a href="#org4793bf4">1.3.5.5. <code>Basic.Reject</code></a></li>
+<li><a href="#org6c0e3df">1.3.5.6. <code>Basic.Nack</code></a></li>
+<li><a href="#org7af365e">1.3.5.7. Dead letter exchanges</a></li>
+</ul>
+</li>
+<li><a href="#org096c73c">1.3.6. <code>Basic.Properties</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org935027e">2. 交换器</a>
 <ul>
-<li><a href="#org4752497">4.1. 启动停止</a>
+<li><a href="#org10c1e99">2.1. 属性</a></li>
+<li><a href="#org68de37f">2.2. direct</a></li>
+<li><a href="#org329369d">2.3. fanout</a></li>
+<li><a href="#org0dd0f69">2.4. topic</a></li>
+<li><a href="#orgd1c2e60">2.5. 路由</a></li>
+</ul>
+</li>
+<li><a href="#org85dbe2c">3. RabbitMQ 管理</a>
 <ul>
-<li><a href="#org88649a9">4.1.1. 停止节点</a></li>
-<li><a href="#org3f4c570">4.1.2. 停止应用</a></li>
-</ul>
-</li>
-<li><a href="#org6d53351">4.2. 配置文件</a></li>
-<li><a href="#org7641b2f">4.3. 管理用户</a>
+<li><a href="#org6318b55">3.1. 启动停止</a>
 <ul>
-<li><a href="#org07381ed">4.3.1. 创建</a></li>
-<li><a href="#org7e62920">4.3.2. 删除</a></li>
-<li><a href="#orgf4b5c0c">4.3.3. 修改密码</a></li>
-<li><a href="#org0c768ee">4.3.4. 查看</a></li>
+<li><a href="#org4ffc3b0">3.1.1. 停止节点</a></li>
+<li><a href="#org0ff2b0d">3.1.2. 停止应用</a></li>
 </ul>
 </li>
-<li><a href="#org3f2d272">4.4. 管理权限</a>
+<li><a href="#org22188e2">3.2. 配置文件</a></li>
+<li><a href="#orgbe93e29">3.3. 管理用户</a>
 <ul>
-<li><a href="#orgfcc14c2">4.4.1. 创建</a></li>
-<li><a href="#org6b340c2">4.4.2. 删除</a></li>
-<li><a href="#orgbd16162">4.4.3. 查看</a></li>
+<li><a href="#org518782f">3.3.1. 创建</a></li>
+<li><a href="#org698a3f7">3.3.2. 删除</a></li>
+<li><a href="#org877feac">3.3.3. 修改密码</a></li>
+<li><a href="#org8a6fe92">3.3.4. 查看</a></li>
 </ul>
 </li>
-<li><a href="#orgc2f1efe">4.5. 管理 vhost</a></li>
-<li><a href="#org509619d">4.6. 信息查询</a>
+<li><a href="#orge2ba20a">3.4. 管理权限</a>
 <ul>
-<li><a href="#org5745ca7">4.6.1. 查看队列</a></li>
-<li><a href="#orgbe4e2c0">4.6.2. 查看交换器</a></li>
-<li><a href="#org52d3081">4.6.3. 查看绑定信息</a></li>
-<li><a href="#orgaadd566">4.6.4. 查看集群状态</a></li>
-<li><a href="#orgc61bb82">4.6.5. 接入 Eshell</a></li>
+<li><a href="#org2d249d5">3.4.1. 创建</a></li>
+<li><a href="#org4e30cb2">3.4.2. 删除</a></li>
+<li><a href="#org7325770">3.4.3. 查看</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a href="#orgaeaa8e0">5. 代码示例</a>
+<li><a href="#orgadf9382">3.5. 管理 vhost</a></li>
+<li><a href="#orga2c8698">3.6. 信息查询</a>
 <ul>
-<li><a href="#org4e47e0d">5.1. 基本用法</a>
+<li><a href="#org771fcb9">3.6.1. 查看队列</a></li>
+<li><a href="#org5805197">3.6.2. 查看交换器</a></li>
+<li><a href="#org8469b20">3.6.3. 查看绑定信息</a></li>
+<li><a href="#org032664b">3.6.4. 查看集群状态</a></li>
+<li><a href="#orge384dc0">3.6.5. 接入 Eshell</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org1a98d08">4. 代码示例</a>
 <ul>
-<li><a href="#org5e59b3a">5.1.1. 生产者</a></li>
-<li><a href="#orgff7d24a">5.1.2. 消费者</a></li>
-</ul>
-</li>
-<li><a href="#orgcd6bd59">5.2. 发送方确认模式</a>
+<li><a href="#orge47e740">4.1. 基本用法</a>
 <ul>
-<li><a href="#org1b4396e">5.2.1. 生产者</a></li>
+<li><a href="#org1b12efd">4.1.1. 生产者</a></li>
+<li><a href="#org7e39d52">4.1.2. 消费者</a></li>
 </ul>
 </li>
-<li><a href="#org70c5076">5.3. 通过 AMQP 实时访问日志</a></li>
-</ul>
-</li>
-<li><a href="#org72b3fb1">6. 集群</a>
+<li><a href="#org389c1d7">4.2. 发送方确认模式</a>
 <ul>
-<li><a href="#org30020ab">6.1. 集群管理</a>
+<li><a href="#org5101496">4.2.1. 生产者</a></li>
+</ul>
+</li>
+<li><a href="#orgfaaa2ee">4.3. 通过 AMQP 实时访问日志</a></li>
+</ul>
+</li>
+<li><a href="#org154c449">5. 集群</a>
 <ul>
-<li><a href="#orgc9d1b65">6.1.1. 清空节点元数据（重设）</a></li>
-<li><a href="#org5ea5b7e">6.1.2. 加入集群</a></li>
-<li><a href="#org16d8a79">6.1.3. 查看集群信息</a></li>
+<li><a href="#orgd8719cb">5.1. Architecture</a>
+<ul>
+<li><a href="#orgf5e6559">5.1.1. Queue in cluster</a></li>
+<li><a href="#org4898350">5.1.2. Exchange in cluster</a></li>
+<li><a href="#org16f9fba">5.1.3. RAM/DISK node</a></li>
+</ul>
+</li>
+<li><a href="#org13b17ea">5.2. 集群管理</a>
+<ul>
+<li><a href="#org2cb4b28">5.2.1. 清空节点元数据（重设）</a></li>
+<li><a href="#org388dd15">5.2.2. 加入集群</a></li>
+<li><a href="#orgdec4153">5.2.3. 查看集群信息</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgee48b39">7. 持久性</a></li>
+<li><a href="#org86149d0">6. 持久性</a></li>
 </ul>
 </div>
 </div>
@@ -370,7 +383,7 @@ for the JavaScript code in this tag.
 
 <tr>
 <td class="org-left">Date</td>
-<td class="org-left">2019-05-06 14:42:25</td>
+<td class="org-left">2019-05-14 18:00:15</td>
 </tr>
 </tbody>
 </table>
@@ -379,153 +392,147 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org2f5f8a7">1. 消息标签</a></li>
-<li><a href="#orgdb7ccba">2. AMQP Protocol</a>
+<li><a href="#org6384e22">1. AMQP</a>
 <ul>
-<li><a href="#org4feb0aa">2.1. AMQP Frame</a>
+<li><a href="#org4b87bce">1.1. AMQP Frame</a>
 <ul>
-<li><a href="#org56bd309">2.1.1. Frame Types</a>
+<li><a href="#orgc59b5d6">1.1.1. Frame Types</a>
 <ul>
-<li><a href="#org64c5fa7">2.1.1.1. Method frame</a></li>
-<li><a href="#orgd3fe35c">2.1.1.2. Content header frame</a></li>
-<li><a href="#org4a46e23">2.1.1.3. Body frame</a></li>
+<li><a href="#org769671f">1.1.1.1. Method frame</a></li>
+<li><a href="#orgd10f095">1.1.1.2. Content header frame</a></li>
+<li><a href="#org24ea523">1.1.1.3. Body frame</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org854c7cd">2.2. AMQP Model</a></li>
-<li><a href="#org0747194">2.3. Protocol Implement</a>
+<li><a href="#orgf109325">1.2. AMQP Model</a></li>
+<li><a href="#org9ea3aba">1.3. Protocol Implement</a>
 <ul>
-<li><a href="#org5d3d001">2.3.1. Declaring exchange</a></li>
-<li><a href="#org9edf901">2.3.2. Declaring queue</a></li>
-<li><a href="#org5086565">2.3.3. Binding queue to exchange</a></li>
-<li><a href="#orgc9f73c7">2.3.4. Publishing message</a></li>
-<li><a href="#org74a0bef">2.3.5. Consuming message</a>
+<li><a href="#orgf5ce879">1.3.1. Declaring exchange</a></li>
+<li><a href="#org4e2b888">1.3.2. Declaring queue</a></li>
+<li><a href="#org41af4cd">1.3.3. Binding queue to exchange</a></li>
+<li><a href="#org5132512">1.3.4. Publishing message</a>
 <ul>
-<li><a href="#org84611a1">2.3.5.1. <code>no_ack</code> argument for the <code>Basic.Consume</code> command</a></li>
+<li><a href="#orgbab0b4d">1.3.4.1. <code>mandatory</code> flag</a></li>
+<li><a href="#org946727c">1.3.4.2. Publisher Confirm</a></li>
+<li><a href="#orgb2f1322">1.3.4.3. Alternate exchange</a></li>
+<li><a href="#org2918113">1.3.4.4. Transaction</a></li>
+<li><a href="#orgaa43970">1.3.4.5. HA queues</a></li>
+<li><a href="#orgdcef4a6">1.3.4.6. Delivery Mode 2</a></li>
 </ul>
 </li>
-<li><a href="#orgff834dd">2.3.6. 获取消息</a></li>
-<li><a href="#org7048761">2.3.7. 拒绝消息</a></li>
-</ul>
-</li>
-<li><a href="#org3a01900">2.4. <code>Basic.Properties</code></a></li>
-<li><a href="#org2d61837">2.5. Guaranteed Publishing</a>
+<li><a href="#orgdc28493">1.3.5. Consuming message</a>
 <ul>
-<li><a href="#org68628ee">2.5.1. <code>mandatory</code> flag</a></li>
-<li><a href="#org76cf025">2.5.2. Publisher Confirm</a></li>
-<li><a href="#org26d4504">2.5.3. Alternate exchange</a></li>
-<li><a href="#orgecadd3b">2.5.4. Transaction</a></li>
-<li><a href="#org7a05cdd">2.5.5. HA queues</a></li>
-<li><a href="#orgafc282a">2.5.6. Delivery Mode 2</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#org30bf5b7">3. 交换器</a>
+<li><a href="#org44943f9">1.3.5.1. Consumer Tag</a></li>
+<li><a href="#org9d2e82b">1.3.5.2. <code>no-ack</code> argument</a>
 <ul>
-<li><a href="#orgd7c3cec">3.1. 属性</a></li>
-<li><a href="#orgfd39ef8">3.2. direct</a></li>
-<li><a href="#org74c82ae">3.3. fanout</a></li>
-<li><a href="#org7125f94">3.4. topic</a></li>
-<li><a href="#org2208b10">3.5. 路由</a></li>
+<li><a href="#org6fc0b2e">1.3.5.2.1. Delivery tag</a></li>
 </ul>
 </li>
-<li><a href="#orga355809">4. RabbitMQ 管理</a>
+<li><a href="#org5855fc2">1.3.5.3. Prefetching (QoS)</a></li>
+<li><a href="#org837c7cd">1.3.5.4. <code>Basic.Get</code></a></li>
+<li><a href="#org4793bf4">1.3.5.5. <code>Basic.Reject</code></a></li>
+<li><a href="#org6c0e3df">1.3.5.6. <code>Basic.Nack</code></a></li>
+<li><a href="#org7af365e">1.3.5.7. Dead letter exchanges</a></li>
+</ul>
+</li>
+<li><a href="#org096c73c">1.3.6. <code>Basic.Properties</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org935027e">2. 交换器</a>
 <ul>
-<li><a href="#org4752497">4.1. 启动停止</a>
+<li><a href="#org10c1e99">2.1. 属性</a></li>
+<li><a href="#org68de37f">2.2. direct</a></li>
+<li><a href="#org329369d">2.3. fanout</a></li>
+<li><a href="#org0dd0f69">2.4. topic</a></li>
+<li><a href="#orgd1c2e60">2.5. 路由</a></li>
+</ul>
+</li>
+<li><a href="#org85dbe2c">3. RabbitMQ 管理</a>
 <ul>
-<li><a href="#org88649a9">4.1.1. 停止节点</a></li>
-<li><a href="#org3f4c570">4.1.2. 停止应用</a></li>
-</ul>
-</li>
-<li><a href="#org6d53351">4.2. 配置文件</a></li>
-<li><a href="#org7641b2f">4.3. 管理用户</a>
+<li><a href="#org6318b55">3.1. 启动停止</a>
 <ul>
-<li><a href="#org07381ed">4.3.1. 创建</a></li>
-<li><a href="#org7e62920">4.3.2. 删除</a></li>
-<li><a href="#orgf4b5c0c">4.3.3. 修改密码</a></li>
-<li><a href="#org0c768ee">4.3.4. 查看</a></li>
+<li><a href="#org4ffc3b0">3.1.1. 停止节点</a></li>
+<li><a href="#org0ff2b0d">3.1.2. 停止应用</a></li>
 </ul>
 </li>
-<li><a href="#org3f2d272">4.4. 管理权限</a>
+<li><a href="#org22188e2">3.2. 配置文件</a></li>
+<li><a href="#orgbe93e29">3.3. 管理用户</a>
 <ul>
-<li><a href="#orgfcc14c2">4.4.1. 创建</a></li>
-<li><a href="#org6b340c2">4.4.2. 删除</a></li>
-<li><a href="#orgbd16162">4.4.3. 查看</a></li>
+<li><a href="#org518782f">3.3.1. 创建</a></li>
+<li><a href="#org698a3f7">3.3.2. 删除</a></li>
+<li><a href="#org877feac">3.3.3. 修改密码</a></li>
+<li><a href="#org8a6fe92">3.3.4. 查看</a></li>
 </ul>
 </li>
-<li><a href="#orgc2f1efe">4.5. 管理 vhost</a></li>
-<li><a href="#org509619d">4.6. 信息查询</a>
+<li><a href="#orge2ba20a">3.4. 管理权限</a>
 <ul>
-<li><a href="#org5745ca7">4.6.1. 查看队列</a></li>
-<li><a href="#orgbe4e2c0">4.6.2. 查看交换器</a></li>
-<li><a href="#org52d3081">4.6.3. 查看绑定信息</a></li>
-<li><a href="#orgaadd566">4.6.4. 查看集群状态</a></li>
-<li><a href="#orgc61bb82">4.6.5. 接入 Eshell</a></li>
+<li><a href="#org2d249d5">3.4.1. 创建</a></li>
+<li><a href="#org4e30cb2">3.4.2. 删除</a></li>
+<li><a href="#org7325770">3.4.3. 查看</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a href="#orgaeaa8e0">5. 代码示例</a>
+<li><a href="#orgadf9382">3.5. 管理 vhost</a></li>
+<li><a href="#orga2c8698">3.6. 信息查询</a>
 <ul>
-<li><a href="#org4e47e0d">5.1. 基本用法</a>
+<li><a href="#org771fcb9">3.6.1. 查看队列</a></li>
+<li><a href="#org5805197">3.6.2. 查看交换器</a></li>
+<li><a href="#org8469b20">3.6.3. 查看绑定信息</a></li>
+<li><a href="#org032664b">3.6.4. 查看集群状态</a></li>
+<li><a href="#orge384dc0">3.6.5. 接入 Eshell</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org1a98d08">4. 代码示例</a>
 <ul>
-<li><a href="#org5e59b3a">5.1.1. 生产者</a></li>
-<li><a href="#orgff7d24a">5.1.2. 消费者</a></li>
-</ul>
-</li>
-<li><a href="#orgcd6bd59">5.2. 发送方确认模式</a>
+<li><a href="#orge47e740">4.1. 基本用法</a>
 <ul>
-<li><a href="#org1b4396e">5.2.1. 生产者</a></li>
+<li><a href="#org1b12efd">4.1.1. 生产者</a></li>
+<li><a href="#org7e39d52">4.1.2. 消费者</a></li>
 </ul>
 </li>
-<li><a href="#org70c5076">5.3. 通过 AMQP 实时访问日志</a></li>
-</ul>
-</li>
-<li><a href="#org72b3fb1">6. 集群</a>
+<li><a href="#org389c1d7">4.2. 发送方确认模式</a>
 <ul>
-<li><a href="#org30020ab">6.1. 集群管理</a>
+<li><a href="#org5101496">4.2.1. 生产者</a></li>
+</ul>
+</li>
+<li><a href="#orgfaaa2ee">4.3. 通过 AMQP 实时访问日志</a></li>
+</ul>
+</li>
+<li><a href="#org154c449">5. 集群</a>
 <ul>
-<li><a href="#orgc9d1b65">6.1.1. 清空节点元数据（重设）</a></li>
-<li><a href="#org5ea5b7e">6.1.2. 加入集群</a></li>
-<li><a href="#org16d8a79">6.1.3. 查看集群信息</a></li>
+<li><a href="#orgd8719cb">5.1. Architecture</a>
+<ul>
+<li><a href="#orgf5e6559">5.1.1. Queue in cluster</a></li>
+<li><a href="#org4898350">5.1.2. Exchange in cluster</a></li>
+<li><a href="#org16f9fba">5.1.3. RAM/DISK node</a></li>
+</ul>
+</li>
+<li><a href="#org13b17ea">5.2. 集群管理</a>
+<ul>
+<li><a href="#org2cb4b28">5.2.1. 清空节点元数据（重设）</a></li>
+<li><a href="#org388dd15">5.2.2. 加入集群</a></li>
+<li><a href="#orgdec4153">5.2.3. 查看集群信息</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgee48b39">7. 持久性</a></li>
+<li><a href="#org86149d0">6. 持久性</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org2f5f8a7" class="outline-2">
-<h2 id="org2f5f8a7"><span class="section-number-2">1</span> 消息标签</h2>
+<div id="outline-container-org6384e22" class="outline-2">
+<h2 id="org6384e22"><span class="section-number-2">1</span> AMQP</h2>
 <div class="outline-text-2" id="text-1">
-<ul class="org-ul">
-<li>AMQP 用标签表述消息，由一个交换器名称和可选的主题标记组成。</li>
-<li>在消息的路由过程中，消息的标签并没有随 payload 一起传递，如果需要明确知道是谁生产的 AMQP 消息的话，就要看生产者是否把发送方信息放入 payload 中。</li>
-</ul>
 </div>
-</div>
-
-
-<div id="outline-container-orgdb7ccba" class="outline-2">
-<h2 id="orgdb7ccba"><span class="section-number-2">2</span> AMQP Protocol</h2>
-<div class="outline-text-2" id="text-2">
-<ul class="org-ul">
-<li>当队列拥有多个消费者，队列收到的消息将以循环的方式发送给消费者，每条消息只会发送给一个订阅的消费者。</li>
-<li>消费者接收到的每条消息都必须进行确认。</li>
-<li>在上一条消息确认之前，RabbitMQ 会认为这个消费者并没有准备好接收下一条消息，因此不会再给该消费者发送更多消息。</li>
-<li>如果消费者收到一条消息，在确认之前断开了连接（或者从队列上取消订阅），RabbitMQ 会认为这条消息没有分发，然后重新分发给下一个订阅的消费者。</li>
-<li>一个信道上可以创建多个订阅，使用 <code>consumer_tag</code> 来标识。</li>
-</ul>
-</div>
-
-<div id="outline-container-org4feb0aa" class="outline-3">
-<h3 id="org4feb0aa"><span class="section-number-3">2.1</span> AMQP Frame</h3>
-<div class="outline-text-3" id="text-2-1">
+<div id="outline-container-org4b87bce" class="outline-3">
+<h3 id="org4b87bce"><span class="section-number-3">1.1</span> AMQP Frame</h3>
+<div class="outline-text-3" id="text-1-1">
 <p>
 AMQP uses <span class="underline">classes</span> and <span class="underline">methods</span>, referred to as <b>AMQP commands</b>, to create a common language between clients and servers.
 </p>
@@ -543,9 +550,9 @@ AMQP uses <span class="underline">classes</span> and <span class="underline">met
 </div>
 </div>
 
-<div id="outline-container-org56bd309" class="outline-4">
-<h4 id="org56bd309"><span class="section-number-4">2.1.1</span> Frame Types</h4>
-<div class="outline-text-4" id="text-2-1-1">
+<div id="outline-container-orgc59b5d6" class="outline-4">
+<h4 id="orgc59b5d6"><span class="section-number-4">1.1.1</span> Frame Types</h4>
+<div class="outline-text-4" id="text-1-1-1">
 <p>
 The AMQP specification defines five types of frames:
 </p>
@@ -564,9 +571,9 @@ Sent to and from RabbitMQ as a check to ensure that both sides of the connection
 </ul>
 </div>
 
-<div id="outline-container-org64c5fa7" class="outline-5">
-<h5 id="org64c5fa7"><span class="section-number-5">2.1.1.1</span> Method frame</h5>
-<div class="outline-text-5" id="text-2-1-1-1">
+<div id="outline-container-org769671f" class="outline-5">
+<h5 id="org769671f"><span class="section-number-5">1.1.1.1</span> Method frame</h5>
+<div class="outline-text-5" id="text-1-1-1-1">
 
 <div class="figure">
 <p><img src="img/rabbit_method_frame.png" alt="rabbit_method_frame.png">
@@ -576,9 +583,9 @@ Sent to and from RabbitMQ as a check to ensure that both sides of the connection
 </div>
 
 
-<div id="outline-container-orgd3fe35c" class="outline-5">
-<h5 id="orgd3fe35c"><span class="section-number-5">2.1.1.2</span> Content header frame</h5>
-<div class="outline-text-5" id="text-2-1-1-2">
+<div id="outline-container-orgd10f095" class="outline-5">
+<h5 id="orgd10f095"><span class="section-number-5">1.1.1.2</span> Content header frame</h5>
+<div class="outline-text-5" id="text-1-1-1-2">
 
 <div class="figure">
 <p><img src="img/rabbit_content_header_frame.png" alt="rabbit_content_header_frame.png">
@@ -588,9 +595,9 @@ Sent to and from RabbitMQ as a check to ensure that both sides of the connection
 </div>
 
 
-<div id="outline-container-org4a46e23" class="outline-5">
-<h5 id="org4a46e23"><span class="section-number-5">2.1.1.3</span> Body frame</h5>
-<div class="outline-text-5" id="text-2-1-1-3">
+<div id="outline-container-org24ea523" class="outline-5">
+<h5 id="org24ea523"><span class="section-number-5">1.1.1.3</span> Body frame</h5>
+<div class="outline-text-5" id="text-1-1-1-3">
 
 <div class="figure">
 <p><img src="img/rabbit_body_frame.png" alt="rabbit_body_frame.png">
@@ -602,9 +609,9 @@ Sent to and from RabbitMQ as a check to ensure that both sides of the connection
 </div>
 
 
-<div id="outline-container-org854c7cd" class="outline-3">
-<h3 id="org854c7cd"><span class="section-number-3">2.2</span> AMQP Model</h3>
-<div class="outline-text-3" id="text-2-2">
+<div id="outline-container-orgf109325" class="outline-3">
+<h3 id="orgf109325"><span class="section-number-3">1.2</span> AMQP Model</h3>
+<div class="outline-text-3" id="text-1-2">
 <p>
 The AMQ model logically defines three abstract components in broker software that define the routing behavior of messages:
 </p>
@@ -621,13 +628,13 @@ A rule that tells the exchange which queue the messages should be stored in</li>
 </div>
 
 
-<div id="outline-container-org0747194" class="outline-3">
-<h3 id="org0747194"><span class="section-number-3">2.3</span> Protocol Implement</h3>
-<div class="outline-text-3" id="text-2-3">
+<div id="outline-container-org9ea3aba" class="outline-3">
+<h3 id="org9ea3aba"><span class="section-number-3">1.3</span> Protocol Implement</h3>
+<div class="outline-text-3" id="text-1-3">
 </div>
-<div id="outline-container-org5d3d001" class="outline-4">
-<h4 id="org5d3d001"><span class="section-number-4">2.3.1</span> Declaring exchange</h4>
-<div class="outline-text-4" id="text-2-3-1">
+<div id="outline-container-orgf5ce879" class="outline-4">
+<h4 id="orgf5ce879"><span class="section-number-4">1.3.1</span> Declaring exchange</h4>
+<div class="outline-text-4" id="text-1-3-1">
 
 <div class="figure">
 <p><img src="img/rabbit_declare_exchange.png" alt="rabbit_declare_exchange.png">
@@ -642,9 +649,9 @@ This response will include a numeric reply code and text value indicating why th
 </div>
 </div>
 
-<div id="outline-container-org9edf901" class="outline-4">
-<h4 id="org9edf901"><span class="section-number-4">2.3.2</span> Declaring queue</h4>
-<div class="outline-text-4" id="text-2-3-2">
+<div id="outline-container-org4e2b888" class="outline-4">
+<h4 id="org4e2b888"><span class="section-number-4">1.3.2</span> Declaring queue</h4>
+<div class="outline-text-4" id="text-1-3-2">
 <div class="org-src-container">
 <pre class="src src-plantuml">hide footbox
 participant "Client" as c
@@ -679,9 +686,9 @@ such as the number of pending messages in the queue and the number of consumers 
 </div>
 
 
-<div id="outline-container-org5086565" class="outline-4">
-<h4 id="org5086565"><span class="section-number-4">2.3.3</span> Binding queue to exchange</h4>
-<div class="outline-text-4" id="text-2-3-3">
+<div id="outline-container-org41af4cd" class="outline-4">
+<h4 id="org41af4cd"><span class="section-number-4">1.3.3</span> Binding queue to exchange</h4>
+<div class="outline-text-4" id="text-1-3-3">
 
 <div class="figure">
 <p><img src="img/rabbit_bind_queue.png" alt="rabbit_bind_queue.png">
@@ -691,34 +698,189 @@ such as the number of pending messages in the queue and the number of consumers 
 </div>
 
 
-<div id="outline-container-orgc9f73c7" class="outline-4">
-<h4 id="orgc9f73c7"><span class="section-number-4">2.3.4</span> Publishing message</h4>
-<div class="outline-text-4" id="text-2-3-4">
+<div id="outline-container-org5132512" class="outline-4">
+<h4 id="org5132512"><span class="section-number-4">1.3.4</span> Publishing message</h4>
+<div class="outline-text-4" id="text-1-3-4">
 
 <div class="figure">
 <p><img src="img/rabbit_publish_msg.png" alt="rabbit_publish_msg.png">
 </p>
 </div>
 </div>
-</div>
 
-<div id="outline-container-org74a0bef" class="outline-4">
-<h4 id="org74a0bef"><span class="section-number-4">2.3.5</span> Consuming message</h4>
-<div class="outline-text-4" id="text-2-3-5">
+
+<div id="outline-container-orgbab0b4d" class="outline-5">
+<h5 id="orgbab0b4d"><span class="section-number-5">1.3.4.1</span> <code>mandatory</code> flag</h5>
+<div class="outline-text-5" id="text-1-3-4-1">
+<p>
+The <code>mandatory</code> flag is an argument that's passed along with the <code>Basic.Publish</code> RPC command and tells RabbitMQ that if a message isn't routable,
+it should send the message back to the publisher via a <code>Basic.Return</code> RPC.
+</p>
+
 
 <div class="figure">
-<p><img src="img/rabbit_comsume_msg.png" alt="rabbit_comsume_msg.png">
+<p><img src="img/rabbit_publish_with_mandatory.png" alt="rabbit_publish_with_mandatory.png">
+</p>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-org946727c" class="outline-5">
+<h5 id="org946727c"><span class="section-number-5">1.3.4.2</span> Publisher Confirm</h5>
+<div class="outline-text-5" id="text-1-3-4-2">
+<p>
+Prior to publishing any messages, a message publisher must issue a <code>Confirm.Select</code> RPC request to RabbitMQ and
+wait for a <code>Confirm.SelectOk</code> response to know that delivery confirmations are enabled.
+</p>
+
+<p>
+For each message that a publisher sends to RabbitMQ, the server will respond with an acknowledgement response (<code>Basic.Ack</code>) or
+a negative acknowledgement response (<code>Basic.Nack</code>).
+</p>
+
+
+<div class="figure">
+<p><img src="img/rabbit_publisher_confirm.png" alt="rabbit_publisher_confirm.png">
+</p>
+</div>
+
+
+<pre class="example">
+Any application that has enabled Publisher Confirms should be able to receive a confirmation at any point after sending the message.
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-orgb2f1322" class="outline-5">
+<h5 id="orgb2f1322"><span class="section-number-5">1.3.4.3</span> Alternate exchange</h5>
+<div class="outline-text-5" id="text-1-3-4-3">
+
+<div class="figure">
+<p><img src="img/rabbit_alternate_exchange.png" alt="rabbit_alternate_exchange.png">
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org2918113" class="outline-5">
+<h5 id="org2918113"><span class="section-number-5">1.3.4.4</span> Transaction</h5>
+<div class="outline-text-5" id="text-1-3-4-4">
+
+<div class="figure">
+<p><img src="img/rabbit_transaction.png" alt="rabbit_transaction.png">
+</p>
+</div>
+
+<pre class="example">
+Transaction allows publishers more control over the SEQUENCE.
+If you're considering transactions as a method of delivery confirmation, consider using Publisher Confirms as a LIGHTWEIGHT alternative.
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-orgaa43970" class="outline-5">
+<h5 id="orgaa43970"><span class="section-number-5">1.3.4.5</span> HA queues</h5>
+<div class="outline-text-5" id="text-1-3-4-5">
+<p>
+Allows queues to have redundant copies across multiple servers.
+</p>
+
+<p>
+HA queues have a single primary server node, and all the other nodes are secondary.
+</p>
+
+<p>
+Should the primary node fail, one of the secondary nodes will take over the role of primary node. <br>
+Should a secondary node be lost in an HA queue configuration, the other nodes would continue to operate as they were, sharing the state of operations that take place across all configured nodes.
+</p>
+
+<p>
+When a lost node is added back, or a new node is added to the cluster, <span class="underline">it won't contain any messages that are already in the queue across the existing nodes</span>. <br>
+Instead, <span class="underline">it will receive all new messages</span> and only be in sync once <i>all the previously published messages are consumed</i>.
+</p>
+
+
+
+<div class="figure">
+<p><img src="img/rabbit_ha_queues.png" alt="rabbit_ha_queues.png">
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgdcef4a6" class="outline-5">
+<h5 id="orgdcef4a6"><span class="section-number-5">1.3.4.6</span> Delivery Mode 2</h5>
+<div class="outline-text-5" id="text-1-3-4-6">
+<p>
+In addition to <code>delivery-mode</code> of 2, for messages to truly survive a restart of a RabbitMQ broker,
+your queues must be declared as <code>durable</code> when they're created.
+</p>
+
+<pre class="example">
+It's a costly way to guarantee delivery.
+</pre>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-orgdc28493" class="outline-4">
+<h4 id="orgdc28493"><span class="section-number-4">1.3.5</span> Consuming message</h4>
+<div class="outline-text-4" id="text-1-3-5">
+<p>
+Consuming messages with <code>Basic.Consume</code> means your application <span class="underline">automatically</span> receives messages from RabbitMQ as they become available
+until the client issues a <code>Basic.Cancel</code>.
+</p>
+
+<p>
+Application needs to <span class="underline">ACKNOWLEDGE</span> the message to let RabbitMQ know the message has been processed.
+</p>
+
+
+
+<div class="figure">
+<p><img src="img/rabbit_basic_consume.png" alt="rabbit_basic_consume.png">
 </p>
 </div>
 </div>
 
 
-<div id="outline-container-org84611a1" class="outline-5">
-<h5 id="org84611a1"><span class="section-number-5">2.3.5.1</span> <code>no_ack</code> argument for the <code>Basic.Consume</code> command</h5>
-<div class="outline-text-5" id="text-2-3-5-1">
+
+<div id="outline-container-org44943f9" class="outline-5">
+<h5 id="org44943f9"><span class="section-number-5">1.3.5.1</span> Consumer Tag</h5>
+<div class="outline-text-5" id="text-1-3-5-1">
 <p>
-When set to true, RabbitMQ will send messages continuously until the consumer sends a <code>Basic.Cancel</code> command or the consumer is disconnected. <br>
-If the <code>no_ack</code> flag is set to false, a consumer must acknowledge each message that it receives by sending a <code>Basic.Ack</code> RPC request:
+When your application issues <code>Basic.Consume</code>, a unique string is created that identifies the application on the open channel with RabbitMQ.
+This string, called a <b>consumer tag</b>, is sent to your application with each message from RabbitMQ.
+</p>
+
+<p>
+The consumer tag can be used to <span class="underline">cancel</span> any future receipt of messages from RabbitMQ by issuing a <code>Basic.Cancel</code> RPC command.
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-org9d2e82b" class="outline-5">
+<h5 id="org9d2e82b"><span class="section-number-5">1.3.5.2</span> <code>no-ack</code> argument</h5>
+<div class="outline-text-5" id="text-1-3-5-2">
+<p>
+There's a no-ack flag with <code>Basic.Consume</code> RPC request.
+When enabled, this flag tells RabbitMQ that your consumer won't acknowledge the receipt of messages and
+that RabbitMQ should just send them <span class="underline">as quickly as it is able</span>.
+</p>
+
+
+
+<p>
+If the <code>no_ack</code> flag is set to false, a consumer must acknowledge each message that it receives by sending a <code>Basic.Ack</code> RPC request.
 </p>
 
 
@@ -726,8 +888,12 @@ If the <code>no_ack</code> flag is set to false, a consumer must acknowledge eac
 <p><img src="img/rabbit_consume_ack.png" alt="rabbit_consume_ack.png">
 </p>
 </div>
+</div>
 
 
+<div id="outline-container-org6fc0b2e" class="outline-6">
+<h6 id="org6fc0b2e"><span class="section-number-6">1.3.5.2.1</span> Delivery tag</h6>
+<div class="outline-text-6" id="text-1-3-5-2-1">
 <p>
 When the <code>Basic.Ack</code> response frame is sent, the consumer must pass with it an argument from the <code>Basic.Deliver</code> method frame
 called the <b>delivery tag</b>. <br>
@@ -738,9 +904,28 @@ and negative acknowledgement.
 </div>
 </div>
 
-<div id="outline-container-orgff834dd" class="outline-4">
-<h4 id="orgff834dd"><span class="section-number-4">2.3.6</span> 获取消息</h4>
-<div class="outline-text-4" id="text-2-3-6">
+<div id="outline-container-org5855fc2" class="outline-5">
+<h5 id="org5855fc2"><span class="section-number-5">1.3.5.3</span> Prefetching (QoS)</h5>
+<div class="outline-text-5" id="text-1-3-5-3">
+<p>
+prefetch 允许为每个 consumer 指定最大的 unacked messages 数目。
+</p>
+
+<p>
+简单来说就是用来指定一个 consumer 一次可以从 RabbitMQ 中获取多少条 message 并缓存在 client 中。 <br>
+一旦缓冲区满了，RabbitMQ 将会停止投递新的 message 到该 consumer 中直到它发出 ack 。
+</p>
+
+<p>
+总的来说，consumer 负责不断处理消息，不断 ack ，然后只要 unacked 数少于 <code>prefetch * consumer</code> 数目，broker 就不断将消息投递过去。
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-org837c7cd" class="outline-5">
+<h5 id="org837c7cd"><span class="section-number-5">1.3.5.4</span> <code>Basic.Get</code></h5>
+<div class="outline-text-5" id="text-1-3-5-4">
 <div class="org-src-container">
 <pre class="src src-plantuml">hide footbox
 participant Client as c
@@ -759,28 +944,66 @@ c --&gt; q : Basic.Ack
 </div>
 
 
-<div id="outline-container-org7048761" class="outline-4">
-<h4 id="org7048761"><span class="section-number-4">2.3.7</span> 拒绝消息</h4>
-<div class="outline-text-4" id="text-2-3-7">
-<div class="org-src-container">
-<pre class="src src-plantuml">hide footbox
-participant Client as c
-database RabbitMQ as q
 
-q -&gt; c : msg
-c --&gt; q : Basic.Reject
-note right
-requeue=true:  RabbitMQ 将消息重新发送给下一个订阅的消费者
-requeue=false: 立即把消息从队列中移除，不会发送给新的消费者
-end note
+<div id="outline-container-org4793bf4" class="outline-5">
+<h5 id="org4793bf4"><span class="section-number-5">1.3.5.5</span> <code>Basic.Reject</code></h5>
+<div class="outline-text-5" id="text-1-3-5-5">
+<p>
+This RPC carries with it the <span class="underline">delivery tag</span> created by RabbitMQ to uniquely identify the message. <br>
+When a consumer rejects a message, you can instruct RabbitMQ to either <span class="underline">discard</span> the message or to <span class="underline">requeue</span> the message with the <code>requeue</code> flag.
+</p>
+
+<p>
+When a message is requeued, the <code>redelivered</code> flag is set in the message, informing the message's <b>next consumer</b> that it had been previously delivered.
+</p>
+
+<pre class="example">
+Basic.Reject allows for a single message to be rejected.
+You can't reject multiple messages at the same time using Basic.Reject.
 </pre>
+</div>
+</div>
+
+
+<div id="outline-container-org6c0e3df" class="outline-5">
+<h5 id="org6c0e3df"><span class="section-number-5">1.3.5.6</span> <code>Basic.Nack</code></h5>
+<div class="outline-text-5" id="text-1-3-5-6">
+<p>
+<code>Basic.Nack</code> method implements <span class="underline">the same behavior</span> as the <code>Basic.Reject</code>, but it adds "multiple-reject" behavior.
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-org7af365e" class="outline-5">
+<h5 id="org7af365e"><span class="section-number-5">1.3.5.7</span> Dead letter exchanges</h5>
+<div class="outline-text-5" id="text-1-3-5-7">
+<p>
+Dead letter exchange is actually a normal exchange.
+</p>
+
+<p>
+The only thing that makes an exchange a dead-letter exchange is the declared use of the exchange for rejected messages <span class="underline">when creating a queue</span>. <br>
+Upon rejecting a message that isn't requeued, RabbitMQ will route the message to the exchanged specified in the queue's <code>x-dead-letter-exchange</code> argument.
+</p>
+
+<pre class="example">
+Dead-letter exchanges AREN'T THE SAME AS the alternate exchanges.
+An expired or rejected message is delivered via a dead-letter exchange,
+whereas an alternate exchange routes messages that otherwise couldn't be routed by RabbitMQ.
+</pre>
+
+
+<div class="figure">
+<p><img src="img/rabbit_dlx.png" alt="rabbit_dlx.png">
+</p>
 </div>
 
 
 <p>
-<code>requeue=false</code> 的意义在于：RabbitMQ 会支持一个特殊的队列（dead letter）用来存放那些被拒绝而不重入队列的消息。
-dead letter 队列可以让管理者通过检测拒绝或未送达的消息来发现问题所在。
-因此，如果想使用 dead letter 队列功能的话，需要使用 <code>reject</code> 命令，并将其设为 false 。
+We can use the same exchange for dead-lettered messages as non-dead-lettered messages
+<span class="underline">but to ensure that the dead-lettered messages aren't delivered to the same queue</span>. <br>
+Set <code>x-dead-letter-routing-key</code>  when declaring the queue.
 </p>
 </div>
 </div>
@@ -789,9 +1012,9 @@ dead letter 队列可以让管理者通过检测拒绝或未送达的消息来�
 
 
 
-<div id="outline-container-org3a01900" class="outline-3">
-<h3 id="org3a01900"><span class="section-number-3">2.4</span> <code>Basic.Properties</code></h3>
-<div class="outline-text-3" id="text-2-4">
+<div id="outline-container-org096c73c" class="outline-4">
+<h4 id="org096c73c"><span class="section-number-4">1.3.6</span> <code>Basic.Properties</code></h4>
+<div class="outline-text-4" id="text-1-3-6">
 <table>
 
 
@@ -893,141 +1116,24 @@ dead letter 队列可以让管理者通过检测拒绝或未送达的消息来�
 </table>
 </div>
 </div>
-
-
-<div id="outline-container-org2d61837" class="outline-3">
-<h3 id="org2d61837"><span class="section-number-3">2.5</span> Guaranteed Publishing</h3>
-<div class="outline-text-3" id="text-2-5">
-</div>
-<div id="outline-container-org68628ee" class="outline-4">
-<h4 id="org68628ee"><span class="section-number-4">2.5.1</span> <code>mandatory</code> flag</h4>
-<div class="outline-text-4" id="text-2-5-1">
-<p>
-The <code>mandatory</code> flag is an argument that's passed along with the <code>Basic.Publish</code> RPC command and tells RabbitMQ that if a message isn't routable,
-it should send the message back to the publisher via a <code>Basic.Return</code> RPC.
-</p>
-
-
-<div class="figure">
-<p><img src="img/rabbit_publish_with_mandatory.png" alt="rabbit_publish_with_mandatory.png">
-</p>
-</div>
 </div>
 </div>
 
 
 
-<div id="outline-container-org76cf025" class="outline-4">
-<h4 id="org76cf025"><span class="section-number-4">2.5.2</span> Publisher Confirm</h4>
-<div class="outline-text-4" id="text-2-5-2">
-<p>
-Prior to publishing any messages, a message publisher must issue a <code>Confirm.Select</code> RPC request to RabbitMQ and
-wait for a <code>Confirm.SelectOk</code> response to know that delivery confirmations are enabled.
-</p>
-
-<p>
-For each message that a publisher sends to RabbitMQ, the server will respond with an acknowledgement response (<code>Basic.Ack</code>) or
-a negative acknowledgement response (<code>Basic.Nack</code>).
-</p>
 
 
-<div class="figure">
-<p><img src="img/rabbit_publisher_confirm.png" alt="rabbit_publisher_confirm.png">
-</p>
+
+
+
+
+<div id="outline-container-org935027e" class="outline-2">
+<h2 id="org935027e"><span class="section-number-2">2</span> 交换器</h2>
+<div class="outline-text-2" id="text-2">
 </div>
-
-
-<pre class="example">
-Any application that has enabled Publisher Confirms should be able to receive a confirmation at any point after sending the message.
-</pre>
-</div>
-</div>
-
-
-<div id="outline-container-org26d4504" class="outline-4">
-<h4 id="org26d4504"><span class="section-number-4">2.5.3</span> Alternate exchange</h4>
-<div class="outline-text-4" id="text-2-5-3">
-
-<div class="figure">
-<p><img src="img/rabbit_alternate_exchange.png" alt="rabbit_alternate_exchange.png">
-</p>
-</div>
-</div>
-</div>
-
-
-<div id="outline-container-orgecadd3b" class="outline-4">
-<h4 id="orgecadd3b"><span class="section-number-4">2.5.4</span> Transaction</h4>
-<div class="outline-text-4" id="text-2-5-4">
-
-<div class="figure">
-<p><img src="img/rabbit_transaction.png" alt="rabbit_transaction.png">
-</p>
-</div>
-
-<pre class="example">
-Transaction allows publishers more control over the SEQUENCE.
-If you're considering transactions as a method of delivery confirmation, consider using Publisher Confirms as a LIGHTWEIGHT alternative.
-</pre>
-</div>
-</div>
-
-
-<div id="outline-container-org7a05cdd" class="outline-4">
-<h4 id="org7a05cdd"><span class="section-number-4">2.5.5</span> HA queues</h4>
-<div class="outline-text-4" id="text-2-5-5">
-<p>
-Allows queues to have redundant copies across multiple servers.
-</p>
-
-<p>
-HA queues have a single primary server node, and all the other nodes are secondary.
-</p>
-
-<p>
-Should the primary node fail, one of the secondary nodes will take over the role of primary node. <br>
-Should a secondary node be lost in an HA queue configuration, the other nodes would continue to operate as they were, sharing the state of operations that take place across all configured nodes.
-</p>
-
-<p>
-When a lost node is added back, or a new node is added to the cluster, <span class="underline">it won't contain any messages that are already in the queue across the existing nodes</span>. <br>
-Instead, <span class="underline">it will receive all new messages</span> and only be in sync once <i>all the previously published messages are consumed</i>.
-</p>
-
-
-
-<div class="figure">
-<p><img src="img/rabbit_ha_queues.png" alt="rabbit_ha_queues.png">
-</p>
-</div>
-</div>
-</div>
-
-
-<div id="outline-container-orgafc282a" class="outline-4">
-<h4 id="orgafc282a"><span class="section-number-4">2.5.6</span> Delivery Mode 2</h4>
-<div class="outline-text-4" id="text-2-5-6">
-<p>
-In addition to <code>delivery-mode</code> of 2, for messages to truly survive a restart of a RabbitMQ broker,
-your queues must be declared as <code>durable</code> when they're created.
-</p>
-
-<pre class="example">
-It's a costly way to guarantee delivery.
-</pre>
-</div>
-</div>
-</div>
-</div>
-
-
-<div id="outline-container-org30bf5b7" class="outline-2">
-<h2 id="org30bf5b7"><span class="section-number-2">3</span> 交换器</h2>
-<div class="outline-text-2" id="text-3">
-</div>
-<div id="outline-container-orgd7c3cec" class="outline-3">
-<h3 id="orgd7c3cec"><span class="section-number-3">3.1</span> 属性</h3>
-<div class="outline-text-3" id="text-3-1">
+<div id="outline-container-org10c1e99" class="outline-3">
+<h3 id="org10c1e99"><span class="section-number-3">2.1</span> 属性</h3>
+<div class="outline-text-3" id="text-2-1">
 <ul class="org-ul">
 <li>Name</li>
 <li>Durability (exchanges survive broker restart)</li>
@@ -1037,9 +1143,9 @@ It's a costly way to guarantee delivery.
 </div>
 </div>
 
-<div id="outline-container-orgfd39ef8" class="outline-3">
-<h3 id="orgfd39ef8"><span class="section-number-3">3.2</span> direct</h3>
-<div class="outline-text-3" id="text-3-2">
+<div id="outline-container-org68de37f" class="outline-3">
+<h3 id="org68de37f"><span class="section-number-3">2.2</span> direct</h3>
+<div class="outline-text-3" id="text-2-2">
 <p>
 如果路由键匹配的话，消息就被投递到对应的队列。
 </p>
@@ -1051,40 +1157,40 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 </p>
 
 
-<div id="orgde8d76c" class="figure">
+<div id="org510a3b6" class="figure">
 <p><img src="img/direct-router.png" alt="direct-router.png">
 </p>
-<p><span class="figure-number">Figure 16: </span>direct router</p>
+<p><span class="figure-number">Figure 17: </span>direct router</p>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-org74c82ae" class="outline-3">
-<h3 id="org74c82ae"><span class="section-number-3">3.3</span> fanout</h3>
-<div class="outline-text-3" id="text-3-3">
+<div id="outline-container-org329369d" class="outline-3">
+<h3 id="org329369d"><span class="section-number-3">2.3</span> fanout</h3>
+<div class="outline-text-3" id="text-2-3">
 <p>
 将收到的消息广播的绑定的队列上。
 </p>
 
 
-<div id="orgae2dc7e" class="figure">
+<div id="orgadb6960" class="figure">
 <p><img src="img/fanout-router.png" alt="fanout-router.png">
 </p>
-<p><span class="figure-number">Figure 17: </span>fanout router</p>
+<p><span class="figure-number">Figure 18: </span>fanout router</p>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-org7125f94" class="outline-3">
-<h3 id="org7125f94"><span class="section-number-3">3.4</span> topic</h3>
-<div class="outline-text-3" id="text-3-4">
+<div id="outline-container-org0dd0f69" class="outline-3">
+<h3 id="org0dd0f69"><span class="section-number-3">2.4</span> topic</h3>
+<div class="outline-text-3" id="text-2-4">
 
-<div id="orgc151ae8" class="figure">
+<div id="org369e98b" class="figure">
 <p><img src="img/topic-router.png" alt="topic-router.png">
 </p>
-<p><span class="figure-number">Figure 18: </span>topic router</p>
+<p><span class="figure-number">Figure 19: </span>topic router</p>
 </div>
 
 <ul class="org-ul">
@@ -1096,25 +1202,26 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 </div>
 
 
-<div id="outline-container-org2208b10" class="outline-3">
-<h3 id="org2208b10"><span class="section-number-3">3.5</span> 路由</h3>
-<div class="outline-text-3" id="text-3-5">
+<div id="outline-container-orgd1c2e60" class="outline-3">
+<h3 id="orgd1c2e60"><span class="section-number-3">2.5</span> 路由</h3>
+<div class="outline-text-3" id="text-2-5">
 <img src="http://javasampleapproach.com/wp-content/uploads/2017/10/springboot-rabbitmq-exchange-to-exchange-architecture.png"/>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orga355809" class="outline-2">
-<h2 id="orga355809"><span class="section-number-2">4</span> RabbitMQ 管理</h2>
-<div class="outline-text-2" id="text-4">
+
+<div id="outline-container-org85dbe2c" class="outline-2">
+<h2 id="org85dbe2c"><span class="section-number-2">3</span> RabbitMQ 管理</h2>
+<div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org4752497" class="outline-3">
-<h3 id="org4752497"><span class="section-number-3">4.1</span> 启动停止</h3>
-<div class="outline-text-3" id="text-4-1">
+<div id="outline-container-org6318b55" class="outline-3">
+<h3 id="org6318b55"><span class="section-number-3">3.1</span> 启动停止</h3>
+<div class="outline-text-3" id="text-3-1">
 </div>
-<div id="outline-container-org88649a9" class="outline-4">
-<h4 id="org88649a9"><span class="section-number-4">4.1.1</span> 停止节点</h4>
-<div class="outline-text-4" id="text-4-1-1">
+<div id="outline-container-org4ffc3b0" class="outline-4">
+<h4 id="org4ffc3b0"><span class="section-number-4">3.1.1</span> 停止节点</h4>
+<div class="outline-text-4" id="text-3-1-1">
 <div class="org-src-container">
 <pre class="src src-sh">rabbitmqctl stop
 rabbitmqctl stop -n rabbit@&lt;nodename&gt;
@@ -1123,9 +1230,9 @@ rabbitmqctl stop -n rabbit@&lt;nodename&gt;
 </div>
 </div>
 
-<div id="outline-container-org3f4c570" class="outline-4">
-<h4 id="org3f4c570"><span class="section-number-4">4.1.2</span> 停止应用</h4>
-<div class="outline-text-4" id="text-4-1-2">
+<div id="outline-container-org0ff2b0d" class="outline-4">
+<h4 id="org0ff2b0d"><span class="section-number-4">3.1.2</span> 停止应用</h4>
+<div class="outline-text-4" id="text-3-1-2">
 <div class="org-src-container">
 <pre class="src src-sh">rabbitmqctl stop_app
 </pre>
@@ -1135,9 +1242,9 @@ rabbitmqctl stop -n rabbit@&lt;nodename&gt;
 </div>
 
 
-<div id="outline-container-org6d53351" class="outline-3">
-<h3 id="org6d53351"><span class="section-number-3">4.2</span> 配置文件</h3>
-<div class="outline-text-3" id="text-4-2">
+<div id="outline-container-org22188e2" class="outline-3">
+<h3 id="org22188e2"><span class="section-number-3">3.2</span> 配置文件</h3>
+<div class="outline-text-3" id="text-3-2">
 <p>
 <code>/etc/rabbitmq/rabbitmq.config</code>
 </p>
@@ -1145,13 +1252,13 @@ rabbitmqctl stop -n rabbit@&lt;nodename&gt;
 </div>
 
 
-<div id="outline-container-org7641b2f" class="outline-3">
-<h3 id="org7641b2f"><span class="section-number-3">4.3</span> 管理用户</h3>
-<div class="outline-text-3" id="text-4-3">
+<div id="outline-container-orgbe93e29" class="outline-3">
+<h3 id="orgbe93e29"><span class="section-number-3">3.3</span> 管理用户</h3>
+<div class="outline-text-3" id="text-3-3">
 </div>
-<div id="outline-container-org07381ed" class="outline-4">
-<h4 id="org07381ed"><span class="section-number-4">4.3.1</span> 创建</h4>
-<div class="outline-text-4" id="text-4-3-1">
+<div id="outline-container-org518782f" class="outline-4">
+<h4 id="org518782f"><span class="section-number-4">3.3.1</span> 创建</h4>
+<div class="outline-text-4" id="text-3-3-1">
 <div class="org-src-container">
 <pre class="src src-sh">rabbitmqctl add_user &lt;username&gt; &lt;password&gt;
 </pre>
@@ -1159,9 +1266,9 @@ rabbitmqctl stop -n rabbit@&lt;nodename&gt;
 </div>
 </div>
 
-<div id="outline-container-org7e62920" class="outline-4">
-<h4 id="org7e62920"><span class="section-number-4">4.3.2</span> 删除</h4>
-<div class="outline-text-4" id="text-4-3-2">
+<div id="outline-container-org698a3f7" class="outline-4">
+<h4 id="org698a3f7"><span class="section-number-4">3.3.2</span> 删除</h4>
+<div class="outline-text-4" id="text-3-3-2">
 <div class="org-src-container">
 <pre class="src src-sh">rabbitmqctl delete_user &lt;username&gt;
 </pre>
@@ -1169,9 +1276,9 @@ rabbitmqctl stop -n rabbit@&lt;nodename&gt;
 </div>
 </div>
 
-<div id="outline-container-orgf4b5c0c" class="outline-4">
-<h4 id="orgf4b5c0c"><span class="section-number-4">4.3.3</span> 修改密码</h4>
-<div class="outline-text-4" id="text-4-3-3">
+<div id="outline-container-org877feac" class="outline-4">
+<h4 id="org877feac"><span class="section-number-4">3.3.3</span> 修改密码</h4>
+<div class="outline-text-4" id="text-3-3-3">
 <div class="org-src-container">
 <pre class="src src-sh">rabbitmqctl change_password &lt;username&gt; &lt;new-password&gt;
 </pre>
@@ -1179,9 +1286,9 @@ rabbitmqctl stop -n rabbit@&lt;nodename&gt;
 </div>
 </div>
 
-<div id="outline-container-org0c768ee" class="outline-4">
-<h4 id="org0c768ee"><span class="section-number-4">4.3.4</span> 查看</h4>
-<div class="outline-text-4" id="text-4-3-4">
+<div id="outline-container-org8a6fe92" class="outline-4">
+<h4 id="org8a6fe92"><span class="section-number-4">3.3.4</span> 查看</h4>
+<div class="outline-text-4" id="text-3-3-4">
 <div class="org-src-container">
 <pre class="src src-sh">rabbitmqctl list_users
 </pre>
@@ -1191,9 +1298,9 @@ rabbitmqctl stop -n rabbit@&lt;nodename&gt;
 </div>
 
 
-<div id="outline-container-org3f2d272" class="outline-3">
-<h3 id="org3f2d272"><span class="section-number-3">4.4</span> 管理权限</h3>
-<div class="outline-text-3" id="text-4-4">
+<div id="outline-container-orge2ba20a" class="outline-3">
+<h3 id="orge2ba20a"><span class="section-number-3">3.4</span> 管理权限</h3>
+<div class="outline-text-3" id="text-3-4">
 <p>
 每条访问控制条目由四部分组成：
 </p>
@@ -1206,9 +1313,9 @@ rabbitmqctl stop -n rabbit@&lt;nodename&gt;
 </ul>
 </div>
 
-<div id="outline-container-orgfcc14c2" class="outline-4">
-<h4 id="orgfcc14c2"><span class="section-number-4">4.4.1</span> 创建</h4>
-<div class="outline-text-4" id="text-4-4-1">
+<div id="outline-container-org2d249d5" class="outline-4">
+<h4 id="org2d249d5"><span class="section-number-4">3.4.1</span> 创建</h4>
+<div class="outline-text-4" id="text-3-4-1">
 <div class="org-src-container">
 <pre class="src src-sh">rabbitmqctl set_permission -p &lt;vhost_name&gt; <span style="color: #e6db74;">\</span>
 &lt;username&gt; <span style="color: #e6db74;">".*"</span> <span style="color: #e6db74;">".*"</span> <span style="color: #e6db74;">".*"</span>
@@ -1217,9 +1324,9 @@ rabbitmqctl stop -n rabbit@&lt;nodename&gt;
 </div>
 </div>
 
-<div id="outline-container-org6b340c2" class="outline-4">
-<h4 id="org6b340c2"><span class="section-number-4">4.4.2</span> 删除</h4>
-<div class="outline-text-4" id="text-4-4-2">
+<div id="outline-container-org4e30cb2" class="outline-4">
+<h4 id="org4e30cb2"><span class="section-number-4">3.4.2</span> 删除</h4>
+<div class="outline-text-4" id="text-3-4-2">
 <div class="org-src-container">
 <pre class="src src-sh">rabbitmqctl clear_permissions -p &lt;vhost_name&gt; &lt;username&gt;
 </pre>
@@ -1227,9 +1334,9 @@ rabbitmqctl stop -n rabbit@&lt;nodename&gt;
 </div>
 </div>
 
-<div id="outline-container-orgbd16162" class="outline-4">
-<h4 id="orgbd16162"><span class="section-number-4">4.4.3</span> 查看</h4>
-<div class="outline-text-4" id="text-4-4-3">
+<div id="outline-container-org7325770" class="outline-4">
+<h4 id="org7325770"><span class="section-number-4">3.4.3</span> 查看</h4>
+<div class="outline-text-4" id="text-3-4-3">
 <div class="org-src-container">
 <pre class="src src-sh">rabbitmqctl list_permissions -p &lt;vhost_name&gt;
 rabbitmqctl list_user_permissions &lt;username&gt;  <span style="color: #465457;"># </span><span style="color: #465457;">&#26597;&#30475;&#26576;&#20010;&#29992;&#25143;&#22312;&#25152;&#26377; vhost &#19978;&#30340;&#26435;&#38480;</span>
@@ -1240,9 +1347,9 @@ rabbitmqctl list_user_permissions &lt;username&gt;  <span style="color: #465457;
 </div>
 
 
-<div id="outline-container-orgc2f1efe" class="outline-3">
-<h3 id="orgc2f1efe"><span class="section-number-3">4.5</span> 管理 vhost</h3>
-<div class="outline-text-3" id="text-4-5">
+<div id="outline-container-orgadf9382" class="outline-3">
+<h3 id="orgadf9382"><span class="section-number-3">3.5</span> 管理 vhost</h3>
+<div class="outline-text-3" id="text-3-5">
 <ul class="org-ul">
 <li><p>
 查看
@@ -1271,13 +1378,13 @@ rabbitmqctl list_user_permissions &lt;username&gt;  <span style="color: #465457;
 
 
 
-<div id="outline-container-org509619d" class="outline-3">
-<h3 id="org509619d"><span class="section-number-3">4.6</span> 信息查询</h3>
-<div class="outline-text-3" id="text-4-6">
+<div id="outline-container-orga2c8698" class="outline-3">
+<h3 id="orga2c8698"><span class="section-number-3">3.6</span> 信息查询</h3>
+<div class="outline-text-3" id="text-3-6">
 </div>
-<div id="outline-container-org5745ca7" class="outline-4">
-<h4 id="org5745ca7"><span class="section-number-4">4.6.1</span> 查看队列</h4>
-<div class="outline-text-4" id="text-4-6-1">
+<div id="outline-container-org771fcb9" class="outline-4">
+<h4 id="org771fcb9"><span class="section-number-4">3.6.1</span> 查看队列</h4>
+<div class="outline-text-4" id="text-3-6-1">
 <div class="org-src-container">
 <pre class="src src-sh">rabbitmqctl list_queues
 rabbitmqctl list_queues name messages consumers memory <span style="color: #465457;"># </span><span style="color: #465457;">memory &#21333;&#20301;&#20026;&#23383;&#33410;</span>
@@ -1310,9 +1417,9 @@ rabbitmqctl list_queues name messages consumers memory <span style="color: #4654
 </div>
 
 
-<div id="outline-container-orgbe4e2c0" class="outline-4">
-<h4 id="orgbe4e2c0"><span class="section-number-4">4.6.2</span> 查看交换器</h4>
-<div class="outline-text-4" id="text-4-6-2">
+<div id="outline-container-org5805197" class="outline-4">
+<h4 id="org5805197"><span class="section-number-4">3.6.2</span> 查看交换器</h4>
+<div class="outline-text-4" id="text-3-6-2">
 <div class="org-src-container">
 <pre class="src src-sh">rabbitmqctl list_exchanges
 </pre>
@@ -1333,9 +1440,9 @@ rabbitmqctl list_queues name messages consumers memory <span style="color: #4654
 </div>
 
 
-<div id="outline-container-org52d3081" class="outline-4">
-<h4 id="org52d3081"><span class="section-number-4">4.6.3</span> 查看绑定信息</h4>
-<div class="outline-text-4" id="text-4-6-3">
+<div id="outline-container-org8469b20" class="outline-4">
+<h4 id="org8469b20"><span class="section-number-4">3.6.3</span> 查看绑定信息</h4>
+<div class="outline-text-4" id="text-3-6-3">
 <div class="org-src-container">
 <pre class="src src-sh">rabbitmqctl list_bindings
 </pre>
@@ -1357,9 +1464,9 @@ rabbitmqctl list_queues name messages consumers memory <span style="color: #4654
 </div>
 
 
-<div id="outline-container-orgaadd566" class="outline-4">
-<h4 id="orgaadd566"><span class="section-number-4">4.6.4</span> 查看集群状态</h4>
-<div class="outline-text-4" id="text-4-6-4">
+<div id="outline-container-org032664b" class="outline-4">
+<h4 id="org032664b"><span class="section-number-4">3.6.4</span> 查看集群状态</h4>
+<div class="outline-text-4" id="text-3-6-4">
 <p>
 包括各个节点MQ状态、镜像队列状态等
 </p>
@@ -1370,9 +1477,9 @@ rabbitmqctl list_queues name messages consumers memory <span style="color: #4654
 </div>
 </div>
 
-<div id="outline-container-orgc61bb82" class="outline-4">
-<h4 id="orgc61bb82"><span class="section-number-4">4.6.5</span> 接入 Eshell</h4>
-<div class="outline-text-4" id="text-4-6-5">
+<div id="outline-container-orge384dc0" class="outline-4">
+<h4 id="orge384dc0"><span class="section-number-4">3.6.5</span> 接入 Eshell</h4>
+<div class="outline-text-4" id="text-3-6-5">
 <p>
 <code>erl -setcookie abc -name test@&lt;node-name&gt; -remsh rabbit@&lt;node-name&gt; -hidden</code>
 </p>
@@ -1393,17 +1500,17 @@ spawn(fun() -&gt; etop:start([{output, text}, {interval, 5}, {lines, 10}, {sort,
 </div>
 
 
-<div id="outline-container-orgaeaa8e0" class="outline-2">
-<h2 id="orgaeaa8e0"><span class="section-number-2">5</span> 代码示例</h2>
-<div class="outline-text-2" id="text-5">
+<div id="outline-container-org1a98d08" class="outline-2">
+<h2 id="org1a98d08"><span class="section-number-2">4</span> 代码示例</h2>
+<div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-org4e47e0d" class="outline-3">
-<h3 id="org4e47e0d"><span class="section-number-3">5.1</span> 基本用法</h3>
-<div class="outline-text-3" id="text-5-1">
+<div id="outline-container-orge47e740" class="outline-3">
+<h3 id="orge47e740"><span class="section-number-3">4.1</span> 基本用法</h3>
+<div class="outline-text-3" id="text-4-1">
 </div>
-<div id="outline-container-org5e59b3a" class="outline-4">
-<h4 id="org5e59b3a"><span class="section-number-4">5.1.1</span> 生产者</h4>
-<div class="outline-text-4" id="text-5-1-1">
+<div id="outline-container-org1b12efd" class="outline-4">
+<h4 id="org1b12efd"><span class="section-number-4">4.1.1</span> 生产者</h4>
+<div class="outline-text-4" id="text-4-1-1">
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #f92672; font-weight: bold;">import</span> pika
 
@@ -1434,9 +1541,9 @@ conn_broker.close()
 </div>
 
 
-<div id="outline-container-orgff7d24a" class="outline-4">
-<h4 id="orgff7d24a"><span class="section-number-4">5.1.2</span> 消费者</h4>
-<div class="outline-text-4" id="text-5-1-2">
+<div id="outline-container-org7e39d52" class="outline-4">
+<h4 id="org7e39d52"><span class="section-number-4">4.1.2</span> 消费者</h4>
+<div class="outline-text-4" id="text-4-1-2">
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #f92672; font-weight: bold;">import</span> pika
 
@@ -1482,9 +1589,9 @@ channel.start_consuming()
 
 
 
-<div id="outline-container-orgcd6bd59" class="outline-3">
-<h3 id="orgcd6bd59"><span class="section-number-3">5.2</span> 发送方确认模式</h3>
-<div class="outline-text-3" id="text-5-2">
+<div id="outline-container-org389c1d7" class="outline-3">
+<h3 id="org389c1d7"><span class="section-number-3">4.2</span> 发送方确认模式</h3>
+<div class="outline-text-3" id="text-4-2">
 <p>
 信道进入 confirm 模式，所有在信道上发布的消息都会被指派一个唯一的 ID 号（从 1 开始）。
 一旦消息被投递给所有匹配队列后，信道会发送一个发送方确认模式给生产者应用程序（包含消息的唯一 ID ）。
@@ -1493,9 +1600,9 @@ channel.start_consuming()
 </div>
 
 
-<div id="outline-container-org1b4396e" class="outline-4">
-<h4 id="org1b4396e"><span class="section-number-4">5.2.1</span> 生产者</h4>
-<div class="outline-text-4" id="text-5-2-1">
+<div id="outline-container-org5101496" class="outline-4">
+<h4 id="org5101496"><span class="section-number-4">4.2.1</span> 生产者</h4>
+<div class="outline-text-4" id="text-4-2-1">
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #465457;">#</span><span style="color: #465457;">! /usr/bin/env python3</span>
 <span style="color: #465457;"># </span><span style="color: #465457;">-*- coding: utf-8 -*-</span>
@@ -1535,9 +1642,9 @@ conn_broker.close()
 </div>
 
 
-<div id="outline-container-org70c5076" class="outline-3">
-<h3 id="org70c5076"><span class="section-number-3">5.3</span> 通过 AMQP 实时访问日志</h3>
-<div class="outline-text-3" id="text-5-3">
+<div id="outline-container-orgfaaa2ee" class="outline-3">
+<h3 id="orgfaaa2ee"><span class="section-number-3">4.3</span> 通过 AMQP 实时访问日志</h3>
+<div class="outline-text-3" id="text-4-3">
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #465457;">#</span><span style="color: #465457;">! /usr/bin/env python3</span>
 <span style="color: #465457;"># </span><span style="color: #465457;">-*- coding: utf-8 -*-</span>
@@ -1578,37 +1685,127 @@ channel.start_consuming()
 </div>
 
 
-<div id="outline-container-org72b3fb1" class="outline-2">
-<h2 id="org72b3fb1"><span class="section-number-2">6</span> 集群</h2>
-<div class="outline-text-2" id="text-6">
+<div id="outline-container-org154c449" class="outline-2">
+<h2 id="org154c449"><span class="section-number-2">5</span> 集群</h2>
+<div class="outline-text-2" id="text-5">
+</div>
+<div id="outline-container-orgd8719cb" class="outline-3">
+<h3 id="orgd8719cb"><span class="section-number-3">5.1</span> Architecture</h3>
+<div class="outline-text-3" id="text-5-1">
 <p>
-RabbitMQ 默认不会将队列的内容复制到整个集群上。
-如果不进行特别的配置，这些信息仅存在于队列所属的那个节点上。
-非所有者节点 <b>只知道队列的元数据</b> 和指向该队列存在的那个节点的指针。
+At all times RabbitMQ is keeping track of four kinds of internal metadata:
+</p>
+
+<ul class="org-ul">
+<li>Queue metadata</li>
+</ul>
+
+<p>
+Queue names and their properties (durable or auto-delete)
+</p>
+<ul class="org-ul">
+<li><p>
+Exchange metadata
+</p>
+
+<p>
+The exchange's name, the type of exchange it is, and what the properties are (durable and so on)
+</p></li>
+<li><p>
+Binding metadata
+</p>
+
+<p>
+A simple table showing how to route messages to queues
+</p></li>
+<li><p>
+Vhost metadata
+</p>
+
+<p>
+Namespacing and security attributes for the queues, exchanges, and bindings within a vhost
+</p></li>
+
+<li>Node location meatadata (clustering only)</li>
+</ul>
+
+
+<p>
+RabbitMQ stores all of this information <span class="underline">in memory</span> while writing it to disk for any queues and exchanges (and their bindings) marked <b>durable</b>.
+</p>
+</div>
+
+
+<div id="outline-container-orgf5e6559" class="outline-4">
+<h4 id="orgf5e6559"><span class="section-number-4">5.1.1</span> Queue in cluster</h4>
+<div class="outline-text-4" id="text-5-1-1">
+<p>
+By default, not every node in cluster has a full copy of every queue.
 </p>
 
 
-<div id="org28ca895" class="figure">
+<div class="figure">
 <p><img src="img/rabbit_cluster.png" alt="rabbit_cluster.png">
 </p>
-<p><span class="figure-number">Figure 19: </span>只有队列的元信息在节点间共享</p>
 </div>
 
+<pre class="example">
+If the queues being recreated were marked as durable, redeclaring them from another node will get you an ugly 404 NOT_FOUND error.
+This ensures messages in that queue on the failed node don't disappear when you restore it to the cluster.
+</pre>
+</div>
+</div>
 
-<div id="org36e32b8" class="figure">
+<div id="outline-container-org4898350" class="outline-4">
+<h4 id="org4898350"><span class="section-number-4">5.1.2</span> Exchange in cluster</h4>
+<div class="outline-text-4" id="text-5-1-2">
+<p>
+Actually, exchanges are just a name and a list of queue bindings. <br>
+The <b>channel</b> does the actual routing of the message to the queue as specified by the matching binding.
+</p>
+
+
+<div class="figure">
 <p><img src="img/rabbit_cluster_exchange.png" alt="rabbit_cluster_exchange.png">
 </p>
-<p><span class="figure-number">Figure 20: </span>交换器中的路由信息在节点间共享</p>
+</div>
 </div>
 </div>
 
-<div id="outline-container-org30020ab" class="outline-3">
-<h3 id="org30020ab"><span class="section-number-3">6.1</span> 集群管理</h3>
-<div class="outline-text-3" id="text-6-1">
+<div id="outline-container-org16f9fba" class="outline-4">
+<h4 id="org16f9fba"><span class="section-number-4">5.1.3</span> RAM/DISK node</h4>
+<div class="outline-text-4" id="text-5-1-3">
+<p>
+When nodes join or leave a cluster, they need to be able to notify <b>at least one</b> disk node of the change.
+</p>
+
+<p>
+If you only have one disk node and that node happens to be down, your cluster can continue to route messages but you can't do any of the following:
+</p>
+
+<ul class="org-ul">
+<li>Create queues</li>
+<li>Create exchanges</li>
+<li>Create bindings</li>
+<li>Add users</li>
+<li>Change permissions</li>
+<li>Add or remove cluster nodes</li>
+</ul>
+
+<pre class="example">
+The only meatadata RAM nodes store to disk are the addresses of disk nodes in the cluster.
+</pre>
 </div>
-<div id="outline-container-orgc9d1b65" class="outline-4">
-<h4 id="orgc9d1b65"><span class="section-number-4">6.1.1</span> 清空节点元数据（重设）</h4>
-<div class="outline-text-4" id="text-6-1-1">
+</div>
+</div>
+
+<div id="outline-container-org13b17ea" class="outline-3">
+<h3 id="org13b17ea"><span class="section-number-3">5.2</span> 集群管理</h3>
+<div class="outline-text-3" id="text-5-2">
+</div>
+<div id="outline-container-org2cb4b28" class="outline-4">
+<h4 id="org2cb4b28"><span class="section-number-4">5.2.1</span> 清空节点元数据（重设）</h4>
+<div class="outline-text-4" id="text-5-2-1">
 <p>
 当重设的节点是集群的一部分时，该命令也会和集群中的磁盘节点进行通信。
 </p>
@@ -1620,9 +1817,9 @@ RabbitMQ 默认不会将队列的内容复制到整个集群上。
 </div>
 </div>
 
-<div id="outline-container-org5ea5b7e" class="outline-4">
-<h4 id="org5ea5b7e"><span class="section-number-4">6.1.2</span> 加入集群</h4>
-<div class="outline-text-4" id="text-6-1-2">
+<div id="outline-container-org388dd15" class="outline-4">
+<h4 id="org388dd15"><span class="section-number-4">5.2.2</span> 加入集群</h4>
+<div class="outline-text-4" id="text-5-2-2">
 <p>
 将新节点加入到集群时，必须列出在集群中的所有磁盘节点，并作为集群命令的参数。
 </p>
@@ -1635,9 +1832,9 @@ rabbitmqctl -n &lt;my_node&gt; cluster &lt;other_node&gt; &lt;my_node&gt;
 </div>
 </div>
 
-<div id="outline-container-org16d8a79" class="outline-4">
-<h4 id="org16d8a79"><span class="section-number-4">6.1.3</span> 查看集群信息</h4>
-<div class="outline-text-4" id="text-6-1-3">
+<div id="outline-container-orgdec4153" class="outline-4">
+<h4 id="orgdec4153"><span class="section-number-4">5.2.3</span> 查看集群信息</h4>
+<div class="outline-text-4" id="text-5-2-3">
 <div class="org-src-container">
 <pre class="src src-sh">rabbitmqctl cluster_status
 </pre>
@@ -1648,9 +1845,9 @@ rabbitmqctl -n &lt;my_node&gt; cluster &lt;other_node&gt; &lt;my_node&gt;
 </div>
 
 
-<div id="outline-container-orgee48b39" class="outline-2">
-<h2 id="orgee48b39"><span class="section-number-2">7</span> 持久性</h2>
-<div class="outline-text-2" id="text-7">
+<div id="outline-container-org86149d0" class="outline-2">
+<h2 id="org86149d0"><span class="section-number-2">6</span> 持久性</h2>
+<div class="outline-text-2" id="text-6">
 <p>
 RabbitMQ 支持消息的持久化，也就是数据写在磁盘上。消息队列持久化包括 3 个部分：
 </p>
