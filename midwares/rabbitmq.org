@@ -373,20 +373,10 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 
 * RabbitMQ 管理
 
-** 启动停止
+** 日志
 
-*** 停止节点
+[[https://www.rabbitmq.com/logging.html][RabbitMQ Logging]]
 
-#+BEGIN_SRC sh
-  rabbitmqctl stop
-  rabbitmqctl stop -n rabbit@<nodename>
-#+END_SRC
-
-*** 停止应用
-
-#+BEGIN_SRC sh
-  rabbitmqctl stop_app
-#+END_SRC
 
 
 ** 配置文件
@@ -394,149 +384,9 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 =/etc/rabbitmq/rabbitmq.config=
 
 
-** 管理用户
+** 接入 Eshell
 
-*** 创建
-
-#+BEGIN_SRC sh
-  rabbitmqctl add_user <username> <password>
-#+END_SRC
-
-*** 删除
-
-#+BEGIN_SRC sh
-  rabbitmqctl delete_user <username>
-#+END_SRC
-
-*** 修改密码
-
-#+BEGIN_SRC sh
-  rabbitmqctl change_password <username> <new-password>
-#+END_SRC
-
-*** 查看
-
-#+BEGIN_SRC sh
-  rabbitmqctl list_users
-#+END_SRC
-
-
-** 管理权限
-
-每条访问控制条目由四部分组成：
-
-- 用户
-- vhost
-- 需要授予的读/写/配置权限组合
-- 权限范围
-
-*** 创建
-
-#+BEGIN_SRC sh
-  rabbitmqctl set_permission -p <vhost_name> \
-  <username> ".*" ".*" ".*"
-#+END_SRC
-
-*** 删除
-
-#+BEGIN_SRC sh
-  rabbitmqctl clear_permissions -p <vhost_name> <username>
-#+END_SRC
-
-*** 查看
-
-#+BEGIN_SRC sh
-  rabbitmqctl list_permissions -p <vhost_name>
-  rabbitmqctl list_user_permissions <username>  # 查看某个用户在所有 vhost 上的权限
-#+END_SRC
-
-
-** 管理 vhost
-
-- 查看
-  #+BEGIN_SRC sh
-    rabbitmqctl list_vhosts
-  #+END_SRC
-- 创建
-  #+BEGIN_SRC sh
-    rabbitmqctl add_vhost <vhost_name>
-  #+END_SRC
-- 删除
-  #+BEGIN_SRC sh
-    rabbitmqctl delete_vhost <vhost_name>
-  #+END_SRC
-
-
-
-** 信息查询
-
-*** 查看队列
-
-#+BEGIN_SRC sh
-  rabbitmqctl list_queues
-  rabbitmqctl list_queues name messages consumers memory # memory 单位为字节
-#+END_SRC
-
-信息参数包括：
-
-- name
-- durable
-- auto_delete
-- arguments
-- pid
-- owner_pid
-- exclusive_consumer_pid
-- exclusive_consumer_tag
-- messages_ready
-- messages_unacknowledged
-- messages_uncommitted
-- messages
-- acks_uncommitted
-- consumers
-- transactions
-- memory
-
-
-*** 查看交换器
-
-#+BEGIN_SRC sh
-  rabbitmqctl list_exchanges
-#+END_SRC
-
-信息参数包括：
-
-- name
-- type
-- durable
-- auto_delete
-- arguments
-
-
-*** 查看绑定信息
-
-#+BEGIN_SRC sh
-  rabbitmqctl list_bindings
-#+END_SRC
-
-参数信息包括：
-
-- source_name
-- source_kind
-- destination_name
-- destination_kind
-- routing_key
-- arguments
-
-
-*** 查看集群状态
-
-包括各个节点MQ状态、镜像队列状态等
-
-=rabbitmqctl report=
-
-*** 接入 Eshell
-
-=erl -setcookie abc -name test@<node-name> -remsh rabbit@<node-name> -hidden=
+=erl -setcookie <cookie> -name test@<node-name> -remsh rabbit@<node-name> -hidden=
 
 退出时要用 =Ctrl+G= 然后执行 *q* 命令退出。
 
@@ -773,31 +623,6 @@ If you only have one disk node and that node happens to be down, your cluster ca
 #+BEGIN_EXAMPLE
   The only meatadata RAM nodes store to disk are the addresses of disk nodes in the cluster.
 #+END_EXAMPLE
-
-** 集群管理
-
-*** 清空节点元数据（重设）
-
-当重设的节点是集群的一部分时，该命令也会和集群中的磁盘节点进行通信。
-
-#+BEGIN_SRC sh
-  rabbitmqctl -n <node> reset
-#+END_SRC
-
-*** 加入集群
-
-将新节点加入到集群时，必须列出在集群中的所有磁盘节点，并作为集群命令的参数。
-
-#+BEGIN_SRC sh
-  # 将 my_node 加入集群，并使其自己也称为磁盘节点
-  rabbitmqctl -n <my_node> cluster <other_node> <my_node>
-#+END_SRC
-
-*** 查看集群信息
-
-#+BEGIN_SRC sh
-  rabbitmqctl cluster_status
-#+END_SRC
 
 
 * 持久性
