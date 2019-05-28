@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- 2019-05-20 Mon 00:19 -->
+<!-- 2019-05-28 Tue 17:55 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RabbitMQ</title>
@@ -234,99 +234,121 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgb7e721f">1. AMQP</a>
+<li><a href="#orgbc777e4">1. AMQP</a>
 <ul>
-<li><a href="#org3b8e228">1.1. AMQP Frame</a>
+<li><a href="#org6ddcaba">1.1. AMQP Frame</a>
 <ul>
-<li><a href="#orga18dd8c">1.1.1. Frame Types</a>
+<li><a href="#org1e3dba3">1.1.1. Frame Types</a>
 <ul>
-<li><a href="#org6d3342c">1.1.1.1. Method frame</a></li>
-<li><a href="#org28a6715">1.1.1.2. Content header frame</a></li>
-<li><a href="#org417097c">1.1.1.3. Body frame</a></li>
+<li><a href="#orgbf96306">1.1.1.1. Method frame</a></li>
+<li><a href="#org5c0880b">1.1.1.2. Content header frame</a></li>
+<li><a href="#org8a340ab">1.1.1.3. Body frame</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orge694083">1.2. AMQP Model</a></li>
-<li><a href="#org80fb7c3">1.3. Protocol Implement</a>
+<li><a href="#org04c7bc7">1.2. AMQP Model</a></li>
+<li><a href="#org417c69d">1.3. Protocol Implement</a>
 <ul>
-<li><a href="#org591c9c1">1.3.1. Declaring exchange</a></li>
-<li><a href="#orga7e62d7">1.3.2. Declaring queue</a></li>
-<li><a href="#org0f3d3ea">1.3.3. Binding queue to exchange</a></li>
-<li><a href="#org48177ce">1.3.4. Publishing message</a>
+<li><a href="#org99c8a1f">1.3.1. Declaring exchange</a></li>
+<li><a href="#orgd601c47">1.3.2. Declaring queue</a></li>
+<li><a href="#org3fa7523">1.3.3. Binding queue to exchange</a></li>
+<li><a href="#orge6db289">1.3.4. Publishing message</a>
 <ul>
-<li><a href="#org20dd3c8">1.3.4.1. <code>mandatory</code> flag</a></li>
-<li><a href="#org4cc58d6">1.3.4.2. Publisher Confirm</a></li>
-<li><a href="#org5fc2e94">1.3.4.3. Alternate exchange</a></li>
-<li><a href="#org8764cde">1.3.4.4. Transaction</a></li>
-<li><a href="#org7862822">1.3.4.5. HA queues</a></li>
-<li><a href="#org6f19b83">1.3.4.6. Delivery Mode 2</a></li>
+<li><a href="#org6e9ecc1">1.3.4.1. <code>mandatory</code> flag</a></li>
+<li><a href="#org028b965">1.3.4.2. Publisher Confirm</a></li>
+<li><a href="#org68cbfca">1.3.4.3. Alternate exchange</a></li>
+<li><a href="#orge115b40">1.3.4.4. Transaction</a></li>
+<li><a href="#orge89ec04">1.3.4.5. HA queues</a></li>
+<li><a href="#orgdd8de51">1.3.4.6. Delivery Mode 2</a></li>
 </ul>
 </li>
-<li><a href="#org939ad25">1.3.5. Consuming message</a>
+<li><a href="#org0f01043">1.3.5. Consuming message</a>
 <ul>
-<li><a href="#orge7a722e">1.3.5.1. Consumer Tag</a></li>
-<li><a href="#orga0cd695">1.3.5.2. <code>no-ack</code> argument</a>
+<li><a href="#orge499b76">1.3.5.1. Consumer Tag</a></li>
+<li><a href="#orgaf28960">1.3.5.2. <code>no-ack</code> argument</a>
 <ul>
-<li><a href="#org4120475">1.3.5.2.1. Delivery tag</a></li>
+<li><a href="#orgbbe801b">1.3.5.2.1. Delivery tag</a></li>
 </ul>
 </li>
-<li><a href="#orgb9744a7">1.3.5.3. Prefetching (QoS)</a></li>
-<li><a href="#orgf89e02c">1.3.5.4. <code>Basic.Get</code></a></li>
-<li><a href="#org854a131">1.3.5.5. <code>Basic.Reject</code></a></li>
-<li><a href="#orgbb47d3d">1.3.5.6. <code>Basic.Nack</code></a></li>
-<li><a href="#orgb88a167">1.3.5.7. Dead letter exchanges</a></li>
+<li><a href="#org59030e8">1.3.5.3. Prefetching (QoS)</a></li>
+<li><a href="#org1a99bdb">1.3.5.4. <code>Basic.Get</code></a></li>
+<li><a href="#org9abad1d">1.3.5.5. <code>Basic.Reject</code></a></li>
+<li><a href="#orgc36b1aa">1.3.5.6. <code>Basic.Nack</code></a></li>
+<li><a href="#org493f1f7">1.3.5.7. Dead letter exchanges</a></li>
 </ul>
 </li>
-<li><a href="#orgc49d70d">1.3.6. <code>Basic.Properties</code></a></li>
+<li><a href="#org3207315">1.3.6. <code>Basic.Properties</code></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgfff9015">2. 交换器</a>
+<li><a href="#org2584247">2. 交换器</a>
 <ul>
-<li><a href="#orgd91712f">2.1. 属性</a></li>
-<li><a href="#org45a8919">2.2. direct</a></li>
-<li><a href="#org77cd312">2.3. fanout</a></li>
-<li><a href="#orgac5f9d8">2.4. topic</a></li>
-<li><a href="#orgf55376f">2.5. 路由</a></li>
+<li><a href="#org2f0acda">2.1. 属性</a></li>
+<li><a href="#org7125df3">2.2. direct</a></li>
+<li><a href="#orgefe4b76">2.3. fanout</a></li>
+<li><a href="#org8af9933">2.4. topic</a></li>
+<li><a href="#orgfe1da58">2.5. 路由</a></li>
 </ul>
 </li>
-<li><a href="#org146a838">3. RabbitMQ 管理</a>
+<li><a href="#orgf430fc7">3. RabbitMQ 管理</a>
 <ul>
-<li><a href="#org524c307">3.1. 日志</a></li>
-<li><a href="#orgd1bbd62">3.2. 配置文件</a></li>
-<li><a href="#orgb3a44b1">3.3. 接入 Eshell</a></li>
+<li><a href="#orgc8e60b1">3.1. 日志</a></li>
+<li><a href="#orgd5168af">3.2. 配置文件</a></li>
+<li><a href="#org1ae24cb">3.3. 接入 Eshell</a></li>
+<li><a href="#orgcd56b29">3.4. 禁止生产者发送消息</a></li>
 </ul>
 </li>
-<li><a href="#org546ffe2">4. 代码示例</a>
+<li><a href="#org4c5433f">4. 代码示例</a>
 <ul>
-<li><a href="#org48b36f8">4.1. 基本用法</a>
+<li><a href="#orgb297d6b">4.1. 基本用法</a>
 <ul>
-<li><a href="#orgc98e764">4.1.1. 生产者</a></li>
-<li><a href="#org51c46a3">4.1.2. 消费者</a></li>
+<li><a href="#orgc7c0e11">4.1.1. 生产者</a></li>
+<li><a href="#org7947423">4.1.2. 消费者</a></li>
 </ul>
 </li>
-<li><a href="#org334bb11">4.2. 发送方确认模式</a>
+<li><a href="#org4db6c5c">4.2. 发送方确认模式</a>
 <ul>
-<li><a href="#org18357aa">4.2.1. 生产者</a></li>
+<li><a href="#org1bc81ab">4.2.1. 生产者</a></li>
 </ul>
 </li>
-<li><a href="#org043945d">4.3. 通过 AMQP 实时访问日志</a></li>
+<li><a href="#org1910f66">4.3. 通过 AMQP 实时访问日志</a></li>
 </ul>
 </li>
-<li><a href="#org547a2cd">5. 集群</a>
+<li><a href="#org06b75f3">5. 集群</a>
 <ul>
-<li><a href="#org7d062e6">5.1. Architecture</a>
+<li><a href="#orgd41d307">5.1. Architecture</a>
 <ul>
-<li><a href="#orgcbf86f4">5.1.1. Queue in cluster</a></li>
-<li><a href="#org333d1db">5.1.2. Exchange in cluster</a></li>
-<li><a href="#orgb6049ab">5.1.3. RAM/DISK node</a></li>
+<li><a href="#org60df726">5.1.1. Queue in cluster</a></li>
+<li><a href="#org023dc49">5.1.2. Exchange in cluster</a></li>
+<li><a href="#org2f82ccd">5.1.3. RAM/DISK node</a></li>
+</ul>
+</li>
+<li><a href="#org646dd4c">5.2. Partition</a>
+<ul>
+<li><a href="#org7c12d67">5.2.1. 手动恢复</a>
+<ul>
+<li><a href="#org83b046a">5.2.1.1. 部分重启</a></li>
+<li><a href="#orge0f7207">5.2.1.2. 全部重启</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org81a1538">6. 持久性</a></li>
+<li><a href="#org3bfaa43">5.3. HA</a>
+<ul>
+<li><a href="#org4d7e6c0">5.3.1. Stopping Nodes and Synchronisation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org9e67884">6. Federation</a>
+<ul>
+<li><a href="#org84d72d1">6.1. 原理</a></li>
+<li><a href="#org306c0c0">6.2. Exchange</a></li>
+</ul>
+</li>
+<li><a href="#org0d9dd67">7. 持久化原则</a></li>
 </ul>
 </div>
 </div>
@@ -347,7 +369,7 @@ for the JavaScript code in this tag.
 
 <tr>
 <td class="org-left">Date</td>
-<td class="org-left">2019-05-20 00:19:00</td>
+<td class="org-left">2019-05-28 17:55:25</td>
 </tr>
 </tbody>
 </table>
@@ -356,110 +378,132 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgb7e721f">1. AMQP</a>
+<li><a href="#orgbc777e4">1. AMQP</a>
 <ul>
-<li><a href="#org3b8e228">1.1. AMQP Frame</a>
+<li><a href="#org6ddcaba">1.1. AMQP Frame</a>
 <ul>
-<li><a href="#orga18dd8c">1.1.1. Frame Types</a>
+<li><a href="#org1e3dba3">1.1.1. Frame Types</a>
 <ul>
-<li><a href="#org6d3342c">1.1.1.1. Method frame</a></li>
-<li><a href="#org28a6715">1.1.1.2. Content header frame</a></li>
-<li><a href="#org417097c">1.1.1.3. Body frame</a></li>
+<li><a href="#orgbf96306">1.1.1.1. Method frame</a></li>
+<li><a href="#org5c0880b">1.1.1.2. Content header frame</a></li>
+<li><a href="#org8a340ab">1.1.1.3. Body frame</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orge694083">1.2. AMQP Model</a></li>
-<li><a href="#org80fb7c3">1.3. Protocol Implement</a>
+<li><a href="#org04c7bc7">1.2. AMQP Model</a></li>
+<li><a href="#org417c69d">1.3. Protocol Implement</a>
 <ul>
-<li><a href="#org591c9c1">1.3.1. Declaring exchange</a></li>
-<li><a href="#orga7e62d7">1.3.2. Declaring queue</a></li>
-<li><a href="#org0f3d3ea">1.3.3. Binding queue to exchange</a></li>
-<li><a href="#org48177ce">1.3.4. Publishing message</a>
+<li><a href="#org99c8a1f">1.3.1. Declaring exchange</a></li>
+<li><a href="#orgd601c47">1.3.2. Declaring queue</a></li>
+<li><a href="#org3fa7523">1.3.3. Binding queue to exchange</a></li>
+<li><a href="#orge6db289">1.3.4. Publishing message</a>
 <ul>
-<li><a href="#org20dd3c8">1.3.4.1. <code>mandatory</code> flag</a></li>
-<li><a href="#org4cc58d6">1.3.4.2. Publisher Confirm</a></li>
-<li><a href="#org5fc2e94">1.3.4.3. Alternate exchange</a></li>
-<li><a href="#org8764cde">1.3.4.4. Transaction</a></li>
-<li><a href="#org7862822">1.3.4.5. HA queues</a></li>
-<li><a href="#org6f19b83">1.3.4.6. Delivery Mode 2</a></li>
+<li><a href="#org6e9ecc1">1.3.4.1. <code>mandatory</code> flag</a></li>
+<li><a href="#org028b965">1.3.4.2. Publisher Confirm</a></li>
+<li><a href="#org68cbfca">1.3.4.3. Alternate exchange</a></li>
+<li><a href="#orge115b40">1.3.4.4. Transaction</a></li>
+<li><a href="#orge89ec04">1.3.4.5. HA queues</a></li>
+<li><a href="#orgdd8de51">1.3.4.6. Delivery Mode 2</a></li>
 </ul>
 </li>
-<li><a href="#org939ad25">1.3.5. Consuming message</a>
+<li><a href="#org0f01043">1.3.5. Consuming message</a>
 <ul>
-<li><a href="#orge7a722e">1.3.5.1. Consumer Tag</a></li>
-<li><a href="#orga0cd695">1.3.5.2. <code>no-ack</code> argument</a>
+<li><a href="#orge499b76">1.3.5.1. Consumer Tag</a></li>
+<li><a href="#orgaf28960">1.3.5.2. <code>no-ack</code> argument</a>
 <ul>
-<li><a href="#org4120475">1.3.5.2.1. Delivery tag</a></li>
+<li><a href="#orgbbe801b">1.3.5.2.1. Delivery tag</a></li>
 </ul>
 </li>
-<li><a href="#orgb9744a7">1.3.5.3. Prefetching (QoS)</a></li>
-<li><a href="#orgf89e02c">1.3.5.4. <code>Basic.Get</code></a></li>
-<li><a href="#org854a131">1.3.5.5. <code>Basic.Reject</code></a></li>
-<li><a href="#orgbb47d3d">1.3.5.6. <code>Basic.Nack</code></a></li>
-<li><a href="#orgb88a167">1.3.5.7. Dead letter exchanges</a></li>
+<li><a href="#org59030e8">1.3.5.3. Prefetching (QoS)</a></li>
+<li><a href="#org1a99bdb">1.3.5.4. <code>Basic.Get</code></a></li>
+<li><a href="#org9abad1d">1.3.5.5. <code>Basic.Reject</code></a></li>
+<li><a href="#orgc36b1aa">1.3.5.6. <code>Basic.Nack</code></a></li>
+<li><a href="#org493f1f7">1.3.5.7. Dead letter exchanges</a></li>
 </ul>
 </li>
-<li><a href="#orgc49d70d">1.3.6. <code>Basic.Properties</code></a></li>
+<li><a href="#org3207315">1.3.6. <code>Basic.Properties</code></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgfff9015">2. 交换器</a>
+<li><a href="#org2584247">2. 交换器</a>
 <ul>
-<li><a href="#orgd91712f">2.1. 属性</a></li>
-<li><a href="#org45a8919">2.2. direct</a></li>
-<li><a href="#org77cd312">2.3. fanout</a></li>
-<li><a href="#orgac5f9d8">2.4. topic</a></li>
-<li><a href="#orgf55376f">2.5. 路由</a></li>
+<li><a href="#org2f0acda">2.1. 属性</a></li>
+<li><a href="#org7125df3">2.2. direct</a></li>
+<li><a href="#orgefe4b76">2.3. fanout</a></li>
+<li><a href="#org8af9933">2.4. topic</a></li>
+<li><a href="#orgfe1da58">2.5. 路由</a></li>
 </ul>
 </li>
-<li><a href="#org146a838">3. RabbitMQ 管理</a>
+<li><a href="#orgf430fc7">3. RabbitMQ 管理</a>
 <ul>
-<li><a href="#org524c307">3.1. 日志</a></li>
-<li><a href="#orgd1bbd62">3.2. 配置文件</a></li>
-<li><a href="#orgb3a44b1">3.3. 接入 Eshell</a></li>
+<li><a href="#orgc8e60b1">3.1. 日志</a></li>
+<li><a href="#orgd5168af">3.2. 配置文件</a></li>
+<li><a href="#org1ae24cb">3.3. 接入 Eshell</a></li>
+<li><a href="#orgcd56b29">3.4. 禁止生产者发送消息</a></li>
 </ul>
 </li>
-<li><a href="#org546ffe2">4. 代码示例</a>
+<li><a href="#org4c5433f">4. 代码示例</a>
 <ul>
-<li><a href="#org48b36f8">4.1. 基本用法</a>
+<li><a href="#orgb297d6b">4.1. 基本用法</a>
 <ul>
-<li><a href="#orgc98e764">4.1.1. 生产者</a></li>
-<li><a href="#org51c46a3">4.1.2. 消费者</a></li>
+<li><a href="#orgc7c0e11">4.1.1. 生产者</a></li>
+<li><a href="#org7947423">4.1.2. 消费者</a></li>
 </ul>
 </li>
-<li><a href="#org334bb11">4.2. 发送方确认模式</a>
+<li><a href="#org4db6c5c">4.2. 发送方确认模式</a>
 <ul>
-<li><a href="#org18357aa">4.2.1. 生产者</a></li>
+<li><a href="#org1bc81ab">4.2.1. 生产者</a></li>
 </ul>
 </li>
-<li><a href="#org043945d">4.3. 通过 AMQP 实时访问日志</a></li>
+<li><a href="#org1910f66">4.3. 通过 AMQP 实时访问日志</a></li>
 </ul>
 </li>
-<li><a href="#org547a2cd">5. 集群</a>
+<li><a href="#org06b75f3">5. 集群</a>
 <ul>
-<li><a href="#org7d062e6">5.1. Architecture</a>
+<li><a href="#orgd41d307">5.1. Architecture</a>
 <ul>
-<li><a href="#orgcbf86f4">5.1.1. Queue in cluster</a></li>
-<li><a href="#org333d1db">5.1.2. Exchange in cluster</a></li>
-<li><a href="#orgb6049ab">5.1.3. RAM/DISK node</a></li>
+<li><a href="#org60df726">5.1.1. Queue in cluster</a></li>
+<li><a href="#org023dc49">5.1.2. Exchange in cluster</a></li>
+<li><a href="#org2f82ccd">5.1.3. RAM/DISK node</a></li>
+</ul>
+</li>
+<li><a href="#org646dd4c">5.2. Partition</a>
+<ul>
+<li><a href="#org7c12d67">5.2.1. 手动恢复</a>
+<ul>
+<li><a href="#org83b046a">5.2.1.1. 部分重启</a></li>
+<li><a href="#orge0f7207">5.2.1.2. 全部重启</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org81a1538">6. 持久性</a></li>
+<li><a href="#org3bfaa43">5.3. HA</a>
+<ul>
+<li><a href="#org4d7e6c0">5.3.1. Stopping Nodes and Synchronisation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org9e67884">6. Federation</a>
+<ul>
+<li><a href="#org84d72d1">6.1. 原理</a></li>
+<li><a href="#org306c0c0">6.2. Exchange</a></li>
+</ul>
+</li>
+<li><a href="#org0d9dd67">7. 持久化原则</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-orgb7e721f" class="outline-2">
-<h2 id="orgb7e721f"><span class="section-number-2">1</span> AMQP</h2>
+<div id="outline-container-orgbc777e4" class="outline-2">
+<h2 id="orgbc777e4"><span class="section-number-2">1</span> AMQP</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org3b8e228" class="outline-3">
-<h3 id="org3b8e228"><span class="section-number-3">1.1</span> AMQP Frame</h3>
+<div id="outline-container-org6ddcaba" class="outline-3">
+<h3 id="org6ddcaba"><span class="section-number-3">1.1</span> AMQP Frame</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 AMQP uses <span class="underline">classes</span> and <span class="underline">methods</span>, referred to as <b>AMQP commands</b>, to create a common language between clients and servers.
@@ -478,8 +522,8 @@ AMQP uses <span class="underline">classes</span> and <span class="underline">met
 </div>
 </div>
 
-<div id="outline-container-orga18dd8c" class="outline-4">
-<h4 id="orga18dd8c"><span class="section-number-4">1.1.1</span> Frame Types</h4>
+<div id="outline-container-org1e3dba3" class="outline-4">
+<h4 id="org1e3dba3"><span class="section-number-4">1.1.1</span> Frame Types</h4>
 <div class="outline-text-4" id="text-1-1-1">
 <p>
 The AMQP specification defines five types of frames:
@@ -499,8 +543,8 @@ Sent to and from RabbitMQ as a check to ensure that both sides of the connection
 </ul>
 </div>
 
-<div id="outline-container-org6d3342c" class="outline-5">
-<h5 id="org6d3342c"><span class="section-number-5">1.1.1.1</span> Method frame</h5>
+<div id="outline-container-orgbf96306" class="outline-5">
+<h5 id="orgbf96306"><span class="section-number-5">1.1.1.1</span> Method frame</h5>
 <div class="outline-text-5" id="text-1-1-1-1">
 
 <div class="figure">
@@ -511,8 +555,8 @@ Sent to and from RabbitMQ as a check to ensure that both sides of the connection
 </div>
 
 
-<div id="outline-container-org28a6715" class="outline-5">
-<h5 id="org28a6715"><span class="section-number-5">1.1.1.2</span> Content header frame</h5>
+<div id="outline-container-org5c0880b" class="outline-5">
+<h5 id="org5c0880b"><span class="section-number-5">1.1.1.2</span> Content header frame</h5>
 <div class="outline-text-5" id="text-1-1-1-2">
 
 <div class="figure">
@@ -523,8 +567,8 @@ Sent to and from RabbitMQ as a check to ensure that both sides of the connection
 </div>
 
 
-<div id="outline-container-org417097c" class="outline-5">
-<h5 id="org417097c"><span class="section-number-5">1.1.1.3</span> Body frame</h5>
+<div id="outline-container-org8a340ab" class="outline-5">
+<h5 id="org8a340ab"><span class="section-number-5">1.1.1.3</span> Body frame</h5>
 <div class="outline-text-5" id="text-1-1-1-3">
 
 <div class="figure">
@@ -537,8 +581,8 @@ Sent to and from RabbitMQ as a check to ensure that both sides of the connection
 </div>
 
 
-<div id="outline-container-orge694083" class="outline-3">
-<h3 id="orge694083"><span class="section-number-3">1.2</span> AMQP Model</h3>
+<div id="outline-container-org04c7bc7" class="outline-3">
+<h3 id="org04c7bc7"><span class="section-number-3">1.2</span> AMQP Model</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 The AMQ model logically defines three abstract components in broker software that define the routing behavior of messages:
@@ -556,12 +600,12 @@ A rule that tells the exchange which queue the messages should be stored in</li>
 </div>
 
 
-<div id="outline-container-org80fb7c3" class="outline-3">
-<h3 id="org80fb7c3"><span class="section-number-3">1.3</span> Protocol Implement</h3>
+<div id="outline-container-org417c69d" class="outline-3">
+<h3 id="org417c69d"><span class="section-number-3">1.3</span> Protocol Implement</h3>
 <div class="outline-text-3" id="text-1-3">
 </div>
-<div id="outline-container-org591c9c1" class="outline-4">
-<h4 id="org591c9c1"><span class="section-number-4">1.3.1</span> Declaring exchange</h4>
+<div id="outline-container-org99c8a1f" class="outline-4">
+<h4 id="org99c8a1f"><span class="section-number-4">1.3.1</span> Declaring exchange</h4>
 <div class="outline-text-4" id="text-1-3-1">
 
 <div class="figure">
@@ -577,13 +621,22 @@ This response will include a numeric reply code and text value indicating why th
 </div>
 </div>
 
-<div id="outline-container-orga7e62d7" class="outline-4">
-<h4 id="orga7e62d7"><span class="section-number-4">1.3.2</span> Declaring queue</h4>
+<div id="outline-container-orgd601c47" class="outline-4">
+<h4 id="orgd601c47"><span class="section-number-4">1.3.2</span> Declaring queue</h4>
 <div class="outline-text-4" id="text-1-3-2">
+<div class="org-src-container">
+<pre class="src src-plantuml">hide footbox
+participant "Client" as c
+database RabbitMQ as r
 
-<div class="figure">
-<p><img src="img/rabbitmq_create.png" alt="rabbitmq_create.png">
-</p>
+c -&gt; r : Queue.Declare
+note right
+exclusive:    设置私有队列，用于限制只有一个消费者的情况
+auto-delete:  当最后一个消费者取消订阅的时候，队列自动移除
+passive=true: 当队列存在，成功返回，否则返回错误，用于检测队列是否存在
+end note
+r --&gt; c : Queue.DeclareOk
+</pre>
 </div>
 
 
@@ -605,8 +658,8 @@ such as the number of pending messages in the queue and the number of consumers 
 </div>
 
 
-<div id="outline-container-org0f3d3ea" class="outline-4">
-<h4 id="org0f3d3ea"><span class="section-number-4">1.3.3</span> Binding queue to exchange</h4>
+<div id="outline-container-org3fa7523" class="outline-4">
+<h4 id="org3fa7523"><span class="section-number-4">1.3.3</span> Binding queue to exchange</h4>
 <div class="outline-text-4" id="text-1-3-3">
 
 <div class="figure">
@@ -617,8 +670,8 @@ such as the number of pending messages in the queue and the number of consumers 
 </div>
 
 
-<div id="outline-container-org48177ce" class="outline-4">
-<h4 id="org48177ce"><span class="section-number-4">1.3.4</span> Publishing message</h4>
+<div id="outline-container-orge6db289" class="outline-4">
+<h4 id="orge6db289"><span class="section-number-4">1.3.4</span> Publishing message</h4>
 <div class="outline-text-4" id="text-1-3-4">
 
 <div class="figure">
@@ -628,8 +681,8 @@ such as the number of pending messages in the queue and the number of consumers 
 </div>
 
 
-<div id="outline-container-org20dd3c8" class="outline-5">
-<h5 id="org20dd3c8"><span class="section-number-5">1.3.4.1</span> <code>mandatory</code> flag</h5>
+<div id="outline-container-org6e9ecc1" class="outline-5">
+<h5 id="org6e9ecc1"><span class="section-number-5">1.3.4.1</span> <code>mandatory</code> flag</h5>
 <div class="outline-text-5" id="text-1-3-4-1">
 <p>
 The <code>mandatory</code> flag is an argument that's passed along with the <code>Basic.Publish</code> RPC command and tells RabbitMQ that if a message isn't routable,
@@ -646,8 +699,8 @@ it should send the message back to the publisher via a <code>Basic.Return</code>
 
 
 
-<div id="outline-container-org4cc58d6" class="outline-5">
-<h5 id="org4cc58d6"><span class="section-number-5">1.3.4.2</span> Publisher Confirm</h5>
+<div id="outline-container-org028b965" class="outline-5">
+<h5 id="org028b965"><span class="section-number-5">1.3.4.2</span> Publisher Confirm</h5>
 <div class="outline-text-5" id="text-1-3-4-2">
 <p>
 Prior to publishing any messages, a message publisher must issue a <code>Confirm.Select</code> RPC request to RabbitMQ and
@@ -673,8 +726,8 @@ Any application that has enabled Publisher Confirms should be able to receive a 
 </div>
 
 
-<div id="outline-container-org5fc2e94" class="outline-5">
-<h5 id="org5fc2e94"><span class="section-number-5">1.3.4.3</span> Alternate exchange</h5>
+<div id="outline-container-org68cbfca" class="outline-5">
+<h5 id="org68cbfca"><span class="section-number-5">1.3.4.3</span> Alternate exchange</h5>
 <div class="outline-text-5" id="text-1-3-4-3">
 
 <div class="figure">
@@ -685,8 +738,8 @@ Any application that has enabled Publisher Confirms should be able to receive a 
 </div>
 
 
-<div id="outline-container-org8764cde" class="outline-5">
-<h5 id="org8764cde"><span class="section-number-5">1.3.4.4</span> Transaction</h5>
+<div id="outline-container-orge115b40" class="outline-5">
+<h5 id="orge115b40"><span class="section-number-5">1.3.4.4</span> Transaction</h5>
 <div class="outline-text-5" id="text-1-3-4-4">
 
 <div class="figure">
@@ -702,8 +755,8 @@ If you're considering transactions as a method of delivery confirmation, conside
 </div>
 
 
-<div id="outline-container-org7862822" class="outline-5">
-<h5 id="org7862822"><span class="section-number-5">1.3.4.5</span> HA queues</h5>
+<div id="outline-container-orge89ec04" class="outline-5">
+<h5 id="orge89ec04"><span class="section-number-5">1.3.4.5</span> HA queues</h5>
 <div class="outline-text-5" id="text-1-3-4-5">
 <p>
 Allows queues to have redundant copies across multiple servers.
@@ -733,8 +786,8 @@ Instead, <span class="underline">it will receive all new messages</span> and onl
 </div>
 
 
-<div id="outline-container-org6f19b83" class="outline-5">
-<h5 id="org6f19b83"><span class="section-number-5">1.3.4.6</span> Delivery Mode 2</h5>
+<div id="outline-container-orgdd8de51" class="outline-5">
+<h5 id="orgdd8de51"><span class="section-number-5">1.3.4.6</span> Delivery Mode 2</h5>
 <div class="outline-text-5" id="text-1-3-4-6">
 <p>
 In addition to <code>delivery-mode</code> of 2, for messages to truly survive a restart of a RabbitMQ broker,
@@ -750,8 +803,8 @@ It's a costly way to guarantee delivery.
 
 
 
-<div id="outline-container-org939ad25" class="outline-4">
-<h4 id="org939ad25"><span class="section-number-4">1.3.5</span> Consuming message</h4>
+<div id="outline-container-org0f01043" class="outline-4">
+<h4 id="org0f01043"><span class="section-number-4">1.3.5</span> Consuming message</h4>
 <div class="outline-text-4" id="text-1-3-5">
 <p>
 Consuming messages with <code>Basic.Consume</code> means your application <span class="underline">automatically</span> receives messages from RabbitMQ as they become available
@@ -772,8 +825,8 @@ Application needs to <span class="underline">ACKNOWLEDGE</span> the message to l
 
 
 
-<div id="outline-container-orge7a722e" class="outline-5">
-<h5 id="orge7a722e"><span class="section-number-5">1.3.5.1</span> Consumer Tag</h5>
+<div id="outline-container-orge499b76" class="outline-5">
+<h5 id="orge499b76"><span class="section-number-5">1.3.5.1</span> Consumer Tag</h5>
 <div class="outline-text-5" id="text-1-3-5-1">
 <p>
 When your application issues <code>Basic.Consume</code>, a unique string is created that identifies the application on the open channel with RabbitMQ.
@@ -787,8 +840,8 @@ The consumer tag can be used to <span class="underline">cancel</span> any future
 </div>
 
 
-<div id="outline-container-orga0cd695" class="outline-5">
-<h5 id="orga0cd695"><span class="section-number-5">1.3.5.2</span> <code>no-ack</code> argument</h5>
+<div id="outline-container-orgaf28960" class="outline-5">
+<h5 id="orgaf28960"><span class="section-number-5">1.3.5.2</span> <code>no-ack</code> argument</h5>
 <div class="outline-text-5" id="text-1-3-5-2">
 <p>
 There's a no-ack flag with <code>Basic.Consume</code> RPC request.
@@ -810,8 +863,8 @@ If the <code>no_ack</code> flag is set to false, a consumer must acknowledge eac
 </div>
 
 
-<div id="outline-container-org4120475" class="outline-6">
-<h6 id="org4120475"><span class="section-number-6">1.3.5.2.1</span> Delivery tag</h6>
+<div id="outline-container-orgbbe801b" class="outline-6">
+<h6 id="orgbbe801b"><span class="section-number-6">1.3.5.2.1</span> Delivery tag</h6>
 <div class="outline-text-6" id="text-1-3-5-2-1">
 <p>
 When the <code>Basic.Ack</code> response frame is sent, the consumer must pass with it an argument from the <code>Basic.Deliver</code> method frame
@@ -823,8 +876,8 @@ and negative acknowledgement.
 </div>
 </div>
 
-<div id="outline-container-orgb9744a7" class="outline-5">
-<h5 id="orgb9744a7"><span class="section-number-5">1.3.5.3</span> Prefetching (QoS)</h5>
+<div id="outline-container-org59030e8" class="outline-5">
+<h5 id="org59030e8"><span class="section-number-5">1.3.5.3</span> Prefetching (QoS)</h5>
 <div class="outline-text-5" id="text-1-3-5-3">
 <p>
 prefetch 允许为每个 consumer 指定最大的 unacked messages 数目。
@@ -842,13 +895,18 @@ prefetch 允许为每个 consumer 指定最大的 unacked messages 数目。
 </div>
 
 
-<div id="outline-container-orgf89e02c" class="outline-5">
-<h5 id="orgf89e02c"><span class="section-number-5">1.3.5.4</span> <code>Basic.Get</code></h5>
+<div id="outline-container-org1a99bdb" class="outline-5">
+<h5 id="org1a99bdb"><span class="section-number-5">1.3.5.4</span> <code>Basic.Get</code></h5>
 <div class="outline-text-5" id="text-1-3-5-4">
+<div class="org-src-container">
+<pre class="src src-plantuml">hide footbox
+participant Client as c
+database RabbitMQ as q
 
-<div class="figure">
-<p><img src="img/rabbitmq_get.png" alt="rabbitmq_get.png">
-</p>
+c -&gt; q : Basic.Get
+q -&gt; c : msg
+c --&gt; q : Basic.Ack
+</pre>
 </div>
 
 <p>
@@ -859,8 +917,8 @@ prefetch 允许为每个 consumer 指定最大的 unacked messages 数目。
 
 
 
-<div id="outline-container-org854a131" class="outline-5">
-<h5 id="org854a131"><span class="section-number-5">1.3.5.5</span> <code>Basic.Reject</code></h5>
+<div id="outline-container-org9abad1d" class="outline-5">
+<h5 id="org9abad1d"><span class="section-number-5">1.3.5.5</span> <code>Basic.Reject</code></h5>
 <div class="outline-text-5" id="text-1-3-5-5">
 <p>
 This RPC carries with it the <span class="underline">delivery tag</span> created by RabbitMQ to uniquely identify the message. <br>
@@ -879,8 +937,8 @@ You can't reject multiple messages at the same time using Basic.Reject.
 </div>
 
 
-<div id="outline-container-orgbb47d3d" class="outline-5">
-<h5 id="orgbb47d3d"><span class="section-number-5">1.3.5.6</span> <code>Basic.Nack</code></h5>
+<div id="outline-container-orgc36b1aa" class="outline-5">
+<h5 id="orgc36b1aa"><span class="section-number-5">1.3.5.6</span> <code>Basic.Nack</code></h5>
 <div class="outline-text-5" id="text-1-3-5-6">
 <p>
 <code>Basic.Nack</code> method implements <span class="underline">the same behavior</span> as the <code>Basic.Reject</code>, but it adds "multiple-reject" behavior.
@@ -889,8 +947,8 @@ You can't reject multiple messages at the same time using Basic.Reject.
 </div>
 
 
-<div id="outline-container-orgb88a167" class="outline-5">
-<h5 id="orgb88a167"><span class="section-number-5">1.3.5.7</span> Dead letter exchanges</h5>
+<div id="outline-container-org493f1f7" class="outline-5">
+<h5 id="org493f1f7"><span class="section-number-5">1.3.5.7</span> Dead letter exchanges</h5>
 <div class="outline-text-5" id="text-1-3-5-7">
 <p>
 Dead letter exchange is actually a normal exchange.
@@ -926,8 +984,8 @@ Set <code>x-dead-letter-routing-key</code>  when declaring the queue.
 
 
 
-<div id="outline-container-orgc49d70d" class="outline-4">
-<h4 id="orgc49d70d"><span class="section-number-4">1.3.6</span> <code>Basic.Properties</code></h4>
+<div id="outline-container-org3207315" class="outline-4">
+<h4 id="org3207315"><span class="section-number-4">1.3.6</span> <code>Basic.Properties</code></h4>
 <div class="outline-text-4" id="text-1-3-6">
 <table>
 
@@ -1041,12 +1099,12 @@ Set <code>x-dead-letter-routing-key</code>  when declaring the queue.
 
 
 
-<div id="outline-container-orgfff9015" class="outline-2">
-<h2 id="orgfff9015"><span class="section-number-2">2</span> 交换器</h2>
+<div id="outline-container-org2584247" class="outline-2">
+<h2 id="org2584247"><span class="section-number-2">2</span> 交换器</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orgd91712f" class="outline-3">
-<h3 id="orgd91712f"><span class="section-number-3">2.1</span> 属性</h3>
+<div id="outline-container-org2f0acda" class="outline-3">
+<h3 id="org2f0acda"><span class="section-number-3">2.1</span> 属性</h3>
 <div class="outline-text-3" id="text-2-1">
 <ul class="org-ul">
 <li>Name</li>
@@ -1057,8 +1115,8 @@ Set <code>x-dead-letter-routing-key</code>  when declaring the queue.
 </div>
 </div>
 
-<div id="outline-container-org45a8919" class="outline-3">
-<h3 id="org45a8919"><span class="section-number-3">2.2</span> direct</h3>
+<div id="outline-container-org7125df3" class="outline-3">
+<h3 id="org7125df3"><span class="section-number-3">2.2</span> direct</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 如果路由键匹配的话，消息就被投递到对应的队列。
@@ -1071,40 +1129,40 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 </p>
 
 
-<div id="org2b256f1" class="figure">
+<div id="orgae1b87e" class="figure">
 <p><img src="img/direct-router.png" alt="direct-router.png">
 </p>
-<p><span class="figure-number">Figure 19: </span>direct router</p>
+<p><span class="figure-number">Figure 17: </span>direct router</p>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-org77cd312" class="outline-3">
-<h3 id="org77cd312"><span class="section-number-3">2.3</span> fanout</h3>
+<div id="outline-container-orgefe4b76" class="outline-3">
+<h3 id="orgefe4b76"><span class="section-number-3">2.3</span> fanout</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 将收到的消息广播的绑定的队列上。
 </p>
 
 
-<div id="orgc99cda7" class="figure">
+<div id="org7d380aa" class="figure">
 <p><img src="img/fanout-router.png" alt="fanout-router.png">
 </p>
-<p><span class="figure-number">Figure 20: </span>fanout router</p>
+<p><span class="figure-number">Figure 18: </span>fanout router</p>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-orgac5f9d8" class="outline-3">
-<h3 id="orgac5f9d8"><span class="section-number-3">2.4</span> topic</h3>
+<div id="outline-container-org8af9933" class="outline-3">
+<h3 id="org8af9933"><span class="section-number-3">2.4</span> topic</h3>
 <div class="outline-text-3" id="text-2-4">
 
-<div id="orge948926" class="figure">
+<div id="org8aa951a" class="figure">
 <p><img src="img/topic-router.png" alt="topic-router.png">
 </p>
-<p><span class="figure-number">Figure 21: </span>topic router</p>
+<p><span class="figure-number">Figure 19: </span>topic router</p>
 </div>
 
 <ul class="org-ul">
@@ -1116,8 +1174,8 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 </div>
 
 
-<div id="outline-container-orgf55376f" class="outline-3">
-<h3 id="orgf55376f"><span class="section-number-3">2.5</span> 路由</h3>
+<div id="outline-container-orgfe1da58" class="outline-3">
+<h3 id="orgfe1da58"><span class="section-number-3">2.5</span> 路由</h3>
 <div class="outline-text-3" id="text-2-5">
 <img src="http://javasampleapproach.com/wp-content/uploads/2017/10/springboot-rabbitmq-exchange-to-exchange-architecture.png"/>
 </div>
@@ -1125,12 +1183,12 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 </div>
 
 
-<div id="outline-container-org146a838" class="outline-2">
-<h2 id="org146a838"><span class="section-number-2">3</span> RabbitMQ 管理</h2>
+<div id="outline-container-orgf430fc7" class="outline-2">
+<h2 id="orgf430fc7"><span class="section-number-2">3</span> RabbitMQ 管理</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org524c307" class="outline-3">
-<h3 id="org524c307"><span class="section-number-3">3.1</span> 日志</h3>
+<div id="outline-container-orgc8e60b1" class="outline-3">
+<h3 id="orgc8e60b1"><span class="section-number-3">3.1</span> 日志</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 <a href="https://www.rabbitmq.com/logging.html">RabbitMQ Logging</a>
@@ -1140,8 +1198,8 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 
 
 
-<div id="outline-container-orgd1bbd62" class="outline-3">
-<h3 id="orgd1bbd62"><span class="section-number-3">3.2</span> 配置文件</h3>
+<div id="outline-container-orgd5168af" class="outline-3">
+<h3 id="orgd5168af"><span class="section-number-3">3.2</span> 配置文件</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 <code>/etc/rabbitmq/rabbitmq.config</code>
@@ -1150,8 +1208,8 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 </div>
 
 
-<div id="outline-container-orgb3a44b1" class="outline-3">
-<h3 id="orgb3a44b1"><span class="section-number-3">3.3</span> 接入 Eshell</h3>
+<div id="outline-container-org1ae24cb" class="outline-3">
+<h3 id="org1ae24cb"><span class="section-number-3">3.3</span> 接入 Eshell</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
 <code>erl -setcookie &lt;cookie&gt; -name test@&lt;node-name&gt; -remsh rabbit@&lt;node-name&gt; -hidden</code>
@@ -1169,19 +1227,30 @@ spawn(fun() -&gt; etop:start([{output, text}, {interval, 5}, {lines, 10}, {sort,
 </div>
 </div>
 </div>
+
+
+<div id="outline-container-orgcd56b29" class="outline-3">
+<h3 id="orgcd56b29"><span class="section-number-3">3.4</span> 禁止生产者发送消息</h3>
+<div class="outline-text-3" id="text-3-4">
+<p>
+<code>rabbitmqctl set_vm_memory_high_watermark 0</code>
+</p>
+</div>
+</div>
 </div>
 
 
-<div id="outline-container-org546ffe2" class="outline-2">
-<h2 id="org546ffe2"><span class="section-number-2">4</span> 代码示例</h2>
+
+<div id="outline-container-org4c5433f" class="outline-2">
+<h2 id="org4c5433f"><span class="section-number-2">4</span> 代码示例</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-org48b36f8" class="outline-3">
-<h3 id="org48b36f8"><span class="section-number-3">4.1</span> 基本用法</h3>
+<div id="outline-container-orgb297d6b" class="outline-3">
+<h3 id="orgb297d6b"><span class="section-number-3">4.1</span> 基本用法</h3>
 <div class="outline-text-3" id="text-4-1">
 </div>
-<div id="outline-container-orgc98e764" class="outline-4">
-<h4 id="orgc98e764"><span class="section-number-4">4.1.1</span> 生产者</h4>
+<div id="outline-container-orgc7c0e11" class="outline-4">
+<h4 id="orgc7c0e11"><span class="section-number-4">4.1.1</span> 生产者</h4>
 <div class="outline-text-4" id="text-4-1-1">
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #f92672; font-weight: bold;">import</span> pika
@@ -1213,8 +1282,8 @@ conn_broker.close()
 </div>
 
 
-<div id="outline-container-org51c46a3" class="outline-4">
-<h4 id="org51c46a3"><span class="section-number-4">4.1.2</span> 消费者</h4>
+<div id="outline-container-org7947423" class="outline-4">
+<h4 id="org7947423"><span class="section-number-4">4.1.2</span> 消费者</h4>
 <div class="outline-text-4" id="text-4-1-2">
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #f92672; font-weight: bold;">import</span> pika
@@ -1261,8 +1330,8 @@ channel.start_consuming()
 
 
 
-<div id="outline-container-org334bb11" class="outline-3">
-<h3 id="org334bb11"><span class="section-number-3">4.2</span> 发送方确认模式</h3>
+<div id="outline-container-org4db6c5c" class="outline-3">
+<h3 id="org4db6c5c"><span class="section-number-3">4.2</span> 发送方确认模式</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
 信道进入 confirm 模式，所有在信道上发布的消息都会被指派一个唯一的 ID 号（从 1 开始）。
@@ -1272,8 +1341,8 @@ channel.start_consuming()
 </div>
 
 
-<div id="outline-container-org18357aa" class="outline-4">
-<h4 id="org18357aa"><span class="section-number-4">4.2.1</span> 生产者</h4>
+<div id="outline-container-org1bc81ab" class="outline-4">
+<h4 id="org1bc81ab"><span class="section-number-4">4.2.1</span> 生产者</h4>
 <div class="outline-text-4" id="text-4-2-1">
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #465457;">#</span><span style="color: #465457;">! /usr/bin/env python3</span>
@@ -1314,8 +1383,8 @@ conn_broker.close()
 </div>
 
 
-<div id="outline-container-org043945d" class="outline-3">
-<h3 id="org043945d"><span class="section-number-3">4.3</span> 通过 AMQP 实时访问日志</h3>
+<div id="outline-container-org1910f66" class="outline-3">
+<h3 id="org1910f66"><span class="section-number-3">4.3</span> 通过 AMQP 实时访问日志</h3>
 <div class="outline-text-3" id="text-4-3">
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #465457;">#</span><span style="color: #465457;">! /usr/bin/env python3</span>
@@ -1357,12 +1426,12 @@ channel.start_consuming()
 </div>
 
 
-<div id="outline-container-org547a2cd" class="outline-2">
-<h2 id="org547a2cd"><span class="section-number-2">5</span> 集群</h2>
+<div id="outline-container-org06b75f3" class="outline-2">
+<h2 id="org06b75f3"><span class="section-number-2">5</span> 集群</h2>
 <div class="outline-text-2" id="text-5">
 </div>
-<div id="outline-container-org7d062e6" class="outline-3">
-<h3 id="org7d062e6"><span class="section-number-3">5.1</span> Architecture</h3>
+<div id="outline-container-orgd41d307" class="outline-3">
+<h3 id="orgd41d307"><span class="section-number-3">5.1</span> Architecture</h3>
 <div class="outline-text-3" id="text-5-1">
 <p>
 At all times RabbitMQ is keeping track of four kinds of internal metadata:
@@ -1408,8 +1477,8 @@ RabbitMQ stores all of this information <span class="underline">in memory</span>
 </div>
 
 
-<div id="outline-container-orgcbf86f4" class="outline-4">
-<h4 id="orgcbf86f4"><span class="section-number-4">5.1.1</span> Queue in cluster</h4>
+<div id="outline-container-org60df726" class="outline-4">
+<h4 id="org60df726"><span class="section-number-4">5.1.1</span> Queue in cluster</h4>
 <div class="outline-text-4" id="text-5-1-1">
 <p>
 By default, not every node in cluster has a full copy of every queue.
@@ -1428,8 +1497,8 @@ This ensures messages in that queue on the failed node don't disappear when you 
 </div>
 </div>
 
-<div id="outline-container-org333d1db" class="outline-4">
-<h4 id="org333d1db"><span class="section-number-4">5.1.2</span> Exchange in cluster</h4>
+<div id="outline-container-org023dc49" class="outline-4">
+<h4 id="org023dc49"><span class="section-number-4">5.1.2</span> Exchange in cluster</h4>
 <div class="outline-text-4" id="text-5-1-2">
 <p>
 Actually, exchanges are just a name and a list of queue bindings. <br>
@@ -1444,8 +1513,8 @@ The <b>channel</b> does the actual routing of the message to the queue as specif
 </div>
 </div>
 
-<div id="outline-container-orgb6049ab" class="outline-4">
-<h4 id="orgb6049ab"><span class="section-number-4">5.1.3</span> RAM/DISK node</h4>
+<div id="outline-container-org2f82ccd" class="outline-4">
+<h4 id="org2f82ccd"><span class="section-number-4">5.1.3</span> RAM/DISK node</h4>
 <div class="outline-text-4" id="text-5-1-3">
 <p>
 When nodes join or leave a cluster, they need to be able to notify <b>at least one</b> disk node of the change.
@@ -1470,12 +1539,97 @@ The only meatadata RAM nodes store to disk are the addresses of disk nodes in th
 </div>
 </div>
 </div>
+
+
+
+<div id="outline-container-org646dd4c" class="outline-3">
+<h3 id="org646dd4c"><span class="section-number-3">5.2</span> Partition</h3>
+<div class="outline-text-3" id="text-5-2">
+</div>
+<div id="outline-container-org7c12d67" class="outline-4">
+<h4 id="org7c12d67"><span class="section-number-4">5.2.1</span> 手动恢复</h4>
+<div class="outline-text-4" id="text-5-2-1">
+</div>
+<div id="outline-container-org83b046a" class="outline-5">
+<h5 id="org83b046a"><span class="section-number-5">5.2.1.1</span> 部分重启</h5>
+<div class="outline-text-5" id="text-5-2-1-1">
+<p>
+First choose one partition which you trust the most. Then stop all nodes in the other partitions and spin them all up again.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orge0f7207" class="outline-5">
+<h5 id="orge0f7207"><span class="section-number-5">5.2.1.2</span> 全部重启</h5>
+<div class="outline-text-5" id="text-5-2-1-2">
+<p>
+It may be simpler to stop the whole cluster and start it again;
+if so make sure that the first node you start is from the trusted partition.
+</p>
+</div>
+</div>
+</div>
 </div>
 
 
-<div id="outline-container-org81a1538" class="outline-2">
-<h2 id="org81a1538"><span class="section-number-2">6</span> 持久性</h2>
+<div id="outline-container-org3bfaa43" class="outline-3">
+<h3 id="org3bfaa43"><span class="section-number-3">5.3</span> HA</h3>
+<div class="outline-text-3" id="text-5-3">
+</div>
+<div id="outline-container-org4d7e6c0" class="outline-4">
+<h4 id="org4d7e6c0"><span class="section-number-4">5.3.1</span> <a href="https://www.rabbitmq.com/ha.html#start-stop">Stopping Nodes and Synchronisation</a></h4>
+<div class="outline-text-4" id="text-5-3-1">
+<p>
+When a mirror rejoins a mirrored queue, it throws away any durable local contents it already has and starts empty.
+Its behaviour is at this point the same as if it were a <a href="https://www.rabbitmq.com/ha.html#unsynchronised-mirrors">new node joining the cluster</a>.
+</p>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+<div id="outline-container-org9e67884" class="outline-2">
+<h2 id="org9e67884"><span class="section-number-2">6</span> Federation</h2>
 <div class="outline-text-2" id="text-6">
+</div>
+<div id="outline-container-org84d72d1" class="outline-3">
+<h3 id="org84d72d1"><span class="section-number-3">6.1</span> 原理</h3>
+<div class="outline-text-3" id="text-6-1">
+<p>
+The high-level goal of the federation plugin is to transmit messages between brokers <b>without requiring clustering</b>.
+</p>
+
+<p>
+The federation plugin allows you to make exchanges and queues federated. <br>
+A federated exchange or queue can receive messages from one or more <b>upstreams</b> (remote exchanges and queues on other brokers).
+</p>
+
+<ul class="org-ul">
+<li>A federated exchange can route messages published upstream to a local queue.</li>
+<li>A federated queue lets a local consumer receive messages from an upstream queue.</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-org306c0c0" class="outline-3">
+<h3 id="org306c0c0"><span class="section-number-3">6.2</span> Exchange</h3>
+<div class="outline-text-3" id="text-6-2">
+
+<div class="figure">
+<p><img src="img/rabbit_federation_exchange.png" alt="rabbit_federation_exchange.png">
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0d9dd67" class="outline-2">
+<h2 id="org0d9dd67"><span class="section-number-2">7</span> 持久化原则</h2>
+<div class="outline-text-2" id="text-7">
 <p>
 RabbitMQ 支持消息的持久化，也就是数据写在磁盘上。消息队列持久化包括 3 个部分：
 </p>

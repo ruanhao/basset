@@ -397,6 +397,12 @@ RabbitMq 会默认实现一个类型为 direct 的，名称为空白字符串的
 #+END_SRC
 
 
+** 禁止生产者发送消息
+
+=rabbitmqctl set_vm_memory_high_watermark 0=
+
+
+
 * 代码示例
 
 ** 基本用法
@@ -625,7 +631,49 @@ If you only have one disk node and that node happens to be down, your cluster ca
 #+END_EXAMPLE
 
 
-* 持久性
+
+** Partition
+
+*** 手动恢复
+
+**** 部分重启
+
+First choose one partition which you trust the most. Then stop all nodes in the other partitions and spin them all up again.
+
+**** 全部重启
+
+It may be simpler to stop the whole cluster and start it again;
+if so make sure that the first node you start is from the trusted partition.
+
+
+** HA
+
+*** [[https://www.rabbitmq.com/ha.html#start-stop][Stopping Nodes and Synchronisation]]
+
+When a mirror rejoins a mirrored queue, it throws away any durable local contents it already has and starts empty.
+Its behaviour is at this point the same as if it were a [[https://www.rabbitmq.com/ha.html#unsynchronised-mirrors][new node joining the cluster]].
+
+
+
+
+* Federation
+
+** 原理
+
+The high-level goal of the federation plugin is to transmit messages between brokers *without requiring clustering*.
+
+The federation plugin allows you to make exchanges and queues federated. \\
+A federated exchange or queue can receive messages from one or more *upstreams* (remote exchanges and queues on other brokers).
+
+- A federated exchange can route messages published upstream to a local queue.
+- A federated queue lets a local consumer receive messages from an upstream queue.
+
+
+** Exchange
+
+[[file:img/rabbit_federation_exchange.png]]
+
+* 持久化原则
 
 RabbitMQ 支持消息的持久化，也就是数据写在磁盘上。消息队列持久化包括 3 个部分：
 
