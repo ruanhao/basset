@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- 2018-05-28 Mon 14:42 -->
+<!-- 2019-06-16 Sun 00:24 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MongoDB</title>
@@ -239,119 +239,31 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org270673a">1. 环境</a>
+<li><a href="#org610be58">1. CRUD 概念</a>
 <ul>
-<li><a href="#orgdd263a5">1.1. Emacs</a></li>
-<li><a href="#org6f44c7d">1.2. Docker</a>
-<ul>
-<li><a href="#org52b0be7">1.2.1. 自定义配置文件</a></li>
-<li><a href="#org8d1b55a">1.2.2. 挂载数据文件</a></li>
+<li><a href="#orgc689c76">1.1. Write Concern</a></li>
+<li><a href="#orgfe58b8b">1.2. Read Concern</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a href="#org04c53f4">2. 查询</a>
+<li><a href="#orgfd342bb">2. Replica Set</a>
 <ul>
-<li><a href="#orge78dd3f">2.1. Query and Projection Operators</a></li>
-<li><a href="#org39b335a">2.2. 基本查询</a>
+<li><a href="#orgd893620">2.1. Automatic Failover</a></li>
+<li><a href="#orgd091b5a">2.2. 选举</a>
 <ul>
-<li><a href="#orgd4a6652">2.2.1. 查询所有</a></li>
-<li><a href="#orga79c30d">2.2.2. 指定相等条件</a></li>
-<li><a href="#orgfa5be03">2.2.3. 查询操作符</a></li>
-<li><a href="#org0410dd4">2.2.4. 与或条件</a></li>
-<li><a href="#org43af774">2.2.5. 查询内嵌文档</a></li>
+<li><a href="#orga3bbc71">2.2.1. Member Priority</a></li>
+<li><a href="#orgaa027b8">2.2.2. 网络分区</a></li>
 </ul>
 </li>
-<li><a href="#org9c730b5">2.3. 查询数组</a>
+<li><a href="#org23e0c81">2.3. Rollback</a></li>
+<li><a href="#orgf167330">2.4. Write Concern</a>
 <ul>
-<li><a href="#org0caee27">2.3.1. 查询数组中的元素</a></li>
-<li><a href="#org00e5be0">2.3.2. 为元素指定多个条件</a></li>
-<li><a href="#orgad3780c">2.3.3. 通过数组下标进行查询</a></li>
-<li><a href="#orga4ad040">2.3.4. 通过数组长度查询</a></li>
+<li><a href="#org508d955">2.4.1. w: majority</a></li>
 </ul>
 </li>
-<li><a href="#orgffb7393">2.4. 查询内嵌文档数组</a>
-<ul>
-<li><a href="#org866bda3">2.4.1. 对字段查询</a></li>
-<li><a href="#orgbb207d2">2.4.2. 使用索引查询</a></li>
-<li><a href="#org1c9701c">2.4.3. 指定多个条件</a></li>
+<li><a href="#org05050da">2.5. Read Preference</a></li>
 </ul>
 </li>
-<li><a href="#org93d3f88">2.5. 对查询结果投影</a>
-<ul>
-<li><a href="#orgcbc6411">2.5.1. 包含某些字段</a></li>
-<li><a href="#org042ceaf">2.5.2. 排除某些字段</a></li>
-<li><a href="#orga43fd67">2.5.3. 对内嵌文档字段投影</a></li>
-<li><a href="#org3123592">2.5.4. 对内嵌文档数组字段投影</a></li>
-<li><a href="#orgff9c850">2.5.5. 对返回结果中数组投影</a></li>
-</ul>
-</li>
-<li><a href="#orgeb49a0e">2.6. 查询 Null 或 Missing 字段</a>
-<ul>
-<li><a href="#org944456f">2.6.1. 空值检查</a></li>
-<li><a href="#orgb965891">2.6.2. 类型检查</a></li>
-<li><a href="#org7199552">2.6.3. 字段存在检查</a></li>
-</ul>
-</li>
-<li><a href="#org7865409">2.7. 在 shell 中使用游标</a></li>
-</ul>
-</li>
-<li><a href="#orgd7c1df2">3. 聚合</a>
-<ul>
-<li><a href="#org2f13d98">3.1. Pipeline stages</a>
-<ul>
-<li><a href="#org362c613">3.1.1. $addFields</a>
-<ul>
-<li><a href="#org85874e6">3.1.1.1. 使用 2 次 $addFields</a></li>
-<li><a href="#orgb211c8c">3.1.1.2. 为嵌入式文档添加字段</a></li>
-<li><a href="#orgf155bee">3.1.1.3. 覆盖已存在的字段</a></li>
-</ul>
-</li>
-<li><a href="#orgd1d3544">3.1.2. $count</a></li>
-<li><a href="#org4d54e59">3.1.3. $facet</a></li>
-<li><a href="#org3a5b333">3.1.4. $group</a></li>
-<li><a href="#org7f12c63">3.1.5. $limit</a></li>
-<li><a href="#org1d47343">3.1.6. $lookup</a></li>
-<li><a href="#orgc859cd4">3.1.7. $match</a></li>
-<li><a href="#org25ca1e3">3.1.8. $project</a></li>
-<li><a href="#org24a0712">3.1.9. $relpaceRoot</a></li>
-<li><a href="#org8313443">3.1.10. $sample</a></li>
-<li><a href="#org6156ff4">3.1.11. $skip</a></li>
-<li><a href="#org44cd941">3.1.12. $sort</a></li>
-<li><a href="#orgfda74d1">3.1.13. $unwind</a></li>
-</ul>
-</li>
-<li><a href="#orga3f9498">3.2. Pipeline operators</a></li>
-</ul>
-</li>
-<li><a href="#org01441a1">4. 索引</a>
-<ul>
-<li><a href="#org7538773">4.1. 索引类型</a>
-<ul>
-<li><a href="#org68166ca">4.1.1. Single Field</a></li>
-<li><a href="#orgfb8db6b">4.1.2. Compound Index</a></li>
-<li><a href="#orge5b230e">4.1.3. Multikey Index</a></li>
-<li><a href="#orgfbe657d">4.1.4. Geospatial Index</a></li>
-<li><a href="#org48082a3">4.1.5. Text Indexes</a></li>
-<li><a href="#org548357b">4.1.6. Hash Indexes</a></li>
-</ul>
-</li>
-<li><a href="#orgcf3b868">4.2. 索引属性</a>
-<ul>
-<li><a href="#orgc34a159">4.2.1. Unique Indexes</a></li>
-<li><a href="#org1d4e24d">4.2.2. Partial Indexes</a></li>
-<li><a href="#orgfa9e71e">4.2.3. Sparse Indexes</a></li>
-<li><a href="#org2843155">4.2.4. TTL Indexes</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#orgc2c06f1">5. Replica Set</a>
-<ul>
-<li><a href="#orgb9d6d9a">5.1. Automatic Failover</a></li>
-</ul>
-</li>
-<li><a href="#orge1d41af">6. Sharding</a></li>
+<li><a href="#org695bb9a">3. Sharding</a></li>
 </ul>
 </div>
 </div>
@@ -359,113 +271,31 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org270673a">1. 环境</a>
+<li><a href="#org610be58">1. CRUD 概念</a>
 <ul>
-<li><a href="#orgdd263a5">1.1. Emacs</a></li>
-<li><a href="#org6f44c7d">1.2. Docker</a>
-<ul>
-<li><a href="#org52b0be7">1.2.1. 自定义配置文件</a></li>
-<li><a href="#org8d1b55a">1.2.2. 挂载数据文件</a></li>
+<li><a href="#orgc689c76">1.1. Write Concern</a></li>
+<li><a href="#orgfe58b8b">1.2. Read Concern</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a href="#org04c53f4">2. 查询</a>
+<li><a href="#orgfd342bb">2. Replica Set</a>
 <ul>
-<li><a href="#orge78dd3f">2.1. Query and Projection Operators</a></li>
-<li><a href="#org39b335a">2.2. 基本查询</a>
+<li><a href="#orgd893620">2.1. Automatic Failover</a></li>
+<li><a href="#orgd091b5a">2.2. 选举</a>
 <ul>
-<li><a href="#orgd4a6652">2.2.1. 查询所有</a></li>
-<li><a href="#orga79c30d">2.2.2. 指定相等条件</a></li>
-<li><a href="#orgfa5be03">2.2.3. 查询操作符</a></li>
-<li><a href="#org0410dd4">2.2.4. 与或条件</a></li>
-<li><a href="#org43af774">2.2.5. 查询内嵌文档</a></li>
+<li><a href="#orga3bbc71">2.2.1. Member Priority</a></li>
+<li><a href="#orgaa027b8">2.2.2. 网络分区</a></li>
 </ul>
 </li>
-<li><a href="#org9c730b5">2.3. 查询数组</a>
+<li><a href="#org23e0c81">2.3. Rollback</a></li>
+<li><a href="#orgf167330">2.4. Write Concern</a>
 <ul>
-<li><a href="#org0caee27">2.3.1. 查询数组中的元素</a></li>
-<li><a href="#org00e5be0">2.3.2. 为元素指定多个条件</a></li>
-<li><a href="#orgad3780c">2.3.3. 通过数组下标进行查询</a></li>
-<li><a href="#orga4ad040">2.3.4. 通过数组长度查询</a></li>
+<li><a href="#org508d955">2.4.1. w: majority</a></li>
 </ul>
 </li>
-<li><a href="#orgffb7393">2.4. 查询内嵌文档数组</a>
-<ul>
-<li><a href="#org866bda3">2.4.1. 对字段查询</a></li>
-<li><a href="#orgbb207d2">2.4.2. 使用索引查询</a></li>
-<li><a href="#org1c9701c">2.4.3. 指定多个条件</a></li>
+<li><a href="#org05050da">2.5. Read Preference</a></li>
 </ul>
 </li>
-<li><a href="#org93d3f88">2.5. 对查询结果投影</a>
-<ul>
-<li><a href="#orgcbc6411">2.5.1. 包含某些字段</a></li>
-<li><a href="#org042ceaf">2.5.2. 排除某些字段</a></li>
-<li><a href="#orga43fd67">2.5.3. 对内嵌文档字段投影</a></li>
-<li><a href="#org3123592">2.5.4. 对内嵌文档数组字段投影</a></li>
-<li><a href="#orgff9c850">2.5.5. 对返回结果中数组投影</a></li>
-</ul>
-</li>
-<li><a href="#orgeb49a0e">2.6. 查询 Null 或 Missing 字段</a>
-<ul>
-<li><a href="#org944456f">2.6.1. 空值检查</a></li>
-<li><a href="#orgb965891">2.6.2. 类型检查</a></li>
-<li><a href="#org7199552">2.6.3. 字段存在检查</a></li>
-</ul>
-</li>
-<li><a href="#org7865409">2.7. 在 shell 中使用游标</a></li>
-</ul>
-</li>
-<li><a href="#orgd7c1df2">3. 聚合</a>
-<ul>
-<li><a href="#org2f13d98">3.1. Pipeline stages</a>
-<ul>
-<li><a href="#org362c613">3.1.1. $addFields</a></li>
-<li><a href="#orgd1d3544">3.1.2. $count</a></li>
-<li><a href="#org4d54e59">3.1.3. $facet</a></li>
-<li><a href="#org3a5b333">3.1.4. $group</a></li>
-<li><a href="#org7f12c63">3.1.5. $limit</a></li>
-<li><a href="#org1d47343">3.1.6. $lookup</a></li>
-<li><a href="#orgc859cd4">3.1.7. $match</a></li>
-<li><a href="#org25ca1e3">3.1.8. $project</a></li>
-<li><a href="#org24a0712">3.1.9. $relpaceRoot</a></li>
-<li><a href="#org8313443">3.1.10. $sample</a></li>
-<li><a href="#org6156ff4">3.1.11. $skip</a></li>
-<li><a href="#org44cd941">3.1.12. $sort</a></li>
-<li><a href="#orgfda74d1">3.1.13. $unwind</a></li>
-</ul>
-</li>
-<li><a href="#orga3f9498">3.2. Pipeline operators</a></li>
-</ul>
-</li>
-<li><a href="#org01441a1">4. 索引</a>
-<ul>
-<li><a href="#org7538773">4.1. 索引类型</a>
-<ul>
-<li><a href="#org68166ca">4.1.1. Single Field</a></li>
-<li><a href="#orgfb8db6b">4.1.2. Compound Index</a></li>
-<li><a href="#orge5b230e">4.1.3. Multikey Index</a></li>
-<li><a href="#orgfbe657d">4.1.4. Geospatial Index</a></li>
-<li><a href="#org48082a3">4.1.5. Text Indexes</a></li>
-<li><a href="#org548357b">4.1.6. Hash Indexes</a></li>
-</ul>
-</li>
-<li><a href="#orgcf3b868">4.2. 索引属性</a>
-<ul>
-<li><a href="#orgc34a159">4.2.1. Unique Indexes</a></li>
-<li><a href="#org1d4e24d">4.2.2. Partial Indexes</a></li>
-<li><a href="#orgfa9e71e">4.2.3. Sparse Indexes</a></li>
-<li><a href="#org2843155">4.2.4. TTL Indexes</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#orgc2c06f1">5. Replica Set</a>
-<ul>
-<li><a href="#orgb9d6d9a">5.1. Automatic Failover</a></li>
-</ul>
-</li>
-<li><a href="#orge1d41af">6. Sharding</a></li>
+<li><a href="#org695bb9a">3. Sharding</a></li>
 </ul>
 </div>
 </div>
@@ -486,1222 +316,161 @@ for the JavaScript code in this tag.
 
 <tr>
 <td class="org-left">Date</td>
-<td class="org-left">2018-05-28 14:42:43</td>
+<td class="org-left">2019-06-16 00:24:28</td>
 </tr>
 </tbody>
 </table>
 </div>
 
-<div id="outline-container-org270673a" class="outline-2">
-<h2 id="org270673a"><span class="section-number-2">1</span> 环境</h2>
+
+
+<div id="outline-container-org610be58" class="outline-2">
+<h2 id="org610be58"><span class="section-number-2">1</span> CRUD 概念</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgdd263a5" class="outline-3">
-<h3 id="orgdd263a5"><span class="section-number-3">1.1</span> Emacs</h3>
+<div id="outline-container-orgc689c76" class="outline-3">
+<h3 id="orgc689c76"><span class="section-number-3">1.1</span> <a href="https://docs.mongodb.com/manual/reference/write-concern/">Write Concern</a></h3>
 <div class="outline-text-3" id="text-1-1">
-<ol class="org-ol">
-<li>安装 <a href="https://github.com/krisajenkins/ob-mongo">ob-mongo</a></li>
-<li><code>rm -rf ~/.emacs.d/elpa/org-xxxxxxx/*.elc</code></li>
-</ol>
-</div>
-</div>
-
-<div id="outline-container-org6f44c7d" class="outline-3">
-<h3 id="org6f44c7d"><span class="section-number-3">1.2</span> Docker</h3>
-<div class="outline-text-3" id="text-1-2">
-</div>
-<div id="outline-container-org52b0be7" class="outline-4">
-<h4 id="org52b0be7"><span class="section-number-4">1.2.1</span> 自定义配置文件</h4>
-<div class="outline-text-4" id="text-1-2-1">
-<div class="org-src-container">
-<pre class="src src-sh">docker run --name some-mongo <span style="color: #00afaf;">\</span>
---rm <span style="color: #00afaf;">\</span>
--p 27017:27017 <span style="color: #00afaf;">\</span>
--v /my/custom:/etc/mongo <span style="color: #00afaf;">\</span>
--d <span style="color: #00afaf;">\</span>
-mongo <span style="color: #00afaf;">\</span>
---config /etc/mongo/mongod.conf
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org8d1b55a" class="outline-4">
-<h4 id="org8d1b55a"><span class="section-number-4">1.2.2</span> 挂载数据文件</h4>
-<div class="outline-text-4" id="text-1-2-2">
-<div class="org-src-container">
-<pre class="src src-sh">docker run --name some-mongo <span style="color: #00afaf;">\</span>
---rm <span style="color: #00afaf;">\</span>
--p 27017:27017 <span style="color: #00afaf;">\</span>
--v /my/own/datadir:/data/db <span style="color: #00afaf;">\</span>
--d mongo
-</pre>
-</div>
-</div>
-</div>
+<p>
+Write concern describes the <b>level of acknowledgment</b>.
+</p>
 </div>
 </div>
 
 
+<div id="outline-container-orgfe58b8b" class="outline-3">
+<h3 id="orgfe58b8b"><span class="section-number-3">1.2</span> Read Concern</h3>
+</div>
+</div>
 
-
-<div id="outline-container-org04c53f4" class="outline-2">
-<h2 id="org04c53f4"><span class="section-number-2">2</span> 查询</h2>
+<div id="outline-container-orgfd342bb" class="outline-2">
+<h2 id="orgfd342bb"><span class="section-number-2">2</span> Replica Set</h2>
 <div class="outline-text-2" id="text-2">
-<img src="https://docs.mongodb.com/manual/_images/crud-annotated-mongodb-find.bakedsvg.svg"/>
-</div>
-
-<div id="outline-container-orge78dd3f" class="outline-3">
-<h3 id="orge78dd3f"><span class="section-number-3">2.1</span> <a href="https://docs.mongodb.com/manual/reference/operator/query/">Query and Projection Operators</a></h3>
-</div>
-
-<div id="outline-container-org39b335a" class="outline-3">
-<h3 id="org39b335a"><span class="section-number-3">2.2</span> 基本查询</h3>
-<div class="outline-text-3" id="text-2-2">
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.insertMany([
-    { item: <span style="color: #00afaf;">"journal"</span>,  qty: 25,  size: { h: 14,    w: 21,    uom: <span style="color: #00afaf;">"cm"</span> }, status: <span style="color: #00afaf;">"A"</span> },
-    { item: <span style="color: #00afaf;">"notebook"</span>, qty: 50,  size: { h: 8.5,   w: 11,    uom: <span style="color: #00afaf;">"in"</span> }, status: <span style="color: #00afaf;">"A"</span> },
-    { item: <span style="color: #00afaf;">"paper"</span>,    qty: 100, size: { h: 8.5,   w: 11,    uom: <span style="color: #00afaf;">"in"</span> }, status: <span style="color: #00afaf;">"D"</span> },
-    { item: <span style="color: #00afaf;">"planner"</span>,  qty: 75,  size: { h: 22.85, w: 30,    uom: <span style="color: #00afaf;">"cm"</span> }, status: <span style="color: #00afaf;">"D"</span> },
-    { item: <span style="color: #00afaf;">"postcard"</span>, qty: 45,  size: { h: 10,    w: 15.25, uom: <span style="color: #00afaf;">"cm"</span> }, status: <span style="color: #00afaf;">"A"</span> }
-]);
-</pre>
-</div>
-</div>
-
-<div id="outline-container-orgd4a6652" class="outline-4">
-<h4 id="orgd4a6652"><span class="section-number-4">2.2.1</span> 查询所有</h4>
-<div class="outline-text-4" id="text-2-2-1">
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find({})
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-orga79c30d" class="outline-4">
-<h4 id="orga79c30d"><span class="section-number-4">2.2.2</span> 指定相等条件</h4>
-<div class="outline-text-4" id="text-2-2-2">
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { status: <span style="color: #00afaf;">"D"</span> } )
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-orgfa5be03" class="outline-4">
-<h4 id="orgfa5be03"><span class="section-number-4">2.2.3</span> 查询操作符</h4>
-<div class="outline-text-4" id="text-2-2-3">
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { status: { $in: [ <span style="color: #00afaf;">"A"</span>, <span style="color: #00afaf;">"D"</span> ] } } )
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org0410dd4" class="outline-4">
-<h4 id="org0410dd4"><span class="section-number-4">2.2.4</span> 与或条件</h4>
-<div class="outline-text-4" id="text-2-2-4">
-<ul class="org-ul">
-<li>AND</li>
-</ul>
-
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { status: <span style="color: #00afaf;">"A"</span>, qty: { $lt: 30 } } )
-</pre>
-</div>
-
-<ul class="org-ul">
-<li>OR</li>
-</ul>
-
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { $or: [ { status: <span style="color: #00afaf;">"A"</span> }, { qty: { $lt: 30 } } ] } )
-</pre>
-</div>
-
-
-<ul class="org-ul">
-<li>AND/OR</li>
-</ul>
-
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( {
-    status: <span style="color: #00afaf;">"A"</span>,
-    $or: [ { qty: { $lt: 30 } }, { item: <span style="color: #00afaf;">/^p/</span> } ]
-} )
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org43af774" class="outline-4">
-<h4 id="org43af774"><span class="section-number-4">2.2.5</span> 查询内嵌文档</h4>
-<div class="outline-text-4" id="text-2-2-5">
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { <span style="color: #00afaf;">"size.h"</span>: { $lt: 15 }, <span style="color: #00afaf;">"size.uom"</span>: <span style="color: #00afaf;">"in"</span>, status: <span style="color: #00afaf;">"D"</span> } )
-</pre>
-</div>
-
-<pre class="example">
-Mongo-Hacker 0.0.14
-Fetched 0 record(s) in [32;1m5ms[m
-
-</pre>
-</div>
-</div>
-</div>
-
-
-<div id="outline-container-org9c730b5" class="outline-3">
-<h3 id="org9c730b5"><span class="section-number-3">2.3</span> 查询数组</h3>
-<div class="outline-text-3" id="text-2-3">
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.insertMany([
-    { item: <span style="color: #00afaf;">"journal"</span>,  qty: 25,  tags: [<span style="color: #00afaf;">"blank"</span>, <span style="color: #00afaf;">"red"</span>],          dim_cm: [ 14, 21 ] },
-    { item: <span style="color: #00afaf;">"notebook"</span>, qty: 50,  tags: [<span style="color: #00afaf;">"red"</span>, <span style="color: #00afaf;">"blank"</span>],          dim_cm: [ 14, 21 ] },
-    { item: <span style="color: #00afaf;">"paper"</span>,    qty: 100, tags: [<span style="color: #00afaf;">"red"</span>, <span style="color: #00afaf;">"blank"</span>, <span style="color: #00afaf;">"plain"</span>], dim_cm: [ 14, 21 ] },
-    { item: <span style="color: #00afaf;">"planner"</span>,  qty: 75,  tags: [<span style="color: #00afaf;">"blank"</span>, <span style="color: #00afaf;">"red"</span>],          dim_cm: [ 22.85, 30 ] },
-    { item: <span style="color: #00afaf;">"postcard"</span>, qty: 45,  tags: [<span style="color: #00afaf;">"blue"</span>],                  dim_cm: [ 10, 15.25 ] }
-]);
-</pre>
-</div>
-</div>
-
-<div id="outline-container-org0caee27" class="outline-4">
-<h4 id="org0caee27"><span class="section-number-4">2.3.1</span> 查询数组中的元素</h4>
-<div class="outline-text-4" id="text-2-3-1">
 <p>
-下述语法都是表示 <b>数组中是否有一个元素满足条件</b>
-</p>
-
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { tags: <span style="color: #00afaf;">"red"</span> } ).limit(1)
-</pre>
-</div>
-
-<pre class="example">
-Mongo-Hacker 0.0.14
-Fetched 0 record(s) in [32;1m1ms[m
-
-</pre>
-
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { dim_cm: { $gt: 25 } } )
-</pre>
-</div>
-
-<pre class="example">
-Mongo-Hacker 0.0.14
-Fetched 0 record(s) in [32;1m1ms[m
-
-</pre>
-</div>
-</div>
-
-<div id="outline-container-org00e5be0" class="outline-4">
-<h4 id="org00e5be0"><span class="section-number-4">2.3.2</span> 为元素指定多个条件</h4>
-<div class="outline-text-4" id="text-2-3-2">
-<p>
-下述例子不是针对某个元素，而是指 <b>是否有一个大于15，有另一个小于20</b>
-</p>
-
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { dim_cm: { $gt: 15, $lt: 20 } } ).limit(1)
-</pre>
-</div>
-
-<pre class="example">
-Mongo-Hacker 0.0.14
-Fetched 0 record(s) in [32;1m1ms[m
-
-</pre>
-
-<p>
-使用 <b>$elemMatch</b> 针对某个元素进行查询
-</p>
-
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { dim_cm: { $elemMatch: { $gt: 22, $lt: 30 } } } )
-</pre>
-</div>
-
-<pre class="example">
-Mongo-Hacker 0.0.14
-Fetched 0 record(s) in [32;1m2ms[m
-
-</pre>
-</div>
-</div>
-
-<div id="outline-container-orgad3780c" class="outline-4">
-<h4 id="orgad3780c"><span class="section-number-4">2.3.3</span> 通过数组下标进行查询</h4>
-<div class="outline-text-4" id="text-2-3-3">
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { <span style="color: #00afaf;">"dim_cm.1"</span>: { $gt: 25 } } )
-</pre>
-</div>
-
-<pre class="example">
-Mongo-Hacker 0.0.14
-Fetched 0 record(s) in [32;1m1ms[m
-
-</pre>
-</div>
-</div>
-
-<div id="outline-container-orga4ad040" class="outline-4">
-<h4 id="orga4ad040"><span class="section-number-4">2.3.4</span> 通过数组长度查询</h4>
-<div class="outline-text-4" id="text-2-3-4">
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { <span style="color: #00afaf;">"tags"</span>: { $size: 3 } } )
-</pre>
-</div>
-
-<pre class="example">
-Mongo-Hacker 0.0.14
-Fetched 0 record(s) in [32;1m1ms[m
-
-</pre>
-</div>
-</div>
-</div>
-
-
-<div id="outline-container-orgffb7393" class="outline-3">
-<h3 id="orgffb7393"><span class="section-number-3">2.4</span> 查询内嵌文档数组</h3>
-<div class="outline-text-3" id="text-2-4">
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.insertMany( [
-    { item: <span style="color: #00afaf;">"journal"</span>,  instock: [ { warehouse: <span style="color: #00afaf;">"A"</span>, qty: 5 }, { warehouse: <span style="color: #00afaf;">"C"</span>, qty: 15 } ] },
-    { item: <span style="color: #00afaf;">"notebook"</span>, instock: [ { warehouse: <span style="color: #00afaf;">"C"</span>, qty: 5 } ] },
-    { item: <span style="color: #00afaf;">"paper"</span>,    instock: [ { warehouse: <span style="color: #00afaf;">"A"</span>, qty: 60 }, { warehouse: <span style="color: #00afaf;">"B"</span>, qty: 15 } ] },
-    { item: <span style="color: #00afaf;">"planner"</span>,  instock: [ { warehouse: <span style="color: #00afaf;">"A"</span>, qty: 40 }, { warehouse: <span style="color: #00afaf;">"B"</span>, qty: 5 } ] },
-    { item: <span style="color: #00afaf;">"postcard"</span>, instock: [ { warehouse: <span style="color: #00afaf;">"B"</span>, qty: 15 }, { warehouse: <span style="color: #00afaf;">"C"</span>, qty: 35 } ] }
-]);
-</pre>
-</div>
-</div>
-
-<div id="outline-container-org866bda3" class="outline-4">
-<h4 id="org866bda3"><span class="section-number-4">2.4.1</span> 对字段查询</h4>
-<div class="outline-text-4" id="text-2-4-1">
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { <span style="color: #00afaf;">'instock.qty'</span>: { $lte: 20 } } )
-</pre>
-</div>
-
-<pre class="example">
-Mongo-Hacker 0.0.14
-Fetched 0 record(s) in [32;1m1ms[m
-
-</pre>
-</div>
-</div>
-
-
-
-<div id="outline-container-orgbb207d2" class="outline-4">
-<h4 id="orgbb207d2"><span class="section-number-4">2.4.2</span> 使用索引查询</h4>
-<div class="outline-text-4" id="text-2-4-2">
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { <span style="color: #00afaf;">'instock.0.qty'</span>: { $lte: 20 } } )
-</pre>
-</div>
-
-<pre class="example">
-Mongo-Hacker 0.0.14
-Fetched 0 record(s) in [32;1m1ms[m
-
-</pre>
-</div>
-</div>
-
-<div id="outline-container-org1c9701c" class="outline-4">
-<h4 id="org1c9701c"><span class="section-number-4">2.4.3</span> 指定多个条件</h4>
-<div class="outline-text-4" id="text-2-4-3">
-<ul class="org-ul">
-<li>针对单个文档</li>
-</ul>
-
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { <span style="color: #00afaf;">"instock"</span>: { $elemMatch: { qty: 5, warehouse: <span style="color: #00afaf;">"A"</span> } } } )
-</pre>
-</div>
-
-<pre class="example">
-Mongo-Hacker 0.0.14
-Fetched 0 record(s) in [32;1m1ms[m
-
-</pre>
-
-
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { <span style="color: #00afaf;">"instock"</span>: { $elemMatch: { qty: { $gt: 10, $lte: 20 } } } } )
-</pre>
-</div>
-
-<pre class="example">
-Mongo-Hacker 0.0.14
-Fetched 0 record(s) in [32;1m1ms[m
-
-</pre>
-
-<ul class="org-ul">
-<li>不针对单个文档</li>
-</ul>
-
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { <span style="color: #00afaf;">"instock.qty"</span>: { $gt: 10,  $lte: 20 } } )
-</pre>
-</div>
-
-<pre class="example">
-Mongo-Hacker 0.0.14
-Fetched 0 record(s) in [32;1m1ms[m
-
-</pre>
-
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { <span style="color: #00afaf;">"instock.qty"</span>: 5, <span style="color: #00afaf;">"instock.warehouse"</span>: <span style="color: #00afaf;">"A"</span> } )
-</pre>
-</div>
-
-<pre class="example">
-Mongo-Hacker 0.0.14
-Fetched 0 record(s) in [32;1m0ms[m
-
-</pre>
-</div>
-</div>
-</div>
-
-
-
-
-
-
-<div id="outline-container-org93d3f88" class="outline-3">
-<h3 id="org93d3f88"><span class="section-number-3">2.5</span> 对查询结果投影</h3>
-<div class="outline-text-3" id="text-2-5">
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.insertMany( [
-    { item: <span style="color: #00afaf;">"journal"</span>,
-      status: <span style="color: #00afaf;">"A"</span>,
-      size: { h: 14, w: 21, uom: <span style="color: #00afaf;">"cm"</span> },
-      instock: [ { warehouse: <span style="color: #00afaf;">"A"</span>, qty: 5 } ] },
-    { item: <span style="color: #00afaf;">"notebook"</span>,
-      status: <span style="color: #00afaf;">"A"</span>,
-      size: { h: 8.5, w: 11, uom: <span style="color: #00afaf;">"in"</span> },
-      instock: [ { warehouse: <span style="color: #00afaf;">"C"</span>, qty: 5 } ] },
-    { item: <span style="color: #00afaf;">"paper"</span>,
-      status: <span style="color: #00afaf;">"D"</span>,
-      size: { h: 8.5, w: 11, uom: <span style="color: #00afaf;">"in"</span> },
-      instock: [ { warehouse: <span style="color: #00afaf;">"A"</span>, qty: 60 } ] },
-    { item: <span style="color: #00afaf;">"planner"</span>,
-      status: <span style="color: #00afaf;">"D"</span>,
-      size: { h: 22.85, w: 30, uom: <span style="color: #00afaf;">"cm"</span> },
-      instock: [ { warehouse: <span style="color: #00afaf;">"A"</span>, qty: 40 } ] },
-    { item: <span style="color: #00afaf;">"postcard"</span>,
-      status: <span style="color: #00afaf;">"A"</span>,
-      size: { h: 10, w: 15.25, uom: <span style="color: #00afaf;">"cm"</span> },
-      instock: [ { warehouse: <span style="color: #00afaf;">"B"</span>, qty: 15 }, { warehouse: <span style="color: #00afaf;">"C"</span>, qty: 35 } ] }
-]);
-</pre>
-</div>
-</div>
-
-<div id="outline-container-orgcbc6411" class="outline-4">
-<h4 id="orgcbc6411"><span class="section-number-4">2.5.1</span> 包含某些字段</h4>
-<div class="outline-text-4" id="text-2-5-1">
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { status: <span style="color: #00afaf;">"A"</span> }, { item: 1, status: 1, _id: 0 } ).limit(3)
-</pre>
-</div>
-
-<pre class="example">
-Mongo-Hacker 0.0.14
-Fetched 0 record(s) in [32;1m1ms[m
-
-</pre>
-</div>
-</div>
-
-
-<div id="outline-container-org042ceaf" class="outline-4">
-<h4 id="org042ceaf"><span class="section-number-4">2.5.2</span> 排除某些字段</h4>
-<div class="outline-text-4" id="text-2-5-2">
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { status: <span style="color: #00afaf;">"A"</span> }, { status: 0, instock: 0 } ).limit(3)
-</pre>
-</div>
-
-<pre class="example">
-Mongo-Hacker 0.0.14
-Fetched 0 record(s) in [32;1m1ms[m
-
-</pre>
-</div>
-</div>
-
-<div id="outline-container-orga43fd67" class="outline-4">
-<h4 id="orga43fd67"><span class="section-number-4">2.5.3</span> 对内嵌文档字段投影</h4>
-<div class="outline-text-4" id="text-2-5-3">
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find(
-   { status: <span style="color: #00afaf;">"A"</span> },
-   { item: 1, status: 1, <span style="color: #00afaf;">"size.uom"</span>: 1 }
-).limit(3)
-</pre>
-</div>
-
-<pre class="example">
-Mongo-Hacker 0.0.14
-Fetched 0 record(s) in [32;1m1ms[m
-
-</pre>
-</div>
-</div>
-
-<div id="outline-container-org3123592" class="outline-4">
-<h4 id="org3123592"><span class="section-number-4">2.5.4</span> 对内嵌文档数组字段投影</h4>
-<div class="outline-text-4" id="text-2-5-4">
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { status: <span style="color: #00afaf;">"A"</span> }, { item: 1, status: 1, <span style="color: #00afaf;">"instock.qty"</span>: 1 } ).limit(3)
-</pre>
-</div>
-
-<pre class="example">
-Mongo-Hacker 0.0.14
-Fetched 0 record(s) in [32;1m1ms[m
-
-</pre>
-</div>
-</div>
-
-<div id="outline-container-orgff9c850" class="outline-4">
-<h4 id="orgff9c850"><span class="section-number-4">2.5.5</span> 对返回结果中数组投影</h4>
-<div class="outline-text-4" id="text-2-5-5">
-<p>
-只能使用 <a href="https://docs.mongodb.com/manual/reference/operator/projection/elemMatch/#proj._S_elemMatch">$elemMatch</a>, <a href="https://docs.mongodb.com/manual/reference/operator/projection/slice/#proj._S_slice">$slice</a>, <a href="https://docs.mongodb.com/manual/reference/operator/projection/positional/#proj._S_">$</a> 对返回结果中的数组进行投影
-</p>
-
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { status: <span style="color: #00afaf;">"A"</span> }, { item: 1, status: 1, instock: { $slice: -1 } } ).limit(3)
-</pre>
-</div>
-
-<pre class="example">
-Mongo-Hacker 0.0.14
-Fetched 0 record(s) in [32;1m1ms[m
-
-</pre>
-</div>
-</div>
-</div>
-
-
-<div id="outline-container-orgeb49a0e" class="outline-3">
-<h3 id="orgeb49a0e"><span class="section-number-3">2.6</span> 查询 Null 或 Missing 字段</h3>
-<div class="outline-text-3" id="text-2-6">
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.insertMany([
-   { _id: 1, item: <span style="color: #00afaf;">null</span> },
-   { _id: 2 }
-])
-</pre>
-</div>
-</div>
-
-<div id="outline-container-org944456f" class="outline-4">
-<h4 id="org944456f"><span class="section-number-4">2.6.1</span> 空值检查</h4>
-<div class="outline-text-4" id="text-2-6-1">
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { item: <span style="color: #00afaf;">null</span> } )
-</pre>
-</div>
-
-<pre class="example">
-Mongo-Hacker 0.0.14
-Fetched 0 record(s) in [32;1m1ms[m
-
-</pre>
-</div>
-</div>
-
-
-<div id="outline-container-orgb965891" class="outline-4">
-<h4 id="orgb965891"><span class="section-number-4">2.6.2</span> 类型检查</h4>
-<div class="outline-text-4" id="text-2-6-2">
-<p>
-<a href="https://docs.mongodb.com/manual/reference/bson-types/">BSON Type</a>
-</p>
-
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { item : { $type: 10 } } )
-</pre>
-</div>
-
-<pre class="example">
-Mongo-Hacker 0.0.14
-Fetched 0 record(s) in [32;1m1ms[m
-
-</pre>
-</div>
-</div>
-
-<div id="outline-container-org7199552" class="outline-4">
-<h4 id="org7199552"><span class="section-number-4">2.6.3</span> 字段存在检查</h4>
-<div class="outline-text-4" id="text-2-6-3">
-<div class="org-src-container">
-<pre class="src src-mongo">db.inventory.find( { item : { $exists: <span style="color: #00afaf;">false</span> } } )
-</pre>
-</div>
-
-<pre class="example">
-Mongo-Hacker 0.0.14
-Fetched 0 record(s) in [32;1m2ms[m
-
-</pre>
-</div>
-</div>
-</div>
-
-
-<div id="outline-container-org7865409" class="outline-3">
-<h3 id="org7865409"><span class="section-number-3">2.7</span> <a href="https://docs.mongodb.com/manual/tutorial/iterate-a-cursor/">在 shell 中使用游标</a></h3>
-<div class="outline-text-3" id="text-2-7">
-<p>
-The <code>db.collection.find()</code> method returns a cursor. To access the documents, you need to iterate the cursor.
-</p>
-
-<p>
-However, in the mongo shell, if the returned cursor is not assigned to a variable using the var keyword,
-then the cursor is automatically <b>iterated up to 20 times</b> to print up to the first 20 documents in the results.
-</p>
-</div>
-</div>
-</div>
-
-
-
-<div id="outline-container-orgd7c1df2" class="outline-2">
-<h2 id="orgd7c1df2"><span class="section-number-2">3</span> 聚合</h2>
-<div class="outline-text-2" id="text-3">
-</div>
-<div id="outline-container-org2f13d98" class="outline-3">
-<h3 id="org2f13d98"><span class="section-number-3">3.1</span> <a href="https://docs.mongodb.com/manual/meta/aggregation-quick-reference/">Pipeline stages</a></h3>
-<div class="outline-text-3" id="text-3-1">
-<img src="https://docs.mongodb.com/manual/_images/aggregation-pipeline.bakedsvg.svg"/>
-</div>
-
-
-<div id="outline-container-org362c613" class="outline-4">
-<h4 id="org362c613"><span class="section-number-4">3.1.1</span> <a href="https://docs.mongodb.com/manual/reference/operator/aggregation/addFields/">$addFields</a></h4>
-<div class="outline-text-4" id="text-3-1-1">
-<p>
-<b>不能为一个数组字段添加元素</b>
-</p>
-</div>
-
-<div id="outline-container-org85874e6" class="outline-5">
-<h5 id="org85874e6"><span class="section-number-5">3.1.1.1</span> 使用 2 次 $addFields</h5>
-<div class="outline-text-5" id="text-3-1-1-1">
-<div class="org-src-container">
-<pre class="src src-mongo">db.scores.insertMany(
-    [
-        {
-            _id: 1,
-            student: <span style="color: #00afaf;">"Maya"</span>,
-            homework: [ 10, 5, 10 ],
-            quiz: [ 10, 8 ],
-            extraCredit: 0
-        },
-        {
-            _id: 2,
-            student: <span style="color: #00afaf;">"Ryan"</span>,
-            homework: [ 5, 6, 5 ],
-            quiz: [ 8, 8 ],
-            extraCredit: 8
-        }
-    ]
-);
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-mongo">db.scores.aggregate( [
-    {
-        $addFields: {
-            totalHomework: { $sum: <span style="color: #00afaf;">"$homework"</span> } ,
-            totalQuiz: { $sum: <span style="color: #00afaf;">"$quiz"</span> }
-        }
-    },
-    {
-        $addFields: { totalScore: { $add: [ <span style="color: #00afaf;">"$totalHomework"</span>, <span style="color: #00afaf;">"$totalQuiz"</span>, <span style="color: #00afaf;">"$extraCredit"</span> ] } }
-    }
-] )
-</pre>
-</div>
-
-<pre class="example">
-/* 1 */
-{
-    "_id" : 1.0,
-    "student" : "Maya",
-    "homework" : [
-        10.0,
-        5.0,
-        10.0
-    ],
-    "quiz" : [
-        10.0,
-        8.0
-    ],
-    "extraCredit" : 0.0,
-    "totalHomework" : 25.0,
-    "totalQuiz" : 18.0,
-    "totalScore" : 43.0
-}
-
-/* 2 */
-{
-    "_id" : 2.0,
-    "student" : "Ryan",
-    "homework" : [
-        5.0,
-        6.0,
-        5.0
-    ],
-    "quiz" : [
-        8.0,
-        8.0
-    ],
-    "extraCredit" : 8.0,
-    "totalHomework" : 16.0,
-    "totalQuiz" : 16.0,
-    "totalScore" : 40.0
-}
-</pre>
-</div>
-</div>
-
-<div id="outline-container-orgb211c8c" class="outline-5">
-<h5 id="orgb211c8c"><span class="section-number-5">3.1.1.2</span> 为嵌入式文档添加字段</h5>
-<div class="outline-text-5" id="text-3-1-1-2">
-<div class="org-src-container">
-<pre class="src src-mongo">db.vehicles.insertMany([
-    { _id: 1, type: <span style="color: #00afaf;">"car"</span>,        specs: { doors: 4, wheels: 4 } },
-    { _id: 2, type: <span style="color: #00afaf;">"motorcycle"</span>, specs: { doors: 0, wheels: 2 } },
-    { _id: 3, type: <span style="color: #00afaf;">"jet ski"</span> }
-]);
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-mongo">db.vehicles.aggregate( [
-    {
-        $addFields: {
-            <span style="color: #00afaf;">"specs.fuel_type"</span>: <span style="color: #00afaf;">"unleaded"</span>
-        }
-    }
-] );
-</pre>
-</div>
-
-<pre class="example">
-/* 1 */
-{
-    "_id" : 1.0,
-    "type" : "car",
-    "specs" : {
-        "doors" : 4.0,
-        "wheels" : 4.0,
-        "fuel_type" : "unleaded"
-    }
-}
-
-/* 2 */
-{
-    "_id" : 2.0,
-    "type" : "motorcycle",
-    "specs" : {
-        "doors" : 0.0,
-        "wheels" : 2.0,
-        "fuel_type" : "unleaded"
-    }
-}
-
-/* 3 */
-{
-    "_id" : 3.0,
-    "type" : "jet ski",
-    "specs" : {
-        "fuel_type" : "unleaded"
-    }
-}
-</pre>
-</div>
-</div>
-
-
-<div id="outline-container-orgf155bee" class="outline-5">
-<h5 id="orgf155bee"><span class="section-number-5">3.1.1.3</span> 覆盖已存在的字段</h5>
-<div class="outline-text-5" id="text-3-1-1-3">
-<div class="org-src-container">
-<pre class="src src-mongo">db.fruit.insertMany([
-    { <span style="color: #00afaf;">"_id"</span> : 1, <span style="color: #00afaf;">"item"</span> : <span style="color: #00afaf;">"tangerine"</span>,  <span style="color: #00afaf;">"type"</span> : <span style="color: #00afaf;">"citrus"</span> },
-    { <span style="color: #00afaf;">"_id"</span> : 2, <span style="color: #00afaf;">"item"</span> : <span style="color: #00afaf;">"lemon"</span>,      <span style="color: #00afaf;">"type"</span> : <span style="color: #00afaf;">"citrus"</span> },
-    { <span style="color: #00afaf;">"_id"</span> : 3, <span style="color: #00afaf;">"item"</span> : <span style="color: #00afaf;">"grapefruit"</span>, <span style="color: #00afaf;">"type"</span> : <span style="color: #00afaf;">"citrus"</span> }
-]);
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-mongo">db.fruit.aggregate( [
-  {
-    $addFields: {
-      _id : <span style="color: #00afaf;">"$item"</span>,
-      item: <span style="color: #00afaf;">"fruit"</span>
-    }
-  }
-] );
-</pre>
-</div>
-
-<pre class="example">
-/* 1 */
-{
-    "_id" : "tangerine",
-    "item" : "fruit",
-    "type" : "citrus"
-}
-
-/* 2 */
-{
-    "_id" : "lemon",
-    "item" : "fruit",
-    "type" : "citrus"
-}
-
-/* 3 */
-{
-    "_id" : "grapefruit",
-    "item" : "fruit",
-    "type" : "citrus"
-}
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-orgd1d3544" class="outline-4">
-<h4 id="orgd1d3544"><span class="section-number-4">3.1.2</span> <a href="https://docs.mongodb.com/manual/reference/operator/aggregation/count/">$count</a></h4>
-<div class="outline-text-4" id="text-3-1-2">
-<div class="org-src-container">
-<pre class="src src-mongo">db.scores.insertMany([
-    { <span style="color: #00afaf;">"_id"</span> : 1, <span style="color: #00afaf;">"subject"</span> : <span style="color: #00afaf;">"History"</span>, <span style="color: #00afaf;">"score"</span> : 88 },
-    { <span style="color: #00afaf;">"_id"</span> : 2, <span style="color: #00afaf;">"subject"</span> : <span style="color: #00afaf;">"History"</span>, <span style="color: #00afaf;">"score"</span> : 92 },
-    { <span style="color: #00afaf;">"_id"</span> : 3, <span style="color: #00afaf;">"subject"</span> : <span style="color: #00afaf;">"History"</span>, <span style="color: #00afaf;">"score"</span> : 97 },
-    { <span style="color: #00afaf;">"_id"</span> : 4, <span style="color: #00afaf;">"subject"</span> : <span style="color: #00afaf;">"History"</span>, <span style="color: #00afaf;">"score"</span> : 71 },
-    { <span style="color: #00afaf;">"_id"</span> : 5, <span style="color: #00afaf;">"subject"</span> : <span style="color: #00afaf;">"History"</span>, <span style="color: #00afaf;">"score"</span> : 79 },
-    { <span style="color: #00afaf;">"_id"</span> : 6, <span style="color: #00afaf;">"subject"</span> : <span style="color: #00afaf;">"History"</span>, <span style="color: #00afaf;">"score"</span> : 83 }
-]);
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-mongo">db.scores.aggregate(
-  [
-    {
-      $match: {
-        score: {
-          $gt: 80
-        }
-      }
-    },
-    {
-      $count: <span style="color: #00afaf;">"passing_scores"</span>
-    }
-  ]
-);
-</pre>
-</div>
-
-<pre class="example">
-{ "passing_scores" : 4 }
-</pre>
-</div>
-</div>
-
-<div id="outline-container-org4d54e59" class="outline-4">
-<h4 id="org4d54e59"><span class="section-number-4">3.1.3</span> <a href="https://docs.mongodb.com/manual/reference/operator/aggregation/facet/">$facet</a></h4>
-<div class="outline-text-4" id="text-3-1-3">
-<div class="org-src-container">
-<pre class="src src-js">{ <span style="color: #00afaf;">"_id"</span> : 1, <span style="color: #00afaf;">"title"</span> : <span style="color: #00afaf;">"The Pillars of Society"</span>, <span style="color: #00afaf;">"artist"</span> : <span style="color: #00afaf;">"Grosz"</span>, <span style="color: #00afaf;">"year"</span> : 1926,
-  <span style="color: #00afaf;">"price"</span> : NumberDecimal(<span style="color: #00afaf;">"199.99"</span>),
-  <span style="color: #00afaf;">"tags"</span> : [ <span style="color: #00afaf;">"painting"</span>, <span style="color: #00afaf;">"satire"</span>, <span style="color: #00afaf;">"Expressionism"</span>, <span style="color: #00afaf;">"caricature"</span> ] }
-{ <span style="color: #00afaf;">"_id"</span> : 2, <span style="color: #00afaf;">"title"</span> : <span style="color: #00afaf;">"Melancholy III"</span>, <span style="color: #00afaf;">"artist"</span> : <span style="color: #00afaf;">"Munch"</span>, <span style="color: #00afaf;">"year"</span> : 1902,
-  <span style="color: #00afaf;">"price"</span> : NumberDecimal(<span style="color: #00afaf;">"280.00"</span>),
-  <span style="color: #00afaf;">"tags"</span> : [ <span style="color: #00afaf;">"woodcut"</span>, <span style="color: #00afaf;">"Expressionism"</span> ] }
-{ <span style="color: #00afaf;">"_id"</span> : 3, <span style="color: #00afaf;">"title"</span> : <span style="color: #00afaf;">"Dancer"</span>, <span style="color: #00afaf;">"artist"</span> : <span style="color: #00afaf;">"Miro"</span>, <span style="color: #00afaf;">"year"</span> : 1925,
-  <span style="color: #00afaf;">"price"</span> : NumberDecimal(<span style="color: #00afaf;">"76.04"</span>),
-  <span style="color: #00afaf;">"tags"</span> : [ <span style="color: #00afaf;">"oil"</span>, <span style="color: #00afaf;">"Surrealism"</span>, <span style="color: #00afaf;">"painting"</span> ] }
-{ <span style="color: #00afaf;">"_id"</span> : 4, <span style="color: #00afaf;">"title"</span> : <span style="color: #00afaf;">"The Great Wave off Kanagawa"</span>, <span style="color: #00afaf;">"artist"</span> : <span style="color: #00afaf;">"Hokusai"</span>,
-  <span style="color: #00afaf;">"price"</span> : NumberDecimal(<span style="color: #00afaf;">"167.30"</span>),
-  <span style="color: #00afaf;">"tags"</span> : [ <span style="color: #00afaf;">"woodblock"</span>, <span style="color: #00afaf;">"ukiyo-e"</span> ] }
-{ <span style="color: #00afaf;">"_id"</span> : 5, <span style="color: #00afaf;">"title"</span> : <span style="color: #00afaf;">"The Persistence of Memory"</span>, <span style="color: #00afaf;">"artist"</span> : <span style="color: #00afaf;">"Dali"</span>, <span style="color: #00afaf;">"year"</span> : 1931,
-  <span style="color: #00afaf;">"price"</span> : NumberDecimal(<span style="color: #00afaf;">"483.00"</span>),
-  <span style="color: #00afaf;">"tags"</span> : [ <span style="color: #00afaf;">"Surrealism"</span>, <span style="color: #00afaf;">"painting"</span>, <span style="color: #00afaf;">"oil"</span> ] }
-{ <span style="color: #00afaf;">"_id"</span> : 6, <span style="color: #00afaf;">"title"</span> : <span style="color: #00afaf;">"Composition VII"</span>, <span style="color: #00afaf;">"artist"</span> : <span style="color: #00afaf;">"Kandinsky"</span>, <span style="color: #00afaf;">"year"</span> : 1913,
-  <span style="color: #00afaf;">"price"</span> : NumberDecimal(<span style="color: #00afaf;">"385.00"</span>),
-  <span style="color: #00afaf;">"tags"</span> : [ <span style="color: #00afaf;">"oil"</span>, <span style="color: #00afaf;">"painting"</span>, <span style="color: #00afaf;">"abstract"</span> ] }
-{ <span style="color: #00afaf;">"_id"</span> : 7, <span style="color: #00afaf;">"title"</span> : <span style="color: #00afaf;">"The Scream"</span>, <span style="color: #00afaf;">"artist"</span> : <span style="color: #00afaf;">"Munch"</span>, <span style="color: #00afaf;">"year"</span> : 1893,
-  <span style="color: #00afaf;">"tags"</span> : [ <span style="color: #00afaf;">"Expressionism"</span>, <span style="color: #00afaf;">"painting"</span>, <span style="color: #00afaf;">"oil"</span> ] }
-{ <span style="color: #00afaf;">"_id"</span> : 8, <span style="color: #00afaf;">"title"</span> : <span style="color: #00afaf;">"Blue Flower"</span>, <span style="color: #00afaf;">"artist"</span> : <span style="color: #00afaf;">"O'Keefe"</span>, <span style="color: #00afaf;">"year"</span> : 1918,
-  <span style="color: #00afaf;">"price"</span> : NumberDecimal(<span style="color: #00afaf;">"118.42"</span>),
-  <span style="color: #00afaf;">"tags"</span> : [ <span style="color: #00afaf;">"abstract"</span>, <span style="color: #00afaf;">"painting"</span> ] }
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-mongo">db.artwork.aggregate( [
-  {
-    $facet: {
-      <span style="color: #00afaf;">"categorizedByTags"</span>: [
-        { $unwind: <span style="color: #00afaf;">"$tags"</span> },
-        { $sortByCount: <span style="color: #00afaf;">"$tags"</span> }
-      ],
-      <span style="color: #00afaf;">"categorizedByPrice"</span>: [
-        <span style="color: #585858; font-style: italic;">// </span><span style="color: #585858; font-style: italic;">Filter out documents without a price e.g., _id: 7</span>
-        { $match: { price: { $exists: 1 } } },
-        {
-          $bucket: {
-            groupBy: <span style="color: #00afaf;">"$price"</span>,
-            boundaries: [  0, 150, 200, 300, 400 ],
-            <span style="color: #5f8700;">default</span>: <span style="color: #00afaf;">"Other"</span>,
-            output: {
-              <span style="color: #00afaf;">"count"</span>: { $sum: 1 },
-              <span style="color: #00afaf;">"titles"</span>: { $push: <span style="color: #00afaf;">"$title"</span> }
-            }
-          }
-        }
-      ],
-      <span style="color: #00afaf;">"categorizedByYears(Auto)"</span>: [
-        {
-          $bucketAuto: {
-            groupBy: <span style="color: #00afaf;">"$year"</span>,
-            buckets: 4
-          }
-        }
-      ]
-    }
-  }
-])
-</pre>
-</div>
-
-<pre class="example">
-{
-  "categorizedByYears(Auto)" : [
-    // First bucket includes the document without a year, e.g., _id: 4
-    { "_id" : { "min" : null, "max" : 1902 }, "count" : 2 },
-    { "_id" : { "min" : 1902, "max" : 1918 }, "count" : 2 },
-    { "_id" : { "min" : 1918, "max" : 1926 }, "count" : 2 },
-    { "_id" : { "min" : 1926, "max" : 1931 }, "count" : 2 }
-  ],
-  "categorizedByPrice" : [
-    {
-      "_id" : 0,
-      "count" : 2,
-      "titles" : [
-        "Dancer",
-        "Blue Flower"
-      ]
-    },
-    {
-      "_id" : 150,
-      "count" : 2,
-      "titles" : [
-        "The Pillars of Society",
-        "The Great Wave off Kanagawa"
-      ]
-    },
-    {
-      "_id" : 200,
-      "count" : 1,
-      "titles" : [
-        "Melancholy III"
-      ]
-    },
-    {
-      "_id" : 300,
-      "count" : 1,
-      "titles" : [
-        "Composition VII"
-      ]
-    },
-    {
-      // Includes document price outside of bucket boundaries, e.g., _id: 5
-      "_id" : "Other",
-      "count" : 1,
-      "titles" : [
-        "The Persistence of Memory"
-      ]
-    }
-  ],
-  "categorizedByTags" : [
-    { "_id" : "painting", "count" : 6 },
-    { "_id" : "oil", "count" : 4 },
-    { "_id" : "Expressionism", "count" : 3 },
-    { "_id" : "Surrealism", "count" : 2 },
-    { "_id" : "abstract", "count" : 2 },
-    { "_id" : "woodblock", "count" : 1 },
-    { "_id" : "woodcut", "count" : 1 },
-    { "_id" : "ukiyo-e", "count" : 1 },
-    { "_id" : "satire", "count" : 1 },
-    { "_id" : "caricature", "count" : 1 }
-  ]
-}
-</pre>
-</div>
-</div>
-
-
-<div id="outline-container-org3a5b333" class="outline-4">
-<h4 id="org3a5b333"><span class="section-number-4">3.1.4</span> <a href="https://docs.mongodb.com/manual/reference/operator/aggregation/group/">$group</a></h4>
-<div class="outline-text-4" id="text-3-1-4">
-<p>
-Specify an '_id' value of null to calculate accumulated values <b>for all the input documents as a whole</b>.
-</p>
-</div>
-</div>
-
-<div id="outline-container-org7f12c63" class="outline-4">
-<h4 id="org7f12c63"><span class="section-number-4">3.1.5</span> <a href="https://docs.mongodb.com/manual/reference/operator/aggregation/limit/">$limit</a></h4>
-<div class="outline-text-4" id="text-3-1-5">
-<div class="org-src-container">
-<pre class="src src-mongo">db.article.aggregate(
-    { $limit : 5 }
-);
-</pre>
-</div>
-</div>
-</div>
-
-
-<div id="outline-container-org1d47343" class="outline-4">
-<h4 id="org1d47343"><span class="section-number-4">3.1.6</span> <a href="https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/">$lookup</a></h4>
-</div>
-
-<div id="outline-container-orgc859cd4" class="outline-4">
-<h4 id="orgc859cd4"><span class="section-number-4">3.1.7</span> <a href="https://docs.mongodb.com/manual/reference/operator/aggregation/match/">$match</a></h4>
-</div>
-
-<div id="outline-container-org25ca1e3" class="outline-4">
-<h4 id="org25ca1e3"><span class="section-number-4">3.1.8</span> <a href="https://docs.mongodb.com/manual/reference/operator/aggregation/project/">$project</a></h4>
-</div>
-
-<div id="outline-container-org24a0712" class="outline-4">
-<h4 id="org24a0712"><span class="section-number-4">3.1.9</span> <a href="https://docs.mongodb.com/manual/reference/operator/aggregation/replaceRoot/">$relpaceRoot</a></h4>
-</div>
-
-<div id="outline-container-org8313443" class="outline-4">
-<h4 id="org8313443"><span class="section-number-4">3.1.10</span> <a href="https://docs.mongodb.com/manual/reference/operator/aggregation/sample/">$sample</a></h4>
-</div>
-
-<div id="outline-container-org6156ff4" class="outline-4">
-<h4 id="org6156ff4"><span class="section-number-4">3.1.11</span> <a href="https://docs.mongodb.com/manual/reference/operator/aggregation/skip/">$skip</a></h4>
-</div>
-
-<div id="outline-container-org44cd941" class="outline-4">
-<h4 id="org44cd941"><span class="section-number-4">3.1.12</span> <a href="https://docs.mongodb.com/manual/reference/operator/aggregation/sort/">$sort</a></h4>
-</div>
-
-<div id="outline-container-orgfda74d1" class="outline-4">
-<h4 id="orgfda74d1"><span class="section-number-4">3.1.13</span> <a href="https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/">$unwind</a></h4>
-</div>
-</div>
-
-<div id="outline-container-orga3f9498" class="outline-3">
-<h3 id="orga3f9498"><span class="section-number-3">3.2</span> <a href="https://docs.mongodb.com/manual/reference/operator/aggregation/">Pipeline operators</a></h3>
-</div>
-</div>
-
-
-<div id="outline-container-org01441a1" class="outline-2">
-<h2 id="org01441a1"><span class="section-number-2">4</span> 索引</h2>
-<div class="outline-text-2" id="text-4">
-<p>
-Indexes are <a href="https://docs.mongodb.com/manual/indexes/#b-tree">special data structure</a> that store a small portion of the collection’s data set in an easy to traverse form.
-The index stores the value of a specific field or set of fields, ordered by the value of the field.
-The ordering of the index entries supports efficient equality matches and range-based query operations.
-In addition, MongoDB can return sorted results by using the ordering in the index.
-</p>
-
-<img src="https://docs.mongodb.com/manual/_images/index-for-sort.bakedsvg.svg"/>
-</div>
-
-<div id="outline-container-org7538773" class="outline-3">
-<h3 id="org7538773"><span class="section-number-3">4.1</span> 索引类型</h3>
-<div class="outline-text-3" id="text-4-1">
-</div>
-<div id="outline-container-org68166ca" class="outline-4">
-<h4 id="org68166ca"><span class="section-number-4">4.1.1</span> Single Field</h4>
-<div class="outline-text-4" id="text-4-1-1">
-<img src="https://docs.mongodb.com/manual/_images/index-ascending.bakedsvg.svg"/>
-
-<div class="org-src-container">
-<pre class="src src-mongo">db.records.createIndex( { score: 1 } )
-</pre>
-</div>
-</div>
-</div>
-
-
-<div id="outline-container-orgfb8db6b" class="outline-4">
-<h4 id="orgfb8db6b"><span class="section-number-4">4.1.2</span> Compound Index</h4>
-<div class="outline-text-4" id="text-4-1-2">
-<p>
-<b>MongoDB imposes a limit of 31 fields for any compound index.</b>
-</p>
-
-
-<img src="https://docs.mongodb.com/manual/_images/index-compound-key.bakedsvg.svg"/>
-
-<div class="org-src-container">
-<pre class="src src-mongo">db.products.createIndex( { <span style="color: #00afaf;">"item"</span>: 1, <span style="color: #00afaf;">"stock"</span>: 1 } )
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-orge5b230e" class="outline-4">
-<h4 id="orge5b230e"><span class="section-number-4">4.1.3</span> Multikey Index</h4>
-<div class="outline-text-4" id="text-4-1-3">
-<p>
-MongoDB uses multikey indexes to index the content stored in <b>arrays</b>.
-</p>
-
-<p>
-MongoDB automatically determines whether to create a multikey index if the indexed field contains an array value;
-<b>you do not need to explicitly specify the multikey type.</b>
-</p>
-
-<img src="https://docs.mongodb.com/manual/_images/index-multikey.bakedsvg.svg"/>
-</div>
-</div>
-
-
-<div id="outline-container-orgfbe657d" class="outline-4">
-<h4 id="orgfbe657d"><span class="section-number-4">4.1.4</span> Geospatial Index</h4>
-</div>
-
-<div id="outline-container-org48082a3" class="outline-4">
-<h4 id="org48082a3"><span class="section-number-4">4.1.5</span> Text Indexes</h4>
-<div class="outline-text-4" id="text-4-1-5">
-<div class="org-src-container">
-<pre class="src src-mongo">db.reviews.createIndex( { comments: <span style="color: #00afaf;">"text"</span> } )
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org548357b" class="outline-4">
-<h4 id="org548357b"><span class="section-number-4">4.1.6</span> Hash Indexes</h4>
-</div>
-</div>
-
-
-<div id="outline-container-orgcf3b868" class="outline-3">
-<h3 id="orgcf3b868"><span class="section-number-3">4.2</span> 索引属性</h3>
-<div class="outline-text-3" id="text-4-2">
-</div>
-<div id="outline-container-orgc34a159" class="outline-4">
-<h4 id="orgc34a159"><span class="section-number-4">4.2.1</span> Unique Indexes</h4>
-</div>
-
-<div id="outline-container-org1d4e24d" class="outline-4">
-<h4 id="org1d4e24d"><span class="section-number-4">4.2.2</span> Partial Indexes</h4>
-<div class="outline-text-4" id="text-4-2-2">
-<p>
-Only index the documents in a collection that meet a specified filter expression.
-</p>
-
-<p>
-Partial indexes offer a <b>superset</b> of the functionality of sparse indexes and should be <b>preferred over sparse indexes</b>.
-</p>
-</div>
-</div>
-
-<div id="outline-container-orgfa9e71e" class="outline-4">
-<h4 id="orgfa9e71e"><span class="section-number-4">4.2.3</span> Sparse Indexes</h4>
-<div class="outline-text-4" id="text-4-2-3">
-<p>
-Ensures that the index <b>only contain</b> entries for documents that have the indexed field.
-The index skips documents that do not have the indexed field.
-</p>
-
-<p>
-The index is <b>sparse</b> because it does not include all documents of a collection.
-</p>
-</div>
-</div>
-
-
-<div id="outline-container-org2843155" class="outline-4">
-<h4 id="org2843155"><span class="section-number-4">4.2.4</span> TTL Indexes</h4>
-<div class="outline-text-4" id="text-4-2-4">
-<p>
-To create a TTL index, use the db.collection.createIndex() method with the expireAfterSeconds option on a field whose value is <b>either a date or an array that contains date values.</b>
-</p>
-</div>
-</div>
-</div>
-</div>
-
-<div id="outline-container-orgc2c06f1" class="outline-2">
-<h2 id="orgc2c06f1"><span class="section-number-2">5</span> Replica Set</h2>
-<div class="outline-text-2" id="text-5">
-<p>
-Replication can provide increased read capacity as <b>clients can send read operations to different servers.</b>
-</p>
-
-<p>
-A replica set contains several data bearing nodes and optionally one arbiter node.
+A replica set contains several <span class="underline">data bearing nodes</span> and optionally one <span class="underline">arbiter node</span> (only used to vote). <br>
 Of the data bearing nodes, <b>one and only one member is deemed the primary node, while the other nodes are deemed secondary nodes.</b>
 </p>
 
 <p>
-MongoDB applies write operations on the primary and then records the operations on the primary’s oplog. Secondary members <b>replicate this log</b> and apply the operations to their data sets.
+MongoDB applies write operations on the primary and then records the operations on the primary’s <span class="underline">oplog</span>. <br>
+Secondary members <b>replicate this log</b> and apply the operations to their data sets.
 </p>
 
 <img src="https://docs.mongodb.com/manual/_images/replica-set-read-write-operations-primary.bakedsvg.svg"/>
-
-<img src="https://docs.mongodb.com/manual/_images/replica-set-primary-with-two-secondaries.bakedsvg.svg"/>
 </div>
 
 
-<div id="outline-container-orgb9d6d9a" class="outline-3">
-<h3 id="orgb9d6d9a"><span class="section-number-3">5.1</span> Automatic Failover</h3>
-<div class="outline-text-3" id="text-5-1">
+<div id="outline-container-orgd893620" class="outline-3">
+<h3 id="orgd893620"><span class="section-number-3">2.1</span> Automatic Failover</h3>
+<div class="outline-text-3" id="text-2-1">
+<ul class="org-ul">
+<li>The replica set <b>cannot process write operations</b> until the election completes successfully.</li>
+
+<li>The replica set can <b>continue to serve read queries</b> while the primary is offline.</li>
+
+<li>Application connection logic should include tolerance for automatic failovers and the subsequent elections.</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-orgd091b5a" class="outline-3">
+<h3 id="orgd091b5a"><span class="section-number-3">2.2</span> 选举</h3>
+<div class="outline-text-3" id="text-2-2">
 <p>
-The replica set <b>cannot process write operations</b> until the election completes successfully.
+Replica sets can trigger an election in response to a variety of events, such as:
+</p>
+
+<ul class="org-ul">
+<li>Adding a new node to the replica set.</li>
+<li>Initiating a replica set.</li>
+<li>Performing replica set maintenance using methods such as <code>rs.stepDown()</code> or <code>rs.reconfig()</code>.</li>
+<li>Secondary members losing connectivity to the primary for more than the configured timeout (10 seconds by default).</li>
+</ul>
+</div>
+
+
+<div id="outline-container-orga3bbc71" class="outline-4">
+<h4 id="orga3bbc71"><span class="section-number-4">2.2.1</span> Member Priority</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<p>
+Secondaries with higher priority call elections relatively <b>sooner</b> than secondaries with lower priority, and are also <b>more likely to win</b>.
 </p>
 
 <p>
-The replica set can <b>continue to serve read queries</b> if such queries are configured to run on secondaries while the primary is offline.
+Members with a priority value of <code>0</code> cannot become primary and do not seek election.
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-orgaa027b8" class="outline-4">
+<h4 id="orgaa027b8"><span class="section-number-4">2.2.2</span> 网络分区</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<p>
+When the primary detects that it can only see a <b>minority</b> of nodes in the replica set, the primary steps down and <span class="underline">becomes a secondary</span>. <br>
+A member in the partition that can communicate with a <b>majority</b> of the nodes (including itself) <span class="underline">holds an election to become the new primary</span>.
+</p>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-org23e0c81" class="outline-3">
+<h3 id="org23e0c81"><span class="section-number-3">2.3</span> Rollback</h3>
+<div class="outline-text-3" id="text-2-3">
+<ul class="org-ul">
+<li>A rollback is necessary <b>only if</b> the primary had accepted write operations that the secondaries had not successfully replicated before the primary stepped down.</li>
+<li>MongoDB attempts to avoid rollbacks.</li>
+<li>A rollback does not occur if the write operations replicate to another member of the replica set before the primary steps down.</li>
+<li>To prevent rollbacks of data that have been acknowledged to the client, run all voting members <b>with journaling enabled</b> and use <code>w: majority</code> write concern.</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgf167330" class="outline-3">
+<h3 id="orgf167330"><span class="section-number-3">2.4</span> <a href="https://docs.mongodb.com/manual/core/replica-set-write-concern/">Write Concern</a></h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
+Write concern for replica sets describe the <b>number</b> of data-bearing members that must acknowledge a write operation before the operation returns as successful. <br>
+A member can only acknowledge a write operation after it has received and applied the write successfully.
 </p>
 
-<img src="https://docs.mongodb.com/manual/_images/replica-set-trigger-election.bakedsvg.svg"/>
+<p>
+For replica sets, the default write concern of <code>w: 1</code> requires that only the primary replica set member acknowledge the write before returning write concern acknowledgment.
+</p>
+</div>
+
+
+<div id="outline-container-org508d955" class="outline-4">
+<h4 id="org508d955"><span class="section-number-4">2.4.1</span> w: majority</h4>
+<div class="outline-text-4" id="text-2-4-1">
+<img src="https://docs.mongodb.com/manual/_images/crud-write-concern-w-majority.bakedsvg.svg"/>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orge1d41af" class="outline-2">
-<h2 id="orge1d41af"><span class="section-number-2">6</span> Sharding</h2>
-<div class="outline-text-2" id="text-6">
+<div id="outline-container-org05050da" class="outline-3">
+<h3 id="org05050da"><span class="section-number-3">2.5</span> Read Preference</h3>
+<div class="outline-text-3" id="text-2-5">
+<p>
+Read preference describes how MongoDB clients <b>route</b> read operations to the members of a replica set.
+</p>
+
+<pre class="example">
+By default, an application directs its read operations to the primary member in a replica set.
+</pre>
+
+<img src="https://docs.mongodb.com/manual/_images/replica-set-read-preference.bakedsvg.svg"/>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org695bb9a" class="outline-2">
+<h2 id="org695bb9a"><span class="section-number-2">3</span> Sharding</h2>
+<div class="outline-text-2" id="text-3">
 <p>
 MongoDB supports horizontal scaling through sharding.
 </p>
