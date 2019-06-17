@@ -3,7 +3,7 @@
 #+EMAIL:     haoru@cisco.com
 #+LANGUAGE:  en
 #+LINK_HOME: http://www.github.com/ruanhao
-#+OPTIONS:   h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+OPTIONS:   h:6 html-postamble:nil html-preamble:t tex:t f:t
 #+STARTUP:   showall
 #+TOC:       headlines 3
 #+HTML_DOCTYPE: <!DOCTYPE html>
@@ -23,12 +23,70 @@
 
 * CRUD 概念
 
+** [[https://docs.mongodb.com/manual/reference/sql-comparison/][SQL to MongoDB Mapping]]
+
+
+
 ** [[https://docs.mongodb.com/manual/reference/write-concern/][Write Concern]]
 
-Write concern describes the *level of acknowledgment*.
-
+Write concern (Write Acknowledgement) describes the *level of acknowledgment*.
 
 ** Read Concern
+
+Read concern (Read Isolation) controls the consistency and isolation of the data read from replica sets and replica set shards.
+
+#+HTML: <img src="https://docs.mongodb.com/manual/_images/read-concern-write-timeline.svg"/>
+
+
+|-------+----------------------------------------------------------------------------------------------------------------------------------|
+| Time  | Event                                                                                                                            |
+|-------+----------------------------------------------------------------------------------------------------------------------------------|
+| t_{0} | Primary applies write_{0}                                                                                                        |
+| t_{1} | Secondary1 applies write_{0}                                                                                                     |
+| t_{2} | Secondary2 applies write_{0}                                                                                                     |
+| t_{3} | Primary is aware of successful replication to Secondary1 and sends acknowledgement to client                                     |
+| t_{4} | Primary is aware of successful replication to Secondary2                                                                         |
+| t_{5} | Secondary1 receives notice (through regular replication mechanism) to update its snapshot of its most recent =w: majority= write |
+| t_{6} | Secondary2 receives notice (through regular replication mechanism) to update its snapshot of its most recent =w: majority= write |
+|-------+----------------------------------------------------------------------------------------------------------------------------------|
+
+
+*** local
+
+| Target        | Time         | State of Data              |
+| Primary       | After t_{0}  | Data reflects Write_{0}    |
+| Secondary_{1} | Before t_{1} | Data reflects Write_{prev} |
+| Secondary_{1} | After t_{1}  | Data reflects Write_{0}    |
+| Secondary_{2} | Before t_{2} | Data reflects Write_{prev} |
+| Secondary_{2} | After t_{2}  | Data reflects Write_{0}    |
+
+*** majority
+
+| Target        | Time         | State of Data              |
+| Primary       | Begore t_{3} | Data reflects Write_{prev} |
+| Primary       | After t_{3}  | Data reflects Write_{0}    |
+| Secondary_{1} | Before t_{5} | Data reflects Write_{prev} |
+| Secondary_{1} | After t_{5}  | Data reflects Write_{0}    |
+| Secondary_{2} | Before t_{6} | Data reflects Write_{prev} |
+| Secondary_{2} | After t_{6}  | Data reflects Write_{0}    |
+
+
+
+*** available
+
+For unsharded collections (including collections in a standalone deployment or a replica set deployment),
+=local= and =available= read concerns behave *identically*.
+
+
+
+
+*** linearizable
+
+"Linearizable" read concern was introduced in MongoDb 3.4 to solve a possible issue with "majority" Read concern.
+
+See [[https://stackoverflow.com/questions/42615319/the-difference-between-majority-and-linearizable][The difference between "majority" and "linearizable"]]
+
+
 
 * Replica Set
 
@@ -92,6 +150,9 @@ For replica sets, the default write concern of =w: 1= requires that only the pri
 *** w: majority
 
 #+HTML: <img src="https://docs.mongodb.com/manual/_images/crud-write-concern-w-majority.bakedsvg.svg"/>
+
+With =writeConcernMajorityJournalDefault= set to false, MongoDB does not wait for =w: majority= writes to be written to the on-disk journal before acknowledging the writes. \\
+As such, majority write operations could possibly roll back in the event of a transient loss (e.g. crash and restart) of a majority of nodes in a given replica set.
 
 ** Read Preference
 

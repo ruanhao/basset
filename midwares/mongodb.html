@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- 2019-06-16 Sun 00:24 -->
+<!-- 2019-06-17 Mon 18:42 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MongoDB</title>
@@ -239,31 +239,39 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org610be58">1. CRUD 概念</a>
+<li><a href="#org39bc450">1. CRUD 概念</a>
 <ul>
-<li><a href="#orgc689c76">1.1. Write Concern</a></li>
-<li><a href="#orgfe58b8b">1.2. Read Concern</a></li>
+<li><a href="#orgef724f1">1.1. SQL to MongoDB Mapping</a></li>
+<li><a href="#orgb498561">1.2. Write Concern</a></li>
+<li><a href="#org3e414a8">1.3. Read Concern</a>
+<ul>
+<li><a href="#org74aa955">1.3.1. local</a></li>
+<li><a href="#org924f288">1.3.2. majority</a></li>
+<li><a href="#org5ea4a82">1.3.3. available</a></li>
+<li><a href="#org207edb6">1.3.4. linearizable</a></li>
 </ul>
 </li>
-<li><a href="#orgfd342bb">2. Replica Set</a>
-<ul>
-<li><a href="#orgd893620">2.1. Automatic Failover</a></li>
-<li><a href="#orgd091b5a">2.2. 选举</a>
-<ul>
-<li><a href="#orga3bbc71">2.2.1. Member Priority</a></li>
-<li><a href="#orgaa027b8">2.2.2. 网络分区</a></li>
 </ul>
 </li>
-<li><a href="#org23e0c81">2.3. Rollback</a></li>
-<li><a href="#orgf167330">2.4. Write Concern</a>
+<li><a href="#org187e744">2. Replica Set</a>
 <ul>
-<li><a href="#org508d955">2.4.1. w: majority</a></li>
+<li><a href="#org1acf64d">2.1. Automatic Failover</a></li>
+<li><a href="#orga229330">2.2. 选举</a>
+<ul>
+<li><a href="#orge6ddc92">2.2.1. Member Priority</a></li>
+<li><a href="#orgd59a01d">2.2.2. 网络分区</a></li>
 </ul>
 </li>
-<li><a href="#org05050da">2.5. Read Preference</a></li>
+<li><a href="#org47f9f66">2.3. Rollback</a></li>
+<li><a href="#org2d77c5d">2.4. Write Concern</a>
+<ul>
+<li><a href="#org036b04e">2.4.1. w: majority</a></li>
 </ul>
 </li>
-<li><a href="#org695bb9a">3. Sharding</a></li>
+<li><a href="#orgcca7f8a">2.5. Read Preference</a></li>
+</ul>
+</li>
+<li><a href="#org1dbe824">3. Sharding</a></li>
 </ul>
 </div>
 </div>
@@ -271,31 +279,39 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org610be58">1. CRUD 概念</a>
+<li><a href="#org39bc450">1. CRUD 概念</a>
 <ul>
-<li><a href="#orgc689c76">1.1. Write Concern</a></li>
-<li><a href="#orgfe58b8b">1.2. Read Concern</a></li>
+<li><a href="#orgef724f1">1.1. SQL to MongoDB Mapping</a></li>
+<li><a href="#orgb498561">1.2. Write Concern</a></li>
+<li><a href="#org3e414a8">1.3. Read Concern</a>
+<ul>
+<li><a href="#org74aa955">1.3.1. local</a></li>
+<li><a href="#org924f288">1.3.2. majority</a></li>
+<li><a href="#org5ea4a82">1.3.3. available</a></li>
+<li><a href="#org207edb6">1.3.4. linearizable</a></li>
 </ul>
 </li>
-<li><a href="#orgfd342bb">2. Replica Set</a>
-<ul>
-<li><a href="#orgd893620">2.1. Automatic Failover</a></li>
-<li><a href="#orgd091b5a">2.2. 选举</a>
-<ul>
-<li><a href="#orga3bbc71">2.2.1. Member Priority</a></li>
-<li><a href="#orgaa027b8">2.2.2. 网络分区</a></li>
 </ul>
 </li>
-<li><a href="#org23e0c81">2.3. Rollback</a></li>
-<li><a href="#orgf167330">2.4. Write Concern</a>
+<li><a href="#org187e744">2. Replica Set</a>
 <ul>
-<li><a href="#org508d955">2.4.1. w: majority</a></li>
+<li><a href="#org1acf64d">2.1. Automatic Failover</a></li>
+<li><a href="#orga229330">2.2. 选举</a>
+<ul>
+<li><a href="#orge6ddc92">2.2.1. Member Priority</a></li>
+<li><a href="#orgd59a01d">2.2.2. 网络分区</a></li>
 </ul>
 </li>
-<li><a href="#org05050da">2.5. Read Preference</a></li>
+<li><a href="#org47f9f66">2.3. Rollback</a></li>
+<li><a href="#org2d77c5d">2.4. Write Concern</a>
+<ul>
+<li><a href="#org036b04e">2.4.1. w: majority</a></li>
 </ul>
 </li>
-<li><a href="#org695bb9a">3. Sharding</a></li>
+<li><a href="#orgcca7f8a">2.5. Read Preference</a></li>
+</ul>
+</li>
+<li><a href="#org1dbe824">3. Sharding</a></li>
 </ul>
 </div>
 </div>
@@ -316,7 +332,7 @@ for the JavaScript code in this tag.
 
 <tr>
 <td class="org-left">Date</td>
-<td class="org-left">2019-06-16 00:24:28</td>
+<td class="org-left">2019-06-17 18:42:13</td>
 </tr>
 </tbody>
 </table>
@@ -324,27 +340,237 @@ for the JavaScript code in this tag.
 
 
 
-<div id="outline-container-org610be58" class="outline-2">
-<h2 id="org610be58"><span class="section-number-2">1</span> CRUD 概念</h2>
+<div id="outline-container-org39bc450" class="outline-2">
+<h2 id="org39bc450"><span class="section-number-2">1</span> CRUD 概念</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgc689c76" class="outline-3">
-<h3 id="orgc689c76"><span class="section-number-3">1.1</span> <a href="https://docs.mongodb.com/manual/reference/write-concern/">Write Concern</a></h3>
-<div class="outline-text-3" id="text-1-1">
+<div id="outline-container-orgef724f1" class="outline-3">
+<h3 id="orgef724f1"><span class="section-number-3">1.1</span> <a href="https://docs.mongodb.com/manual/reference/sql-comparison/">SQL to MongoDB Mapping</a></h3>
+</div>
+
+
+
+<div id="outline-container-orgb498561" class="outline-3">
+<h3 id="orgb498561"><span class="section-number-3">1.2</span> <a href="https://docs.mongodb.com/manual/reference/write-concern/">Write Concern</a></h3>
+<div class="outline-text-3" id="text-1-2">
 <p>
-Write concern describes the <b>level of acknowledgment</b>.
+Write concern (Write Acknowledgement) describes the <b>level of acknowledgment</b>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org3e414a8" class="outline-3">
+<h3 id="org3e414a8"><span class="section-number-3">1.3</span> Read Concern</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+Read concern (Read Isolation) controls the consistency and isolation of the data read from replica sets and replica set shards.
+</p>
+
+<img src="https://docs.mongodb.com/manual/_images/read-concern-write-timeline.svg"/>
+
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Time</th>
+<th scope="col" class="org-left">Event</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">t<sub>0</sub></td>
+<td class="org-left">Primary applies write<sub>0</sub></td>
+</tr>
+
+<tr>
+<td class="org-left">t<sub>1</sub></td>
+<td class="org-left">Secondary1 applies write<sub>0</sub></td>
+</tr>
+
+<tr>
+<td class="org-left">t<sub>2</sub></td>
+<td class="org-left">Secondary2 applies write<sub>0</sub></td>
+</tr>
+
+<tr>
+<td class="org-left">t<sub>3</sub></td>
+<td class="org-left">Primary is aware of successful replication to Secondary1 and sends acknowledgement to client</td>
+</tr>
+
+<tr>
+<td class="org-left">t<sub>4</sub></td>
+<td class="org-left">Primary is aware of successful replication to Secondary2</td>
+</tr>
+
+<tr>
+<td class="org-left">t<sub>5</sub></td>
+<td class="org-left">Secondary1 receives notice (through regular replication mechanism) to update its snapshot of its most recent <code>w: majority</code> write</td>
+</tr>
+
+<tr>
+<td class="org-left">t<sub>6</sub></td>
+<td class="org-left">Secondary2 receives notice (through regular replication mechanism) to update its snapshot of its most recent <code>w: majority</code> write</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+<div id="outline-container-org74aa955" class="outline-4">
+<h4 id="org74aa955"><span class="section-number-4">1.3.1</span> local</h4>
+<div class="outline-text-4" id="text-1-3-1">
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Target</td>
+<td class="org-left">Time</td>
+<td class="org-left">State of Data</td>
+</tr>
+
+<tr>
+<td class="org-left">Primary</td>
+<td class="org-left">After t<sub>0</sub></td>
+<td class="org-left">Data reflects Write<sub>0</sub></td>
+</tr>
+
+<tr>
+<td class="org-left">Secondary<sub>1</sub></td>
+<td class="org-left">Before t<sub>1</sub></td>
+<td class="org-left">Data reflects Write<sub>prev</sub></td>
+</tr>
+
+<tr>
+<td class="org-left">Secondary<sub>1</sub></td>
+<td class="org-left">After t<sub>1</sub></td>
+<td class="org-left">Data reflects Write<sub>0</sub></td>
+</tr>
+
+<tr>
+<td class="org-left">Secondary<sub>2</sub></td>
+<td class="org-left">Before t<sub>2</sub></td>
+<td class="org-left">Data reflects Write<sub>prev</sub></td>
+</tr>
+
+<tr>
+<td class="org-left">Secondary<sub>2</sub></td>
+<td class="org-left">After t<sub>2</sub></td>
+<td class="org-left">Data reflects Write<sub>0</sub></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div id="outline-container-org924f288" class="outline-4">
+<h4 id="org924f288"><span class="section-number-4">1.3.2</span> majority</h4>
+<div class="outline-text-4" id="text-1-3-2">
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Target</td>
+<td class="org-left">Time</td>
+<td class="org-left">State of Data</td>
+</tr>
+
+<tr>
+<td class="org-left">Primary</td>
+<td class="org-left">Begore t<sub>3</sub></td>
+<td class="org-left">Data reflects Write<sub>prev</sub></td>
+</tr>
+
+<tr>
+<td class="org-left">Primary</td>
+<td class="org-left">After t<sub>3</sub></td>
+<td class="org-left">Data reflects Write<sub>0</sub></td>
+</tr>
+
+<tr>
+<td class="org-left">Secondary<sub>1</sub></td>
+<td class="org-left">Before t<sub>5</sub></td>
+<td class="org-left">Data reflects Write<sub>prev</sub></td>
+</tr>
+
+<tr>
+<td class="org-left">Secondary<sub>1</sub></td>
+<td class="org-left">After t<sub>5</sub></td>
+<td class="org-left">Data reflects Write<sub>0</sub></td>
+</tr>
+
+<tr>
+<td class="org-left">Secondary<sub>2</sub></td>
+<td class="org-left">Before t<sub>6</sub></td>
+<td class="org-left">Data reflects Write<sub>prev</sub></td>
+</tr>
+
+<tr>
+<td class="org-left">Secondary<sub>2</sub></td>
+<td class="org-left">After t<sub>6</sub></td>
+<td class="org-left">Data reflects Write<sub>0</sub></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+
+<div id="outline-container-org5ea4a82" class="outline-4">
+<h4 id="org5ea4a82"><span class="section-number-4">1.3.3</span> available</h4>
+<div class="outline-text-4" id="text-1-3-3">
+<p>
+For unsharded collections (including collections in a standalone deployment or a replica set deployment),
+<code>local</code> and <code>available</code> read concerns behave <b>identically</b>.
 </p>
 </div>
 </div>
 
 
-<div id="outline-container-orgfe58b8b" class="outline-3">
-<h3 id="orgfe58b8b"><span class="section-number-3">1.2</span> Read Concern</h3>
+
+
+<div id="outline-container-org207edb6" class="outline-4">
+<h4 id="org207edb6"><span class="section-number-4">1.3.4</span> linearizable</h4>
+<div class="outline-text-4" id="text-1-3-4">
+<p>
+"Linearizable" read concern was introduced in MongoDb 3.4 to solve a possible issue with "majority" Read concern.
+</p>
+
+<p>
+See <a href="https://stackoverflow.com/questions/42615319/the-difference-between-majority-and-linearizable">The difference between "majority" and "linearizable"</a>
+</p>
+</div>
+</div>
 </div>
 </div>
 
-<div id="outline-container-orgfd342bb" class="outline-2">
-<h2 id="orgfd342bb"><span class="section-number-2">2</span> Replica Set</h2>
+
+
+<div id="outline-container-org187e744" class="outline-2">
+<h2 id="org187e744"><span class="section-number-2">2</span> Replica Set</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 A replica set contains several <span class="underline">data bearing nodes</span> and optionally one <span class="underline">arbiter node</span> (only used to vote). <br>
@@ -360,8 +586,8 @@ Secondary members <b>replicate this log</b> and apply the operations to their da
 </div>
 
 
-<div id="outline-container-orgd893620" class="outline-3">
-<h3 id="orgd893620"><span class="section-number-3">2.1</span> Automatic Failover</h3>
+<div id="outline-container-org1acf64d" class="outline-3">
+<h3 id="org1acf64d"><span class="section-number-3">2.1</span> Automatic Failover</h3>
 <div class="outline-text-3" id="text-2-1">
 <ul class="org-ul">
 <li>The replica set <b>cannot process write operations</b> until the election completes successfully.</li>
@@ -374,8 +600,8 @@ Secondary members <b>replicate this log</b> and apply the operations to their da
 </div>
 
 
-<div id="outline-container-orgd091b5a" class="outline-3">
-<h3 id="orgd091b5a"><span class="section-number-3">2.2</span> 选举</h3>
+<div id="outline-container-orga229330" class="outline-3">
+<h3 id="orga229330"><span class="section-number-3">2.2</span> 选举</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 Replica sets can trigger an election in response to a variety of events, such as:
@@ -390,8 +616,8 @@ Replica sets can trigger an election in response to a variety of events, such as
 </div>
 
 
-<div id="outline-container-orga3bbc71" class="outline-4">
-<h4 id="orga3bbc71"><span class="section-number-4">2.2.1</span> Member Priority</h4>
+<div id="outline-container-orge6ddc92" class="outline-4">
+<h4 id="orge6ddc92"><span class="section-number-4">2.2.1</span> Member Priority</h4>
 <div class="outline-text-4" id="text-2-2-1">
 <p>
 Secondaries with higher priority call elections relatively <b>sooner</b> than secondaries with lower priority, and are also <b>more likely to win</b>.
@@ -404,8 +630,8 @@ Members with a priority value of <code>0</code> cannot become primary and do not
 </div>
 
 
-<div id="outline-container-orgaa027b8" class="outline-4">
-<h4 id="orgaa027b8"><span class="section-number-4">2.2.2</span> 网络分区</h4>
+<div id="outline-container-orgd59a01d" class="outline-4">
+<h4 id="orgd59a01d"><span class="section-number-4">2.2.2</span> 网络分区</h4>
 <div class="outline-text-4" id="text-2-2-2">
 <p>
 When the primary detects that it can only see a <b>minority</b> of nodes in the replica set, the primary steps down and <span class="underline">becomes a secondary</span>. <br>
@@ -417,8 +643,8 @@ A member in the partition that can communicate with a <b>majority</b> of the nod
 
 
 
-<div id="outline-container-org23e0c81" class="outline-3">
-<h3 id="org23e0c81"><span class="section-number-3">2.3</span> Rollback</h3>
+<div id="outline-container-org47f9f66" class="outline-3">
+<h3 id="org47f9f66"><span class="section-number-3">2.3</span> Rollback</h3>
 <div class="outline-text-3" id="text-2-3">
 <ul class="org-ul">
 <li>A rollback is necessary <b>only if</b> the primary had accepted write operations that the secondaries had not successfully replicated before the primary stepped down.</li>
@@ -429,8 +655,8 @@ A member in the partition that can communicate with a <b>majority</b> of the nod
 </div>
 </div>
 
-<div id="outline-container-orgf167330" class="outline-3">
-<h3 id="orgf167330"><span class="section-number-3">2.4</span> <a href="https://docs.mongodb.com/manual/core/replica-set-write-concern/">Write Concern</a></h3>
+<div id="outline-container-org2d77c5d" class="outline-3">
+<h3 id="org2d77c5d"><span class="section-number-3">2.4</span> <a href="https://docs.mongodb.com/manual/core/replica-set-write-concern/">Write Concern</a></h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
 Write concern for replica sets describe the <b>number</b> of data-bearing members that must acknowledge a write operation before the operation returns as successful. <br>
@@ -443,16 +669,21 @@ For replica sets, the default write concern of <code>w: 1</code> requires that o
 </div>
 
 
-<div id="outline-container-org508d955" class="outline-4">
-<h4 id="org508d955"><span class="section-number-4">2.4.1</span> w: majority</h4>
+<div id="outline-container-org036b04e" class="outline-4">
+<h4 id="org036b04e"><span class="section-number-4">2.4.1</span> w: majority</h4>
 <div class="outline-text-4" id="text-2-4-1">
 <img src="https://docs.mongodb.com/manual/_images/crud-write-concern-w-majority.bakedsvg.svg"/>
+
+<p>
+With <code>writeConcernMajorityJournalDefault</code> set to false, MongoDB does not wait for <code>w: majority</code> writes to be written to the on-disk journal before acknowledging the writes. <br>
+As such, majority write operations could possibly roll back in the event of a transient loss (e.g. crash and restart) of a majority of nodes in a given replica set.
+</p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org05050da" class="outline-3">
-<h3 id="org05050da"><span class="section-number-3">2.5</span> Read Preference</h3>
+<div id="outline-container-orgcca7f8a" class="outline-3">
+<h3 id="orgcca7f8a"><span class="section-number-3">2.5</span> Read Preference</h3>
 <div class="outline-text-3" id="text-2-5">
 <p>
 Read preference describes how MongoDB clients <b>route</b> read operations to the members of a replica set.
@@ -468,8 +699,8 @@ By default, an application directs its read operations to the primary member in 
 </div>
 
 
-<div id="outline-container-org695bb9a" class="outline-2">
-<h2 id="org695bb9a"><span class="section-number-2">3</span> Sharding</h2>
+<div id="outline-container-org1dbe824" class="outline-2">
+<h2 id="org1dbe824"><span class="section-number-2">3</span> Sharding</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 MongoDB supports horizontal scaling through sharding.
