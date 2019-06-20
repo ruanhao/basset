@@ -5,7 +5,7 @@
 #+LINK_HOME: http://www.github.com/ruanhao
 #+OPTIONS:   h:6 html-postamble:nil html-preamble:t tex:t f:t
 #+STARTUP:   showall
-#+TOC:       headlines 3
+#+TOC:       headlines 5
 #+HTML_DOCTYPE: <!DOCTYPE html>
 #+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://www.pirilampo.org/styles/readtheorg/css/htmlize.css"/>
@@ -24,7 +24,6 @@
 * CRUD 概念
 
 ** [[https://docs.mongodb.com/manual/reference/sql-comparison/][SQL to MongoDB Mapping]]
-
 
 
 ** [[https://docs.mongodb.com/manual/reference/write-concern/][Write Concern]]
@@ -85,6 +84,67 @@ For unsharded collections (including collections in a standalone deployment or a
 "Linearizable" read concern was introduced in MongoDb 3.4 to solve a possible issue with "majority" Read concern.
 
 See [[https://stackoverflow.com/questions/42615319/the-difference-between-majority-and-linearizable][The difference between "majority" and "linearizable"]]
+
+
+
+
+** 原子性
+
+In MongoDB, a write operation is atomic *on the level of a single document.*
+
+When a single write operation (e.g. db.collection.updateMany()) modifies multiple documents, \\
+the modification of each document is atomic, but the operation *as a whole is not atomic.*
+
+#+BEGIN_EXAMPLE
+  For many scenarios, modeling your data appropriately will minimize the need for multi-document transactions.
+#+END_EXAMPLE
+
+** 并发控制
+
+Concurrency control allows multiple applications to run concurrently without causing data inconsistency or conflicts.
+
+1. One approach is to create a _unique index_.
+2. Another approach is to specify the expected current value of a field in the query predicate for the write operations. (乐观锁)
+
+
+
+** [[https://docs.mongodb.com/manual/core/causal-consistency-read-write-concerns/][Causal Consistency]]
+
+Four causal consistency guarantees:
+
+1. Read own writes
+2. Monotonic reads
+3. monotonic writes
+4. Writes follow reads
+
+
+
+*** Network partition example
+
+The read concern "majority" and write concern "majority" ensure that the four causal consistency guarantees hold even in network partition circumstances
+where two members in a replica set transiently believe that they are the primary:
+
+#+HTML: <img src="https://docs.mongodb.com/manual/_images/network-partition-two-primaries.svg"/>
+
+- Writes with "majority" write concern can complete on P_{new} but cannot complete on P_old.
+- Writes with ={ w: 1 }= write concern can complete on either P_old or P_new. \\
+  However, the writes to P_old (as well as the writes replicated to S_1) *roll back once these members regain communication with the rest of the replica set*.
+- After a successful write with "majority" write concern on P_new, causally consistent reads with "majority" read concern can observe the write on P_new, S_2, and S_3. \\
+  The reads can also observe the write on P_old and S_1 _once they can communicate with the rest of the replica set and sync from the other members of the replica set_. \\
+  Any writes made to P_old and/or replicated to S_1 during the partition are rolled back.
+
+**** 场景分析
+
+- [[https://docs.mongodb.com/manual/core/causal-consistency-read-write-concerns/#causal-rc-majority-wc-majority][Read Concern "majority" and Write concern "majority"]]
+- [[https://docs.mongodb.com/manual/core/causal-consistency-read-write-concerns/#causal-rc-majority-wc-1][Read Concern "majority" and Write concern {w: 1}]]
+- [[https://docs.mongodb.com/manual/core/causal-consistency-read-write-concerns/#causal-rc-local-wc-majority][Read Concern "local" and Write concern "majority"]]
+- [[https://docs.mongodb.com/manual/core/causal-consistency-read-write-concerns/#causal-rc-local-wc-1][Read Concern "local" and Write concern {w: 1}]]
+
+
+
+
+
+
 
 
 
