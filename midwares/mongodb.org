@@ -227,15 +227,70 @@ Read preference describes how MongoDB clients *route* read operations to the mem
 
 * Sharding
 
-MongoDB supports horizontal scaling through sharding.
+MongoDB uses sharding to support deployments with _very large data sets_ and _high throughput operations_.
 
-MongoDB sharded cluster consists of the following components:
+MongoDB shards data at the collection level, distributing the collection data across the shards in the cluster.
 
-- shard: Each shard contains a subset of the sharded data. Each shard can be deployed as a replica set.
-- mongos: The mongos acts as a query router, providing an interface between client applications and the sharded cluster.
-- config servers: Config servers store metadata and configuration settings for the cluster.
+** Components
 
 #+HTML: <img src="https://docs.mongodb.com/manual/_images/sharded-cluster-production-architecture.bakedsvg.svg"/>
+
+#+BEGIN_EXAMPLE
+Production Configuration:
+  - Deploy Config Servers as a 3 member replica set
+  - Deploy *each Shard* as a 3 member replica set
+  - Deploy one or more mongos routers
+#+END_EXAMPLE
+
+
+*** Shard
+
+- A shard contains a *subset* of sharded data for a sharded cluster.
+- Performing queries on a single shard only returns a subset of data. \\
+  Connect to the mongos to perform cluster level operations, including read or write operations.
+
+*** Config Servers
+
+- Config servers store *metadata* and configuration settings for the cluster.
+- Users should avoid writing directly to the config database in the course of normal operation or maintenance.
+- If the config server replica set loses its primary and cannot elect a primary, the cluster's metadata becomes *read only*. \\
+  You can still read and write data from the shards, but no chunk migration or chunk splits will occur \\
+  until the replica set can elect a primary.
+
+*** mongos
+
+- =mongos= acts as a query *router*, providing an interface between client applications and the sharded cluster.
+- =mongos= provide the only interface to a sharded cluster from the perspective of applications.
+- =mongos= tracks what data is on which shard by caching the metadata from the config servers.
+- =mongos= has no persistent state and consumes minimal system resources.
+
+#+BEGIN_EXAMPLE
+  mongos can route queries that include the shard key or the prefix of a compound shard key a specific shard or set of shards.
+  mongos uses the shard key value to locate the chunk whose range includes the shard key value and
+  directs the query at the shard containing that chunk.
+#+END_EXAMPLE
+
+** Shard Key
+
+- The shard key consists of an immutable field or fields that exist in every document in the target collection.
+- A sharded collection can have *only one* shard key.
+- To shard a non-empty collection, the collection must have an index that starts with the shard key.
+- If queries do not include the shard key or the prefix of a compound shard key, mongos performs a broadcast operation, \\
+  querying all shards in the sharded cluster.
+
+*** Chunk
+
+MongoDB *partitions* data in the collection using ranges of shard key values. \\
+Each range defines a non-overlapping range of shard key values and is associated with a chunk.
+
+MongoDB attempts to distribute chunks evenly among the shards in the cluster. \\
+The shard key has a direct relationship to the effectiveness of chunk distribution.
+
+#+HTML: <img src="https://docs.mongodb.com/manual/_images/sharding-range-based.bakedsvg.svg"/>
+
+
+** Sharded Cluster
+
 
 You must connect to a mongos router to interact with any collection in the sharded cluster.
 This includes sharded and unsharded collections.

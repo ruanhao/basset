@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- 2019-06-20 Thu 13:51 -->
+<!-- 2019-06-23 Sun 16:23 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MongoDB</title>
@@ -239,50 +239,66 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org65869d9">1. CRUD 概念</a>
+<li><a href="#org4d2a22b">1. CRUD 概念</a>
 <ul>
-<li><a href="#org4d15622">1.1. SQL to MongoDB Mapping</a></li>
-<li><a href="#org0e176fb">1.2. Write Concern</a></li>
-<li><a href="#orgd349fc9">1.3. Read Concern</a>
+<li><a href="#org241ff84">1.1. SQL to MongoDB Mapping</a></li>
+<li><a href="#org3b93e5f">1.2. Write Concern</a></li>
+<li><a href="#org4b1a9b9">1.3. Read Concern</a>
 <ul>
-<li><a href="#orgc660157">1.3.1. local</a></li>
-<li><a href="#org3e91d13">1.3.2. majority</a></li>
-<li><a href="#orgf402d92">1.3.3. available</a></li>
-<li><a href="#org2b32242">1.3.4. linearizable</a></li>
+<li><a href="#org8eee0a3">1.3.1. local</a></li>
+<li><a href="#orgc410289">1.3.2. majority</a></li>
+<li><a href="#orgc7701b9">1.3.3. available</a></li>
+<li><a href="#orga54f09b">1.3.4. linearizable</a></li>
 </ul>
 </li>
-<li><a href="#orgdff2861">1.4. 原子性</a></li>
-<li><a href="#org47fccb8">1.5. 并发控制</a></li>
-<li><a href="#orgd785486">1.6. Causal Consistency</a>
+<li><a href="#org48ab9fc">1.4. 原子性</a></li>
+<li><a href="#org18d5947">1.5. 并发控制</a></li>
+<li><a href="#org9a74ba7">1.6. Causal Consistency</a>
 <ul>
-<li><a href="#orgd90d1f9">1.6.1. Network partition example</a>
+<li><a href="#org02d9033">1.6.1. Network partition example</a>
 <ul>
-<li><a href="#orgedd0801">1.6.1.1. 场景分析</a></li>
+<li><a href="#orgb07a389">1.6.1.1. 场景分析</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orga171bf5">2. Replica Set</a>
+<li><a href="#org91c393f">2. Replica Set</a>
 <ul>
-<li><a href="#org574ae88">2.1. Automatic Failover</a></li>
-<li><a href="#org0fa19ff">2.2. 选举</a>
+<li><a href="#orgf10a7e1">2.1. Automatic Failover</a></li>
+<li><a href="#org47cd747">2.2. 选举</a>
 <ul>
-<li><a href="#orgb074f20">2.2.1. Member Priority</a></li>
-<li><a href="#orga65cbe8">2.2.2. 网络分区</a></li>
+<li><a href="#org4528767">2.2.1. Member Priority</a></li>
+<li><a href="#orge4154db">2.2.2. 网络分区</a></li>
 </ul>
 </li>
-<li><a href="#org2d8ed5b">2.3. Rollback</a></li>
-<li><a href="#org51393f6">2.4. Write Concern</a>
+<li><a href="#org4873024">2.3. Rollback</a></li>
+<li><a href="#org4a03178">2.4. Write Concern</a>
 <ul>
-<li><a href="#org8c4b24e">2.4.1. w: majority</a></li>
+<li><a href="#orgae98b86">2.4.1. w: majority</a></li>
 </ul>
 </li>
-<li><a href="#org1063ac8">2.5. Read Preference</a></li>
+<li><a href="#org143b3f2">2.5. Read Preference</a></li>
 </ul>
 </li>
-<li><a href="#org3ca5bbd">3. Sharding</a></li>
+<li><a href="#org596f410">3. Sharding</a>
+<ul>
+<li><a href="#orgbd9ce6e">3.1. Components</a>
+<ul>
+<li><a href="#org0dae790">3.1.1. Shard</a></li>
+<li><a href="#org33f89a4">3.1.2. Config Servers</a></li>
+<li><a href="#org16c4511">3.1.3. mongos</a></li>
+</ul>
+</li>
+<li><a href="#org5fc5291">3.2. Shard Key</a>
+<ul>
+<li><a href="#org9b3279b">3.2.1. Chunk</a></li>
+</ul>
+</li>
+<li><a href="#org75efac2">3.3. Sharded Cluster</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -290,50 +306,66 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org65869d9">1. CRUD 概念</a>
+<li><a href="#org4d2a22b">1. CRUD 概念</a>
 <ul>
-<li><a href="#org4d15622">1.1. SQL to MongoDB Mapping</a></li>
-<li><a href="#org0e176fb">1.2. Write Concern</a></li>
-<li><a href="#orgd349fc9">1.3. Read Concern</a>
+<li><a href="#org241ff84">1.1. SQL to MongoDB Mapping</a></li>
+<li><a href="#org3b93e5f">1.2. Write Concern</a></li>
+<li><a href="#org4b1a9b9">1.3. Read Concern</a>
 <ul>
-<li><a href="#orgc660157">1.3.1. local</a></li>
-<li><a href="#org3e91d13">1.3.2. majority</a></li>
-<li><a href="#orgf402d92">1.3.3. available</a></li>
-<li><a href="#org2b32242">1.3.4. linearizable</a></li>
+<li><a href="#org8eee0a3">1.3.1. local</a></li>
+<li><a href="#orgc410289">1.3.2. majority</a></li>
+<li><a href="#orgc7701b9">1.3.3. available</a></li>
+<li><a href="#orga54f09b">1.3.4. linearizable</a></li>
 </ul>
 </li>
-<li><a href="#orgdff2861">1.4. 原子性</a></li>
-<li><a href="#org47fccb8">1.5. 并发控制</a></li>
-<li><a href="#orgd785486">1.6. Causal Consistency</a>
+<li><a href="#org48ab9fc">1.4. 原子性</a></li>
+<li><a href="#org18d5947">1.5. 并发控制</a></li>
+<li><a href="#org9a74ba7">1.6. Causal Consistency</a>
 <ul>
-<li><a href="#orgd90d1f9">1.6.1. Network partition example</a>
+<li><a href="#org02d9033">1.6.1. Network partition example</a>
 <ul>
-<li><a href="#orgedd0801">1.6.1.1. 场景分析</a></li>
+<li><a href="#orgb07a389">1.6.1.1. 场景分析</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orga171bf5">2. Replica Set</a>
+<li><a href="#org91c393f">2. Replica Set</a>
 <ul>
-<li><a href="#org574ae88">2.1. Automatic Failover</a></li>
-<li><a href="#org0fa19ff">2.2. 选举</a>
+<li><a href="#orgf10a7e1">2.1. Automatic Failover</a></li>
+<li><a href="#org47cd747">2.2. 选举</a>
 <ul>
-<li><a href="#orgb074f20">2.2.1. Member Priority</a></li>
-<li><a href="#orga65cbe8">2.2.2. 网络分区</a></li>
+<li><a href="#org4528767">2.2.1. Member Priority</a></li>
+<li><a href="#orge4154db">2.2.2. 网络分区</a></li>
 </ul>
 </li>
-<li><a href="#org2d8ed5b">2.3. Rollback</a></li>
-<li><a href="#org51393f6">2.4. Write Concern</a>
+<li><a href="#org4873024">2.3. Rollback</a></li>
+<li><a href="#org4a03178">2.4. Write Concern</a>
 <ul>
-<li><a href="#org8c4b24e">2.4.1. w: majority</a></li>
+<li><a href="#orgae98b86">2.4.1. w: majority</a></li>
 </ul>
 </li>
-<li><a href="#org1063ac8">2.5. Read Preference</a></li>
+<li><a href="#org143b3f2">2.5. Read Preference</a></li>
 </ul>
 </li>
-<li><a href="#org3ca5bbd">3. Sharding</a></li>
+<li><a href="#org596f410">3. Sharding</a>
+<ul>
+<li><a href="#orgbd9ce6e">3.1. Components</a>
+<ul>
+<li><a href="#org0dae790">3.1.1. Shard</a></li>
+<li><a href="#org33f89a4">3.1.2. Config Servers</a></li>
+<li><a href="#org16c4511">3.1.3. mongos</a></li>
+</ul>
+</li>
+<li><a href="#org5fc5291">3.2. Shard Key</a>
+<ul>
+<li><a href="#org9b3279b">3.2.1. Chunk</a></li>
+</ul>
+</li>
+<li><a href="#org75efac2">3.3. Sharded Cluster</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -354,7 +386,7 @@ for the JavaScript code in this tag.
 
 <tr>
 <td class="org-left">Date</td>
-<td class="org-left">2019-06-20 13:51:49</td>
+<td class="org-left">2019-06-23 16:23:09</td>
 </tr>
 </tbody>
 </table>
@@ -362,17 +394,17 @@ for the JavaScript code in this tag.
 
 
 
-<div id="outline-container-org65869d9" class="outline-2">
-<h2 id="org65869d9"><span class="section-number-2">1</span> CRUD 概念</h2>
+<div id="outline-container-org4d2a22b" class="outline-2">
+<h2 id="org4d2a22b"><span class="section-number-2">1</span> CRUD 概念</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org4d15622" class="outline-3">
-<h3 id="org4d15622"><span class="section-number-3">1.1</span> <a href="https://docs.mongodb.com/manual/reference/sql-comparison/">SQL to MongoDB Mapping</a></h3>
+<div id="outline-container-org241ff84" class="outline-3">
+<h3 id="org241ff84"><span class="section-number-3">1.1</span> <a href="https://docs.mongodb.com/manual/reference/sql-comparison/">SQL to MongoDB Mapping</a></h3>
 </div>
 
 
-<div id="outline-container-org0e176fb" class="outline-3">
-<h3 id="org0e176fb"><span class="section-number-3">1.2</span> <a href="https://docs.mongodb.com/manual/reference/write-concern/">Write Concern</a></h3>
+<div id="outline-container-org3b93e5f" class="outline-3">
+<h3 id="org3b93e5f"><span class="section-number-3">1.2</span> <a href="https://docs.mongodb.com/manual/reference/write-concern/">Write Concern</a></h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 Write concern (Write Acknowledgement) describes the <b>level of acknowledgment</b>.
@@ -380,8 +412,8 @@ Write concern (Write Acknowledgement) describes the <b>level of acknowledgment</
 </div>
 </div>
 
-<div id="outline-container-orgd349fc9" class="outline-3">
-<h3 id="orgd349fc9"><span class="section-number-3">1.3</span> Read Concern</h3>
+<div id="outline-container-org4b1a9b9" class="outline-3">
+<h3 id="org4b1a9b9"><span class="section-number-3">1.3</span> Read Concern</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 Read concern (Read Isolation) controls the consistency and isolation of the data read from replica sets and replica set shards.
@@ -444,8 +476,8 @@ Read concern (Read Isolation) controls the consistency and isolation of the data
 </div>
 
 
-<div id="outline-container-orgc660157" class="outline-4">
-<h4 id="orgc660157"><span class="section-number-4">1.3.1</span> local</h4>
+<div id="outline-container-org8eee0a3" class="outline-4">
+<h4 id="org8eee0a3"><span class="section-number-4">1.3.1</span> local</h4>
 <div class="outline-text-4" id="text-1-3-1">
 <table>
 
@@ -498,8 +530,8 @@ Read concern (Read Isolation) controls the consistency and isolation of the data
 </div>
 </div>
 
-<div id="outline-container-org3e91d13" class="outline-4">
-<h4 id="org3e91d13"><span class="section-number-4">1.3.2</span> majority</h4>
+<div id="outline-container-orgc410289" class="outline-4">
+<h4 id="orgc410289"><span class="section-number-4">1.3.2</span> majority</h4>
 <div class="outline-text-4" id="text-1-3-2">
 <table>
 
@@ -560,8 +592,8 @@ Read concern (Read Isolation) controls the consistency and isolation of the data
 
 
 
-<div id="outline-container-orgf402d92" class="outline-4">
-<h4 id="orgf402d92"><span class="section-number-4">1.3.3</span> available</h4>
+<div id="outline-container-orgc7701b9" class="outline-4">
+<h4 id="orgc7701b9"><span class="section-number-4">1.3.3</span> available</h4>
 <div class="outline-text-4" id="text-1-3-3">
 <p>
 For unsharded collections (including collections in a standalone deployment or a replica set deployment),
@@ -573,8 +605,8 @@ For unsharded collections (including collections in a standalone deployment or a
 
 
 
-<div id="outline-container-org2b32242" class="outline-4">
-<h4 id="org2b32242"><span class="section-number-4">1.3.4</span> linearizable</h4>
+<div id="outline-container-orga54f09b" class="outline-4">
+<h4 id="orga54f09b"><span class="section-number-4">1.3.4</span> linearizable</h4>
 <div class="outline-text-4" id="text-1-3-4">
 <p>
 "Linearizable" read concern was introduced in MongoDb 3.4 to solve a possible issue with "majority" Read concern.
@@ -590,8 +622,8 @@ See <a href="https://stackoverflow.com/questions/42615319/the-difference-between
 
 
 
-<div id="outline-container-orgdff2861" class="outline-3">
-<h3 id="orgdff2861"><span class="section-number-3">1.4</span> 原子性</h3>
+<div id="outline-container-org48ab9fc" class="outline-3">
+<h3 id="org48ab9fc"><span class="section-number-3">1.4</span> 原子性</h3>
 <div class="outline-text-3" id="text-1-4">
 <p>
 In MongoDB, a write operation is atomic <b>on the level of a single document.</b>
@@ -608,8 +640,8 @@ For many scenarios, modeling your data appropriately will minimize the need for 
 </div>
 </div>
 
-<div id="outline-container-org47fccb8" class="outline-3">
-<h3 id="org47fccb8"><span class="section-number-3">1.5</span> 并发控制</h3>
+<div id="outline-container-org18d5947" class="outline-3">
+<h3 id="org18d5947"><span class="section-number-3">1.5</span> 并发控制</h3>
 <div class="outline-text-3" id="text-1-5">
 <p>
 Concurrency control allows multiple applications to run concurrently without causing data inconsistency or conflicts.
@@ -624,8 +656,8 @@ Concurrency control allows multiple applications to run concurrently without cau
 
 
 
-<div id="outline-container-orgd785486" class="outline-3">
-<h3 id="orgd785486"><span class="section-number-3">1.6</span> <a href="https://docs.mongodb.com/manual/core/causal-consistency-read-write-concerns/">Causal Consistency</a></h3>
+<div id="outline-container-org9a74ba7" class="outline-3">
+<h3 id="org9a74ba7"><span class="section-number-3">1.6</span> <a href="https://docs.mongodb.com/manual/core/causal-consistency-read-write-concerns/">Causal Consistency</a></h3>
 <div class="outline-text-3" id="text-1-6">
 <p>
 Four causal consistency guarantees:
@@ -641,8 +673,8 @@ Four causal consistency guarantees:
 
 
 
-<div id="outline-container-orgd90d1f9" class="outline-4">
-<h4 id="orgd90d1f9"><span class="section-number-4">1.6.1</span> Network partition example</h4>
+<div id="outline-container-org02d9033" class="outline-4">
+<h4 id="org02d9033"><span class="section-number-4">1.6.1</span> Network partition example</h4>
 <div class="outline-text-4" id="text-1-6-1">
 <p>
 The read concern "majority" and write concern "majority" ensure that the four causal consistency guarantees hold even in network partition circumstances
@@ -661,8 +693,8 @@ Any writes made to P<sub>old</sub> and/or replicated to S<sub>1</sub> during the
 </ul>
 </div>
 
-<div id="outline-container-orgedd0801" class="outline-5">
-<h5 id="orgedd0801"><span class="section-number-5">1.6.1.1</span> 场景分析</h5>
+<div id="outline-container-orgb07a389" class="outline-5">
+<h5 id="orgb07a389"><span class="section-number-5">1.6.1.1</span> 场景分析</h5>
 <div class="outline-text-5" id="text-1-6-1-1">
 <ul class="org-ul">
 <li><a href="https://docs.mongodb.com/manual/core/causal-consistency-read-write-concerns/#causal-rc-majority-wc-majority">Read Concern "majority" and Write concern "majority"</a></li>
@@ -684,8 +716,8 @@ Any writes made to P<sub>old</sub> and/or replicated to S<sub>1</sub> during the
 
 
 
-<div id="outline-container-orga171bf5" class="outline-2">
-<h2 id="orga171bf5"><span class="section-number-2">2</span> Replica Set</h2>
+<div id="outline-container-org91c393f" class="outline-2">
+<h2 id="org91c393f"><span class="section-number-2">2</span> Replica Set</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 A replica set contains several <span class="underline">data bearing nodes</span> and optionally one <span class="underline">arbiter node</span> (only used to vote). <br>
@@ -701,8 +733,8 @@ Secondary members <b>replicate this log</b> and apply the operations to their da
 </div>
 
 
-<div id="outline-container-org574ae88" class="outline-3">
-<h3 id="org574ae88"><span class="section-number-3">2.1</span> Automatic Failover</h3>
+<div id="outline-container-orgf10a7e1" class="outline-3">
+<h3 id="orgf10a7e1"><span class="section-number-3">2.1</span> Automatic Failover</h3>
 <div class="outline-text-3" id="text-2-1">
 <ul class="org-ul">
 <li>The replica set <b>cannot process write operations</b> until the election completes successfully.</li>
@@ -715,8 +747,8 @@ Secondary members <b>replicate this log</b> and apply the operations to their da
 </div>
 
 
-<div id="outline-container-org0fa19ff" class="outline-3">
-<h3 id="org0fa19ff"><span class="section-number-3">2.2</span> 选举</h3>
+<div id="outline-container-org47cd747" class="outline-3">
+<h3 id="org47cd747"><span class="section-number-3">2.2</span> 选举</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 Replica sets can trigger an election in response to a variety of events, such as:
@@ -731,8 +763,8 @@ Replica sets can trigger an election in response to a variety of events, such as
 </div>
 
 
-<div id="outline-container-orgb074f20" class="outline-4">
-<h4 id="orgb074f20"><span class="section-number-4">2.2.1</span> Member Priority</h4>
+<div id="outline-container-org4528767" class="outline-4">
+<h4 id="org4528767"><span class="section-number-4">2.2.1</span> Member Priority</h4>
 <div class="outline-text-4" id="text-2-2-1">
 <p>
 Secondaries with higher priority call elections relatively <b>sooner</b> than secondaries with lower priority, and are also <b>more likely to win</b>.
@@ -745,8 +777,8 @@ Members with a priority value of <code>0</code> cannot become primary and do not
 </div>
 
 
-<div id="outline-container-orga65cbe8" class="outline-4">
-<h4 id="orga65cbe8"><span class="section-number-4">2.2.2</span> 网络分区</h4>
+<div id="outline-container-orge4154db" class="outline-4">
+<h4 id="orge4154db"><span class="section-number-4">2.2.2</span> 网络分区</h4>
 <div class="outline-text-4" id="text-2-2-2">
 <p>
 When the primary detects that it can only see a <b>minority</b> of nodes in the replica set, the primary steps down and <span class="underline">becomes a secondary</span>. <br>
@@ -758,8 +790,8 @@ A member in the partition that can communicate with a <b>majority</b> of the nod
 
 
 
-<div id="outline-container-org2d8ed5b" class="outline-3">
-<h3 id="org2d8ed5b"><span class="section-number-3">2.3</span> Rollback</h3>
+<div id="outline-container-org4873024" class="outline-3">
+<h3 id="org4873024"><span class="section-number-3">2.3</span> Rollback</h3>
 <div class="outline-text-3" id="text-2-3">
 <ul class="org-ul">
 <li>A rollback is necessary <b>only if</b> the primary had accepted write operations that the secondaries had not successfully replicated before the primary stepped down.</li>
@@ -770,8 +802,8 @@ A member in the partition that can communicate with a <b>majority</b> of the nod
 </div>
 </div>
 
-<div id="outline-container-org51393f6" class="outline-3">
-<h3 id="org51393f6"><span class="section-number-3">2.4</span> <a href="https://docs.mongodb.com/manual/core/replica-set-write-concern/">Write Concern</a></h3>
+<div id="outline-container-org4a03178" class="outline-3">
+<h3 id="org4a03178"><span class="section-number-3">2.4</span> <a href="https://docs.mongodb.com/manual/core/replica-set-write-concern/">Write Concern</a></h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
 Write concern for replica sets describe the <b>number</b> of data-bearing members that must acknowledge a write operation before the operation returns as successful. <br>
@@ -784,8 +816,8 @@ For replica sets, the default write concern of <code>w: 1</code> requires that o
 </div>
 
 
-<div id="outline-container-org8c4b24e" class="outline-4">
-<h4 id="org8c4b24e"><span class="section-number-4">2.4.1</span> w: majority</h4>
+<div id="outline-container-orgae98b86" class="outline-4">
+<h4 id="orgae98b86"><span class="section-number-4">2.4.1</span> w: majority</h4>
 <div class="outline-text-4" id="text-2-4-1">
 <img src="https://docs.mongodb.com/manual/_images/crud-write-concern-w-majority.bakedsvg.svg"/>
 
@@ -797,8 +829,8 @@ As such, majority write operations could possibly roll back in the event of a tr
 </div>
 </div>
 
-<div id="outline-container-org1063ac8" class="outline-3">
-<h3 id="org1063ac8"><span class="section-number-3">2.5</span> Read Preference</h3>
+<div id="outline-container-org143b3f2" class="outline-3">
+<h3 id="org143b3f2"><span class="section-number-3">2.5</span> Read Preference</h3>
 <div class="outline-text-3" id="text-2-5">
 <p>
 Read preference describes how MongoDB clients <b>route</b> read operations to the members of a replica set.
@@ -814,25 +846,109 @@ By default, an application directs its read operations to the primary member in 
 </div>
 
 
-<div id="outline-container-org3ca5bbd" class="outline-2">
-<h2 id="org3ca5bbd"><span class="section-number-2">3</span> Sharding</h2>
+<div id="outline-container-org596f410" class="outline-2">
+<h2 id="org596f410"><span class="section-number-2">3</span> Sharding</h2>
 <div class="outline-text-2" id="text-3">
 <p>
-MongoDB supports horizontal scaling through sharding.
+MongoDB uses sharding to support deployments with <span class="underline">very large data sets</span> and <span class="underline">high throughput operations</span>.
 </p>
 
 <p>
-MongoDB sharded cluster consists of the following components:
+MongoDB shards data at the collection level, distributing the collection data across the shards in the cluster.
 </p>
+</div>
 
-<ul class="org-ul">
-<li>shard: Each shard contains a subset of the sharded data. Each shard can be deployed as a replica set.</li>
-<li>mongos: The mongos acts as a query router, providing an interface between client applications and the sharded cluster.</li>
-<li>config servers: Config servers store metadata and configuration settings for the cluster.</li>
-</ul>
-
+<div id="outline-container-orgbd9ce6e" class="outline-3">
+<h3 id="orgbd9ce6e"><span class="section-number-3">3.1</span> Components</h3>
+<div class="outline-text-3" id="text-3-1">
 <img src="https://docs.mongodb.com/manual/_images/sharded-cluster-production-architecture.bakedsvg.svg"/>
 
+<pre class="example">
+Production Configuration:
+  - Deploy Config Servers as a 3 member replica set
+  - Deploy *each Shard* as a 3 member replica set
+  - Deploy one or more mongos routers
+</pre>
+</div>
+
+
+<div id="outline-container-org0dae790" class="outline-4">
+<h4 id="org0dae790"><span class="section-number-4">3.1.1</span> Shard</h4>
+<div class="outline-text-4" id="text-3-1-1">
+<ul class="org-ul">
+<li>A shard contains a <b>subset</b> of sharded data for a sharded cluster.</li>
+<li>Performing queries on a single shard only returns a subset of data. <br>
+Connect to the mongos to perform cluster level operations, including read or write operations.</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org33f89a4" class="outline-4">
+<h4 id="org33f89a4"><span class="section-number-4">3.1.2</span> Config Servers</h4>
+<div class="outline-text-4" id="text-3-1-2">
+<ul class="org-ul">
+<li>Config servers store <b>metadata</b> and configuration settings for the cluster.</li>
+<li>Users should avoid writing directly to the config database in the course of normal operation or maintenance.</li>
+<li>If the config server replica set loses its primary and cannot elect a primary, the cluster's metadata becomes <b>read only</b>. <br>
+You can still read and write data from the shards, but no chunk migration or chunk splits will occur <br>
+until the replica set can elect a primary.</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org16c4511" class="outline-4">
+<h4 id="org16c4511"><span class="section-number-4">3.1.3</span> mongos</h4>
+<div class="outline-text-4" id="text-3-1-3">
+<ul class="org-ul">
+<li><code>mongos</code> acts as a query <b>router</b>, providing an interface between client applications and the sharded cluster.</li>
+<li><code>mongos</code> provide the only interface to a sharded cluster from the perspective of applications.</li>
+<li><code>mongos</code> tracks what data is on which shard by caching the metadata from the config servers.</li>
+<li><code>mongos</code> has no persistent state and consumes minimal system resources.</li>
+</ul>
+
+<pre class="example">
+mongos can route queries that include the shard key or the prefix of a compound shard key a specific shard or set of shards.
+mongos uses the shard key value to locate the chunk whose range includes the shard key value and
+directs the query at the shard containing that chunk.
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org5fc5291" class="outline-3">
+<h3 id="org5fc5291"><span class="section-number-3">3.2</span> Shard Key</h3>
+<div class="outline-text-3" id="text-3-2">
+<ul class="org-ul">
+<li>The shard key consists of an immutable field or fields that exist in every document in the target collection.</li>
+<li>A sharded collection can have <b>only one</b> shard key.</li>
+<li>To shard a non-empty collection, the collection must have an index that starts with the shard key.</li>
+<li>If queries do not include the shard key or the prefix of a compound shard key, mongos performs a broadcast operation, <br>
+querying all shards in the sharded cluster.</li>
+</ul>
+</div>
+
+<div id="outline-container-org9b3279b" class="outline-4">
+<h4 id="org9b3279b"><span class="section-number-4">3.2.1</span> Chunk</h4>
+<div class="outline-text-4" id="text-3-2-1">
+<p>
+MongoDB <b>partitions</b> data in the collection using ranges of shard key values. <br>
+Each range defines a non-overlapping range of shard key values and is associated with a chunk.
+</p>
+
+<p>
+MongoDB attempts to distribute chunks evenly among the shards in the cluster. <br>
+The shard key has a direct relationship to the effectiveness of chunk distribution.
+</p>
+
+<img src="https://docs.mongodb.com/manual/_images/sharding-range-based.bakedsvg.svg"/>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org75efac2" class="outline-3">
+<h3 id="org75efac2"><span class="section-number-3">3.3</span> Sharded Cluster</h3>
+<div class="outline-text-3" id="text-3-3">
 <p>
 You must connect to a mongos router to interact with any collection in the sharded cluster.
 This includes sharded and unsharded collections.
@@ -840,6 +956,7 @@ This includes sharded and unsharded collections.
 </p>
 
 <img src="https://docs.mongodb.com/manual/_images/sharded-cluster-mixed.bakedsvg.svg"/>
+</div>
 </div>
 </div>
 </div>
