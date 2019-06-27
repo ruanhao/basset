@@ -3,9 +3,33 @@
 #+EMAIL:     ruanhao1116@gmail.com
 #+LANGUAGE:  en
 #+LINK_HOME: http://www.github.com/ruanhao
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
-#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
+#+OPTIONS:   h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
 #+STARTUP:   showall
+#+TOC:       headlines 4
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
+#+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+
+* 内部原理
+
+** Reactor 模型
+
+#+HTML: <img src="https://images0.cnblogs.com/blog2015/434101/201503/112151380898648.jpg"/>
+
+- =mainReactor=
+
+  对应 bossGroup
+- =subReactor=
+
+  对应 workerGroup ，本质是 IO 线程池，负责 IO 事件
+- =Thread Pool=
+
+  对应用户业务的线程池（即不阻塞 IO 线程池）
+
 
 * 1, Buffer
 
