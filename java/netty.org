@@ -16,7 +16,64 @@
 
 * 核心组件
 
-** EventLoop
+** ByteBuf
+
+*** Heap Buffer
+
+- 存储于堆空间（实际数据存放在字节数组中）
+- 优点：快速创建与释放，并提供直接访问内部字节数组的方法
+- 缺点：进行 I/O 操作时， *需要先将数据复制到直接缓冲区中* 再进行网络传输
+- 多用于业务逻辑的实现
+
+*** Direct Buffer
+
+- 由操作系统在本地内存中分配空间，不占用堆空间
+- 优点：I/O 性能好，可以实现零拷贝
+- 缺点：分配与释放速度慢（可以通过 *内存池* 解决这个问题）
+- 多用于 I/O 通信
+
+*** 自旋锁在引用计数实现中的应用
+
+=AbstractReferenceCountedByteBuf:retain0(int increment)= (v4.0.15)
+
+#+BEGIN_SRC java
+  public ByteBuf retain(int increment) {
+      if (increment <= 0) {
+          throw new IllegalArgumentException("increment: " + increment + " (expected: > 0)");
+      }
+
+      for (;;) {
+          int refCnt = this.refCnt;
+          if (refCnt == 0) {
+              throw new IllegalReferenceCountException(0, increment);
+          }
+          if (refCnt > Integer.MAX_VALUE - increment) {
+              throw new IllegalReferenceCountException(refCnt, increment);
+          }
+          if (refCntUpdater.compareAndSet(this, refCnt, refCnt + increment)) { // CAS operation
+              break;
+          }
+      }
+      return this;
+  }
+#+END_SRC
+
+
+
+*** 在 Pipeline 中的创建与释放
+
+**** 初始 ByteBuf 创建
+
+参见 =io.netty.channel.nio.AbstractNioByteChannel.NioByteUnsafe.read()=
+
+**** 最终 ByteBuf 释放
+
+参见:
+
+- =TailContext.userEventTriggered(ChannelHandlerContext, Object)=
+- =HeadContext.write(ChannelHandlerContext, Object, ChannelPromise)=
+
+** EventLoop/EventLoopGroup
 
 *** 类继承关系
 
@@ -32,6 +89,46 @@
 - 所有由 EventLoop 处理的 I/O 事件都将在与其关联的 Thread 上进行处理
 - 一个 Channel 在整个生命周期中 *只会注册在一个 EventLoop 上* （保证线程安全）
 - 一个 EventLoop 在运行过程中，会被分配给一个或者多个 Channel
+- 对一个端口的侦听，只会绑定到 BossEventLoopGroup 中的一个 Eventloop
+
+
+**** NioEventLoop 执行逻辑
+
+#+HTML: <img src="https://caorong.github.io/post_images/2016-11-25-01-23-15.png"/>
+
+
+**** Selector.wakeup()
+
+java 的 Selector 在原生的 select api 之上 增加了个 =Selector.wakeup()= ，目的是唤醒阻塞在 =select()= 的线程。(*通过写入一个字节*)
+
+在下述时刻需要被唤醒：
+
+1. 注册了新的 channel 或者事件
+2. channel 关闭， 取消注册
+3. 优先级更高的事件触发（如定时器事件），希望及时处理
+
+
+**** Epoll bug 修复
+
+#+BEGIN_SRC java
+  for(;;){
+      int selectedKeys = selector.select(timeoutMillis); // select with timeout
+      selectCnt ++;
+      // 由于 select 阻塞 而等待了 timeoutMillis 毫秒， 说明阻塞了，没有 bug
+      if (time - TimeUnit.MILLISECONDS.toNanos(timeoutMillis) >= currentTimeNanos) {
+          selectCnt = 1;
+      } else if (SELECTOR_AUTO_REBUILD_THRESHOLD > 0 &&
+                 selectCnt >= SELECTOR_AUTO_REBUILD_THRESHOLD) {
+          // 在小于 timeoutMillis 毫秒的时间内 select 的次数超过了 阀值(512) 次
+          rebuildSelector();
+          selector = this.selector;
+
+          selector.selectNow();// Select again
+          selectCnt = 1;
+          break;
+      }
+  }
+#+END_SRC
 
 **** Reactor 模型
 
@@ -124,6 +221,7 @@
 
 #+HTML: <img src="https://image-static.segmentfault.com/261/392/2613926792-5a688f9f53f61"/>
 
+
 * 代码示例
 
 ** ChannelHandler
@@ -146,6 +244,16 @@
    pipeline.addLast(group, "handler", new MyBusinessLogicHandler());
 #+END_SRC
 
+
+*** 常用编解码器
+
+- [[https://github.com/ruanhao/java-for-fun/tree/master/src/main/java/com/hao/notes/netty/channelhandler/delimiterbasedframe][DelimiterBased]]
+- [[https://github.com/ruanhao/java-for-fun/tree/master/src/main/java/com/hao/notes/netty/channelhandler/lengthfieldbasedframe][LengthFieldBased]]
+- [[https://github.com/ruanhao/java-for-fun/tree/master/src/main/java/com/hao/notes/netty/channelhandler/httpcodec][HttpCodec]]
+- [[https://github.com/ruanhao/java-for-fun/tree/master/src/main/java/com/hao/notes/netty/channelhandler/idlestate][IdleState]]
+- [[https://github.com/ruanhao/java-for-fun/tree/master/src/main/java/com/hao/notes/netty/channelhandler/messagetobyte][MessageToByte]]
+- [[https://github.com/ruanhao/java-for-fun/tree/master/src/main/java/com/hao/notes/netty/channelhandler/replayingdecoder][ReplayingDecoder]]
+- [[https://github.com/ruanhao/java-for-fun/tree/master/src/main/java/com/hao/notes/netty/channelhandler/websocket][WebSocket]]
 
 ** TLS
 
@@ -222,3 +330,5 @@
 * 参考资料
 
 - [[https://caorong.github.io/2016/12/24/head-first-netty-1/][深入浅出Netty - EventLoop, EventLoopGroup]]
+- [[https://caorong.github.io/2017/01/16/head-first-netty-3/][深入浅出Netty - ByteBuf 和 ByteBufPool]]
+- [[https://blog.lovezhy.cc/2018/10/03/netty%E5%86%85%E5%AD%98%E6%B1%A0%E5%AE%9E%E7%8E%B0/][Netty内存池实现]]

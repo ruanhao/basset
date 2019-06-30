@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- 2019-06-30 Sun 11:16 -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Netty</title>
+<meta name="generator" content="Org mode">
+<meta name="author" content="Hao Ruan">
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+<link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Netty</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org9fa4171">1. 核心组件</a>
+<ul>
+<li><a href="#org090bffb">1.1. ByteBuf</a>
+<ul>
+<li><a href="#org1f017da">1.1.1. Heap Buffer</a></li>
+<li><a href="#org17df81c">1.1.2. Direct Buffer</a></li>
+<li><a href="#orgc913af3">1.1.3. 自旋锁在引用计数实现中的应用</a></li>
+<li><a href="#org51dc017">1.1.4. 在 Pipeline 中的创建与释放</a>
+<ul>
+<li><a href="#org1b58c0c">1.1.4.1. 初始 ByteBuf 创建</a></li>
+<li><a href="#orgd3a16ad">1.1.4.2. 最终 ByteBuf 释放</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgb528b7f">1.2. EventLoop/EventLoopGroup</a>
+<ul>
+<li><a href="#orgbfd469b">1.2.1. 类继承关系</a></li>
+<li><a href="#orgaa5e6ed">1.2.2. 线程模型</a>
+<ul>
+<li><a href="#org7d9514a">1.2.2.1. NioEventLoop 执行逻辑</a></li>
+<li><a href="#org4f1453c">1.2.2.2. Selector.wakeup()</a></li>
+<li><a href="#orgaf274b7">1.2.2.3. Epoll bug 修复</a></li>
+<li><a href="#orga582b39">1.2.2.4. Reactor 模型</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgebef20b">1.3. ChannelPipeline</a>
+<ul>
+<li><a href="#orgbae7ea5">1.3.1. Propagation Methods</a>
+<ul>
+<li><a href="#orge8c0173">1.3.1.1. Inbound</a></li>
+<li><a href="#orgf048d22">1.3.1.2. Outbound</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org82a1550">1.4. ChannelFuture</a>
+<ul>
+<li><a href="#org60ea8e5">1.4.1. 类继承关系</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org60e37f1">2. 代码示例</a>
+<ul>
+<li><a href="#org7182439">2.1. ChannelHandler</a>
+<ul>
+<li><a href="#org4883475">2.1.1. 使用业务线程池</a></li>
+<li><a href="#org6727c33">2.1.2. 常用编解码器</a></li>
+</ul>
+</li>
+<li><a href="#org7783f76">2.2. TLS</a>
+<ul>
+<li><a href="#org6c41962">2.2.1. Pre Master Secret</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgbdd2cf1">3. 参考资料</a></li>
+</ul>
+</div>
+</div>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org9fa4171">1. 核心组件</a>
+<ul>
+<li><a href="#org090bffb">1.1. ByteBuf</a>
+<ul>
+<li><a href="#org1f017da">1.1.1. Heap Buffer</a></li>
+<li><a href="#org17df81c">1.1.2. Direct Buffer</a></li>
+<li><a href="#orgc913af3">1.1.3. 自旋锁在引用计数实现中的应用</a></li>
+<li><a href="#org51dc017">1.1.4. 在 Pipeline 中的创建与释放</a>
+<ul>
+<li><a href="#org1b58c0c">1.1.4.1. 初始 ByteBuf 创建</a></li>
+<li><a href="#orgd3a16ad">1.1.4.2. 最终 ByteBuf 释放</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgb528b7f">1.2. EventLoop/EventLoopGroup</a>
+<ul>
+<li><a href="#orgbfd469b">1.2.1. 类继承关系</a></li>
+<li><a href="#orgaa5e6ed">1.2.2. 线程模型</a>
+<ul>
+<li><a href="#org7d9514a">1.2.2.1. NioEventLoop 执行逻辑</a></li>
+<li><a href="#org4f1453c">1.2.2.2. Selector.wakeup()</a></li>
+<li><a href="#orgaf274b7">1.2.2.3. Epoll bug 修复</a></li>
+<li><a href="#orga582b39">1.2.2.4. Reactor 模型</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgebef20b">1.3. ChannelPipeline</a>
+<ul>
+<li><a href="#orgbae7ea5">1.3.1. Propagation Methods</a>
+<ul>
+<li><a href="#orge8c0173">1.3.1.1. Inbound</a></li>
+<li><a href="#orgf048d22">1.3.1.2. Outbound</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org82a1550">1.4. ChannelFuture</a>
+<ul>
+<li><a href="#org60ea8e5">1.4.1. 类继承关系</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org60e37f1">2. 代码示例</a>
+<ul>
+<li><a href="#org7182439">2.1. ChannelHandler</a>
+<ul>
+<li><a href="#org4883475">2.1.1. 使用业务线程池</a></li>
+<li><a href="#org6727c33">2.1.2. 常用编解码器</a></li>
+</ul>
+</li>
+<li><a href="#org7783f76">2.2. TLS</a>
+<ul>
+<li><a href="#org6c41962">2.2.1. Pre Master Secret</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgbdd2cf1">3. 参考资料</a></li>
+</ul>
+</div>
+</div>
+<div class="outline-2" id="meta">
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Author</td>
+<td class="org-left">Hao Ruan (ruanhao1116@gmail.com)</td>
+</tr>
+
+<tr>
+<td class="org-left">Date</td>
+<td class="org-left">2019-06-30 11:16:21</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div id="outline-container-org9fa4171" class="outline-2">
+<h2 id="org9fa4171"><span class="section-number-2">1</span> 核心组件</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-org090bffb" class="outline-3">
+<h3 id="org090bffb"><span class="section-number-3">1.1</span> ByteBuf</h3>
+<div class="outline-text-3" id="text-1-1">
+</div>
+<div id="outline-container-org1f017da" class="outline-4">
+<h4 id="org1f017da"><span class="section-number-4">1.1.1</span> Heap Buffer</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<ul class="org-ul">
+<li>存储于堆空间（实际数据存放在字节数组中）</li>
+<li>优点：快速创建与释放，并提供直接访问内部字节数组的方法</li>
+<li>缺点：进行 I/O 操作时， <b>需要先将数据复制到直接缓冲区中</b> 再进行网络传输</li>
+<li>多用于业务逻辑的实现</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org17df81c" class="outline-4">
+<h4 id="org17df81c"><span class="section-number-4">1.1.2</span> Direct Buffer</h4>
+<div class="outline-text-4" id="text-1-1-2">
+<ul class="org-ul">
+<li>由操作系统在本地内存中分配空间，不占用堆空间</li>
+<li>优点：I/O 性能好，可以实现零拷贝</li>
+<li>缺点：分配与释放速度慢（可以通过 <b>内存池</b> 解决这个问题）</li>
+<li>多用于 I/O 通信</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgc913af3" class="outline-4">
+<h4 id="orgc913af3"><span class="section-number-4">1.1.3</span> 自旋锁在引用计数实现中的应用</h4>
+<div class="outline-text-4" id="text-1-1-3">
+<p>
+<code>AbstractReferenceCountedByteBuf:retain0(int increment)</code> (v4.0.15)
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #f92672; font-weight: bold;">public</span> <span style="color: #66d9ef; font-weight: bold;">ByteBuf</span> <span style="color: #a6e22e;">retain</span>(<span style="color: #66d9ef; font-weight: bold;">int</span> <span style="color: #fd971f;">increment</span>) {
+    <span style="color: #f92672; font-weight: bold;">if</span> (increment &lt;= 0) {
+        <span style="color: #f92672; font-weight: bold;">throw</span> <span style="color: #f92672; font-weight: bold;">new</span> <span style="color: #66d9ef; font-weight: bold;">IllegalArgumentException</span>(<span style="color: #e6db74;">"increment: "</span> + increment + <span style="color: #e6db74;">" (expected: &gt; 0)"</span>);
+    }
+
+    <span style="color: #f92672; font-weight: bold;">for</span> (;;) {
+        <span style="color: #66d9ef; font-weight: bold;">int</span> <span style="color: #fd971f;">refCnt</span> = <span style="color: #f92672; font-weight: bold;">this</span>.refCnt;
+        <span style="color: #f92672; font-weight: bold;">if</span> (refCnt == 0) {
+            <span style="color: #f92672; font-weight: bold;">throw</span> <span style="color: #f92672; font-weight: bold;">new</span> <span style="color: #66d9ef; font-weight: bold;">IllegalReferenceCountException</span>(0, increment);
+        }
+        <span style="color: #f92672; font-weight: bold;">if</span> (refCnt &gt; <span style="color: #ae81ff;">Integer</span>.MAX_VALUE - increment) {
+            <span style="color: #f92672; font-weight: bold;">throw</span> <span style="color: #f92672; font-weight: bold;">new</span> <span style="color: #66d9ef; font-weight: bold;">IllegalReferenceCountException</span>(refCnt, increment);
+        }
+        <span style="color: #f92672; font-weight: bold;">if</span> (refCntUpdater.compareAndSet(<span style="color: #f92672; font-weight: bold;">this</span>, refCnt, refCnt + increment)) { <span style="color: #465457;">// </span><span style="color: #465457;">CAS operation</span>
+            <span style="color: #f92672; font-weight: bold;">break</span>;
+        }
+    }
+    <span style="color: #f92672; font-weight: bold;">return</span> <span style="color: #f92672; font-weight: bold;">this</span>;
+}
+</pre>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-org51dc017" class="outline-4">
+<h4 id="org51dc017"><span class="section-number-4">1.1.4</span> 在 Pipeline 中的创建与释放</h4>
+<div class="outline-text-4" id="text-1-1-4">
+</div>
+<div id="outline-container-org1b58c0c" class="outline-5">
+<h5 id="org1b58c0c"><span class="section-number-5">1.1.4.1</span> 初始 ByteBuf 创建</h5>
+<div class="outline-text-5" id="text-1-1-4-1">
+<p>
+参见 <code>io.netty.channel.nio.AbstractNioByteChannel.NioByteUnsafe.read()</code>
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgd3a16ad" class="outline-5">
+<h5 id="orgd3a16ad"><span class="section-number-5">1.1.4.2</span> 最终 ByteBuf 释放</h5>
+<div class="outline-text-5" id="text-1-1-4-2">
+<p>
+参见:
+</p>
+
+<ul class="org-ul">
+<li><code>TailContext.userEventTriggered(ChannelHandlerContext, Object)</code></li>
+<li><code>HeadContext.write(ChannelHandlerContext, Object, ChannelPromise)</code></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb528b7f" class="outline-3">
+<h3 id="orgb528b7f"><span class="section-number-3">1.2</span> EventLoop/EventLoopGroup</h3>
+<div class="outline-text-3" id="text-1-2">
+</div>
+<div id="outline-container-orgbfd469b" class="outline-4">
+<h4 id="orgbfd469b"><span class="section-number-4">1.2.1</span> 类继承关系</h4>
+<div class="outline-text-4" id="text-1-2-1">
+<img src="https://dpzbhybb2pdcj.cloudfront.net/maurer/Figures/07fig02_alt.jpg"/>
+</div>
+</div>
+
+<div id="outline-container-orgaa5e6ed" class="outline-4">
+<h4 id="orgaa5e6ed"><span class="section-number-4">1.2.2</span> 线程模型</h4>
+<div class="outline-text-4" id="text-1-2-2">
+
+<div class="figure">
+<p><img src="img/netty_eventloop.png" alt="netty_eventloop.png">
+</p>
+</div>
+
+
+<ul class="org-ul">
+<li>一个 EventLoopGroup 中包含一个或多个 EventLoop</li>
+<li>一个 EventLoop 在整个生命周期中 <b>只会绑定一个 Thread</b></li>
+<li>所有由 EventLoop 处理的 I/O 事件都将在与其关联的 Thread 上进行处理</li>
+<li>一个 Channel 在整个生命周期中 <b>只会注册在一个 EventLoop 上</b> （保证线程安全）</li>
+<li>一个 EventLoop 在运行过程中，会被分配给一个或者多个 Channel</li>
+<li>对一个端口的侦听，只会绑定到 BossEventLoopGroup 中的一个 Eventloop</li>
+</ul>
+</div>
+
+
+<div id="outline-container-org7d9514a" class="outline-5">
+<h5 id="org7d9514a"><span class="section-number-5">1.2.2.1</span> NioEventLoop 执行逻辑</h5>
+<div class="outline-text-5" id="text-1-2-2-1">
+<img src="https://caorong.github.io/post_images/2016-11-25-01-23-15.png"/>
+</div>
+</div>
+
+
+<div id="outline-container-org4f1453c" class="outline-5">
+<h5 id="org4f1453c"><span class="section-number-5">1.2.2.2</span> Selector.wakeup()</h5>
+<div class="outline-text-5" id="text-1-2-2-2">
+<p>
+java 的 Selector 在原生的 select api 之上 增加了个 <code>Selector.wakeup()</code> ，目的是唤醒阻塞在 <code>select()</code> 的线程。(<b>通过写入一个字节</b>)
+</p>
+
+<p>
+在下述时刻需要被唤醒：
+</p>
+
+<ol class="org-ol">
+<li>注册了新的 channel 或者事件</li>
+<li>channel 关闭， 取消注册</li>
+<li>优先级更高的事件触发（如定时器事件），希望及时处理</li>
+</ol>
+</div>
+</div>
+
+
+<div id="outline-container-orgaf274b7" class="outline-5">
+<h5 id="orgaf274b7"><span class="section-number-5">1.2.2.3</span> Epoll bug 修复</h5>
+<div class="outline-text-5" id="text-1-2-2-3">
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #f92672; font-weight: bold;">for</span>(;;){
+    <span style="color: #66d9ef; font-weight: bold;">int</span> <span style="color: #fd971f;">selectedKeys</span> = selector.select(timeoutMillis); <span style="color: #465457;">// </span><span style="color: #465457;">select with timeout</span>
+    selectCnt ++;
+    <span style="color: #465457;">// </span><span style="color: #465457;">&#30001;&#20110; select &#38459;&#22622; &#32780;&#31561;&#24453;&#20102; timeoutMillis &#27627;&#31186;&#65292; &#35828;&#26126;&#38459;&#22622;&#20102;&#65292;&#27809;&#26377; bug</span>
+    <span style="color: #f92672; font-weight: bold;">if</span> (time - <span style="color: #ae81ff;">TimeUnit</span>.MILLISECONDS.toNanos(timeoutMillis) &gt;= currentTimeNanos) {
+        selectCnt = 1;
+    } <span style="color: #f92672; font-weight: bold;">else</span> <span style="color: #f92672; font-weight: bold;">if</span> (SELECTOR_AUTO_REBUILD_THRESHOLD &gt; 0 &amp;&amp;
+               selectCnt &gt;= SELECTOR_AUTO_REBUILD_THRESHOLD) {
+        <span style="color: #465457;">// </span><span style="color: #465457;">&#22312;&#23567;&#20110; timeoutMillis &#27627;&#31186;&#30340;&#26102;&#38388;&#20869; select &#30340;&#27425;&#25968;&#36229;&#36807;&#20102; &#38400;&#20540;(512) &#27425;</span>
+        rebuildSelector();
+        selector = <span style="color: #f92672; font-weight: bold;">this</span>.selector;
+
+        selector.selectNow();<span style="color: #465457;">// </span><span style="color: #465457;">Select again</span>
+        selectCnt = 1;
+        <span style="color: #f92672; font-weight: bold;">break</span>;
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga582b39" class="outline-5">
+<h5 id="orga582b39"><span class="section-number-5">1.2.2.4</span> Reactor 模型</h5>
+<div class="outline-text-5" id="text-1-2-2-4">
+<img src="http://static.oschina.net/uploads/space/2013/1125/130828_uKWD_190591.jpeg"/>
+
+<ul class="org-ul">
+<li>mainReactor 对应 bossGroup</li>
+<li>subReactor 对应 workerGroup ，本质是 <b>IO 线程池</b> ，负责 IO 事件</li>
+<li>Thread Pool 对应用户业务的线程池（即不阻塞 IO 线程池）</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-orgebef20b" class="outline-3">
+<h3 id="orgebef20b"><span class="section-number-3">1.3</span> ChannelPipeline</h3>
+<div class="outline-text-3" id="text-1-3">
+<pre class="example">
+                                          I/O Request via Channel or ChannelHandlerContext
+                                                    |
++---------------------------------------------------+---------------+
+|                           ChannelPipeline         |               |
+|                                                  \|/              |
+|    +---------------------+            +-----------+----------+    |
+|    | Inbound Handler  N  |            | Outbound Handler  1  |    |
+|    +----------+----------+            +-----------+----------+    |
+|              /|\                                  |               |
+|               |                                  \|/              |
+|    +----------+----------+            +-----------+----------+    |
+|    | Inbound Handler N-1 |            | Outbound Handler  2  |    |
+|    +----------+----------+            +-----------+----------+    |
+|              /|\                                  .               |
+|               .                                   .               |
+| ChannelHandlerContext.fireIN_EVT() ChannelHandlerContext.OUT_EVT()|
+|        [ method call]                       [method call]         |
+|               .                                   .               |
+|               .                                  \|/              |
+|    +----------+----------+            +-----------+----------+    |
+|    | Inbound Handler  2  |            | Outbound Handler M-1 |    |
+|    +----------+----------+            +-----------+----------+    |
+|              /|\                                  |               |
+|               |                                  \|/              |
+|    +----------+----------+            +-----------+----------+    |
+|    | Inbound Handler  1  |            | Outbound Handler  M  |    |
+|    +----------+----------+            +-----------+----------+    |
+|              /|\                                  |               |
++---------------+-----------------------------------+---------------+
+                |                                  \|/
++---------------+-----------------------------------+---------------+
+|               |                                   |               |
+|       [ Socket.read() ]                    [ Socket.write() ]     |
+|                                                                   |
+|  Netty Internal I/O Threads (Transport Implementation)            |
++-------------------------------------------------------------------+
+
+</pre>
+</div>
+
+<div id="outline-container-orgbae7ea5" class="outline-4">
+<h4 id="orgbae7ea5"><span class="section-number-4">1.3.1</span> Propagation Methods</h4>
+<div class="outline-text-4" id="text-1-3-1">
+</div>
+<div id="outline-container-orge8c0173" class="outline-5">
+<h5 id="orge8c0173"><span class="section-number-5">1.3.1.1</span> Inbound</h5>
+<div class="outline-text-5" id="text-1-3-1-1">
+<ul class="org-ul">
+<li>ChannelHandlerContext.fireChannelRegistered()</li>
+<li>ChannelHandlerContext.fireChannelActive()</li>
+<li>ChannelHandlerContext.fireChannelRead(Object)</li>
+<li>ChannelHandlerContext.fireChannelReadComplete()</li>
+<li>ChannelHandlerContext.fireExceptionCaught(Throwable)</li>
+<li>ChannelHandlerContext.fireUserEventTriggered(Object)</li>
+<li>ChannelHandlerContext.fireChannelWritabilityChanged()</li>
+<li>ChannelHandlerContext.fireChannelInactive()</li>
+<li>ChannelHandlerContext.fireChannelUnregistered()</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgf048d22" class="outline-5">
+<h5 id="orgf048d22"><span class="section-number-5">1.3.1.2</span> Outbound</h5>
+<div class="outline-text-5" id="text-1-3-1-2">
+<ul class="org-ul">
+<li>ChannelHandlerContext.bind(SocketAddress, ChannelPromise)</li>
+<li>ChannelHandlerContext.connect(SocketAddress, SocketAddress, ChannelPromise)</li>
+<li>ChannelHandlerContext.write(Object, ChannelPromise)</li>
+<li>ChannelHandlerContext.flush()</li>
+<li>ChannelHandlerContext.read()</li>
+<li>ChannelHandlerContext.disconnect(ChannelPromise)</li>
+<li>ChannelHandlerContext.close(ChannelPromise)</li>
+<li>ChannelHandlerContext.deregister(ChannelPromise)</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div id="outline-container-org82a1550" class="outline-3">
+<h3 id="org82a1550"><span class="section-number-3">1.4</span> ChannelFuture</h3>
+<div class="outline-text-3" id="text-1-4">
+</div>
+<div id="outline-container-org60ea8e5" class="outline-4">
+<h4 id="org60ea8e5"><span class="section-number-4">1.4.1</span> 类继承关系</h4>
+<div class="outline-text-4" id="text-1-4-1">
+<img src="https://image-static.segmentfault.com/261/392/2613926792-5a688f9f53f61"/>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org60e37f1" class="outline-2">
+<h2 id="org60e37f1"><span class="section-number-2">2</span> 代码示例</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-org7182439" class="outline-3">
+<h3 id="org7182439"><span class="section-number-3">2.1</span> ChannelHandler</h3>
+<div class="outline-text-3" id="text-2-1">
+</div>
+<div id="outline-container-org4883475" class="outline-4">
+<h4 id="org4883475"><span class="section-number-4">2.1.1</span> 使用业务线程池</h4>
+<div class="outline-text-4" id="text-2-1-1">
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #f92672; font-weight: bold;">static</span> <span style="color: #f92672; font-weight: bold;">final</span> <span style="color: #66d9ef; font-weight: bold;">EventExecutorGroup</span> <span style="color: #fd971f;">group</span> = <span style="color: #f92672; font-weight: bold;">new</span> <span style="color: #66d9ef; font-weight: bold;">DefaultEventExecutorGroup</span>(16);
+
+<span style="color: #66d9ef; font-weight: bold;">ChannelPipeline</span> <span style="color: #fd971f;">pipeline</span> = ch.pipeline();
+
+pipeline.addLast(<span style="color: #e6db74;">"decoder"</span>, <span style="color: #f92672; font-weight: bold;">new</span> <span style="color: #66d9ef; font-weight: bold;">MyProtocolDecoder</span>());
+pipeline.addLast(<span style="color: #e6db74;">"encoder"</span>, <span style="color: #f92672; font-weight: bold;">new</span> <span style="color: #66d9ef; font-weight: bold;">MyProtocolEncoder</span>());
+
+<span style="color: #465457;">// </span><span style="color: #465457;">Tell the pipeline to run MyBusinessLogicHandler's event handler methods</span>
+<span style="color: #465457;">// </span><span style="color: #465457;">in a different thread than an I/O thread so that the I/O thread is not blocked by</span>
+<span style="color: #465457;">// </span><span style="color: #465457;">a time-consuming task.</span>
+<span style="color: #465457;">// </span><span style="color: #465457;">If your business logic is fully asynchronous or finished very quickly, you don't</span>
+<span style="color: #465457;">// </span><span style="color: #465457;">need to specify a group.</span>
+pipeline.addLast(group, <span style="color: #e6db74;">"handler"</span>, <span style="color: #f92672; font-weight: bold;">new</span> <span style="color: #66d9ef; font-weight: bold;">MyBusinessLogicHandler</span>());
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org6727c33" class="outline-4">
+<h4 id="org6727c33"><span class="section-number-4">2.1.2</span> 常用编解码器</h4>
+<div class="outline-text-4" id="text-2-1-2">
+<ul class="org-ul">
+<li><a href="https://github.com/ruanhao/java-for-fun/tree/master/src/main/java/com/hao/notes/netty/channelhandler/delimiterbasedframe">DelimiterBased</a></li>
+<li><a href="https://github.com/ruanhao/java-for-fun/tree/master/src/main/java/com/hao/notes/netty/channelhandler/lengthfieldbasedframe">LengthFieldBased</a></li>
+<li><a href="https://github.com/ruanhao/java-for-fun/tree/master/src/main/java/com/hao/notes/netty/channelhandler/httpcodec">HttpCodec</a></li>
+<li><a href="https://github.com/ruanhao/java-for-fun/tree/master/src/main/java/com/hao/notes/netty/channelhandler/idlestate">IdleState</a></li>
+<li><a href="https://github.com/ruanhao/java-for-fun/tree/master/src/main/java/com/hao/notes/netty/channelhandler/messagetobyte">MessageToByte</a></li>
+<li><a href="https://github.com/ruanhao/java-for-fun/tree/master/src/main/java/com/hao/notes/netty/channelhandler/replayingdecoder">ReplayingDecoder</a></li>
+<li><a href="https://github.com/ruanhao/java-for-fun/tree/master/src/main/java/com/hao/notes/netty/channelhandler/websocket">WebSocket</a></li>
+</ul>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7783f76" class="outline-3">
+<h3 id="org7783f76"><span class="section-number-3">2.2</span> TLS</h3>
+<div class="outline-text-3" id="text-2-2">
+</div>
+<div id="outline-container-org6c41962" class="outline-4">
+<h4 id="org6c41962"><span class="section-number-4">2.2.1</span> Pre Master Secret</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<div class="org-src-container">
+<pre class="src src-java">
+<span style="color: #f92672; font-weight: bold;">private</span> <span style="color: #f92672; font-weight: bold;">static</span> <span style="color: #f92672; font-weight: bold;">final</span> <span style="color: #66d9ef; font-weight: bold;">SslContext</span> <span style="color: #fd971f;">sslContext</span> = SslContextBuilder
+    .forClient()
+    .sessionCacheSize(8192L)
+    .sessionTimeout(60L)
+    .trustManager(<span style="color: #ae81ff;">InsecureTrustManagerFactory</span>.INSTANCE)
+    .build();
+
+<span style="color: #f92672; font-weight: bold;">public</span> <span style="color: #66d9ef; font-weight: bold;">void</span> <span style="color: #a6e22e;">doConnect</span>() {
+    <span style="color: #66d9ef; font-weight: bold;">EventLoopGroup</span> <span style="color: #fd971f;">group</span> = <span style="color: #f92672; font-weight: bold;">new</span> <span style="color: #66d9ef; font-weight: bold;">NioEventLoopGroup</span>();
+    <span style="color: #66d9ef; font-weight: bold;">Bootstrap</span> <span style="color: #fd971f;">b</span> = <span style="color: #f92672; font-weight: bold;">new</span> <span style="color: #66d9ef; font-weight: bold;">Bootstrap</span>();
+    b.group(group)
+        .channel(NioSocketChannel.<span style="color: #f92672; font-weight: bold;">class</span>)
+        .remoteAddress(<span style="color: #e6db74;">"127.0.0.1"</span>, 30443)
+        .handler(<span style="color: #f92672; font-weight: bold;">new</span> <span style="color: #66d9ef; font-weight: bold;">ChannelInitializer</span>&lt;<span style="color: #66d9ef; font-weight: bold;">SocketChannel</span>&gt;() {
+                <span style="color: #ae81ff;">@Override</span>
+                <span style="color: #f92672; font-weight: bold;">public</span> <span style="color: #66d9ef; font-weight: bold;">void</span> <span style="color: #a6e22e;">initChannel</span>(<span style="color: #66d9ef; font-weight: bold;">SocketChannel</span> <span style="color: #fd971f;">ch</span>) <span style="color: #f92672; font-weight: bold;">throws</span> <span style="color: #66d9ef; font-weight: bold;">Exception</span> {
+                    <span style="color: #66d9ef; font-weight: bold;">SSLEngine</span> <span style="color: #fd971f;">engine</span> = sslContext.newEngine(ch.alloc());
+
+                    <span style="color: #66d9ef; font-weight: bold;">Method</span> <span style="color: #fd971f;">initHandshakerMethod</span> = engine.getClass().getDeclaredMethod(<span style="color: #e6db74;">"initHandshaker"</span>);
+                    initHandshakerMethod.setAccessible(<span style="color: #ae81ff;">true</span>);
+                    initHandshakerMethod.invoke(engine);
+
+                    <span style="color: #66d9ef; font-weight: bold;">Field</span> <span style="color: #fd971f;">handshakerField</span> = engine.getClass().getDeclaredField(<span style="color: #e6db74;">"handshaker"</span>);
+                    handshakerField.setAccessible(<span style="color: #ae81ff;">true</span>);
+                    <span style="color: #66d9ef; font-weight: bold;">Object</span> <span style="color: #fd971f;">handShakerObj</span> = handshakerField.get(engine);
+
+                    <span style="color: #66d9ef; font-weight: bold;">SslHandler</span> <span style="color: #fd971f;">sslHandler</span> = <span style="color: #f92672; font-weight: bold;">new</span> <span style="color: #66d9ef; font-weight: bold;">SslHandler</span>(engine);
+                    sslHandler.handshakeFuture().addListener(<span style="color: #f92672; font-weight: bold;">new</span> <span style="color: #66d9ef; font-weight: bold;">GenericFutureListener</span>&lt;<span style="color: #66d9ef; font-weight: bold;">Future</span>&lt;<span style="color: #66d9ef; font-weight: bold;">Channel</span>&gt;&gt;() {
+                            <span style="color: #ae81ff;">@Override</span>
+                            <span style="color: #f92672; font-weight: bold;">public</span> <span style="color: #66d9ef; font-weight: bold;">void</span> <span style="color: #a6e22e;">operationComplete</span>(<span style="color: #66d9ef; font-weight: bold;">Future</span>&lt;<span style="color: #66d9ef; font-weight: bold;">Channel</span>&gt; <span style="color: #fd971f;">future</span>) <span style="color: #f92672; font-weight: bold;">throws</span> <span style="color: #66d9ef; font-weight: bold;">Exception</span> {
+                                <span style="color: #f92672; font-weight: bold;">if</span> (future.isSuccess()) {
+                                    <span style="color: #66d9ef; font-weight: bold;">SSLSession</span> <span style="color: #fd971f;">session</span> = engine.getSession();
+                                    <span style="color: #66d9ef; font-weight: bold;">Field</span> <span style="color: #fd971f;">masterSecretField</span> = session.getClass().getDeclaredField(<span style="color: #e6db74;">"masterSecret"</span>);
+                                    masterSecretField.setAccessible(<span style="color: #ae81ff;">true</span>);
+                                    <span style="color: #66d9ef; font-weight: bold;">SecretKey</span> <span style="color: #fd971f;">k</span> = (<span style="color: #66d9ef; font-weight: bold;">SecretKey</span>)masterSecretField.get(session);
+                                    <span style="color: #66d9ef; font-weight: bold;">String</span> <span style="color: #fd971f;">preMasterSecretString</span> = BaseEncoding.base16().encode(k.getEncoded()).toLowerCase();
+
+                                    <span style="color: #66d9ef; font-weight: bold;">Class</span>&lt;?&gt; <span style="color: #fd971f;">handshakerClass</span> = Class.forName(<span style="color: #e6db74;">"sun.security.ssl.Handshaker"</span>);
+                                    <span style="color: #66d9ef; font-weight: bold;">Field</span> <span style="color: #fd971f;">clientRandomField</span> = handshakerClass.getDeclaredField(<span style="color: #e6db74;">"clnt_random"</span>);
+                                    clientRandomField.setAccessible(<span style="color: #ae81ff;">true</span>);
+                                    <span style="color: #66d9ef; font-weight: bold;">Object</span> <span style="color: #fd971f;">clientRandomObj</span> = clientRandomField.get(handShakerObj);
+                                    <span style="color: #66d9ef; font-weight: bold;">Field</span> <span style="color: #fd971f;">randomBytesField</span> = clientRandomObj.getClass().getDeclaredField(<span style="color: #e6db74;">"random_bytes"</span>);
+                                    randomBytesField.setAccessible(<span style="color: #ae81ff;">true</span>);
+                                    <span style="color: #66d9ef; font-weight: bold;">byte</span>[] <span style="color: #fd971f;">randomBytes</span> = (<span style="color: #66d9ef; font-weight: bold;">byte</span>[])randomBytesField.get(clientRandomObj);
+                                    <span style="color: #66d9ef; font-weight: bold;">String</span> <span style="color: #fd971f;">clientRandom</span> = BaseEncoding.base16().encode(randomBytes).toLowerCase();
+                                    <span style="color: #465457;">/* </span><span style="color: #465457;">this log trace can be used in SSLKEYLOGFILE understood by wireshark */</span>
+                                    log.info(<span style="color: #e6db74;">"CLIENT_RANDOM {} {}"</span>, clientRandom, preMasterSecretString);
+                                }
+                            }
+                        });
+
+                    ch.pipeline().addLast(sslHandler);
+                    ch.pipeline().addLast(<span style="color: #f92672; font-weight: bold;">new</span> <span style="color: #66d9ef; font-weight: bold;">SimpleChannelInboundHandler</span>&lt;<span style="color: #66d9ef; font-weight: bold;">ByteBuf</span>&gt;() {
+                            <span style="color: #ae81ff;">@Override</span>
+                            <span style="color: #f92672; font-weight: bold;">protected</span> <span style="color: #66d9ef; font-weight: bold;">void</span> <span style="color: #a6e22e;">channelRead0</span>(<span style="color: #66d9ef; font-weight: bold;">ChannelHandlerContext</span> <span style="color: #fd971f;">ctx</span>, <span style="color: #66d9ef; font-weight: bold;">ByteBuf</span> <span style="color: #fd971f;">msg</span>) <span style="color: #f92672; font-weight: bold;">throws</span> <span style="color: #66d9ef; font-weight: bold;">Exception</span> {
+                                <span style="color: #465457;">// </span><span style="color: #465457;">TODO</span>
+                            }
+                        });
+                }
+            });
+    b.connect();
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-orgbdd2cf1" class="outline-2">
+<h2 id="orgbdd2cf1"><span class="section-number-2">3</span> 参考资料</h2>
+<div class="outline-text-2" id="text-3">
+<ul class="org-ul">
+<li><a href="https://caorong.github.io/2016/12/24/head-first-netty-1/">深入浅出Netty - EventLoop, EventLoopGroup</a></li>
+<li><a href="https://caorong.github.io/2017/01/16/head-first-netty-3/">深入浅出Netty - ByteBuf 和 ByteBufPool</a></li>
+<li><a href="https://blog.lovezhy.cc/2018/10/03/netty%E5%86%85%E5%AD%98%E6%B1%A0%E5%AE%9E%E7%8E%B0/">Netty内存池实现</a></li>
+</ul>
+</div>
+</div>
+</div>
+</body>
+</html>
