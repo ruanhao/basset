@@ -16,21 +16,109 @@
 
 * 核心组件
 
+
 ** ByteBuf
 
-*** Heap Buffer
+#+HTML: <img src="https://dpzbhybb2pdcj.cloudfront.net/maurer/Figures/05fig03_alt.jpg"/>
+
+*** Heap/Direct
+
+**** Heap Buffer
 
 - 存储于堆空间（实际数据存放在字节数组中）
 - 优点：快速创建与释放，并提供直接访问内部字节数组的方法
 - 缺点：进行 I/O 操作时， *需要先将数据复制到直接缓冲区中* 再进行网络传输
 - 多用于业务逻辑的实现
 
-*** Direct Buffer
+
+**** Direct Buffer
 
 - 由操作系统在本地内存中分配空间，不占用堆空间
 - 优点：I/O 性能好，可以实现零拷贝
 - 缺点：分配与释放速度慢（可以通过 *内存池* 解决这个问题）
 - 多用于 I/O 通信
+
+
+**** 发送数据时的缓冲转换
+
+If your data were contained in a heap-allocated buffer, the JVM would, in fact,
+*copy your buffer to a direct buffer internally before sending it through the socket.*
+
+#+BEGIN_SRC java
+
+  @Override
+  protected final Object filterOutboundMessage(Object msg) { // io.netty.channel.nio.AbstractNioByteChannel.filterOutboundMessage(Object)
+      if (msg instanceof ByteBuf) {
+          ByteBuf buf = (ByteBuf) msg;
+          if (buf.isDirect()) {
+              return msg;
+          }
+
+          return newDirectBuffer(buf);
+      }
+
+      if (msg instanceof FileRegion) {
+          return msg;
+      }
+
+      throw new UnsupportedOperationException("unsupported message type: " +
+                                              StringUtil.simpleClassName(msg) + EXPECTED_TYPES);
+  }
+
+  /**
+   ,* Returns an off-heap copy of the specified {@link ByteBuf}, and releases the original one.
+   ,* Note that this method does not create an off-heap copy if the allocation / deallocation cost is too high,
+   ,* but just returns the original {@link ByteBuf}..
+   ,*/
+  protected final ByteBuf newDirectBuffer(ByteBuf buf) { // io.netty.channel.nio.AbstractNioChannel.newDirectBuffer(ByteBuf)
+      final int readableBytes = buf.readableBytes();
+      if (readableBytes == 0) {
+          ReferenceCountUtil.safeRelease(buf);
+          return Unpooled.EMPTY_BUFFER;
+      }
+
+      final ByteBufAllocator alloc = alloc();
+      if (alloc.isDirectBufferPooled()) {
+          ByteBuf directBuf = alloc.directBuffer(readableBytes);
+          directBuf.writeBytes(buf, buf.readerIndex(), readableBytes);
+          ReferenceCountUtil.safeRelease(buf);
+          return directBuf;
+      }
+
+      final ByteBuf directBuf = ByteBufUtil.threadLocalDirectBuffer();
+      if (directBuf != null) {
+          directBuf.writeBytes(buf, buf.readerIndex(), readableBytes);
+          ReferenceCountUtil.safeRelease(buf);
+          return directBuf;
+      }
+
+      // Allocating and deallocating an unpooled direct buffer is very expensive; give up.
+      return buf;
+  }
+#+END_SRC
+
+
+
+*** Derived Buffer
+
+A /derived buffer/ provides a view of a =ByteBuf= that represents its contents in a specialized way. \\
+Such views are created by the following methods:
+
+- duplicate()
+- slice()
+- slice(int, int)
+- Unpooled.unmodifiableBuffer(...)
+- order(ByteOrder)
+- readSlice(int)
+
+Each returns a new =ByteBuf= instance *with its own reader, writer, and marker indices*.
+
+The internal storage is *shared* just as in a JDK =ByteBuffer=.
+
+*** Arena
+
+#+HTML: <img src="https://caorong.github.io/post_images/2016-11-26-23-46-26.png"/>
+
 
 *** 自旋锁在引用计数实现中的应用
 
@@ -73,24 +161,27 @@
 - =TailContext.userEventTriggered(ChannelHandlerContext, Object)=
 - =HeadContext.write(ChannelHandlerContext, Object, ChannelPromise)=
 
+
 ** EventLoop/EventLoopGroup
 
 *** 类继承关系
 
 #+HTML: <img src="https://dpzbhybb2pdcj.cloudfront.net/maurer/Figures/07fig02_alt.jpg"/>
 
+
 *** 线程模型
+
+#+HTML: <img src="https://dpzbhybb2pdcj.cloudfront.net/maurer/Figures/03fig01.jpg"/></br>
+
+#+HTML: <img src="https://dpzbhybb2pdcj.cloudfront.net/maurer/Figures/03fig04_alt.jpg"/>
 
 [[file:img/netty_eventloop.png]]
 
-
-- 一个 EventLoopGroup 中包含一个或多个 EventLoop
-- 一个 EventLoop 在整个生命周期中 *只会绑定一个 Thread*
-- 所有由 EventLoop 处理的 I/O 事件都将在与其关联的 Thread 上进行处理
-- 一个 Channel 在整个生命周期中 *只会注册在一个 EventLoop 上* （保证线程安全）
-- 一个 EventLoop 在运行过程中，会被分配给一个或者多个 Channel
-- 对一个端口的侦听，只会绑定到 BossEventLoopGroup 中的一个 Eventloop
-
+- An =EventLoopGroup= contains one or more =EventLoops=
+- An =EventLoop= is bound to a *single Thread* for its lifetime
+- All I/O events processed by an EventLoop are handled on its dedicated =Thread=
+- A =Channel= is registered for its lifetime *with a single EventLoop* (eliminates the need for synchronization)
+- A single =EventLoop= may be assigned to one or more =Channels=
 
 **** NioEventLoop 执行逻辑
 
@@ -130,6 +221,7 @@ java 的 Selector 在原生的 select api 之上 增加了个 =Selector.wakeup()
   }
 #+END_SRC
 
+
 **** Reactor 模型
 
 #+HTML: <img src="http://static.oschina.net/uploads/space/2013/1125/130828_uKWD_190591.jpeg"/>
@@ -138,6 +230,59 @@ java 的 Selector 在原生的 select api 之上 增加了个 =Selector.wakeup()
 - subReactor 对应 workerGroup ，本质是 *IO 线程池* ，负责 IO 事件
 - Thread Pool 对应用户业务的线程池（即不阻塞 IO 线程池）
 
+
+
+** Channel
+
+*** 类继承关系
+
+#+BEGIN_SRC plantuml :file img/channel_classes.png :eval never-export
+  interface Channel
+
+  interface Comparable
+  interface ChannelOutboundInvoker
+  interface AttributeMap
+
+  interface ServerChannel
+  interface ChannelPipeline
+  interface ChannelConfig
+
+  interface EventLoop
+
+  abstract class AbstractChannel
+
+
+  Channel .up.|> Comparable
+  Channel .up.|> ChannelOutboundInvoker
+  Channel .up.|> AttributeMap
+
+  ServerChannel .up.|> Channel
+  AbstractChannel .up.|> Channel
+
+  Channel *-down-> ChannelPipeline
+  Channel *-down-> ChannelConfig
+  Channel *-down-> EventLoop
+
+
+
+
+#+END_SRC
+
+#+RESULTS:
+[[file:img/channel_classes.png]]
+
+
+*** Selecting and processing state changes
+
+The possible state changes are:
+
+- A new =Channel= was accepted and is ready. (OP_ACCEPT)
+- A =Channel= connection was completed. (OP_CONNECT)
+- A =Channel= has data that is ready for reading. (OP_READ)
+- A =Channel= is available for writing data. (OP_WRITE)
+
+
+#+HTML: <img src="https://dpzbhybb2pdcj.cloudfront.net/maurer/Figures/04fig02_alt.jpg"/>
 
 
 ** ChannelPipeline
@@ -182,6 +327,8 @@ java 的 Selector 在原生的 select api 之上 增加了个 =Selector.wakeup()
 
 #+END_EXAMPLE
 
+#+HTML: <img src="https://dpzbhybb2pdcj.cloudfront.net/maurer/Figures/03fig03_alt.jpg"/>
+
 *** Propagation Methods
 
 **** Inbound
@@ -216,6 +363,8 @@ java 的 Selector 在原生的 select api 之上 增加了个 =Selector.wakeup()
 
 
 ** ChannelFuture
+
+- Each of Netty's outbound I/O operations returns a =ChannelFuture=
 
 *** 类继承关系
 
@@ -329,6 +478,11 @@ java 的 Selector 在原生的 select api 之上 增加了个 =Selector.wakeup()
 
 * 参考资料
 
+** EventLoop
+
 - [[https://caorong.github.io/2016/12/24/head-first-netty-1/][深入浅出Netty - EventLoop, EventLoopGroup]]
+
+** ByteBuf
+
 - [[https://caorong.github.io/2017/01/16/head-first-netty-3/][深入浅出Netty - ByteBuf 和 ByteBufPool]]
 - [[https://blog.lovezhy.cc/2018/10/03/netty%E5%86%85%E5%AD%98%E6%B1%A0%E5%AE%9E%E7%8E%B0/][Netty内存池实现]]
