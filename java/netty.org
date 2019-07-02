@@ -285,7 +285,7 @@ The possible state changes are:
 #+HTML: <img src="https://dpzbhybb2pdcj.cloudfront.net/maurer/Figures/04fig02_alt.jpg"/>
 
 
-** ChannelPipeline
+** ChannelHandler/ChannelPipeline
 
 #+BEGIN_EXAMPLE
                                               I/O Request via Channel or ChannelHandlerContext
@@ -328,6 +328,74 @@ The possible state changes are:
 #+END_EXAMPLE
 
 #+HTML: <img src="https://dpzbhybb2pdcj.cloudfront.net/maurer/Figures/03fig03_alt.jpg"/>
+
+*** 类继承关系
+
+#+BEGIN_SRC plantuml :file img/channelhandler_classes.png :eval never-export
+  interface ChannelHandler {
+      void handlerAdded(ChannelHandlerContext ctx) throws Exception;
+      void handlerRemoved(ChannelHandlerContext ctx) throws Exception;
+  }
+
+  interface ChannelInboundHandler {
+      void channelRegistered(ChannelHandlerContext ctx) throws Exception;
+      void channelUnregistered(ChannelHandlerContext ctx) throws Exception;
+      void channelActive(ChannelHandlerContext ctx) throws Exception;
+      void channelInactive(ChannelHandlerContext ctx) throws Exception;
+      void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception;
+      void channelReadComplete(ChannelHandlerContext ctx) throws Exception;
+      void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception;
+      void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception;
+      void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception;
+  }
+
+  interface ChannelOutboundHandler {
+      void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception;
+      void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) throws Exception;
+      void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception;
+      void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception;
+      void deregister(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception;
+      void read(ChannelHandlerContext ctx) throws Exception;
+      void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception;
+      void flush(ChannelHandlerContext ctx) throws Exception;
+  }
+
+  abstract class ChannelHandlerAdapter
+  class ChannelInboundHandlerAdapter
+  class ChannelOutboundHandlerAdapter
+
+  ChannelInboundHandler -up-> ChannelHandler
+  ChannelOutboundHandler -up-> ChannelHandler
+
+  ChannelHandlerAdapter .up.|> ChannelHandler
+
+  ChannelInboundHandlerAdapter .up.|> ChannelInboundHandler
+  ChannelInboundHandlerAdapter -up-> ChannelHandlerAdapter
+
+  ChannelOutboundHandlerAdapter .up.|> ChannelOutboundHandler
+  ChannelOutboundHandlerAdapter -up-> ChannelHandlerAdapter
+
+
+#+END_SRC
+
+#+RESULTS:
+[[file:img/channelhandler_classes.png]]
+
+
+*** ChannelHandlerContext
+
+A =ChannelHandlerContext= represents an association between a =ChannelHandler= and a =ChannelPipeline= and is created whenever
+a =ChannelHandler= is added to a =ChannelPipeline=.
+
+The =ChannelHandlerContext= associated with a =ChannelHandler= never changes, so it's safe to cache a reference to it.
+
+**** Propagation via Channel/ChannelPipeline
+
+#+HTML: <img src="https://dpzbhybb2pdcj.cloudfront.net/maurer/Figures/06fig05_alt.jpg"/>
+
+**** Propagation via ChannelHandlerContext
+
+#+HTML: <img src="https://dpzbhybb2pdcj.cloudfront.net/maurer/Figures/06fig06_alt.jpg"/>
 
 *** Propagation Methods
 
