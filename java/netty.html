@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- 2019-07-02 Tue 12:33 -->
+<!-- 2019-07-06 Sat 18:03 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Netty</title>
@@ -234,90 +234,90 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org4a262bc">1. 核心组件</a>
+<li><a href="#orgb2bdd25">1. 核心组件</a>
 <ul>
-<li><a href="#orgd4316b1">1.1. ByteBuf</a>
+<li><a href="#orga00ce47">1.1. ByteBuf</a>
 <ul>
-<li><a href="#orga877c72">1.1.1. Heap/Direct</a>
+<li><a href="#orgb80e531">1.1.1. Heap/Direct</a>
 <ul>
-<li><a href="#org74a983a">1.1.1.1. Heap Buffer</a></li>
-<li><a href="#org7935312">1.1.1.2. Direct Buffer</a></li>
-<li><a href="#org4f80e03">1.1.1.3. 发送数据时的缓冲转换</a></li>
+<li><a href="#org1895481">1.1.1.1. Heap Buffer</a></li>
+<li><a href="#orgd7fa2f6">1.1.1.2. Direct Buffer</a></li>
+<li><a href="#org71cbd88">1.1.1.3. 发送数据时的缓冲转换</a></li>
 </ul>
 </li>
-<li><a href="#org2885f09">1.1.2. Derived Buffer</a></li>
-<li><a href="#org617ec6f">1.1.3. Arena</a></li>
-<li><a href="#orgbdd0bf2">1.1.4. 自旋锁在引用计数实现中的应用</a></li>
-<li><a href="#orgfaee33f">1.1.5. 在 Pipeline 中的创建与释放</a>
+<li><a href="#orgf2c760e">1.1.2. Derived Buffer</a></li>
+<li><a href="#orgdc81ac3">1.1.3. Arena</a></li>
+<li><a href="#orgb7601be">1.1.4. 自旋锁在引用计数实现中的应用</a></li>
+<li><a href="#orgbf0f2e8">1.1.5. 在 Pipeline 中的创建与释放</a>
 <ul>
-<li><a href="#org178feb1">1.1.5.1. 初始 ByteBuf 创建</a></li>
-<li><a href="#orge7cf6f8">1.1.5.2. 最终 ByteBuf 释放</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#org80c12e0">1.2. EventLoop/EventLoopGroup</a>
-<ul>
-<li><a href="#org587b2c0">1.2.1. 类继承关系</a></li>
-<li><a href="#orgfb72da9">1.2.2. 线程模型</a>
-<ul>
-<li><a href="#org6bc4768">1.2.2.1. NioEventLoop 执行逻辑</a></li>
-<li><a href="#orgefd90c9">1.2.2.2. Selector.wakeup()</a></li>
-<li><a href="#org3ffbd10">1.2.2.3. Epoll bug 修复</a></li>
-<li><a href="#org1b6e183">1.2.2.4. Reactor 模型</a></li>
+<li><a href="#orgb799b74">1.1.5.1. 初始 ByteBuf 创建</a></li>
+<li><a href="#org6372bbd">1.1.5.2. 最终 ByteBuf 释放</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org6e45843">1.3. Channel</a>
+<li><a href="#orga4ba864">1.2. EventLoop/EventLoopGroup</a>
 <ul>
-<li><a href="#orgfde3211">1.3.1. 类继承关系</a></li>
-<li><a href="#org3da4591">1.3.2. Selecting and processing state changes</a></li>
-</ul>
-</li>
-<li><a href="#org6640070">1.4. ChannelHandler/ChannelPipeline</a>
+<li><a href="#org6ce6537">1.2.1. 类继承关系</a></li>
+<li><a href="#org3dd6eca">1.2.2. 线程模型</a>
 <ul>
-<li><a href="#org3c8b9f2">1.4.1. 类继承关系</a></li>
-<li><a href="#orge428597">1.4.2. ChannelHandlerContext</a>
-<ul>
-<li><a href="#org627184b">1.4.2.1. Propagation via Channel/ChannelPipeline</a></li>
-<li><a href="#org061573a">1.4.2.2. Propagation via ChannelHandlerContext</a></li>
-</ul>
-</li>
-<li><a href="#orgea54b42">1.4.3. Propagation Methods</a>
-<ul>
-<li><a href="#orgca7d8c2">1.4.3.1. Inbound</a></li>
-<li><a href="#orgd8a1887">1.4.3.2. Outbound</a></li>
+<li><a href="#orgda9f2d3">1.2.2.1. NioEventLoop 执行逻辑</a></li>
+<li><a href="#orgd7d3fa9">1.2.2.2. Selector.wakeup()</a></li>
+<li><a href="#org5626b80">1.2.2.3. Epoll bug 修复</a></li>
+<li><a href="#org13f50ed">1.2.2.4. Reactor 模型</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org10874bb">1.5. ChannelFuture</a>
+<li><a href="#orgceafdd4">1.3. Channel</a>
 <ul>
-<li><a href="#orgcbcee8c">1.5.1. 类继承关系</a></li>
+<li><a href="#org622f63e">1.3.1. 类继承关系</a></li>
+<li><a href="#orgedc1d6f">1.3.2. Selecting and processing state changes</a></li>
+</ul>
+</li>
+<li><a href="#orgd01c0c1">1.4. ChannelHandler/ChannelPipeline</a>
+<ul>
+<li><a href="#org27d70f4">1.4.1. 类继承关系</a></li>
+<li><a href="#org9c655c3">1.4.2. ChannelHandlerContext</a>
+<ul>
+<li><a href="#org4ab68e1">1.4.2.1. Propagation via Channel/ChannelPipeline</a></li>
+<li><a href="#org29bc8c2">1.4.2.2. Propagation via ChannelHandlerContext</a></li>
+</ul>
+</li>
+<li><a href="#org7f47491">1.4.3. Propagation Methods</a>
+<ul>
+<li><a href="#orge7ec927">1.4.3.1. Inbound</a></li>
+<li><a href="#org552d392">1.4.3.2. Outbound</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgbb79920">2. 代码示例</a>
+<li><a href="#orgf83c5d5">1.5. ChannelFuture</a>
 <ul>
-<li><a href="#orge74e61c">2.1. ChannelHandler</a>
-<ul>
-<li><a href="#orgfc8e14a">2.1.1. 使用业务线程池</a></li>
-<li><a href="#org049093f">2.1.2. 常用编解码器</a></li>
-</ul>
-</li>
-<li><a href="#org565c093">2.2. TLS</a>
-<ul>
-<li><a href="#orgd37d670">2.2.1. Pre Master Secret</a></li>
+<li><a href="#org46df5b5">1.5.1. 类继承关系</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org1517583">3. 参考资料</a>
+<li><a href="#org7e649ce">2. 代码示例</a>
 <ul>
-<li><a href="#org873cdfe">3.1. EventLoop</a></li>
-<li><a href="#org4681983">3.2. ByteBuf</a></li>
+<li><a href="#org749435d">2.1. ChannelHandler</a>
+<ul>
+<li><a href="#orgb1e4d35">2.1.1. 使用业务线程池</a></li>
+<li><a href="#org9f4094d">2.1.2. 常用编解码器</a></li>
+</ul>
+</li>
+<li><a href="#orge03d744">2.2. TLS</a>
+<ul>
+<li><a href="#orga17053b">2.2.1. Pre Master Secret</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org96414f8">3. 参考资料</a>
+<ul>
+<li><a href="#org37dff28">3.1. EventLoop</a></li>
+<li><a href="#org6d8ec3b">3.2. ByteBuf</a></li>
 </ul>
 </li>
 </ul>
@@ -327,90 +327,90 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org4a262bc">1. 核心组件</a>
+<li><a href="#orgb2bdd25">1. 核心组件</a>
 <ul>
-<li><a href="#orgd4316b1">1.1. ByteBuf</a>
+<li><a href="#orga00ce47">1.1. ByteBuf</a>
 <ul>
-<li><a href="#orga877c72">1.1.1. Heap/Direct</a>
+<li><a href="#orgb80e531">1.1.1. Heap/Direct</a>
 <ul>
-<li><a href="#org74a983a">1.1.1.1. Heap Buffer</a></li>
-<li><a href="#org7935312">1.1.1.2. Direct Buffer</a></li>
-<li><a href="#org4f80e03">1.1.1.3. 发送数据时的缓冲转换</a></li>
+<li><a href="#org1895481">1.1.1.1. Heap Buffer</a></li>
+<li><a href="#orgd7fa2f6">1.1.1.2. Direct Buffer</a></li>
+<li><a href="#org71cbd88">1.1.1.3. 发送数据时的缓冲转换</a></li>
 </ul>
 </li>
-<li><a href="#org2885f09">1.1.2. Derived Buffer</a></li>
-<li><a href="#org617ec6f">1.1.3. Arena</a></li>
-<li><a href="#orgbdd0bf2">1.1.4. 自旋锁在引用计数实现中的应用</a></li>
-<li><a href="#orgfaee33f">1.1.5. 在 Pipeline 中的创建与释放</a>
+<li><a href="#orgf2c760e">1.1.2. Derived Buffer</a></li>
+<li><a href="#orgdc81ac3">1.1.3. Arena</a></li>
+<li><a href="#orgb7601be">1.1.4. 自旋锁在引用计数实现中的应用</a></li>
+<li><a href="#orgbf0f2e8">1.1.5. 在 Pipeline 中的创建与释放</a>
 <ul>
-<li><a href="#org178feb1">1.1.5.1. 初始 ByteBuf 创建</a></li>
-<li><a href="#orge7cf6f8">1.1.5.2. 最终 ByteBuf 释放</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#org80c12e0">1.2. EventLoop/EventLoopGroup</a>
-<ul>
-<li><a href="#org587b2c0">1.2.1. 类继承关系</a></li>
-<li><a href="#orgfb72da9">1.2.2. 线程模型</a>
-<ul>
-<li><a href="#org6bc4768">1.2.2.1. NioEventLoop 执行逻辑</a></li>
-<li><a href="#orgefd90c9">1.2.2.2. Selector.wakeup()</a></li>
-<li><a href="#org3ffbd10">1.2.2.3. Epoll bug 修复</a></li>
-<li><a href="#org1b6e183">1.2.2.4. Reactor 模型</a></li>
+<li><a href="#orgb799b74">1.1.5.1. 初始 ByteBuf 创建</a></li>
+<li><a href="#org6372bbd">1.1.5.2. 最终 ByteBuf 释放</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org6e45843">1.3. Channel</a>
+<li><a href="#orga4ba864">1.2. EventLoop/EventLoopGroup</a>
 <ul>
-<li><a href="#orgfde3211">1.3.1. 类继承关系</a></li>
-<li><a href="#org3da4591">1.3.2. Selecting and processing state changes</a></li>
-</ul>
-</li>
-<li><a href="#org6640070">1.4. ChannelHandler/ChannelPipeline</a>
+<li><a href="#org6ce6537">1.2.1. 类继承关系</a></li>
+<li><a href="#org3dd6eca">1.2.2. 线程模型</a>
 <ul>
-<li><a href="#org3c8b9f2">1.4.1. 类继承关系</a></li>
-<li><a href="#orge428597">1.4.2. ChannelHandlerContext</a>
-<ul>
-<li><a href="#org627184b">1.4.2.1. Propagation via Channel/ChannelPipeline</a></li>
-<li><a href="#org061573a">1.4.2.2. Propagation via ChannelHandlerContext</a></li>
-</ul>
-</li>
-<li><a href="#orgea54b42">1.4.3. Propagation Methods</a>
-<ul>
-<li><a href="#orgca7d8c2">1.4.3.1. Inbound</a></li>
-<li><a href="#orgd8a1887">1.4.3.2. Outbound</a></li>
+<li><a href="#orgda9f2d3">1.2.2.1. NioEventLoop 执行逻辑</a></li>
+<li><a href="#orgd7d3fa9">1.2.2.2. Selector.wakeup()</a></li>
+<li><a href="#org5626b80">1.2.2.3. Epoll bug 修复</a></li>
+<li><a href="#org13f50ed">1.2.2.4. Reactor 模型</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org10874bb">1.5. ChannelFuture</a>
+<li><a href="#orgceafdd4">1.3. Channel</a>
 <ul>
-<li><a href="#orgcbcee8c">1.5.1. 类继承关系</a></li>
+<li><a href="#org622f63e">1.3.1. 类继承关系</a></li>
+<li><a href="#orgedc1d6f">1.3.2. Selecting and processing state changes</a></li>
+</ul>
+</li>
+<li><a href="#orgd01c0c1">1.4. ChannelHandler/ChannelPipeline</a>
+<ul>
+<li><a href="#org27d70f4">1.4.1. 类继承关系</a></li>
+<li><a href="#org9c655c3">1.4.2. ChannelHandlerContext</a>
+<ul>
+<li><a href="#org4ab68e1">1.4.2.1. Propagation via Channel/ChannelPipeline</a></li>
+<li><a href="#org29bc8c2">1.4.2.2. Propagation via ChannelHandlerContext</a></li>
+</ul>
+</li>
+<li><a href="#org7f47491">1.4.3. Propagation Methods</a>
+<ul>
+<li><a href="#orge7ec927">1.4.3.1. Inbound</a></li>
+<li><a href="#org552d392">1.4.3.2. Outbound</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgbb79920">2. 代码示例</a>
+<li><a href="#orgf83c5d5">1.5. ChannelFuture</a>
 <ul>
-<li><a href="#orge74e61c">2.1. ChannelHandler</a>
-<ul>
-<li><a href="#orgfc8e14a">2.1.1. 使用业务线程池</a></li>
-<li><a href="#org049093f">2.1.2. 常用编解码器</a></li>
-</ul>
-</li>
-<li><a href="#org565c093">2.2. TLS</a>
-<ul>
-<li><a href="#orgd37d670">2.2.1. Pre Master Secret</a></li>
+<li><a href="#org46df5b5">1.5.1. 类继承关系</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org1517583">3. 参考资料</a>
+<li><a href="#org7e649ce">2. 代码示例</a>
 <ul>
-<li><a href="#org873cdfe">3.1. EventLoop</a></li>
-<li><a href="#org4681983">3.2. ByteBuf</a></li>
+<li><a href="#org749435d">2.1. ChannelHandler</a>
+<ul>
+<li><a href="#orgb1e4d35">2.1.1. 使用业务线程池</a></li>
+<li><a href="#org9f4094d">2.1.2. 常用编解码器</a></li>
+</ul>
+</li>
+<li><a href="#orge03d744">2.2. TLS</a>
+<ul>
+<li><a href="#orga17053b">2.2.1. Pre Master Secret</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org96414f8">3. 参考资料</a>
+<ul>
+<li><a href="#org37dff28">3.1. EventLoop</a></li>
+<li><a href="#org6d8ec3b">3.2. ByteBuf</a></li>
 </ul>
 </li>
 </ul>
@@ -433,28 +433,28 @@ for the JavaScript code in this tag.
 
 <tr>
 <td class="org-left">Date</td>
-<td class="org-left">2019-07-02 12:33:36</td>
+<td class="org-left">2019-07-06 18:03:05</td>
 </tr>
 </tbody>
 </table>
 </div>
 
-<div id="outline-container-org4a262bc" class="outline-2">
-<h2 id="org4a262bc"><span class="section-number-2">1</span> 核心组件</h2>
+<div id="outline-container-orgb2bdd25" class="outline-2">
+<h2 id="orgb2bdd25"><span class="section-number-2">1</span> 核心组件</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgd4316b1" class="outline-3">
-<h3 id="orgd4316b1"><span class="section-number-3">1.1</span> ByteBuf</h3>
+<div id="outline-container-orga00ce47" class="outline-3">
+<h3 id="orga00ce47"><span class="section-number-3">1.1</span> ByteBuf</h3>
 <div class="outline-text-3" id="text-1-1">
 <img src="https://dpzbhybb2pdcj.cloudfront.net/maurer/Figures/05fig03_alt.jpg"/>
 </div>
 
-<div id="outline-container-orga877c72" class="outline-4">
-<h4 id="orga877c72"><span class="section-number-4">1.1.1</span> Heap/Direct</h4>
+<div id="outline-container-orgb80e531" class="outline-4">
+<h4 id="orgb80e531"><span class="section-number-4">1.1.1</span> Heap/Direct</h4>
 <div class="outline-text-4" id="text-1-1-1">
 </div>
-<div id="outline-container-org74a983a" class="outline-5">
-<h5 id="org74a983a"><span class="section-number-5">1.1.1.1</span> Heap Buffer</h5>
+<div id="outline-container-org1895481" class="outline-5">
+<h5 id="org1895481"><span class="section-number-5">1.1.1.1</span> Heap Buffer</h5>
 <div class="outline-text-5" id="text-1-1-1-1">
 <ul class="org-ul">
 <li>存储于堆空间（实际数据存放在字节数组中）</li>
@@ -466,8 +466,8 @@ for the JavaScript code in this tag.
 </div>
 
 
-<div id="outline-container-org7935312" class="outline-5">
-<h5 id="org7935312"><span class="section-number-5">1.1.1.2</span> Direct Buffer</h5>
+<div id="outline-container-orgd7fa2f6" class="outline-5">
+<h5 id="orgd7fa2f6"><span class="section-number-5">1.1.1.2</span> Direct Buffer</h5>
 <div class="outline-text-5" id="text-1-1-1-2">
 <ul class="org-ul">
 <li>由操作系统在本地内存中分配空间，不占用堆空间</li>
@@ -479,8 +479,8 @@ for the JavaScript code in this tag.
 </div>
 
 
-<div id="outline-container-org4f80e03" class="outline-5">
-<h5 id="org4f80e03"><span class="section-number-5">1.1.1.3</span> 发送数据时的缓冲转换</h5>
+<div id="outline-container-org71cbd88" class="outline-5">
+<h5 id="org71cbd88"><span class="section-number-5">1.1.1.3</span> 发送数据时的缓冲转换</h5>
 <div class="outline-text-5" id="text-1-1-1-3">
 <p>
 If your data were contained in a heap-allocated buffer, the JVM would, in fact,
@@ -546,8 +546,8 @@ If your data were contained in a heap-allocated buffer, the JVM would, in fact,
 
 
 
-<div id="outline-container-org2885f09" class="outline-4">
-<h4 id="org2885f09"><span class="section-number-4">1.1.2</span> Derived Buffer</h4>
+<div id="outline-container-orgf2c760e" class="outline-4">
+<h4 id="orgf2c760e"><span class="section-number-4">1.1.2</span> Derived Buffer</h4>
 <div class="outline-text-4" id="text-1-1-2">
 <p>
 A <i>derived buffer</i> provides a view of a <code>ByteBuf</code> that represents its contents in a specialized way. <br>
@@ -573,16 +573,16 @@ The internal storage is <b>shared</b> just as in a JDK <code>ByteBuffer</code>.
 </div>
 </div>
 
-<div id="outline-container-org617ec6f" class="outline-4">
-<h4 id="org617ec6f"><span class="section-number-4">1.1.3</span> Arena</h4>
+<div id="outline-container-orgdc81ac3" class="outline-4">
+<h4 id="orgdc81ac3"><span class="section-number-4">1.1.3</span> Arena</h4>
 <div class="outline-text-4" id="text-1-1-3">
 <img src="https://caorong.github.io/post_images/2016-11-26-23-46-26.png"/>
 </div>
 </div>
 
 
-<div id="outline-container-orgbdd0bf2" class="outline-4">
-<h4 id="orgbdd0bf2"><span class="section-number-4">1.1.4</span> 自旋锁在引用计数实现中的应用</h4>
+<div id="outline-container-orgb7601be" class="outline-4">
+<h4 id="orgb7601be"><span class="section-number-4">1.1.4</span> 自旋锁在引用计数实现中的应用</h4>
 <div class="outline-text-4" id="text-1-1-4">
 <p>
 <code>AbstractReferenceCountedByteBuf:retain0(int increment)</code> (v4.0.15)
@@ -615,12 +615,12 @@ The internal storage is <b>shared</b> just as in a JDK <code>ByteBuffer</code>.
 
 
 
-<div id="outline-container-orgfaee33f" class="outline-4">
-<h4 id="orgfaee33f"><span class="section-number-4">1.1.5</span> 在 Pipeline 中的创建与释放</h4>
+<div id="outline-container-orgbf0f2e8" class="outline-4">
+<h4 id="orgbf0f2e8"><span class="section-number-4">1.1.5</span> 在 Pipeline 中的创建与释放</h4>
 <div class="outline-text-4" id="text-1-1-5">
 </div>
-<div id="outline-container-org178feb1" class="outline-5">
-<h5 id="org178feb1"><span class="section-number-5">1.1.5.1</span> 初始 ByteBuf 创建</h5>
+<div id="outline-container-orgb799b74" class="outline-5">
+<h5 id="orgb799b74"><span class="section-number-5">1.1.5.1</span> 初始 ByteBuf 创建</h5>
 <div class="outline-text-5" id="text-1-1-5-1">
 <p>
 参见 <code>io.netty.channel.nio.AbstractNioByteChannel.NioByteUnsafe.read()</code>
@@ -628,8 +628,8 @@ The internal storage is <b>shared</b> just as in a JDK <code>ByteBuffer</code>.
 </div>
 </div>
 
-<div id="outline-container-orge7cf6f8" class="outline-5">
-<h5 id="orge7cf6f8"><span class="section-number-5">1.1.5.2</span> 最终 ByteBuf 释放</h5>
+<div id="outline-container-org6372bbd" class="outline-5">
+<h5 id="org6372bbd"><span class="section-number-5">1.1.5.2</span> 最终 ByteBuf 释放</h5>
 <div class="outline-text-5" id="text-1-1-5-2">
 <p>
 参见:
@@ -645,20 +645,20 @@ The internal storage is <b>shared</b> just as in a JDK <code>ByteBuffer</code>.
 </div>
 
 
-<div id="outline-container-org80c12e0" class="outline-3">
-<h3 id="org80c12e0"><span class="section-number-3">1.2</span> EventLoop/EventLoopGroup</h3>
+<div id="outline-container-orga4ba864" class="outline-3">
+<h3 id="orga4ba864"><span class="section-number-3">1.2</span> EventLoop/EventLoopGroup</h3>
 <div class="outline-text-3" id="text-1-2">
 </div>
-<div id="outline-container-org587b2c0" class="outline-4">
-<h4 id="org587b2c0"><span class="section-number-4">1.2.1</span> 类继承关系</h4>
+<div id="outline-container-org6ce6537" class="outline-4">
+<h4 id="org6ce6537"><span class="section-number-4">1.2.1</span> 类继承关系</h4>
 <div class="outline-text-4" id="text-1-2-1">
 <img src="https://dpzbhybb2pdcj.cloudfront.net/maurer/Figures/07fig02_alt.jpg"/>
 </div>
 </div>
 
 
-<div id="outline-container-orgfb72da9" class="outline-4">
-<h4 id="orgfb72da9"><span class="section-number-4">1.2.2</span> 线程模型</h4>
+<div id="outline-container-org3dd6eca" class="outline-4">
+<h4 id="org3dd6eca"><span class="section-number-4">1.2.2</span> 线程模型</h4>
 <div class="outline-text-4" id="text-1-2-2">
 <img src="https://dpzbhybb2pdcj.cloudfront.net/maurer/Figures/03fig01.jpg"/></br>
 
@@ -679,16 +679,16 @@ The internal storage is <b>shared</b> just as in a JDK <code>ByteBuffer</code>.
 </ul>
 </div>
 
-<div id="outline-container-org6bc4768" class="outline-5">
-<h5 id="org6bc4768"><span class="section-number-5">1.2.2.1</span> NioEventLoop 执行逻辑</h5>
+<div id="outline-container-orgda9f2d3" class="outline-5">
+<h5 id="orgda9f2d3"><span class="section-number-5">1.2.2.1</span> NioEventLoop 执行逻辑</h5>
 <div class="outline-text-5" id="text-1-2-2-1">
 <img src="https://caorong.github.io/post_images/2016-11-25-01-23-15.png"/>
 </div>
 </div>
 
 
-<div id="outline-container-orgefd90c9" class="outline-5">
-<h5 id="orgefd90c9"><span class="section-number-5">1.2.2.2</span> Selector.wakeup()</h5>
+<div id="outline-container-orgd7d3fa9" class="outline-5">
+<h5 id="orgd7d3fa9"><span class="section-number-5">1.2.2.2</span> Selector.wakeup()</h5>
 <div class="outline-text-5" id="text-1-2-2-2">
 <p>
 java 的 Selector 在原生的 select api 之上 增加了个 <code>Selector.wakeup()</code> ，目的是唤醒阻塞在 <code>select()</code> 的线程。(<b>通过写入一个字节</b>)
@@ -707,8 +707,8 @@ java 的 Selector 在原生的 select api 之上 增加了个 <code>Selector.wak
 </div>
 
 
-<div id="outline-container-org3ffbd10" class="outline-5">
-<h5 id="org3ffbd10"><span class="section-number-5">1.2.2.3</span> Epoll bug 修复</h5>
+<div id="outline-container-org5626b80" class="outline-5">
+<h5 id="org5626b80"><span class="section-number-5">1.2.2.3</span> Epoll bug 修复</h5>
 <div class="outline-text-5" id="text-1-2-2-3">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #f92672; font-weight: bold;">for</span>(;;){
@@ -734,8 +734,8 @@ java 的 Selector 在原生的 select api 之上 增加了个 <code>Selector.wak
 </div>
 
 
-<div id="outline-container-org1b6e183" class="outline-5">
-<h5 id="org1b6e183"><span class="section-number-5">1.2.2.4</span> Reactor 模型</h5>
+<div id="outline-container-org13f50ed" class="outline-5">
+<h5 id="org13f50ed"><span class="section-number-5">1.2.2.4</span> Reactor 模型</h5>
 <div class="outline-text-5" id="text-1-2-2-4">
 <img src="http://static.oschina.net/uploads/space/2013/1125/130828_uKWD_190591.jpeg"/>
 
@@ -751,12 +751,12 @@ java 的 Selector 在原生的 select api 之上 增加了个 <code>Selector.wak
 
 
 
-<div id="outline-container-org6e45843" class="outline-3">
-<h3 id="org6e45843"><span class="section-number-3">1.3</span> Channel</h3>
+<div id="outline-container-orgceafdd4" class="outline-3">
+<h3 id="orgceafdd4"><span class="section-number-3">1.3</span> Channel</h3>
 <div class="outline-text-3" id="text-1-3">
 </div>
-<div id="outline-container-orgfde3211" class="outline-4">
-<h4 id="orgfde3211"><span class="section-number-4">1.3.1</span> 类继承关系</h4>
+<div id="outline-container-org622f63e" class="outline-4">
+<h4 id="org622f63e"><span class="section-number-4">1.3.1</span> 类继承关系</h4>
 <div class="outline-text-4" id="text-1-3-1">
 
 <div class="figure">
@@ -767,8 +767,8 @@ java 的 Selector 在原生的 select api 之上 增加了个 <code>Selector.wak
 </div>
 
 
-<div id="outline-container-org3da4591" class="outline-4">
-<h4 id="org3da4591"><span class="section-number-4">1.3.2</span> Selecting and processing state changes</h4>
+<div id="outline-container-orgedc1d6f" class="outline-4">
+<h4 id="orgedc1d6f"><span class="section-number-4">1.3.2</span> Selecting and processing state changes</h4>
 <div class="outline-text-4" id="text-1-3-2">
 <p>
 The possible state changes are:
@@ -788,8 +788,8 @@ The possible state changes are:
 </div>
 
 
-<div id="outline-container-org6640070" class="outline-3">
-<h3 id="org6640070"><span class="section-number-3">1.4</span> ChannelHandler/ChannelPipeline</h3>
+<div id="outline-container-orgd01c0c1" class="outline-3">
+<h3 id="orgd01c0c1"><span class="section-number-3">1.4</span> ChannelHandler/ChannelPipeline</h3>
 <div class="outline-text-3" id="text-1-4">
 <pre class="example">
                                           I/O Request via Channel or ChannelHandlerContext
@@ -834,8 +834,8 @@ The possible state changes are:
 <img src="https://dpzbhybb2pdcj.cloudfront.net/maurer/Figures/03fig03_alt.jpg"/>
 </div>
 
-<div id="outline-container-org3c8b9f2" class="outline-4">
-<h4 id="org3c8b9f2"><span class="section-number-4">1.4.1</span> 类继承关系</h4>
+<div id="outline-container-org27d70f4" class="outline-4">
+<h4 id="org27d70f4"><span class="section-number-4">1.4.1</span> 类继承关系</h4>
 <div class="outline-text-4" id="text-1-4-1">
 
 <div class="figure">
@@ -846,8 +846,8 @@ The possible state changes are:
 </div>
 
 
-<div id="outline-container-orge428597" class="outline-4">
-<h4 id="orge428597"><span class="section-number-4">1.4.2</span> ChannelHandlerContext</h4>
+<div id="outline-container-org9c655c3" class="outline-4">
+<h4 id="org9c655c3"><span class="section-number-4">1.4.2</span> ChannelHandlerContext</h4>
 <div class="outline-text-4" id="text-1-4-2">
 <p>
 A <code>ChannelHandlerContext</code> represents an association between a <code>ChannelHandler</code> and a <code>ChannelPipeline</code> and is created whenever
@@ -859,27 +859,27 @@ The <code>ChannelHandlerContext</code> associated with a <code>ChannelHandler</c
 </p>
 </div>
 
-<div id="outline-container-org627184b" class="outline-5">
-<h5 id="org627184b"><span class="section-number-5">1.4.2.1</span> Propagation via Channel/ChannelPipeline</h5>
+<div id="outline-container-org4ab68e1" class="outline-5">
+<h5 id="org4ab68e1"><span class="section-number-5">1.4.2.1</span> Propagation via Channel/ChannelPipeline</h5>
 <div class="outline-text-5" id="text-1-4-2-1">
 <img src="https://dpzbhybb2pdcj.cloudfront.net/maurer/Figures/06fig05_alt.jpg"/>
 </div>
 </div>
 
-<div id="outline-container-org061573a" class="outline-5">
-<h5 id="org061573a"><span class="section-number-5">1.4.2.2</span> Propagation via ChannelHandlerContext</h5>
+<div id="outline-container-org29bc8c2" class="outline-5">
+<h5 id="org29bc8c2"><span class="section-number-5">1.4.2.2</span> Propagation via ChannelHandlerContext</h5>
 <div class="outline-text-5" id="text-1-4-2-2">
 <img src="https://dpzbhybb2pdcj.cloudfront.net/maurer/Figures/06fig06_alt.jpg"/>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgea54b42" class="outline-4">
-<h4 id="orgea54b42"><span class="section-number-4">1.4.3</span> Propagation Methods</h4>
+<div id="outline-container-org7f47491" class="outline-4">
+<h4 id="org7f47491"><span class="section-number-4">1.4.3</span> Propagation Methods</h4>
 <div class="outline-text-4" id="text-1-4-3">
 </div>
-<div id="outline-container-orgca7d8c2" class="outline-5">
-<h5 id="orgca7d8c2"><span class="section-number-5">1.4.3.1</span> Inbound</h5>
+<div id="outline-container-orge7ec927" class="outline-5">
+<h5 id="orge7ec927"><span class="section-number-5">1.4.3.1</span> Inbound</h5>
 <div class="outline-text-5" id="text-1-4-3-1">
 <ul class="org-ul">
 <li>ChannelHandlerContext.fireChannelRegistered()</li>
@@ -895,8 +895,8 @@ The <code>ChannelHandlerContext</code> associated with a <code>ChannelHandler</c
 </div>
 </div>
 
-<div id="outline-container-orgd8a1887" class="outline-5">
-<h5 id="orgd8a1887"><span class="section-number-5">1.4.3.2</span> Outbound</h5>
+<div id="outline-container-org552d392" class="outline-5">
+<h5 id="org552d392"><span class="section-number-5">1.4.3.2</span> Outbound</h5>
 <div class="outline-text-5" id="text-1-4-3-2">
 <ul class="org-ul">
 <li>ChannelHandlerContext.bind(SocketAddress, ChannelPromise)</li>
@@ -921,16 +921,16 @@ The <code>ChannelHandlerContext</code> associated with a <code>ChannelHandler</c
 
 
 
-<div id="outline-container-org10874bb" class="outline-3">
-<h3 id="org10874bb"><span class="section-number-3">1.5</span> ChannelFuture</h3>
+<div id="outline-container-orgf83c5d5" class="outline-3">
+<h3 id="orgf83c5d5"><span class="section-number-3">1.5</span> ChannelFuture</h3>
 <div class="outline-text-3" id="text-1-5">
 <ul class="org-ul">
 <li>Each of Netty's outbound I/O operations returns a <code>ChannelFuture</code></li>
 </ul>
 </div>
 
-<div id="outline-container-orgcbcee8c" class="outline-4">
-<h4 id="orgcbcee8c"><span class="section-number-4">1.5.1</span> 类继承关系</h4>
+<div id="outline-container-org46df5b5" class="outline-4">
+<h4 id="org46df5b5"><span class="section-number-4">1.5.1</span> 类继承关系</h4>
 <div class="outline-text-4" id="text-1-5-1">
 <img src="https://image-static.segmentfault.com/261/392/2613926792-5a688f9f53f61"/>
 </div>
@@ -939,16 +939,16 @@ The <code>ChannelHandlerContext</code> associated with a <code>ChannelHandler</c
 </div>
 
 
-<div id="outline-container-orgbb79920" class="outline-2">
-<h2 id="orgbb79920"><span class="section-number-2">2</span> 代码示例</h2>
+<div id="outline-container-org7e649ce" class="outline-2">
+<h2 id="org7e649ce"><span class="section-number-2">2</span> 代码示例</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orge74e61c" class="outline-3">
-<h3 id="orge74e61c"><span class="section-number-3">2.1</span> ChannelHandler</h3>
+<div id="outline-container-org749435d" class="outline-3">
+<h3 id="org749435d"><span class="section-number-3">2.1</span> ChannelHandler</h3>
 <div class="outline-text-3" id="text-2-1">
 </div>
-<div id="outline-container-orgfc8e14a" class="outline-4">
-<h4 id="orgfc8e14a"><span class="section-number-4">2.1.1</span> 使用业务线程池</h4>
+<div id="outline-container-orgb1e4d35" class="outline-4">
+<h4 id="orgb1e4d35"><span class="section-number-4">2.1.1</span> 使用业务线程池</h4>
 <div class="outline-text-4" id="text-2-1-1">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #f92672; font-weight: bold;">static</span> <span style="color: #f92672; font-weight: bold;">final</span> <span style="color: #66d9ef; font-weight: bold;">EventExecutorGroup</span> <span style="color: #fd971f;">group</span> = <span style="color: #f92672; font-weight: bold;">new</span> <span style="color: #66d9ef; font-weight: bold;">DefaultEventExecutorGroup</span>(16);
@@ -970,8 +970,8 @@ pipeline.addLast(group, <span style="color: #e6db74;">"handler"</span>, <span st
 </div>
 
 
-<div id="outline-container-org049093f" class="outline-4">
-<h4 id="org049093f"><span class="section-number-4">2.1.2</span> 常用编解码器</h4>
+<div id="outline-container-org9f4094d" class="outline-4">
+<h4 id="org9f4094d"><span class="section-number-4">2.1.2</span> 常用编解码器</h4>
 <div class="outline-text-4" id="text-2-1-2">
 <ul class="org-ul">
 <li><a href="https://github.com/ruanhao/java-for-fun/tree/master/src/main/java/com/hao/notes/netty/channelhandler/delimiterbasedframe">DelimiterBased</a></li>
@@ -986,12 +986,12 @@ pipeline.addLast(group, <span style="color: #e6db74;">"handler"</span>, <span st
 </div>
 </div>
 
-<div id="outline-container-org565c093" class="outline-3">
-<h3 id="org565c093"><span class="section-number-3">2.2</span> TLS</h3>
+<div id="outline-container-orge03d744" class="outline-3">
+<h3 id="orge03d744"><span class="section-number-3">2.2</span> TLS</h3>
 <div class="outline-text-3" id="text-2-2">
 </div>
-<div id="outline-container-orgd37d670" class="outline-4">
-<h4 id="orgd37d670"><span class="section-number-4">2.2.1</span> Pre Master Secret</h4>
+<div id="outline-container-orga17053b" class="outline-4">
+<h4 id="orga17053b"><span class="section-number-4">2.2.1</span> Pre Master Secret</h4>
 <div class="outline-text-4" id="text-2-2-1">
 <div class="org-src-container">
 <pre class="src src-java">
@@ -1066,12 +1066,12 @@ pipeline.addLast(group, <span style="color: #e6db74;">"handler"</span>, <span st
 
 
 
-<div id="outline-container-org1517583" class="outline-2">
-<h2 id="org1517583"><span class="section-number-2">3</span> 参考资料</h2>
+<div id="outline-container-org96414f8" class="outline-2">
+<h2 id="org96414f8"><span class="section-number-2">3</span> 参考资料</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org873cdfe" class="outline-3">
-<h3 id="org873cdfe"><span class="section-number-3">3.1</span> EventLoop</h3>
+<div id="outline-container-org37dff28" class="outline-3">
+<h3 id="org37dff28"><span class="section-number-3">3.1</span> EventLoop</h3>
 <div class="outline-text-3" id="text-3-1">
 <ul class="org-ul">
 <li><a href="https://caorong.github.io/2016/12/24/head-first-netty-1/">深入浅出Netty - EventLoop, EventLoopGroup</a></li>
@@ -1079,10 +1079,11 @@ pipeline.addLast(group, <span style="color: #e6db74;">"handler"</span>, <span st
 </div>
 </div>
 
-<div id="outline-container-org4681983" class="outline-3">
-<h3 id="org4681983"><span class="section-number-3">3.2</span> ByteBuf</h3>
+<div id="outline-container-org6d8ec3b" class="outline-3">
+<h3 id="org6d8ec3b"><span class="section-number-3">3.2</span> ByteBuf</h3>
 <div class="outline-text-3" id="text-3-2">
 <ul class="org-ul">
+<li><a href="https://caorong.github.io/2016/08/27/netty-hole/">使用 PooledByteBuf，一定要注意 allocate 和 release 是同一个线程</a></li>
 <li><a href="https://caorong.github.io/2017/01/16/head-first-netty-3/">深入浅出Netty - ByteBuf 和 ByteBufPool</a></li>
 <li><a href="https://blog.lovezhy.cc/2018/10/03/netty%E5%86%85%E5%AD%98%E6%B1%A0%E5%AE%9E%E7%8E%B0/">Netty内存池实现</a></li>
 <li><a href="https://www.jianshu.com/p/ce7c6f5cb5f6">Netty 内存管理: PooledByteBufAllocator &amp; PoolArena 代码探险</a></li>
