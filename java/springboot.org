@@ -13,6 +13,60 @@
 | Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
 #+HTML: </div>
 
+* 缓存
+
+** JSR107
+
+#+HTML: <img src="https://img-blog.csdn.net/20180826194453182?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2x1bzYwOTYzMDE5OQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"/>
+
+定义了 5 个核心接口:
+
+1. CachingProvider
+
+   创建，配置，获取，管理和控制 =CacheManager= ，一个应用运行期间可以访问多个 =CacheManager=
+2. CacheManager
+
+   创建，配置，获取，管理和控制 =Cache= ，一个 =CacheManager= 仅被一个 =CachingProvider= 拥有
+3. Cache
+
+   类似 =Map= 的数据结构，一个 Cache 仅被一个 =CacheManager= 拥有
+4. Entry
+
+   存储在 =Cache= 中的 k-v 对
+5. Expiry
+
+   =Cache= 中条目的有效期，可以通过 =ExpiryPolicy= 设置
+
+
+
+
+** Springboot 缓存抽象
+
+- Cache
+
+缓存接口，定义缓存操作。实现有：RedisCache, EhCacheCache, ConcurrentMapCache 等
+- CacheManager
+
+缓存管理器
+- @Cacheable
+
+根据方法的请求参数对其结果进行缓存
+- @CacheEvict
+
+清空缓存
+- @CachePut
+
+更新缓存
+- @EnableCaching
+
+开启基于注解的缓存
+- keyGenerator
+
+key 生成策略
+- serialize
+
+value 序列化策略
+
 * 工具
 
 ** JacksonXML
