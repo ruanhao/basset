@@ -67,6 +67,116 @@ key 生成策略
 
 value 序列化策略
 
+
+** 示例代码
+
+- [[https://github.com/ruanhao/java-for-fun/tree/master/src/test/java/com/hao/notes/caching][基本使用]]
+- [[https://github.com/ruanhao/java-for-fun/tree/master/src/test/java/com/hao/notes/caching/redis][使用 Redis 作为 CacheManager]]
+
+
+* 调度
+
+** [[https://github.com/ruanhao/java-for-fun/tree/master/src/test/java/com/hao/notes/schedule][示例工程]]
+** 每隔固定时间执行
+
+     #+BEGIN_SRC java
+       @Scheduled(fixedRate=5000)
+     #+END_SRC
+
+** 指定任务间隔
+
+     #+BEGIN_SRC java
+       // specify the interval between invocations measured
+       // from the completion of the task
+       @Scheduled(fixedDelay=5000)
+     #+END_SRC
+
+** UNIX Cron 风格
+
+     #+BEGIN_SRC java
+       @Scheduled(cron="0 28 11 ? * *")     // 每天 11 点 28 分 执行
+       @Scheduled(cron="0 */5 14,18 * * ?") // 每天 14/18 点整，每隔 5 分钟执行
+       @Scheduled(cron="0 15 10 ? * 1-6")   // 每个月周一至周六 10:15 执行
+       @Scheduled(cron="0 0 2 ? * 6L")      // 每个月最后一个周六凌晨 2 点执行
+       @Scheduled(cron="0 0 2 LW * ?")      // 每个月最后一个工作日凌晨 2 点执行
+       @Scheduled(cron="0 0 2-4 ? * 1#1")   // 每个月第一个周一凌晨 2 点至 4 点期间，每隔整点执行
+
+     #+END_SRC
+
+
+
+* Properties
+
+** [[https://github.com/ruanhao/java-for-fun/tree/master/src/test/java/com/hao/notes/properties][示例工程]]
+
+** 相关注解
+
+- [[https://github.com/ruanhao/java-for-fun/blob/master/src/test/java/com/hao/notes/properties/Mail.java][@PropertySource]]
+
+  加载指定的properties配置文件
+- [[https://github.com/ruanhao/java-for-fun/blob/master/src/test/java/com/hao/notes/properties/MyConfiguration.java][@ImportResource]]
+
+  导入 Spring bean 配置文件 （需标注在配置类上）
+
+
+
+** @ConfigurationProperties 与 @Value 的区别
+
+|                | @ConfigurationProperties | @Value   |
+| 功能           | 批量注入配置文件属性     | 单个指定 |
+| 松散绑定(语法) | ✓                        | ✗        |
+| spEL           | ✗                        | ✓        |
+| JSR303 校验    | ✓                        | ✗        |
+| 复杂类型       | ✓                        | ✗        |
+
+
+** [[https://github.com/ruanhao/java-for-fun/blob/master/src/test/java/com/hao/notes/properties/ExamplesWithDevProfile.java][Profile]]
+
+*** 文件名规则
+
+文件名可以是 =application-{profile}.properties/yml=
+
+
+*** 激活
+
+**** application.properties 配置文件
+
+#+BEGIN_SRC
+  spring.profiles.active=<profile1>,<profile2>
+#+END_SRC
+
+**** 命令行
+
+#+BEGIN_SRC sh
+  java -jar spring-boot-02-config-0.0.1-SNAPSHOT.jar --spring.profiles.active=<profile>
+#+END_SRC
+
+**** 虚拟机参数
+
+=-Dspring.profiles.active==
+
+
+
+
+
+
+
+** 配置文件搜索顺序
+
+1. =file:config=
+2. =file:/=
+3. =classpath:/config=
+4. =classpath:/=
+
+项目打包好了以后，可以使用命令行参数的形式，启动项目的时候来指定配置文件的新位置: （指定配置文件和默认的配置文件会共同起作用）
+
+#+BEGIN_SRC sh
+  java -jar project-0.0.1-SNAPSHOT.jar --spring.config.location=/path/to/application.properties
+#+END_SRC
+
+
+** [[https://github.com/ruanhao/java-for-fun/blob/master/src/test/resources/test-properties-config/placeholder.properties][配置文件占位符]]
+
 * 工具
 
 ** JacksonXML
@@ -550,166 +660,7 @@ HttpMessageConverter 工作于两个方向：
     #+END_SRC
 
 
-** Scheduling Tasks
 
-*** 启用计划任务
-
-    在配置类上使用 =@EnableScheduling= 来开启对计划任务的支持。
-
-
-*** 任务执行
-
-**** 每隔固定时间执行
-
-     #+BEGIN_SRC java
-  @Scheduled(fixedRate=5000)
-     #+END_SRC
-
-**** 指定任务间隔
-
-     #+BEGIN_SRC java
-  // specify the interval between invocations measured
-  // from the completion of the task
-  @Scheduled(fixedDelay=5000)
-     #+END_SRC
-
-**** UNIX Cron 风格
-
-     #+BEGIN_SRC java
-  @Scheduled(cron="0 28 11 ? * *") // 每天 11 点 28 分 执行
-     #+END_SRC
-
-
-** [[https://github.com/ruanhao/show-me-the-code/tree/springboot-type-safe-configuration-properties][Type Safe Configuration Properties]]
-
-*** 配置文件
-
-    #+BEGIN_SRC sh
-  #Simple properties
-  mail.host=mailer@mail.com
-  mail.port=9000
-  mail.from=mailer@mail.com
-
-  #List properties
-  mail.defaultRecipients[0]=admin@mail.com
-  mail.defaultRecipients[1]=owner@mail.com
-
-  #Map Properties
-  mail.additionalHeaders.redelivery=true
-  mail.additionalHeaders.secure=true
-
-  #Object properties
-  mail.credentials.username=john
-  mail.credentials.password=password
-  mail.credentials.authMethod=SHA1
-    #+END_SRC
-
-
-*** Properties Bean
-
-    #+BEGIN_SRC java
-  @Getter
-  @Setter
-  @ToString
-  @Configuration
-  @Validated
-  @PropertySource("classpath:configprops.properties")
-  @ConfigurationProperties(prefix="mail")
-  public class ConfigProperties {
-
-      @Getter
-      @Setter
-      @ToString
-      public static class Credentials {
-          @Length(max=4, min=1)
-          private String authMethod;
-          private String username;
-          private String password;
-      }
-
-      @NotBlank
-      private String host;
-      @Min(1025)
-      @Max(65536)
-      private int port;
-      @Pattern(regexp="^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,6}$")
-      private String from;
-
-      // In order to validate values of nested properties,
-      // you must annotate the associated field as @Valid to trigger its validation.
-      @Valid
-      private Credentials credentials;
-      private List<String> defaultRecipients;
-      private Map<String, String> additionalHeaders;
-
-  }
-
-    #+END_SRC
-
-
-** 内容注入
-
-*** 注入普通字符串
-
-    #+BEGIN_SRC java
-  @Value("I love you")
-  String normal;
-    #+END_SRC
-
-
-*** 注入操作系统属性
-
-    #+BEGIN_SRC java
-  @Value("#{systemProperties['os.name']}")
-  String osName
-    #+END_SRC
-
-
-*** 注入表达式结果
-
-    #+BEGIN_SRC java
-  @Value("#{ T(java.lang.Math).random() * 100.0 }")
-  double randomNumber;
-    #+END_SRC
-
-
-*** 注入其他 Bean 属性
-
-    #+BEGIN_SRC java
-  @Value("#{anotherBean.value}")
-  String another;
-    #+END_SRC
-
-
-*** 注入文件资源
-
-    #+BEGIN_SRC java
-  @Value("classpath:test.txt")
-  Resource testFile;
-    #+END_SRC
-
-
-*** 注入网址资源
-
-    #+BEGIN_SRC java
-  @Value("http://www.baidu.com")
-  Resource testUrl;
-
-    #+END_SRC
-
-
-*** 从配置文件注入
-
-    #+BEGIN_SRC java
-      @Configuration
-      @PropertySource("classpath:jdbc.properties")
-      public class MyConfig {
-          @Value("${jdbc.url}")
-          private String jdbcUrl;
-      }
-
-
-    #+END_SRC
 
 
 ** Springboot Test
