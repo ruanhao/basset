@@ -105,20 +105,22 @@ value 序列化策略
 
 
 
-* Properties
+* [[https://github.com/ruanhao/java-for-fun/tree/master/src/test/java/com/hao/notes/properties][配置]]
 
-** [[https://github.com/ruanhao/java-for-fun/tree/master/src/test/java/com/hao/notes/properties][示例工程]]
-
-** 相关注解
-
-- [[https://github.com/ruanhao/java-for-fun/blob/master/src/test/java/com/hao/notes/properties/Mail.java][@PropertySource]]
-
-  加载指定的properties配置文件
-- [[https://github.com/ruanhao/java-for-fun/blob/master/src/test/java/com/hao/notes/properties/MyConfiguration.java][@ImportResource]]
-
-  导入 Spring bean 配置文件 （需标注在配置类上）
+** [[https://github.com/lxy-go/SpringBoot/blob/master/SpringBoot%E5%85%A5%E9%97%A8%E7%AE%80%E4%BB%8B.md#8%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AE][自动配置原理]]
 
 
+- SpringBoot 启动时加载自动配置类
+
+  扫描所有 jar 包类路径下的 =MATA-INF/spring.factories= 文件（比如 =spring-boot-autoconfigure-1.5.15.RELEASE.jar/META-INF/spring.factories= ），
+  文件中 =org.springframework.boot.autoconfigure.EnableAutoConfiguration= 对应的所有的自动配置类将进行自动配置。
+- 自动配置类根据配置属性进行配置（创建 bean）
+
+  所有在配置文件中能配置的属性在 =xxxProperties= 类中封装，比如 =@EnableConfigurationProperties(RedisProperties.class)=
+
+*** 自动配置报告
+
+启用 =debug=true= 属性，打印自动配合报告，这样就可以知道哪些自动配置类生效。
 
 ** @ConfigurationProperties 与 @Value 的区别
 
@@ -132,26 +134,20 @@ value 序列化策略
 
 ** [[https://github.com/ruanhao/java-for-fun/blob/master/src/test/java/com/hao/notes/properties/ExamplesWithDevProfile.java][Profile]]
 
-*** 文件名规则
-
-文件名可以是 =application-{profile}.properties/yml=
-
-
-*** 激活
-
-**** application.properties 配置文件
+*** 主配置文件激活
+主配置文件: =application.properties=
 
 #+BEGIN_SRC
   spring.profiles.active=<profile1>,<profile2>
 #+END_SRC
 
-**** 命令行
+*** 命令行激活
 
 #+BEGIN_SRC sh
   java -jar spring-boot-02-config-0.0.1-SNAPSHOT.jar --spring.profiles.active=<profile>
 #+END_SRC
 
-**** 虚拟机参数
+*** 虚拟机参数激活
 
 =-Dspring.profiles.active==
 
@@ -176,6 +172,58 @@ value 序列化策略
 
 
 ** [[https://github.com/ruanhao/java-for-fun/blob/master/src/test/resources/test-properties-config/placeholder.properties][配置文件占位符]]
+
+** =@Conditional= 派生注解
+
+| @ConditionalOnJava              | 系统的java版本是否符合要求                      |
+| @ConditionalOnBean              | 容器中存在指定Bean                              |
+| @ConditionalOnMissBean          | 容器中不存在指定Bean                            |
+| @ConditionalOnExpression        | 满足spEL表达式                                  |
+| @ConditionalOnClass             | 系统中有指定的类                                |
+| @ConditionalOnMissClass         | 系统中没有指定的类                              |
+| @ConditionalOnSingleCandidate   | 容器中只有一个指定的Bean,或者这个Bean是首选Bean |
+| @ConditionalOnProperty          | 系统中指定的属性是否有指定的值                  |
+| @ConditionalOnResource          | 类路径下是否存在指定的资源文件                  |
+| @ConditionalOnWebApplication    | 当前是web环境                                   |
+| @ConditionalOnNotWebApplication | 当前不是web环境                                 |
+| @ConditionalOnJndi              | JNDI存在指定项                                  |
+
+
+* [[https://github.com/ruanhao/java-for-fun/tree/master/src/test/java/com/hao/notes/async][Async]]
+
+** 异常统一捕获
+
+如果需要统一进行异常捕获，可以实现 =AsyncConfigurer= 接口，
+=getAsyncExecutor= 方法返回的 Executor 对象用于处理异步方法调用，
+=getAsyncUncaughtExceptionHandler= 方法返回的对象捕获异步调用期间产生的异常，
+*当且仅当异步调用方法的返回类型为 void* 。
+
+#+BEGIN_SRC java
+  @EnableAsync
+  @Configuration
+  public class AsyncConfiguration implements AsyncConfigurer {
+
+      @Override
+      public Executor getAsyncExecutor() {
+          ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+          taskExecutor.setCorePoolSize(4);
+          taskExecutor.setMaxPoolSize(8);
+          taskExecutor.setQueueCapacity(32);
+          taskExecutor.initialize();
+          return taskExecutor;
+      }
+
+      @Override
+      public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
+          return new SimpleAsyncUncaughtExceptionHandler();
+      }
+
+  }
+#+END_SRC
+
+
+
+
 
 * 工具
 
@@ -386,6 +434,7 @@ value 序列化策略
 *** 传送门
 
 - [[https://orika-mapper.github.io/orika-docs/advanced-mappings.html][高级映射配置]]
+
 
 * 实践
 
@@ -623,41 +672,6 @@ HttpMessageConverter 工作于两个方向：
 - ApplicationPreparedEvent
 - ApplicationReadyEvent
 - ApplicationStartingEvent
-
-
-
-** [[https://github.com/ruanhao/show-me-the-code/tree/springboot-async-method][Async Method]]
-
-
-*** 异常统一捕获
-
-    如果需要统一进行异常捕获，可以实现 =AsyncConfigurer= 接口，
-    =getAsyncExecutor= 方法返回的 Executor 对象用于处理异步方法调用，
-    =getAsyncUncaughtExceptionHandler= 方法返回的对象捕获异步调用期间产生的异常，
-    *当且仅当异步调用方法的返回类型为 void* 。
-
-    #+BEGIN_SRC java
-  @EnableAsync
-  @Configuration
-  public class AsyncConfiguration implements AsyncConfigurer {
-
-      @Override
-      public Executor getAsyncExecutor() {
-          ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-          taskExecutor.setCorePoolSize(4);
-          taskExecutor.setMaxPoolSize(8);
-          taskExecutor.setQueueCapacity(32);
-          taskExecutor.initialize();
-          return taskExecutor;
-      }
-
-      @Override
-      public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
-          return new SimpleAsyncUncaughtExceptionHandler();
-      }
-
-  }
-    #+END_SRC
 
 
 
@@ -1116,3 +1130,8 @@ times(1) 是默认的，因此，使用的 times(1) 可以显示的省略
 **** 传送门
 
 [[https://www.baeldung.com/tag/mockito/][Baeldung Mockito]]
+
+
+* 参考
+
+** [[https://docs.spring.io/spring-boot/docs/2.0.1.RELEASE/reference/htmlsingle/#common-application-properties][所有可配置选项]]
