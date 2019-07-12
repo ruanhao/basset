@@ -13,6 +13,57 @@
 | Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
 #+HTML: </div>
 
+* WEB
+
+** 静态资源路径
+
+- =classpath:/META-INF/resources/=
+- =classpath:/resources/=
+- =classpath:/static/=
+- =classpath:/public/=
+- 当前项目的根路径(=/=)
+
+
+** Spring MVC 原理
+
+#+HTML: <img src="http://www.51gjie.com/Images/image1/epnnzel2.4i4.jpg"/>
+#+HTML: </br>
+#+HTML: <img src="http://www.51gjie.com/Images/image1/srcc4b4l.hix.jpg"/>
+
+
+- 用户发送请求到前端控制器(DispatcherServlet)，前端控制器收到请求后自己不进行处理，而是委托给其他的解析器进行处理，作为统一访问点，进行全局的流程控制
+- 前端控制器请求 HandlerMapping 查找 Handler ，返回 HandlerExecutionChain 对象（包含一个 Handler 对象，即 *Controller* ，和多个 HandlerInterceptor 拦截器）对象，
+  通过这种策略模式，很容易添加新的映射策略（这个过程可以根据 xml 配置或注解进行查找）
+- HandlerAdapter 将会把处理器包装为适配器，从而支持多种类型的处理器，即适配器设计模式的应用，从而很容易支持很多类型的处理器
+- 处理器适配器去执行 Handler ，将会根据适配的结果调用真正的处理器的功能处理方法，完成功能处理，并返回一个 ModelAndView 对象
+- 处理器适配器向前端控制器返回ModelAndView，ModelAndView是springmvc框架的一个底层对象，包括 Model 和 View
+- 前端控制器请求 ViewResolver 进行视图解析，即根据逻辑视图名解析成真正的视图
+- View 会根据传进来的 Model 模型数据进行渲染
+- 前端控制器向用户响应结果、
+
+*** DispatcherServlet 原理
+
+#+HTML: <img src="http://www.51gjie.com/Images/image1/0meux44p.4vz.jpg"/>
+
+
+*** 重要组件
+
+**** ContentNegotiatingViewResovler
+
+#+HTML: <img src="http://blog.springsource.org/wp-content/uploads/2013/06/cnvr-all-flow.png"/>
+
+- =ContentNegotiatingViewResolver= 组合所有视图解析器
+- 可以自定义一个视图解析器， =ContentNegotiatingViewResolver= 自动将其整合进来
+
+**** =HttpMessageConverters=
+
+转换 HTTP 响应，如 User => JOSN
+
+**** =ConfigurableWebBindingInitializer=
+
+用于将请求的数据转换成 RequestBody
+
+
 * 缓存
 
 ** JSR107
@@ -1135,3 +1186,5 @@ times(1) 是默认的，因此，使用的 times(1) 可以显示的省略
 * 参考
 
 ** [[https://docs.spring.io/spring-boot/docs/2.0.1.RELEASE/reference/htmlsingle/#common-application-properties][所有可配置选项]]
+
+** [[https://spring.io/blog/2013/06/03/content-negotiation-using-views][Content Negotiation Using Views]]
