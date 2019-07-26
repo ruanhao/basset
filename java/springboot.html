@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- 2019-07-12 Fri 14:23 -->
+<!-- 2019-07-26 Fri 10:40 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SpingBoot</title>
@@ -234,169 +234,189 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgeb42dfc">1. WEB</a>
+<li><a href="#org4455703">1. WEB</a>
 <ul>
-<li><a href="#orgf3d6fad">1.1. 静态资源路径</a></li>
-<li><a href="#orgc324246">1.2. Spring MVC 原理</a>
+<li><a href="#org25a2e28">1.1. 静态资源路径</a></li>
+<li><a href="#orgc825b23">1.2. Spring MVC 原理</a>
 <ul>
-<li><a href="#orgbdbd922">1.2.1. DispatcherServlet 原理</a></li>
-<li><a href="#org8bcc32a">1.2.2. 重要组件</a>
+<li><a href="#orgd2b4fc5">1.2.1. DispatcherServlet 原理</a></li>
+<li><a href="#org648f5e6">1.2.2. 运行流程</a></li>
+<li><a href="#orgfdff8d6">1.2.3. Default Servlet Handler</a></li>
+<li><a href="#orge4601f0">1.2.4. @InitBinder</a></li>
+<li><a href="#org9e06291">1.2.5. HttpMessageConverter&lt;T&gt;</a>
 <ul>
-<li><a href="#org816bcb2">1.2.2.1. ContentNegotiatingViewResovler</a></li>
-<li><a href="#org51f14d5">1.2.2.2. <code>HttpMessageConverters</code></a></li>
-<li><a href="#org9e300a1">1.2.2.3. <code>ConfigurableWebBindingInitializer</code></a></li>
+<li><a href="#org0ba48dd">1.2.5.1. 接口方法</a></li>
+<li><a href="#org0b05c4d">1.2.5.2. 使用方式</a></li>
+<li><a href="#orge476f82">1.2.5.3. 原理</a></li>
+</ul>
+</li>
+<li><a href="#orga6f87a8">1.2.6. 使用 ServletAPI 作为 Handler 入参</a></li>
+<li><a href="#orge9e5124">1.2.7. HiddenHttpMethodFilter</a></li>
+<li><a href="#org888878a">1.2.8. 拦截器</a>
+<ul>
+<li><a href="#orgd817fe9">1.2.8.1. 执行流程</a></li>
+</ul>
+</li>
+<li><a href="#org315277d">1.2.9. 异常处理</a>
+<ul>
+<li><a href="#org73ea10d">1.2.9.1. ExceptionHandlerExceptionResolver</a>
+<ul>
+<li><a href="#org9af8e13">1.2.9.1.1. ResponseStatusExceptionResolver</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org6ea79e9">1.2.10. ContentNegotiatingViewResovler</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org9d57daf">2. 缓存</a>
+<ul>
+<li><a href="#org839600a">2.1. JSR107</a></li>
+<li><a href="#orgeea90c6">2.2. Springboot 缓存抽象</a></li>
+<li><a href="#org1925754">2.3. 示例代码</a></li>
+</ul>
+</li>
+<li><a href="#org7d230e1">3. 调度</a>
+<ul>
+<li><a href="#orgd1a3e34">3.1. 示例工程</a></li>
+<li><a href="#orga5d8f0f">3.2. 每隔固定时间执行</a></li>
+<li><a href="#orgdfc3dee">3.3. 指定任务间隔</a></li>
+<li><a href="#org8f2dd02">3.4. UNIX Cron 风格</a></li>
+</ul>
+</li>
+<li><a href="#org297b8a1">4. 配置</a>
+<ul>
+<li><a href="#org6092c92">4.1. 自动配置原理</a>
+<ul>
+<li><a href="#orgf86dafd">4.1.1. 自动配置报告</a></li>
+</ul>
+</li>
+<li><a href="#org8d27c21">4.2. @ConfigurationProperties 与 @Value 的区别</a></li>
+<li><a href="#org3494a61">4.3. Profile</a>
+<ul>
+<li><a href="#org4569d27">4.3.1. 主配置文件激活</a></li>
+<li><a href="#org971dddd">4.3.2. 命令行激活</a></li>
+<li><a href="#org4acd795">4.3.3. 虚拟机参数激活</a></li>
+</ul>
+</li>
+<li><a href="#org7089332">4.4. 配置文件搜索顺序</a></li>
+<li><a href="#org1f0d605">4.5. 配置文件占位符</a></li>
+<li><a href="#org6eb9bf2">4.6. <code>@Conditional</code> 派生注解</a></li>
+</ul>
+</li>
+<li><a href="#orgd3cfcb7">5. Async</a>
+<ul>
+<li><a href="#orgc620c28">5.1. 异常统一捕获</a></li>
+</ul>
+</li>
+<li><a href="#orgc6d750c">6. 工具</a>
+<ul>
+<li><a href="#org6a44b1a">6.1. JacksonXML</a>
+<ul>
+<li><a href="#orgdffe7b4">6.1.1. 示例数据</a></li>
+<li><a href="#org257aa1f">6.1.2. pom 配置</a></li>
+<li><a href="#org81dba5e">6.1.3. DTO</a></li>
+<li><a href="#org5159dea">6.1.4. Controller</a></li>
+</ul>
+</li>
+<li><a href="#orgefca863">6.2. MapStruct</a>
+<ul>
+<li><a href="#org2a584f1">6.2.1. pom 配置</a>
+<ul>
+<li><a href="#org0e172c6">6.2.1.1. properties</a></li>
+<li><a href="#org984c5f0">6.2.1.2. dependency</a></li>
+<li><a href="#org4a77603">6.2.1.3. plugin</a></li>
+</ul>
+</li>
+<li><a href="#org2802cb5">6.2.2. Mapper 接口</a></li>
+<li><a href="#org306eab9">6.2.3. 调用</a></li>
+</ul>
+</li>
+<li><a href="#orgb778afe">6.3. MapperFactory</a>
+<ul>
+<li><a href="#orgdd93c96">6.3.1. 配置</a></li>
+<li><a href="#org325583d">6.3.2. 使用</a></li>
+<li><a href="#orgca56e3c">6.3.3. 传送门</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orga26b5b3">7. 实践</a>
+<ul>
+<li><a href="#orgc697e43">7.1. Restful Service (MVC)</a>
+<ul>
+<li><a href="#org15b0c43">7.1.1. WebApplicationInitializer</a></li>
+<li><a href="#orge005ae6">7.1.2. Controller</a></li>
+<li><a href="#org7d049da">7.1.3. HttpMessageConverter</a></li>
+<li><a href="#org829f8da">7.1.4. 异常处理</a>
+<ul>
+<li><a href="#orge5783f8">7.1.4.1. 异常级别</a></li>
+<li><a href="#orgb89b5ea">7.1.4.2. 控制器级别</a></li>
+<li><a href="#org41ba17e">7.1.4.3. 全局级别</a>
+<ul>
+<li><a href="#orgf2e2468">7.1.4.3.1. 重新抛出</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org0e52635">2. 缓存</a>
+<li><a href="#org2e28b4a">7.2. Application Event</a>
 <ul>
-<li><a href="#org8c6fdc7">2.1. JSR107</a></li>
-<li><a href="#org741bd79">2.2. Springboot 缓存抽象</a></li>
-<li><a href="#org531d465">2.3. 示例代码</a></li>
+<li><a href="#org7cdcfe6">7.2.1. Event</a></li>
+<li><a href="#org9213efa">7.2.2. Listener</a></li>
+<li><a href="#org10da0fd">7.2.3. Publisher</a></li>
+<li><a href="#orgcb2e5c2">7.2.4. 自定义 applicationEventMulticaster</a></li>
+<li><a href="#orgecdc5b2">7.2.5. 常见 SpringApplicationEvent</a></li>
 </ul>
 </li>
-<li><a href="#orgcdc44ba">3. 调度</a>
+<li><a href="#org778774c">7.3. Springboot Test</a>
 <ul>
-<li><a href="#orgf1b03ac">3.1. 示例工程</a></li>
-<li><a href="#org9cb4810">3.2. 每隔固定时间执行</a></li>
-<li><a href="#org50be9d1">3.3. 指定任务间隔</a></li>
-<li><a href="#org80f8534">3.4. UNIX Cron 风格</a></li>
+<li><a href="#org3e7f372">7.3.1. 样板文件</a></li>
+<li><a href="#org4cbd0aa">7.3.2. MockMvc</a></li>
+<li><a href="#orgb77c194">7.3.3. Hamcrest</a>
+<ul>
+<li><a href="#org444c1d3">7.3.3.1. Core API</a></li>
+<li><a href="#orgbf38d9f">7.3.3.2. Object Matcher</a></li>
+<li><a href="#orgebe76d0">7.3.3.3. Bean Matcher</a></li>
+<li><a href="#org42fa2cc">7.3.3.4. Collection Matcher</a></li>
+<li><a href="#org1d45bea">7.3.3.5. Number Matcher</a></li>
+<li><a href="#org8226a03">7.3.3.6. Text Matcher</a></li>
 </ul>
 </li>
-<li><a href="#orgf5a7878">4. 配置</a>
+<li><a href="#orge8bb2c7">7.3.4. Mockito</a>
 <ul>
-<li><a href="#org3abb399">4.1. 自动配置原理</a>
+<li><a href="#org08e773b">7.3.4.1. Mock 与 Stub 的区别</a></li>
+<li><a href="#org6c82927">7.3.4.2. 验证行为</a></li>
+<li><a href="#org68cf218">7.3.4.3. 打桩</a></li>
+<li><a href="#org54c1374">7.3.4.4. 连续调用打桩对象</a></li>
+<li><a href="#org638798d">7.3.4.5. 参数匹配器</a></li>
+<li><a href="#org931b89d">7.3.4.6. 调用次数</a></li>
+<li><a href="#org7fcd287">7.3.4.7. 处理异常</a></li>
+<li><a href="#org72b2f2d">7.3.4.8. 确保不发生交互</a></li>
+<li><a href="#orge651ef9">7.3.4.9. 寻找多余交互</a></li>
+<li><a href="#org8b29867">7.3.4.10. 注解</a>
 <ul>
-<li><a href="#orgca4bf00">4.1.1. 自动配置报告</a></li>
+<li><a href="#orga9b6d64">7.3.4.10.1. 启用注解</a></li>
+<li><a href="#org516664f">7.3.4.10.2. @Mock</a></li>
+<li><a href="#org91b3ed3">7.3.4.10.3. @Spy</a></li>
+<li><a href="#org2df906d">7.3.4.10.4. @Captor</a></li>
+<li><a href="#orgb40bc92">7.3.4.10.5. @InjectMocks</a></li>
 </ul>
 </li>
-<li><a href="#orga1dd9c0">4.2. @ConfigurationProperties 与 @Value 的区别</a></li>
-<li><a href="#org5ca647f">4.3. Profile</a>
-<ul>
-<li><a href="#org92ea305">4.3.1. 主配置文件激活</a></li>
-<li><a href="#orgedb593a">4.3.2. 命令行激活</a></li>
-<li><a href="#orgeae6ba4">4.3.3. 虚拟机参数激活</a></li>
-</ul>
-</li>
-<li><a href="#org769d9f7">4.4. 配置文件搜索顺序</a></li>
-<li><a href="#org4d993b6">4.5. 配置文件占位符</a></li>
-<li><a href="#orgfc2f3d3">4.6. <code>@Conditional</code> 派生注解</a></li>
-</ul>
-</li>
-<li><a href="#org3b6c418">5. Async</a>
-<ul>
-<li><a href="#org2574a7f">5.1. 异常统一捕获</a></li>
-</ul>
-</li>
-<li><a href="#org5547fe5">6. 工具</a>
-<ul>
-<li><a href="#orge9b31a4">6.1. JacksonXML</a>
-<ul>
-<li><a href="#org77b3760">6.1.1. 示例数据</a></li>
-<li><a href="#org3b75e01">6.1.2. pom 配置</a></li>
-<li><a href="#orge754b34">6.1.3. DTO</a></li>
-<li><a href="#org8de94f8">6.1.4. Controller</a></li>
-</ul>
-</li>
-<li><a href="#org0e9dcb2">6.2. MapStruct</a>
-<ul>
-<li><a href="#org2ede6d9">6.2.1. pom 配置</a>
-<ul>
-<li><a href="#org8bfdcad">6.2.1.1. properties</a></li>
-<li><a href="#org2204848">6.2.1.2. dependency</a></li>
-<li><a href="#org13fa0d0">6.2.1.3. plugin</a></li>
-</ul>
-</li>
-<li><a href="#org818b7de">6.2.2. Mapper 接口</a></li>
-<li><a href="#org9078b37">6.2.3. 调用</a></li>
-</ul>
-</li>
-<li><a href="#org2d98365">6.3. MapperFactory</a>
-<ul>
-<li><a href="#org9be7b86">6.3.1. 配置</a></li>
-<li><a href="#org31d7bae">6.3.2. 使用</a></li>
-<li><a href="#orgebca401">6.3.3. 传送门</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#orga64a650">7. 实践</a>
-<ul>
-<li><a href="#org1ff97e8">7.1. Restful Service (MVC)</a>
-<ul>
-<li><a href="#org9e18359">7.1.1. WebApplicationInitializer</a></li>
-<li><a href="#org913d131">7.1.2. Controller</a></li>
-<li><a href="#orgfb6d990">7.1.3. HttpMessageConverter</a></li>
-<li><a href="#orgdf20f92">7.1.4. 异常处理</a>
-<ul>
-<li><a href="#org05ed8b3">7.1.4.1. 异常级别</a></li>
-<li><a href="#org7504d0e">7.1.4.2. 控制器级别</a></li>
-<li><a href="#org98e6a2e">7.1.4.3. 全局级别</a>
-<ul>
-<li><a href="#org1839e92">7.1.4.3.1. 重新抛出</a></li>
+<li><a href="#org14ba30a">7.3.4.11. 传送门</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org94911d4">7.2. Application Event</a>
+<li><a href="#org8d08925">8. 参考</a>
 <ul>
-<li><a href="#org9f13647">7.2.1. Event</a></li>
-<li><a href="#org6b1fc18">7.2.2. Listener</a></li>
-<li><a href="#org86cd8d9">7.2.3. Publisher</a></li>
-<li><a href="#orgfd2dbb2">7.2.4. 自定义 applicationEventMulticaster</a></li>
-<li><a href="#org05948d9">7.2.5. 常见 SpringApplicationEvent</a></li>
-</ul>
-</li>
-<li><a href="#org0cc5568">7.3. Springboot Test</a>
-<ul>
-<li><a href="#org32d1593">7.3.1. 样板文件</a></li>
-<li><a href="#orgb2cba7a">7.3.2. MockMvc</a></li>
-<li><a href="#org073895c">7.3.3. Hamcrest</a>
-<ul>
-<li><a href="#orga27e46b">7.3.3.1. Core API</a></li>
-<li><a href="#org511a4ce">7.3.3.2. Object Matcher</a></li>
-<li><a href="#org428a963">7.3.3.3. Bean Matcher</a></li>
-<li><a href="#org90bfe6a">7.3.3.4. Collection Matcher</a></li>
-<li><a href="#org79d85bb">7.3.3.5. Number Matcher</a></li>
-<li><a href="#org086b6c2">7.3.3.6. Text Matcher</a></li>
-</ul>
-</li>
-<li><a href="#org60a5ae4">7.3.4. Mockito</a>
-<ul>
-<li><a href="#org11d7d2b">7.3.4.1. Mock 与 Stub 的区别</a></li>
-<li><a href="#org5714cdd">7.3.4.2. 验证行为</a></li>
-<li><a href="#org156147a">7.3.4.3. 打桩</a></li>
-<li><a href="#org4a13a3c">7.3.4.4. 连续调用打桩对象</a></li>
-<li><a href="#org3fac4b3">7.3.4.5. 参数匹配器</a></li>
-<li><a href="#orga445758">7.3.4.6. 调用次数</a></li>
-<li><a href="#orgb7a07a7">7.3.4.7. 处理异常</a></li>
-<li><a href="#orgfa0b999">7.3.4.8. 确保不发生交互</a></li>
-<li><a href="#orgd1638cc">7.3.4.9. 寻找多余交互</a></li>
-<li><a href="#org48d5b9d">7.3.4.10. 注解</a>
-<ul>
-<li><a href="#org1b63897">7.3.4.10.1. 启用注解</a></li>
-<li><a href="#org58c2165">7.3.4.10.2. @Mock</a></li>
-<li><a href="#org0c64320">7.3.4.10.3. @Spy</a></li>
-<li><a href="#orga7bee76">7.3.4.10.4. @Captor</a></li>
-<li><a href="#org9f7909b">7.3.4.10.5. @InjectMocks</a></li>
-</ul>
-</li>
-<li><a href="#orgd3688a4">7.3.4.11. 传送门</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#org104a9eb">8. 参考</a>
-<ul>
-<li><a href="#orga6cd3e9">8.1. 所有可配置选项</a></li>
-<li><a href="#org0cf8ffb">8.2. Content Negotiation Using Views</a></li>
+<li><a href="#org62771fa">8.1. 所有可配置选项</a></li>
+<li><a href="#org5215955">8.2. Content Negotiation Using Views</a></li>
 </ul>
 </li>
 </ul>
@@ -406,157 +426,173 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgeb42dfc">1. WEB</a>
+<li><a href="#org4455703">1. WEB</a>
 <ul>
-<li><a href="#orgf3d6fad">1.1. 静态资源路径</a></li>
-<li><a href="#orgc324246">1.2. Spring MVC 原理</a>
+<li><a href="#org25a2e28">1.1. 静态资源路径</a></li>
+<li><a href="#orgc825b23">1.2. Spring MVC 原理</a>
 <ul>
-<li><a href="#orgbdbd922">1.2.1. DispatcherServlet 原理</a></li>
-<li><a href="#org8bcc32a">1.2.2. 重要组件</a>
+<li><a href="#orgd2b4fc5">1.2.1. DispatcherServlet 原理</a></li>
+<li><a href="#org648f5e6">1.2.2. 运行流程</a></li>
+<li><a href="#orgfdff8d6">1.2.3. Default Servlet Handler</a></li>
+<li><a href="#orge4601f0">1.2.4. @InitBinder</a></li>
+<li><a href="#org9e06291">1.2.5. HttpMessageConverter&lt;T&gt;</a>
 <ul>
-<li><a href="#org816bcb2">1.2.2.1. ContentNegotiatingViewResovler</a></li>
-<li><a href="#org51f14d5">1.2.2.2. <code>HttpMessageConverters</code></a></li>
-<li><a href="#org9e300a1">1.2.2.3. <code>ConfigurableWebBindingInitializer</code></a></li>
+<li><a href="#org0ba48dd">1.2.5.1. 接口方法</a></li>
+<li><a href="#org0b05c4d">1.2.5.2. 使用方式</a></li>
+<li><a href="#orge476f82">1.2.5.3. 原理</a></li>
+</ul>
+</li>
+<li><a href="#orga6f87a8">1.2.6. 使用 ServletAPI 作为 Handler 入参</a></li>
+<li><a href="#orge9e5124">1.2.7. HiddenHttpMethodFilter</a></li>
+<li><a href="#org888878a">1.2.8. 拦截器</a>
+<ul>
+<li><a href="#orgd817fe9">1.2.8.1. 执行流程</a></li>
+</ul>
+</li>
+<li><a href="#org315277d">1.2.9. 异常处理</a>
+<ul>
+<li><a href="#org73ea10d">1.2.9.1. ExceptionHandlerExceptionResolver</a></li>
+</ul>
+</li>
+<li><a href="#org6ea79e9">1.2.10. ContentNegotiatingViewResovler</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org9d57daf">2. 缓存</a>
+<ul>
+<li><a href="#org839600a">2.1. JSR107</a></li>
+<li><a href="#orgeea90c6">2.2. Springboot 缓存抽象</a></li>
+<li><a href="#org1925754">2.3. 示例代码</a></li>
+</ul>
+</li>
+<li><a href="#org7d230e1">3. 调度</a>
+<ul>
+<li><a href="#orgd1a3e34">3.1. 示例工程</a></li>
+<li><a href="#orga5d8f0f">3.2. 每隔固定时间执行</a></li>
+<li><a href="#orgdfc3dee">3.3. 指定任务间隔</a></li>
+<li><a href="#org8f2dd02">3.4. UNIX Cron 风格</a></li>
+</ul>
+</li>
+<li><a href="#org297b8a1">4. 配置</a>
+<ul>
+<li><a href="#org6092c92">4.1. 自动配置原理</a>
+<ul>
+<li><a href="#orgf86dafd">4.1.1. 自动配置报告</a></li>
+</ul>
+</li>
+<li><a href="#org8d27c21">4.2. @ConfigurationProperties 与 @Value 的区别</a></li>
+<li><a href="#org3494a61">4.3. Profile</a>
+<ul>
+<li><a href="#org4569d27">4.3.1. 主配置文件激活</a></li>
+<li><a href="#org971dddd">4.3.2. 命令行激活</a></li>
+<li><a href="#org4acd795">4.3.3. 虚拟机参数激活</a></li>
+</ul>
+</li>
+<li><a href="#org7089332">4.4. 配置文件搜索顺序</a></li>
+<li><a href="#org1f0d605">4.5. 配置文件占位符</a></li>
+<li><a href="#org6eb9bf2">4.6. <code>@Conditional</code> 派生注解</a></li>
+</ul>
+</li>
+<li><a href="#orgd3cfcb7">5. Async</a>
+<ul>
+<li><a href="#orgc620c28">5.1. 异常统一捕获</a></li>
+</ul>
+</li>
+<li><a href="#orgc6d750c">6. 工具</a>
+<ul>
+<li><a href="#org6a44b1a">6.1. JacksonXML</a>
+<ul>
+<li><a href="#orgdffe7b4">6.1.1. 示例数据</a></li>
+<li><a href="#org257aa1f">6.1.2. pom 配置</a></li>
+<li><a href="#org81dba5e">6.1.3. DTO</a></li>
+<li><a href="#org5159dea">6.1.4. Controller</a></li>
+</ul>
+</li>
+<li><a href="#orgefca863">6.2. MapStruct</a>
+<ul>
+<li><a href="#org2a584f1">6.2.1. pom 配置</a>
+<ul>
+<li><a href="#org0e172c6">6.2.1.1. properties</a></li>
+<li><a href="#org984c5f0">6.2.1.2. dependency</a></li>
+<li><a href="#org4a77603">6.2.1.3. plugin</a></li>
+</ul>
+</li>
+<li><a href="#org2802cb5">6.2.2. Mapper 接口</a></li>
+<li><a href="#org306eab9">6.2.3. 调用</a></li>
+</ul>
+</li>
+<li><a href="#orgb778afe">6.3. MapperFactory</a>
+<ul>
+<li><a href="#orgdd93c96">6.3.1. 配置</a></li>
+<li><a href="#org325583d">6.3.2. 使用</a></li>
+<li><a href="#orgca56e3c">6.3.3. 传送门</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orga26b5b3">7. 实践</a>
+<ul>
+<li><a href="#orgc697e43">7.1. Restful Service (MVC)</a>
+<ul>
+<li><a href="#org15b0c43">7.1.1. WebApplicationInitializer</a></li>
+<li><a href="#orge005ae6">7.1.2. Controller</a></li>
+<li><a href="#org7d049da">7.1.3. HttpMessageConverter</a></li>
+<li><a href="#org829f8da">7.1.4. 异常处理</a>
+<ul>
+<li><a href="#orge5783f8">7.1.4.1. 异常级别</a></li>
+<li><a href="#orgb89b5ea">7.1.4.2. 控制器级别</a></li>
+<li><a href="#org41ba17e">7.1.4.3. 全局级别</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org2e28b4a">7.2. Application Event</a>
+<ul>
+<li><a href="#org7cdcfe6">7.2.1. Event</a></li>
+<li><a href="#org9213efa">7.2.2. Listener</a></li>
+<li><a href="#org10da0fd">7.2.3. Publisher</a></li>
+<li><a href="#orgcb2e5c2">7.2.4. 自定义 applicationEventMulticaster</a></li>
+<li><a href="#orgecdc5b2">7.2.5. 常见 SpringApplicationEvent</a></li>
+</ul>
+</li>
+<li><a href="#org778774c">7.3. Springboot Test</a>
+<ul>
+<li><a href="#org3e7f372">7.3.1. 样板文件</a></li>
+<li><a href="#org4cbd0aa">7.3.2. MockMvc</a></li>
+<li><a href="#orgb77c194">7.3.3. Hamcrest</a>
+<ul>
+<li><a href="#org444c1d3">7.3.3.1. Core API</a></li>
+<li><a href="#orgbf38d9f">7.3.3.2. Object Matcher</a></li>
+<li><a href="#orgebe76d0">7.3.3.3. Bean Matcher</a></li>
+<li><a href="#org42fa2cc">7.3.3.4. Collection Matcher</a></li>
+<li><a href="#org1d45bea">7.3.3.5. Number Matcher</a></li>
+<li><a href="#org8226a03">7.3.3.6. Text Matcher</a></li>
+</ul>
+</li>
+<li><a href="#orge8bb2c7">7.3.4. Mockito</a>
+<ul>
+<li><a href="#org08e773b">7.3.4.1. Mock 与 Stub 的区别</a></li>
+<li><a href="#org6c82927">7.3.4.2. 验证行为</a></li>
+<li><a href="#org68cf218">7.3.4.3. 打桩</a></li>
+<li><a href="#org54c1374">7.3.4.4. 连续调用打桩对象</a></li>
+<li><a href="#org638798d">7.3.4.5. 参数匹配器</a></li>
+<li><a href="#org931b89d">7.3.4.6. 调用次数</a></li>
+<li><a href="#org7fcd287">7.3.4.7. 处理异常</a></li>
+<li><a href="#org72b2f2d">7.3.4.8. 确保不发生交互</a></li>
+<li><a href="#orge651ef9">7.3.4.9. 寻找多余交互</a></li>
+<li><a href="#org8b29867">7.3.4.10. 注解</a></li>
+<li><a href="#org14ba30a">7.3.4.11. 传送门</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org0e52635">2. 缓存</a>
+<li><a href="#org8d08925">8. 参考</a>
 <ul>
-<li><a href="#org8c6fdc7">2.1. JSR107</a></li>
-<li><a href="#org741bd79">2.2. Springboot 缓存抽象</a></li>
-<li><a href="#org531d465">2.3. 示例代码</a></li>
-</ul>
-</li>
-<li><a href="#orgcdc44ba">3. 调度</a>
-<ul>
-<li><a href="#orgf1b03ac">3.1. 示例工程</a></li>
-<li><a href="#org9cb4810">3.2. 每隔固定时间执行</a></li>
-<li><a href="#org50be9d1">3.3. 指定任务间隔</a></li>
-<li><a href="#org80f8534">3.4. UNIX Cron 风格</a></li>
-</ul>
-</li>
-<li><a href="#orgf5a7878">4. 配置</a>
-<ul>
-<li><a href="#org3abb399">4.1. 自动配置原理</a>
-<ul>
-<li><a href="#orgca4bf00">4.1.1. 自动配置报告</a></li>
-</ul>
-</li>
-<li><a href="#orga1dd9c0">4.2. @ConfigurationProperties 与 @Value 的区别</a></li>
-<li><a href="#org5ca647f">4.3. Profile</a>
-<ul>
-<li><a href="#org92ea305">4.3.1. 主配置文件激活</a></li>
-<li><a href="#orgedb593a">4.3.2. 命令行激活</a></li>
-<li><a href="#orgeae6ba4">4.3.3. 虚拟机参数激活</a></li>
-</ul>
-</li>
-<li><a href="#org769d9f7">4.4. 配置文件搜索顺序</a></li>
-<li><a href="#org4d993b6">4.5. 配置文件占位符</a></li>
-<li><a href="#orgfc2f3d3">4.6. <code>@Conditional</code> 派生注解</a></li>
-</ul>
-</li>
-<li><a href="#org3b6c418">5. Async</a>
-<ul>
-<li><a href="#org2574a7f">5.1. 异常统一捕获</a></li>
-</ul>
-</li>
-<li><a href="#org5547fe5">6. 工具</a>
-<ul>
-<li><a href="#orge9b31a4">6.1. JacksonXML</a>
-<ul>
-<li><a href="#org77b3760">6.1.1. 示例数据</a></li>
-<li><a href="#org3b75e01">6.1.2. pom 配置</a></li>
-<li><a href="#orge754b34">6.1.3. DTO</a></li>
-<li><a href="#org8de94f8">6.1.4. Controller</a></li>
-</ul>
-</li>
-<li><a href="#org0e9dcb2">6.2. MapStruct</a>
-<ul>
-<li><a href="#org2ede6d9">6.2.1. pom 配置</a>
-<ul>
-<li><a href="#org8bfdcad">6.2.1.1. properties</a></li>
-<li><a href="#org2204848">6.2.1.2. dependency</a></li>
-<li><a href="#org13fa0d0">6.2.1.3. plugin</a></li>
-</ul>
-</li>
-<li><a href="#org818b7de">6.2.2. Mapper 接口</a></li>
-<li><a href="#org9078b37">6.2.3. 调用</a></li>
-</ul>
-</li>
-<li><a href="#org2d98365">6.3. MapperFactory</a>
-<ul>
-<li><a href="#org9be7b86">6.3.1. 配置</a></li>
-<li><a href="#org31d7bae">6.3.2. 使用</a></li>
-<li><a href="#orgebca401">6.3.3. 传送门</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#orga64a650">7. 实践</a>
-<ul>
-<li><a href="#org1ff97e8">7.1. Restful Service (MVC)</a>
-<ul>
-<li><a href="#org9e18359">7.1.1. WebApplicationInitializer</a></li>
-<li><a href="#org913d131">7.1.2. Controller</a></li>
-<li><a href="#orgfb6d990">7.1.3. HttpMessageConverter</a></li>
-<li><a href="#orgdf20f92">7.1.4. 异常处理</a>
-<ul>
-<li><a href="#org05ed8b3">7.1.4.1. 异常级别</a></li>
-<li><a href="#org7504d0e">7.1.4.2. 控制器级别</a></li>
-<li><a href="#org98e6a2e">7.1.4.3. 全局级别</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#org94911d4">7.2. Application Event</a>
-<ul>
-<li><a href="#org9f13647">7.2.1. Event</a></li>
-<li><a href="#org6b1fc18">7.2.2. Listener</a></li>
-<li><a href="#org86cd8d9">7.2.3. Publisher</a></li>
-<li><a href="#orgfd2dbb2">7.2.4. 自定义 applicationEventMulticaster</a></li>
-<li><a href="#org05948d9">7.2.5. 常见 SpringApplicationEvent</a></li>
-</ul>
-</li>
-<li><a href="#org0cc5568">7.3. Springboot Test</a>
-<ul>
-<li><a href="#org32d1593">7.3.1. 样板文件</a></li>
-<li><a href="#orgb2cba7a">7.3.2. MockMvc</a></li>
-<li><a href="#org073895c">7.3.3. Hamcrest</a>
-<ul>
-<li><a href="#orga27e46b">7.3.3.1. Core API</a></li>
-<li><a href="#org511a4ce">7.3.3.2. Object Matcher</a></li>
-<li><a href="#org428a963">7.3.3.3. Bean Matcher</a></li>
-<li><a href="#org90bfe6a">7.3.3.4. Collection Matcher</a></li>
-<li><a href="#org79d85bb">7.3.3.5. Number Matcher</a></li>
-<li><a href="#org086b6c2">7.3.3.6. Text Matcher</a></li>
-</ul>
-</li>
-<li><a href="#org60a5ae4">7.3.4. Mockito</a>
-<ul>
-<li><a href="#org11d7d2b">7.3.4.1. Mock 与 Stub 的区别</a></li>
-<li><a href="#org5714cdd">7.3.4.2. 验证行为</a></li>
-<li><a href="#org156147a">7.3.4.3. 打桩</a></li>
-<li><a href="#org4a13a3c">7.3.4.4. 连续调用打桩对象</a></li>
-<li><a href="#org3fac4b3">7.3.4.5. 参数匹配器</a></li>
-<li><a href="#orga445758">7.3.4.6. 调用次数</a></li>
-<li><a href="#orgb7a07a7">7.3.4.7. 处理异常</a></li>
-<li><a href="#orgfa0b999">7.3.4.8. 确保不发生交互</a></li>
-<li><a href="#orgd1638cc">7.3.4.9. 寻找多余交互</a></li>
-<li><a href="#org48d5b9d">7.3.4.10. 注解</a></li>
-<li><a href="#orgd3688a4">7.3.4.11. 传送门</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#org104a9eb">8. 参考</a>
-<ul>
-<li><a href="#orga6cd3e9">8.1. 所有可配置选项</a></li>
-<li><a href="#org0cf8ffb">8.2. Content Negotiation Using Views</a></li>
+<li><a href="#org62771fa">8.1. 所有可配置选项</a></li>
+<li><a href="#org5215955">8.2. Content Negotiation Using Views</a></li>
 </ul>
 </li>
 </ul>
@@ -579,18 +615,18 @@ for the JavaScript code in this tag.
 
 <tr>
 <td class="org-left">Date</td>
-<td class="org-left">2019-07-12 14:23:06</td>
+<td class="org-left">2019-07-26 10:40:30</td>
 </tr>
 </tbody>
 </table>
 </div>
 
-<div id="outline-container-orgeb42dfc" class="outline-2">
-<h2 id="orgeb42dfc"><span class="section-number-2">1</span> WEB</h2>
+<div id="outline-container-org4455703" class="outline-2">
+<h2 id="org4455703"><span class="section-number-2">1</span> WEB</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgf3d6fad" class="outline-3">
-<h3 id="orgf3d6fad"><span class="section-number-3">1.1</span> 静态资源路径</h3>
+<div id="outline-container-org25a2e28" class="outline-3">
+<h3 id="org25a2e28"><span class="section-number-3">1.1</span> 静态资源路径</h3>
 <div class="outline-text-3" id="text-1-1">
 <ul class="org-ul">
 <li><code>classpath:/META-INF/resources/</code></li>
@@ -603,8 +639,8 @@ for the JavaScript code in this tag.
 </div>
 
 
-<div id="outline-container-orgc324246" class="outline-3">
-<h3 id="orgc324246"><span class="section-number-3">1.2</span> Spring MVC 原理</h3>
+<div id="outline-container-orgc825b23" class="outline-3">
+<h3 id="orgc825b23"><span class="section-number-3">1.2</span> Spring MVC 原理</h3>
 <div class="outline-text-3" id="text-1-2">
 <img src="http://www.51gjie.com/Images/image1/epnnzel2.4i4.jpg"/>
 </br>
@@ -620,25 +656,281 @@ for the JavaScript code in this tag.
 <li>处理器适配器向前端控制器返回ModelAndView，ModelAndView是springmvc框架的一个底层对象，包括 Model 和 View</li>
 <li>前端控制器请求 ViewResolver 进行视图解析，即根据逻辑视图名解析成真正的视图</li>
 <li>View 会根据传进来的 Model 模型数据进行渲染</li>
-<li>前端控制器向用户响应结果、</li>
+<li>前端控制器向用户响应结果</li>
 </ul>
 </div>
 
-<div id="outline-container-orgbdbd922" class="outline-4">
-<h4 id="orgbdbd922"><span class="section-number-4">1.2.1</span> DispatcherServlet 原理</h4>
+<div id="outline-container-orgd2b4fc5" class="outline-4">
+<h4 id="orgd2b4fc5"><span class="section-number-4">1.2.1</span> DispatcherServlet 原理</h4>
 <div class="outline-text-4" id="text-1-2-1">
 <img src="http://www.51gjie.com/Images/image1/0meux44p.4vz.jpg"/>
 </div>
 </div>
 
 
-<div id="outline-container-org8bcc32a" class="outline-4">
-<h4 id="org8bcc32a"><span class="section-number-4">1.2.2</span> 重要组件</h4>
+<div id="outline-container-org648f5e6" class="outline-4">
+<h4 id="org648f5e6"><span class="section-number-4">1.2.2</span> 运行流程</h4>
 <div class="outline-text-4" id="text-1-2-2">
+
+<div class="figure">
+<p><img src="img/spring-mvc-seq.png" alt="spring-mvc-seq.png">
+</p>
 </div>
-<div id="outline-container-org816bcb2" class="outline-5">
-<h5 id="org816bcb2"><span class="section-number-5">1.2.2.1</span> ContentNegotiatingViewResovler</h5>
-<div class="outline-text-5" id="text-1-2-2-1">
+
+<img src="https://www.javacodebook.com/wp-content/uploads/2015/03/fig14-06.jpg"/>
+</div>
+</div>
+
+<div id="outline-container-orgfdff8d6" class="outline-4">
+<h4 id="orgfdff8d6"><span class="section-number-4">1.2.3</span> Default Servlet Handler</h4>
+<div class="outline-text-4" id="text-1-2-3">
+<p>
+<code>&lt;mvc:default-servlet-handler/&gt;</code> 将在 SpringMVC 上下文中定义一个 DefaultServletHttpRequestHandler ，它会对进入 DispatcherServlet 的请求进行筛查，
+如果发现是没有经过映射的请求，就将该请求交由 WEB 应用服务器默认的 Servlet 处理， <b>如果不是静态资源的请求，才由 DispatcherServlet 继续处理</b> 。
+</p>
+
+<p>
+一般 WEB 应用服务器默认的 Servlet 的名称都是 default 。若所使用的 WEB 服务器的默认 Servlet 名称不是 default ，则需要通过 <code>default-servlet-name</code> 属性显式指定。
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-orge4601f0" class="outline-4">
+<h4 id="orge4601f0"><span class="section-number-4">1.2.4</span> @InitBinder</h4>
+<div class="outline-text-4" id="text-1-2-4">
+<ul class="org-ul">
+<li>由 <code>@InitBinder</code> 标识的方法，可以对 <code>WebDataBinder</code> 对象进行初始化</li>
+<li>WebDataBinder 是 DataBinder 的子类，用于完成由表单字段到 POJO 属性的绑定</li>
+<li><code>@InitBinder</code> 方法不能有返回值，它必须声明为void</li>
+<li><code>@InitBinder</code> 方法的参数通常是 WebDataBinder</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org9e06291" class="outline-4">
+<h4 id="org9e06291"><span class="section-number-4">1.2.5</span> HttpMessageConverter&lt;T&gt;</h4>
+<div class="outline-text-4" id="text-1-2-5">
+<img src="https://qsli.github.io/2016/11/29/HttpMessageConverter/http-message-converter.jpg"/>
+
+<p>
+负责将请求信息转换为一个 T 类型的对象，或将 T 类型的对象输出为响应信息。
+</p>
+</div>
+
+<div id="outline-container-org0ba48dd" class="outline-5">
+<h5 id="org0ba48dd"><span class="section-number-5">1.2.5.1</span> 接口方法</h5>
+<div class="outline-text-5" id="text-1-2-5-1">
+<ul class="org-ul">
+<li><p>
+canRead
+</p>
+
+<p>
+指定转换器可以读取的对象类型，即是否可将请求信息转换为 T 类型的对象
+</p></li>
+<li><p>
+canWrite
+</p>
+
+<p>
+指定是否可将 T 类型的对象写到响应流中
+</p></li>
+<li><p>
+read
+</p>
+
+<p>
+将请求信息转为 T 类型对象
+</p></li>
+<li><p>
+write
+</p>
+
+<p>
+将 T 类型对象写到响应流
+</p></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-org0b05c4d" class="outline-5">
+<h5 id="org0b05c4d"><span class="section-number-5">1.2.5.2</span> 使用方式</h5>
+<div class="outline-text-5" id="text-1-2-5-2">
+<ul class="org-ul">
+<li>使用 <code>@RequestBody</code> / <code>@ResponseBody</code> 对处理方法进行标注</li>
+<li>使用 <code>HttpEntity&lt;T&gt;</code> / <code>ResponseEntity&lt;T&gt;</code> 作为入参或返回值</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orge476f82" class="outline-5">
+<h5 id="orge476f82"><span class="section-number-5">1.2.5.3</span> 原理</h5>
+<div class="outline-text-5" id="text-1-2-5-3">
+<p>
+Spring 首先根据请求头选择匹配的 HttpMessageConverter ，进而根据泛型类型过滤匹配的 HttpMessageConverter ，若找不到可用的 converter 则报错。
+</p>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-orga6f87a8" class="outline-4">
+<h4 id="orga6f87a8"><span class="section-number-4">1.2.6</span> 使用 ServletAPI 作为 Handler 入参</h4>
+<div class="outline-text-4" id="text-1-2-6">
+<p>
+MVC 的 Handler 方法可以接受的 ServletAPI 类型的参数，具体可参考：
+</p>
+
+<p>
+<code>org.springframework.web.servlet.mvc.method.annotation.ServletRequestMethodArgumentResolver.resolveArgument/4</code>
+</p>
+
+<p>
+常见的有：
+</p>
+
+<ul class="org-ul">
+<li>HttpServletRequest</li>
+<li>HttpServletResponse</li>
+<li>HttpSession</li>
+<li>Principal</li>
+<li>Locale</li>
+<li>InputStream</li>
+<li>OutputStream</li>
+<li>Reader</li>
+<li>Writer</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-orge9e5124" class="outline-4">
+<h4 id="orge9e5124"><span class="section-number-4">1.2.7</span> HiddenHttpMethodFilter</h4>
+<div class="outline-text-4" id="text-1-2-7">
+<p>
+浏览器表单只支持 GET 与 POST 请求，而 DELETE，PUT 等方法并不支持，Spring3.0 添加了一个过滤器，可以将这些请求转换为标准的 HTTP 方法，
+使得支持 GET，POST，PUT 与 DELETE 请求。
+</p>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="outline-container-org888878a" class="outline-4">
+<h4 id="org888878a"><span class="section-number-4">1.2.8</span> 拦截器</h4>
+<div class="outline-text-4" id="text-1-2-8">
+</div>
+<div id="outline-container-orgd817fe9" class="outline-5">
+<h5 id="orgd817fe9"><span class="section-number-5">1.2.8.1</span> 执行流程</h5>
+<div class="outline-text-5" id="text-1-2-8-1">
+
+<div class="figure">
+<p><img src="img/spring-mvc-filter-seq.png" alt="spring-mvc-filter-seq.png">
+</p>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org315277d" class="outline-4">
+<h4 id="org315277d"><span class="section-number-4">1.2.9</span> 异常处理</h4>
+<div class="outline-text-4" id="text-1-2-9">
+
+<div class="figure">
+<p><img src="img/spring-mvc-ex-handle.png" alt="spring-mvc-ex-handle.png">
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-org73ea10d" class="outline-5">
+<h5 id="org73ea10d"><span class="section-number-5">1.2.9.1</span> ExceptionHandlerExceptionResolver</h5>
+<div class="outline-text-5" id="text-1-2-9-1">
+
+<div class="figure">
+<p><img src="img/spring-mvc-ExceptionHandlerExceptionResolver.png" alt="spring-mvc-ExceptionHandlerExceptionResolver.png">
+</p>
+</div>
+</div>
+
+<div id="outline-container-org9af8e13" class="outline-6">
+<h6 id="org9af8e13"><span class="section-number-6">1.2.9.1.1</span> ResponseStatusExceptionResolver</h6>
+<div class="outline-text-6" id="text-1-2-9-1-1">
+
+<div class="figure">
+<p><img src="img/spring-mvc-ResponseStatusExceptionResolver.png" alt="spring-mvc-ResponseStatusExceptionResolver.png">
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+<div id="outline-container-org6ea79e9" class="outline-4">
+<h4 id="org6ea79e9"><span class="section-number-4">1.2.10</span> ContentNegotiatingViewResovler</h4>
+<div class="outline-text-4" id="text-1-2-10">
 <img src="http://blog.springsource.org/wp-content/uploads/2013/06/cnvr-all-flow.png"/>
 
 <ul class="org-ul">
@@ -647,35 +939,17 @@ for the JavaScript code in this tag.
 </ul>
 </div>
 </div>
-
-<div id="outline-container-org51f14d5" class="outline-5">
-<h5 id="org51f14d5"><span class="section-number-5">1.2.2.2</span> <code>HttpMessageConverters</code></h5>
-<div class="outline-text-5" id="text-1-2-2-2">
-<p>
-转换 HTTP 响应，如 User =&gt; JOSN
-</p>
-</div>
-</div>
-
-<div id="outline-container-org9e300a1" class="outline-5">
-<h5 id="org9e300a1"><span class="section-number-5">1.2.2.3</span> <code>ConfigurableWebBindingInitializer</code></h5>
-<div class="outline-text-5" id="text-1-2-2-3">
-<p>
-用于将请求的数据转换成 RequestBody
-</p>
-</div>
-</div>
-</div>
 </div>
 </div>
 
 
-<div id="outline-container-org0e52635" class="outline-2">
-<h2 id="org0e52635"><span class="section-number-2">2</span> 缓存</h2>
+
+<div id="outline-container-org9d57daf" class="outline-2">
+<h2 id="org9d57daf"><span class="section-number-2">2</span> 缓存</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org8c6fdc7" class="outline-3">
-<h3 id="org8c6fdc7"><span class="section-number-3">2.1</span> JSR107</h3>
+<div id="outline-container-org839600a" class="outline-3">
+<h3 id="org839600a"><span class="section-number-3">2.1</span> JSR107</h3>
 <div class="outline-text-3" id="text-2-1">
 <img src="https://img-blog.csdn.net/20180826194453182?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2x1bzYwOTYzMDE5OQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"/>
 
@@ -726,8 +1000,8 @@ Expiry
 
 
 
-<div id="outline-container-org741bd79" class="outline-3">
-<h3 id="org741bd79"><span class="section-number-3">2.2</span> Springboot 缓存抽象</h3>
+<div id="outline-container-orgeea90c6" class="outline-3">
+<h3 id="orgeea90c6"><span class="section-number-3">2.2</span> Springboot 缓存抽象</h3>
 <div class="outline-text-3" id="text-2-2">
 <ul class="org-ul">
 <li>Cache</li>
@@ -789,8 +1063,8 @@ value 序列化策略
 </div>
 
 
-<div id="outline-container-org531d465" class="outline-3">
-<h3 id="org531d465"><span class="section-number-3">2.3</span> 示例代码</h3>
+<div id="outline-container-org1925754" class="outline-3">
+<h3 id="org1925754"><span class="section-number-3">2.3</span> 示例代码</h3>
 <div class="outline-text-3" id="text-2-3">
 <ul class="org-ul">
 <li><a href="https://github.com/ruanhao/java-for-fun/tree/master/src/test/java/com/hao/notes/caching">基本使用</a></li>
@@ -801,15 +1075,15 @@ value 序列化策略
 </div>
 
 
-<div id="outline-container-orgcdc44ba" class="outline-2">
-<h2 id="orgcdc44ba"><span class="section-number-2">3</span> 调度</h2>
+<div id="outline-container-org7d230e1" class="outline-2">
+<h2 id="org7d230e1"><span class="section-number-2">3</span> 调度</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-orgf1b03ac" class="outline-3">
-<h3 id="orgf1b03ac"><span class="section-number-3">3.1</span> <a href="https://github.com/ruanhao/java-for-fun/tree/master/src/test/java/com/hao/notes/schedule">示例工程</a></h3>
+<div id="outline-container-orgd1a3e34" class="outline-3">
+<h3 id="orgd1a3e34"><span class="section-number-3">3.1</span> <a href="https://github.com/ruanhao/java-for-fun/tree/master/src/test/java/com/hao/notes/schedule">示例工程</a></h3>
 </div>
-<div id="outline-container-org9cb4810" class="outline-3">
-<h3 id="org9cb4810"><span class="section-number-3">3.2</span> 每隔固定时间执行</h3>
+<div id="outline-container-orga5d8f0f" class="outline-3">
+<h3 id="orga5d8f0f"><span class="section-number-3">3.2</span> 每隔固定时间执行</h3>
 <div class="outline-text-3" id="text-3-2">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #ae81ff;">@Scheduled</span>(fixedRate=5000)
@@ -818,8 +1092,8 @@ value 序列化策略
 </div>
 </div>
 
-<div id="outline-container-org50be9d1" class="outline-3">
-<h3 id="org50be9d1"><span class="section-number-3">3.3</span> 指定任务间隔</h3>
+<div id="outline-container-orgdfc3dee" class="outline-3">
+<h3 id="orgdfc3dee"><span class="section-number-3">3.3</span> 指定任务间隔</h3>
 <div class="outline-text-3" id="text-3-3">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #465457;">// </span><span style="color: #465457;">specify the interval between invocations measured</span>
@@ -830,8 +1104,8 @@ value 序列化策略
 </div>
 </div>
 
-<div id="outline-container-org80f8534" class="outline-3">
-<h3 id="org80f8534"><span class="section-number-3">3.4</span> UNIX Cron 风格</h3>
+<div id="outline-container-org8f2dd02" class="outline-3">
+<h3 id="org8f2dd02"><span class="section-number-3">3.4</span> UNIX Cron 风格</h3>
 <div class="outline-text-3" id="text-3-4">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #ae81ff;">@Scheduled</span>(cron=<span style="color: #e6db74;">"0 28 11 ? * *"</span>)     <span style="color: #465457;">// </span><span style="color: #465457;">&#27599;&#22825; 11 &#28857; 28 &#20998; &#25191;&#34892;</span>
@@ -849,12 +1123,12 @@ value 序列化策略
 
 
 
-<div id="outline-container-orgf5a7878" class="outline-2">
-<h2 id="orgf5a7878"><span class="section-number-2">4</span> <a href="https://github.com/ruanhao/java-for-fun/tree/master/src/test/java/com/hao/notes/properties">配置</a></h2>
+<div id="outline-container-org297b8a1" class="outline-2">
+<h2 id="org297b8a1"><span class="section-number-2">4</span> <a href="https://github.com/ruanhao/java-for-fun/tree/master/src/test/java/com/hao/notes/properties">配置</a></h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-org3abb399" class="outline-3">
-<h3 id="org3abb399"><span class="section-number-3">4.1</span> <a href="https://github.com/lxy-go/SpringBoot/blob/master/SpringBoot%E5%85%A5%E9%97%A8%E7%AE%80%E4%BB%8B.md#8%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AE">自动配置原理</a></h3>
+<div id="outline-container-org6092c92" class="outline-3">
+<h3 id="org6092c92"><span class="section-number-3">4.1</span> <a href="https://github.com/lxy-go/SpringBoot/blob/master/SpringBoot%E5%85%A5%E9%97%A8%E7%AE%80%E4%BB%8B.md#8%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AE">自动配置原理</a></h3>
 <div class="outline-text-3" id="text-4-1">
 <ul class="org-ul">
 <li><p>
@@ -875,8 +1149,8 @@ SpringBoot 启动时加载自动配置类
 </ul>
 </div>
 
-<div id="outline-container-orgca4bf00" class="outline-4">
-<h4 id="orgca4bf00"><span class="section-number-4">4.1.1</span> 自动配置报告</h4>
+<div id="outline-container-orgf86dafd" class="outline-4">
+<h4 id="orgf86dafd"><span class="section-number-4">4.1.1</span> 自动配置报告</h4>
 <div class="outline-text-4" id="text-4-1-1">
 <p>
 启用 <code>debug=true</code> 属性，打印自动配合报告，这样就可以知道哪些自动配置类生效。
@@ -885,8 +1159,8 @@ SpringBoot 启动时加载自动配置类
 </div>
 </div>
 
-<div id="outline-container-orga1dd9c0" class="outline-3">
-<h3 id="orga1dd9c0"><span class="section-number-3">4.2</span> @ConfigurationProperties 与 @Value 的区别</h3>
+<div id="outline-container-org8d27c21" class="outline-3">
+<h3 id="org8d27c21"><span class="section-number-3">4.2</span> @ConfigurationProperties 与 @Value 的区别</h3>
 <div class="outline-text-3" id="text-4-2">
 <table>
 
@@ -940,12 +1214,12 @@ SpringBoot 启动时加载自动配置类
 </div>
 
 
-<div id="outline-container-org5ca647f" class="outline-3">
-<h3 id="org5ca647f"><span class="section-number-3">4.3</span> <a href="https://github.com/ruanhao/java-for-fun/blob/master/src/test/java/com/hao/notes/properties/ExamplesWithDevProfile.java">Profile</a></h3>
+<div id="outline-container-org3494a61" class="outline-3">
+<h3 id="org3494a61"><span class="section-number-3">4.3</span> <a href="https://github.com/ruanhao/java-for-fun/blob/master/src/test/java/com/hao/notes/properties/ExamplesWithDevProfile.java">Profile</a></h3>
 <div class="outline-text-3" id="text-4-3">
 </div>
-<div id="outline-container-org92ea305" class="outline-4">
-<h4 id="org92ea305"><span class="section-number-4">4.3.1</span> 主配置文件激活</h4>
+<div id="outline-container-org4569d27" class="outline-4">
+<h4 id="org4569d27"><span class="section-number-4">4.3.1</span> 主配置文件激活</h4>
 <div class="outline-text-4" id="text-4-3-1">
 <p>
 主配置文件: <code>application.properties</code>
@@ -957,8 +1231,8 @@ spring.profiles.active=&lt;profile1&gt;,&lt;profile2&gt;
 </div>
 </div>
 
-<div id="outline-container-orgedb593a" class="outline-4">
-<h4 id="orgedb593a"><span class="section-number-4">4.3.2</span> 命令行激活</h4>
+<div id="outline-container-org971dddd" class="outline-4">
+<h4 id="org971dddd"><span class="section-number-4">4.3.2</span> 命令行激活</h4>
 <div class="outline-text-4" id="text-4-3-2">
 <div class="org-src-container">
 <pre class="src src-sh">java -jar spring-boot-02-config-0.0.1-SNAPSHOT.jar --spring.profiles.active=&lt;profile&gt;
@@ -967,8 +1241,8 @@ spring.profiles.active=&lt;profile1&gt;,&lt;profile2&gt;
 </div>
 </div>
 
-<div id="outline-container-orgeae6ba4" class="outline-4">
-<h4 id="orgeae6ba4"><span class="section-number-4">4.3.3</span> 虚拟机参数激活</h4>
+<div id="outline-container-org4acd795" class="outline-4">
+<h4 id="org4acd795"><span class="section-number-4">4.3.3</span> 虚拟机参数激活</h4>
 <div class="outline-text-4" id="text-4-3-3">
 <p>
 <code>-Dspring.profiles.active=</code>
@@ -983,8 +1257,8 @@ spring.profiles.active=&lt;profile1&gt;,&lt;profile2&gt;
 
 
 
-<div id="outline-container-org769d9f7" class="outline-3">
-<h3 id="org769d9f7"><span class="section-number-3">4.4</span> 配置文件搜索顺序</h3>
+<div id="outline-container-org7089332" class="outline-3">
+<h3 id="org7089332"><span class="section-number-3">4.4</span> 配置文件搜索顺序</h3>
 <div class="outline-text-3" id="text-4-4">
 <ol class="org-ol">
 <li><code>file:config</code></li>
@@ -1005,12 +1279,12 @@ spring.profiles.active=&lt;profile1&gt;,&lt;profile2&gt;
 </div>
 
 
-<div id="outline-container-org4d993b6" class="outline-3">
-<h3 id="org4d993b6"><span class="section-number-3">4.5</span> <a href="https://github.com/ruanhao/java-for-fun/blob/master/src/test/resources/test-properties-config/placeholder.properties">配置文件占位符</a></h3>
+<div id="outline-container-org1f0d605" class="outline-3">
+<h3 id="org1f0d605"><span class="section-number-3">4.5</span> <a href="https://github.com/ruanhao/java-for-fun/blob/master/src/test/resources/test-properties-config/placeholder.properties">配置文件占位符</a></h3>
 </div>
 
-<div id="outline-container-orgfc2f3d3" class="outline-3">
-<h3 id="orgfc2f3d3"><span class="section-number-3">4.6</span> <code>@Conditional</code> 派生注解</h3>
+<div id="outline-container-org6eb9bf2" class="outline-3">
+<h3 id="org6eb9bf2"><span class="section-number-3">4.6</span> <code>@Conditional</code> 派生注解</h3>
 <div class="outline-text-3" id="text-4-6">
 <table>
 
@@ -1087,12 +1361,12 @@ spring.profiles.active=&lt;profile1&gt;,&lt;profile2&gt;
 </div>
 
 
-<div id="outline-container-org3b6c418" class="outline-2">
-<h2 id="org3b6c418"><span class="section-number-2">5</span> <a href="https://github.com/ruanhao/java-for-fun/tree/master/src/test/java/com/hao/notes/async">Async</a></h2>
+<div id="outline-container-orgd3cfcb7" class="outline-2">
+<h2 id="orgd3cfcb7"><span class="section-number-2">5</span> <a href="https://github.com/ruanhao/java-for-fun/tree/master/src/test/java/com/hao/notes/async">Async</a></h2>
 <div class="outline-text-2" id="text-5">
 </div>
-<div id="outline-container-org2574a7f" class="outline-3">
-<h3 id="org2574a7f"><span class="section-number-3">5.1</span> 异常统一捕获</h3>
+<div id="outline-container-orgc620c28" class="outline-3">
+<h3 id="orgc620c28"><span class="section-number-3">5.1</span> 异常统一捕获</h3>
 <div class="outline-text-3" id="text-5-1">
 <p>
 如果需要统一进行异常捕获，可以实现 <code>AsyncConfigurer</code> 接口，
@@ -1132,16 +1406,16 @@ spring.profiles.active=&lt;profile1&gt;,&lt;profile2&gt;
 
 
 
-<div id="outline-container-org5547fe5" class="outline-2">
-<h2 id="org5547fe5"><span class="section-number-2">6</span> 工具</h2>
+<div id="outline-container-orgc6d750c" class="outline-2">
+<h2 id="orgc6d750c"><span class="section-number-2">6</span> 工具</h2>
 <div class="outline-text-2" id="text-6">
 </div>
-<div id="outline-container-orge9b31a4" class="outline-3">
-<h3 id="orge9b31a4"><span class="section-number-3">6.1</span> JacksonXML</h3>
+<div id="outline-container-org6a44b1a" class="outline-3">
+<h3 id="org6a44b1a"><span class="section-number-3">6.1</span> JacksonXML</h3>
 <div class="outline-text-3" id="text-6-1">
 </div>
-<div id="outline-container-org77b3760" class="outline-4">
-<h4 id="org77b3760"><span class="section-number-4">6.1.1</span> 示例数据</h4>
+<div id="outline-container-orgdffe7b4" class="outline-4">
+<h4 id="orgdffe7b4"><span class="section-number-4">6.1.1</span> 示例数据</h4>
 <div class="outline-text-4" id="text-6-1-1">
 <div class="org-src-container">
 <pre class="src src-xml">&lt;<span style="color: #a6e22e;">root</span> <span style="color: #fd971f;">k6</span>=<span style="color: #e6db74;">"6"</span>&gt;
@@ -1161,8 +1435,8 @@ spring.profiles.active=&lt;profile1&gt;,&lt;profile2&gt;
 </div>
 
 
-<div id="outline-container-org3b75e01" class="outline-4">
-<h4 id="org3b75e01"><span class="section-number-4">6.1.2</span> pom 配置</h4>
+<div id="outline-container-org257aa1f" class="outline-4">
+<h4 id="org257aa1f"><span class="section-number-4">6.1.2</span> pom 配置</h4>
 <div class="outline-text-4" id="text-6-1-2">
 <div class="org-src-container">
 <pre class="src src-xml">&lt;<span style="color: #a6e22e;">dependency</span>&gt;
@@ -1175,8 +1449,8 @@ spring.profiles.active=&lt;profile1&gt;,&lt;profile2&gt;
 </div>
 
 
-<div id="outline-container-orge754b34" class="outline-4">
-<h4 id="orge754b34"><span class="section-number-4">6.1.3</span> DTO</h4>
+<div id="outline-container-org81dba5e" class="outline-4">
+<h4 id="org81dba5e"><span class="section-number-4">6.1.3</span> DTO</h4>
 <div class="outline-text-4" id="text-6-1-3">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #f92672; font-weight: bold;">import</span> <span style="color: #ae81ff;">java</span>.<span style="color: #ae81ff;">util</span>.*;
@@ -1211,8 +1485,8 @@ spring.profiles.active=&lt;profile1&gt;,&lt;profile2&gt;
 </div>
 </div>
 
-<div id="outline-container-org8de94f8" class="outline-4">
-<h4 id="org8de94f8"><span class="section-number-4">6.1.4</span> Controller</h4>
+<div id="outline-container-org5159dea" class="outline-4">
+<h4 id="org5159dea"><span class="section-number-4">6.1.4</span> Controller</h4>
 <div class="outline-text-4" id="text-6-1-4">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #ae81ff;">@PostMapping</span>(path=<span style="color: #e6db74;">"/xml"</span>, consumes=<span style="color: #ae81ff;">MediaType</span>.APPLICATION_XML_VALUE)
@@ -1228,16 +1502,16 @@ spring.profiles.active=&lt;profile1&gt;,&lt;profile2&gt;
 
 
 
-<div id="outline-container-org0e9dcb2" class="outline-3">
-<h3 id="org0e9dcb2"><span class="section-number-3">6.2</span> MapStruct</h3>
+<div id="outline-container-orgefca863" class="outline-3">
+<h3 id="orgefca863"><span class="section-number-3">6.2</span> MapStruct</h3>
 <div class="outline-text-3" id="text-6-2">
 </div>
-<div id="outline-container-org2ede6d9" class="outline-4">
-<h4 id="org2ede6d9"><span class="section-number-4">6.2.1</span> pom 配置</h4>
+<div id="outline-container-org2a584f1" class="outline-4">
+<h4 id="org2a584f1"><span class="section-number-4">6.2.1</span> pom 配置</h4>
 <div class="outline-text-4" id="text-6-2-1">
 </div>
-<div id="outline-container-org8bfdcad" class="outline-5">
-<h5 id="org8bfdcad"><span class="section-number-5">6.2.1.1</span> properties</h5>
+<div id="outline-container-org0e172c6" class="outline-5">
+<h5 id="org0e172c6"><span class="section-number-5">6.2.1.1</span> properties</h5>
 <div class="outline-text-5" id="text-6-2-1-1">
 <div class="org-src-container">
 <pre class="src src-xml">&lt;<span style="color: #a6e22e;">properties</span>&gt;
@@ -1248,8 +1522,8 @@ spring.profiles.active=&lt;profile1&gt;,&lt;profile2&gt;
 </div>
 </div>
 
-<div id="outline-container-org2204848" class="outline-5">
-<h5 id="org2204848"><span class="section-number-5">6.2.1.2</span> dependency</h5>
+<div id="outline-container-org984c5f0" class="outline-5">
+<h5 id="org984c5f0"><span class="section-number-5">6.2.1.2</span> dependency</h5>
 <div class="outline-text-5" id="text-6-2-1-2">
 <div class="org-src-container">
 <pre class="src src-xml"><span style="color: #465457;">&lt;!-- </span><span style="color: #465457;">&#38024;&#23545; swagger &#30340; workaround </span><span style="color: #465457;">--&gt;</span>
@@ -1281,8 +1555,8 @@ spring.profiles.active=&lt;profile1&gt;,&lt;profile2&gt;
 </div>
 </div>
 
-<div id="outline-container-org13fa0d0" class="outline-5">
-<h5 id="org13fa0d0"><span class="section-number-5">6.2.1.3</span> plugin</h5>
+<div id="outline-container-org4a77603" class="outline-5">
+<h5 id="org4a77603"><span class="section-number-5">6.2.1.3</span> plugin</h5>
 <div class="outline-text-5" id="text-6-2-1-3">
 <div class="org-src-container">
 <pre class="src src-xml"><span style="color: #465457;">&lt;!-- </span><span style="color: #465457;">&#20860;&#23481; lombok </span><span style="color: #465457;">--&gt;</span>
@@ -1297,8 +1571,8 @@ spring.profiles.active=&lt;profile1&gt;,&lt;profile2&gt;
 </div>
 
 
-<div id="outline-container-org818b7de" class="outline-4">
-<h4 id="org818b7de"><span class="section-number-4">6.2.2</span> Mapper 接口</h4>
+<div id="outline-container-org2802cb5" class="outline-4">
+<h4 id="org2802cb5"><span class="section-number-4">6.2.2</span> Mapper 接口</h4>
 <div class="outline-text-4" id="text-6-2-2">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #ae81ff;">@Mapper</span>(unmappedTargetPolicy=<span style="color: #ae81ff;">ReportingPolicy</span>.IGNORE)
@@ -1322,8 +1596,8 @@ spring.profiles.active=&lt;profile1&gt;,&lt;profile2&gt;
 </div>
 
 
-<div id="outline-container-org9078b37" class="outline-4">
-<h4 id="org9078b37"><span class="section-number-4">6.2.3</span> 调用</h4>
+<div id="outline-container-org306eab9" class="outline-4">
+<h4 id="org306eab9"><span class="section-number-4">6.2.3</span> 调用</h4>
 <div class="outline-text-4" id="text-6-2-3">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #66d9ef; font-weight: bold;">ClassB</span> <span style="color: #fd971f;">objB</span> = <span style="color: #f92672; font-weight: bold;">new</span> <span style="color: #66d9ef; font-weight: bold;">ClassB</span>();
@@ -1337,12 +1611,12 @@ spring.profiles.active=&lt;profile1&gt;,&lt;profile2&gt;
 </div>
 
 
-<div id="outline-container-org2d98365" class="outline-3">
-<h3 id="org2d98365"><span class="section-number-3">6.3</span> MapperFactory</h3>
+<div id="outline-container-orgb778afe" class="outline-3">
+<h3 id="orgb778afe"><span class="section-number-3">6.3</span> MapperFactory</h3>
 <div class="outline-text-3" id="text-6-3">
 </div>
-<div id="outline-container-org9be7b86" class="outline-4">
-<h4 id="org9be7b86"><span class="section-number-4">6.3.1</span> 配置</h4>
+<div id="outline-container-orgdd93c96" class="outline-4">
+<h4 id="orgdd93c96"><span class="section-number-4">6.3.1</span> 配置</h4>
 <div class="outline-text-4" id="text-6-3-1">
 <div class="org-src-container">
 <pre class="src src-xml">&lt;<span style="color: #a6e22e;">dependency</span>&gt;
@@ -1374,8 +1648,8 @@ spring.profiles.active=&lt;profile1&gt;,&lt;profile2&gt;
 </div>
 </div>
 
-<div id="outline-container-org31d7bae" class="outline-4">
-<h4 id="org31d7bae"><span class="section-number-4">6.3.2</span> 使用</h4>
+<div id="outline-container-org325583d" class="outline-4">
+<h4 id="org325583d"><span class="section-number-4">6.3.2</span> 使用</h4>
 <div class="outline-text-4" id="text-6-3-2">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #f92672; font-weight: bold;">class</span> <span style="color: #66d9ef; font-weight: bold;">NetworkBo</span> {
@@ -1396,8 +1670,8 @@ spring.profiles.active=&lt;profile1&gt;,&lt;profile2&gt;
 </div>
 
 
-<div id="outline-container-orgebca401" class="outline-4">
-<h4 id="orgebca401"><span class="section-number-4">6.3.3</span> 传送门</h4>
+<div id="outline-container-orgca56e3c" class="outline-4">
+<h4 id="orgca56e3c"><span class="section-number-4">6.3.3</span> 传送门</h4>
 <div class="outline-text-4" id="text-6-3-3">
 <ul class="org-ul">
 <li><a href="https://orika-mapper.github.io/orika-docs/advanced-mappings.html">高级映射配置</a></li>
@@ -1408,16 +1682,16 @@ spring.profiles.active=&lt;profile1&gt;,&lt;profile2&gt;
 </div>
 
 
-<div id="outline-container-orga64a650" class="outline-2">
-<h2 id="orga64a650"><span class="section-number-2">7</span> 实践</h2>
+<div id="outline-container-orga26b5b3" class="outline-2">
+<h2 id="orga26b5b3"><span class="section-number-2">7</span> 实践</h2>
 <div class="outline-text-2" id="text-7">
 </div>
-<div id="outline-container-org1ff97e8" class="outline-3">
-<h3 id="org1ff97e8"><span class="section-number-3">7.1</span> <a href="https://github.com/ruanhao/show-me-the-code/tree/springboot-restful-service">Restful Service (MVC)</a></h3>
+<div id="outline-container-orgc697e43" class="outline-3">
+<h3 id="orgc697e43"><span class="section-number-3">7.1</span> <a href="https://github.com/ruanhao/show-me-the-code/tree/springboot-restful-service">Restful Service (MVC)</a></h3>
 <div class="outline-text-3" id="text-7-1">
 </div>
-<div id="outline-container-org9e18359" class="outline-4">
-<h4 id="org9e18359"><span class="section-number-4">7.1.1</span> WebApplicationInitializer</h4>
+<div id="outline-container-org15b0c43" class="outline-4">
+<h4 id="org15b0c43"><span class="section-number-4">7.1.1</span> WebApplicationInitializer</h4>
 <div class="outline-text-4" id="text-7-1-1">
 <p>
 实现 <code>WebApplicationInitializer</code> 接口便可以实现等同于对 <code>web.xml</code> 进行配置
@@ -1425,8 +1699,8 @@ spring.profiles.active=&lt;profile1&gt;,&lt;profile2&gt;
 </div>
 </div>
 
-<div id="outline-container-org913d131" class="outline-4">
-<h4 id="org913d131"><span class="section-number-4">7.1.2</span> Controller</h4>
+<div id="outline-container-orge005ae6" class="outline-4">
+<h4 id="orge005ae6"><span class="section-number-4">7.1.2</span> Controller</h4>
 <div class="outline-text-4" id="text-7-1-2">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #ae81ff;">@RestController</span>
@@ -1444,8 +1718,8 @@ spring.profiles.active=&lt;profile1&gt;,&lt;profile2&gt;
 </div>
 
 
-<div id="outline-container-orgfb6d990" class="outline-4">
-<h4 id="orgfb6d990"><span class="section-number-4">7.1.3</span> HttpMessageConverter</h4>
+<div id="outline-container-org7d049da" class="outline-4">
+<h4 id="org7d049da"><span class="section-number-4">7.1.3</span> HttpMessageConverter</h4>
 <div class="outline-text-4" id="text-7-1-3">
 <p>
 对每个 HTTP 请求，Spring MVC 将遍历所有配置的 HttpMessageConverter 对象，
@@ -1467,12 +1741,12 @@ HttpMessageConverter 工作于两个方向：
 </div>
 
 
-<div id="outline-container-orgdf20f92" class="outline-4">
-<h4 id="orgdf20f92"><span class="section-number-4">7.1.4</span> 异常处理</h4>
+<div id="outline-container-org829f8da" class="outline-4">
+<h4 id="org829f8da"><span class="section-number-4">7.1.4</span> 异常处理</h4>
 <div class="outline-text-4" id="text-7-1-4">
 </div>
-<div id="outline-container-org05ed8b3" class="outline-5">
-<h5 id="org05ed8b3"><span class="section-number-5">7.1.4.1</span> 异常级别</h5>
+<div id="outline-container-orge5783f8" class="outline-5">
+<h5 id="orge5783f8"><span class="section-number-5">7.1.4.1</span> 异常级别</h5>
 <div class="outline-text-5" id="text-7-1-4-1">
 <p>
 正常情况下，任何未被处理的异常将导致服务器返回 HTTP 500 Response 。
@@ -1504,8 +1778,8 @@ HttpMessageConverter 工作于两个方向：
 
 
 
-<div id="outline-container-org7504d0e" class="outline-5">
-<h5 id="org7504d0e"><span class="section-number-5">7.1.4.2</span> 控制器级别</h5>
+<div id="outline-container-orgb89b5ea" class="outline-5">
+<h5 id="orgb89b5ea"><span class="section-number-5">7.1.4.2</span> 控制器级别</h5>
 <div class="outline-text-5" id="text-7-1-4-2">
 <p>
 使用 <code>@ExceptionHandler</code> 注解处理同一个控制器中抛出的异常，这种方式的优点：
@@ -1560,8 +1834,8 @@ HttpMessageConverter 工作于两个方向：
 </div>
 </div>
 
-<div id="outline-container-org98e6a2e" class="outline-5">
-<h5 id="org98e6a2e"><span class="section-number-5">7.1.4.3</span> 全局级别</h5>
+<div id="outline-container-org41ba17e" class="outline-5">
+<h5 id="org41ba17e"><span class="section-number-5">7.1.4.3</span> 全局级别</h5>
 <div class="outline-text-5" id="text-7-1-4-3">
 <p>
 任何标注 <code>@ControllerAdvice</code> / <code>@RestControllerAdvice</code> 注解的类支持 3 种类型的方法：
@@ -1587,8 +1861,8 @@ HttpMessageConverter 工作于两个方向：
 </div>
 </div>
 
-<div id="outline-container-org1839e92" class="outline-6">
-<h6 id="org1839e92"><span class="section-number-6">7.1.4.3.1</span> 重新抛出</h6>
+<div id="outline-container-orgf2e2468" class="outline-6">
+<h6 id="orgf2e2468"><span class="section-number-6">7.1.4.3.1</span> 重新抛出</h6>
 <div class="outline-text-6" id="text-7-1-4-3-1">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #ae81ff;">@ControllerAdvice</span>
@@ -1622,12 +1896,12 @@ HttpMessageConverter 工作于两个方向：
 
 
 
-<div id="outline-container-org94911d4" class="outline-3">
-<h3 id="org94911d4"><span class="section-number-3">7.2</span> <a href="https://github.com/ruanhao/show-me-the-code/tree/springboot-application-event">Application Event</a></h3>
+<div id="outline-container-org2e28b4a" class="outline-3">
+<h3 id="org2e28b4a"><span class="section-number-3">7.2</span> <a href="https://github.com/ruanhao/show-me-the-code/tree/springboot-application-event">Application Event</a></h3>
 <div class="outline-text-3" id="text-7-2">
 </div>
-<div id="outline-container-org9f13647" class="outline-4">
-<h4 id="org9f13647"><span class="section-number-4">7.2.1</span> Event</h4>
+<div id="outline-container-org7cdcfe6" class="outline-4">
+<h4 id="org7cdcfe6"><span class="section-number-4">7.2.1</span> Event</h4>
 <div class="outline-text-4" id="text-7-2-1">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #ae81ff;">@ToString</span>
@@ -1650,8 +1924,8 @@ HttpMessageConverter 工作于两个方向：
 </div>
 
 
-<div id="outline-container-org6b1fc18" class="outline-4">
-<h4 id="org6b1fc18"><span class="section-number-4">7.2.2</span> Listener</h4>
+<div id="outline-container-org9213efa" class="outline-4">
+<h4 id="org9213efa"><span class="section-number-4">7.2.2</span> Listener</h4>
 <div class="outline-text-4" id="text-7-2-2">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #ae81ff;">@Component</span>
@@ -1670,8 +1944,8 @@ HttpMessageConverter 工作于两个方向：
 </div>
 
 
-<div id="outline-container-org86cd8d9" class="outline-4">
-<h4 id="org86cd8d9"><span class="section-number-4">7.2.3</span> Publisher</h4>
+<div id="outline-container-org10da0fd" class="outline-4">
+<h4 id="org10da0fd"><span class="section-number-4">7.2.3</span> Publisher</h4>
 <div class="outline-text-4" id="text-7-2-3">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #ae81ff;">@Service</span>
@@ -1693,8 +1967,8 @@ HttpMessageConverter 工作于两个方向：
 </div>
 
 
-<div id="outline-container-orgfd2dbb2" class="outline-4">
-<h4 id="orgfd2dbb2"><span class="section-number-4">7.2.4</span> 自定义 applicationEventMulticaster</h4>
+<div id="outline-container-orgcb2e5c2" class="outline-4">
+<h4 id="orgcb2e5c2"><span class="section-number-4">7.2.4</span> 自定义 applicationEventMulticaster</h4>
 <div class="outline-text-4" id="text-7-2-4">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #ae81ff;">@Bean</span>(name=<span style="color: #e6db74;">"applicationEventMulticaster"</span>)
@@ -1710,8 +1984,8 @@ HttpMessageConverter 工作于两个方向：
 </div>
 
 
-<div id="outline-container-org05948d9" class="outline-4">
-<h4 id="org05948d9"><span class="section-number-4">7.2.5</span> 常见 SpringApplicationEvent</h4>
+<div id="outline-container-orgecdc5b2" class="outline-4">
+<h4 id="orgecdc5b2"><span class="section-number-4">7.2.5</span> 常见 SpringApplicationEvent</h4>
 <div class="outline-text-4" id="text-7-2-5">
 <ul class="org-ul">
 <li>ApplicationEnvironmentPreparedEvent</li>
@@ -1728,12 +2002,12 @@ HttpMessageConverter 工作于两个方向：
 
 
 
-<div id="outline-container-org0cc5568" class="outline-3">
-<h3 id="org0cc5568"><span class="section-number-3">7.3</span> Springboot Test</h3>
+<div id="outline-container-org778774c" class="outline-3">
+<h3 id="org778774c"><span class="section-number-3">7.3</span> Springboot Test</h3>
 <div class="outline-text-3" id="text-7-3">
 </div>
-<div id="outline-container-org32d1593" class="outline-4">
-<h4 id="org32d1593"><span class="section-number-4">7.3.1</span> 样板文件</h4>
+<div id="outline-container-org3e7f372" class="outline-4">
+<h4 id="org3e7f372"><span class="section-number-4">7.3.1</span> 样板文件</h4>
 <div class="outline-text-4" id="text-7-3-1">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #ae81ff;">@RunWith</span>(SpringRunner.<span style="color: #f92672; font-weight: bold;">class</span>)
@@ -1757,8 +2031,8 @@ HttpMessageConverter 工作于两个方向：
 
 
 
-<div id="outline-container-orgb2cba7a" class="outline-4">
-<h4 id="orgb2cba7a"><span class="section-number-4">7.3.2</span> MockMvc</h4>
+<div id="outline-container-org4cbd0aa" class="outline-4">
+<h4 id="org4cbd0aa"><span class="section-number-4">7.3.2</span> MockMvc</h4>
 <div class="outline-text-4" id="text-7-3-2">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #ae81ff;">@Autowired</span>
@@ -1791,8 +2065,8 @@ HttpMessageConverter 工作于两个方向：
 </div>
 
 
-<div id="outline-container-org073895c" class="outline-4">
-<h4 id="org073895c"><span class="section-number-4">7.3.3</span> Hamcrest</h4>
+<div id="outline-container-orgb77c194" class="outline-4">
+<h4 id="orgb77c194"><span class="section-number-4">7.3.3</span> Hamcrest</h4>
 <div class="outline-text-4" id="text-7-3-3">
 <p>
 <code>import static org.hamcrest.Matchers.*;</code>
@@ -1803,8 +2077,8 @@ HttpMessageConverter 工作于两个方向：
 </p>
 </div>
 
-<div id="outline-container-orga27e46b" class="outline-5">
-<h5 id="orga27e46b"><span class="section-number-5">7.3.3.1</span> Core API</h5>
+<div id="outline-container-org444c1d3" class="outline-5">
+<h5 id="org444c1d3"><span class="section-number-5">7.3.3.1</span> Core API</h5>
 <div class="outline-text-5" id="text-7-3-3-1">
 <ul class="org-ul">
 <li>is</li>
@@ -1816,8 +2090,8 @@ HttpMessageConverter 工作于两个方向：
 </div>
 
 
-<div id="outline-container-org511a4ce" class="outline-5">
-<h5 id="org511a4ce"><span class="section-number-5">7.3.3.2</span> Object Matcher</h5>
+<div id="outline-container-orgbf38d9f" class="outline-5">
+<h5 id="orgbf38d9f"><span class="section-number-5">7.3.3.2</span> Object Matcher</h5>
 <div class="outline-text-5" id="text-7-3-3-2">
 <dl class="org-dl">
 <dt>hasToString(str)</dt><dd>To assert that the `toString` method of an Object returns a specified `str`</dd>
@@ -1829,8 +2103,8 @@ HttpMessageConverter 工作于两个方向：
 </div>
 
 
-<div id="outline-container-org428a963" class="outline-5">
-<h5 id="org428a963"><span class="section-number-5">7.3.3.3</span> Bean Matcher</h5>
+<div id="outline-container-orgebe76d0" class="outline-5">
+<h5 id="orgebe76d0"><span class="section-number-5">7.3.3.3</span> Bean Matcher</h5>
 <div class="outline-text-5" id="text-7-3-3-3">
 <ul class="org-ul">
 <li>hasProperty</li>
@@ -1840,8 +2114,8 @@ HttpMessageConverter 工作于两个方向：
 </div>
 
 
-<div id="outline-container-org90bfe6a" class="outline-5">
-<h5 id="org90bfe6a"><span class="section-number-5">7.3.3.4</span> Collection Matcher</h5>
+<div id="outline-container-org42fa2cc" class="outline-5">
+<h5 id="org42fa2cc"><span class="section-number-5">7.3.3.4</span> Collection Matcher</h5>
 <div class="outline-text-5" id="text-7-3-3-4">
 <ul class="org-ul">
 <li>empty</li>
@@ -1861,8 +2135,8 @@ HttpMessageConverter 工作于两个方向：
 </div>
 </div>
 
-<div id="outline-container-org79d85bb" class="outline-5">
-<h5 id="org79d85bb"><span class="section-number-5">7.3.3.5</span> Number Matcher</h5>
+<div id="outline-container-org1d45bea" class="outline-5">
+<h5 id="org1d45bea"><span class="section-number-5">7.3.3.5</span> Number Matcher</h5>
 <div class="outline-text-5" id="text-7-3-3-5">
 <ul class="org-ul">
 <li>greaterThan</li>
@@ -1875,8 +2149,8 @@ HttpMessageConverter 工作于两个方向：
 </div>
 
 
-<div id="outline-container-org086b6c2" class="outline-5">
-<h5 id="org086b6c2"><span class="section-number-5">7.3.3.6</span> Text Matcher</h5>
+<div id="outline-container-org8226a03" class="outline-5">
+<h5 id="org8226a03"><span class="section-number-5">7.3.3.6</span> Text Matcher</h5>
 <div class="outline-text-5" id="text-7-3-3-6">
 <ul class="org-ul">
 <li>isEmptyString</li>
@@ -1894,8 +2168,8 @@ HttpMessageConverter 工作于两个方向：
 </div>
 
 
-<div id="outline-container-org60a5ae4" class="outline-4">
-<h4 id="org60a5ae4"><span class="section-number-4">7.3.4</span> Mockito</h4>
+<div id="outline-container-orge8bb2c7" class="outline-4">
+<h4 id="orge8bb2c7"><span class="section-number-4">7.3.4</span> Mockito</h4>
 <div class="outline-text-4" id="text-7-3-4">
 <p>
 Mock 测试就是在测试过程中，对于某些不容易构造（如 HttpServletRequest 必须在Servlet 容器中才能构造出来）
@@ -1908,8 +2182,8 @@ Mock 最大的功能是把单元测试的耦合分解开，如果代码对另一
 </div>
 
 
-<div id="outline-container-org11d7d2b" class="outline-5">
-<h5 id="org11d7d2b"><span class="section-number-5">7.3.4.1</span> Mock 与 Stub 的区别</h5>
+<div id="outline-container-org08e773b" class="outline-5">
+<h5 id="org08e773b"><span class="section-number-5">7.3.4.1</span> Mock 与 Stub 的区别</h5>
 <div class="outline-text-5" id="text-7-3-4-1">
 <p>
 Mock 不是 Stub，两者是有区别的：
@@ -1925,8 +2199,8 @@ Mock 不是 Stub，两者是有区别的：
 
 
 
-<div id="outline-container-org5714cdd" class="outline-5">
-<h5 id="org5714cdd"><span class="section-number-5">7.3.4.2</span> 验证行为</h5>
+<div id="outline-container-org6c82927" class="outline-5">
+<h5 id="org6c82927"><span class="section-number-5">7.3.4.2</span> 验证行为</h5>
 <div class="outline-text-5" id="text-7-3-4-2">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #465457;">//</span><span style="color: #465457;">Let's import Mockito statically so that the code looks clearer</span>
@@ -1952,8 +2226,8 @@ verify(mockedList).clear();
 </div>
 
 
-<div id="outline-container-org156147a" class="outline-5">
-<h5 id="org156147a"><span class="section-number-5">7.3.4.3</span> 打桩</h5>
+<div id="outline-container-org68cf218" class="outline-5">
+<h5 id="org68cf218"><span class="section-number-5">7.3.4.3</span> 打桩</h5>
 <div class="outline-text-5" id="text-7-3-4-3">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #465457;">//</span><span style="color: #465457;">You can mock concrete classes, not just interfaces</span>
@@ -1977,8 +2251,8 @@ System.out.println(mockedList.get(999));
 </div>
 
 
-<div id="outline-container-org4a13a3c" class="outline-5">
-<h5 id="org4a13a3c"><span class="section-number-5">7.3.4.4</span> 连续调用打桩对象</h5>
+<div id="outline-container-org54c1374" class="outline-5">
+<h5 id="org54c1374"><span class="section-number-5">7.3.4.4</span> 连续调用打桩对象</h5>
 <div class="outline-text-5" id="text-7-3-4-4">
 <div class="org-src-container">
 <pre class="src src-java">when(mock.someMethod(<span style="color: #e6db74;">"some arg"</span>))
@@ -2007,8 +2281,8 @@ System.out.println(mock.someMethod(<span style="color: #e6db74;">"some arg"</spa
 </div>
 
 
-<div id="outline-container-org3fac4b3" class="outline-5">
-<h5 id="org3fac4b3"><span class="section-number-5">7.3.4.5</span> 参数匹配器</h5>
+<div id="outline-container-org638798d" class="outline-5">
+<h5 id="org638798d"><span class="section-number-5">7.3.4.5</span> 参数匹配器</h5>
 <div class="outline-text-5" id="text-7-3-4-5">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #465457;">//</span><span style="color: #465457;">stubbing using built-in anyInt() argument matcher</span>
@@ -2032,8 +2306,8 @@ verify(mockedList).get(anyInt());
 </div>
 
 
-<div id="outline-container-orga445758" class="outline-5">
-<h5 id="orga445758"><span class="section-number-5">7.3.4.6</span> 调用次数</h5>
+<div id="outline-container-org931b89d" class="outline-5">
+<h5 id="org931b89d"><span class="section-number-5">7.3.4.6</span> 调用次数</h5>
 <div class="outline-text-5" id="text-7-3-4-6">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #465457;">//</span><span style="color: #465457;">using mock</span>
@@ -2071,8 +2345,8 @@ times(1) 是默认的，因此，使用的 times(1) 可以显示的省略
 </div>
 
 
-<div id="outline-container-orgb7a07a7" class="outline-5">
-<h5 id="orgb7a07a7"><span class="section-number-5">7.3.4.7</span> 处理异常</h5>
+<div id="outline-container-org7fcd287" class="outline-5">
+<h5 id="org7fcd287"><span class="section-number-5">7.3.4.7</span> 处理异常</h5>
 <div class="outline-text-5" id="text-7-3-4-7">
 <div class="org-src-container">
 <pre class="src src-java">doThrow(<span style="color: #f92672; font-weight: bold;">new</span> <span style="color: #66d9ef; font-weight: bold;">RuntimeException</span>()).when(mockedList).clear();
@@ -2086,8 +2360,8 @@ mockedList.clear();
 </div>
 
 
-<div id="outline-container-orgfa0b999" class="outline-5">
-<h5 id="orgfa0b999"><span class="section-number-5">7.3.4.8</span> 确保不发生交互</h5>
+<div id="outline-container-org72b2f2d" class="outline-5">
+<h5 id="org72b2f2d"><span class="section-number-5">7.3.4.8</span> 确保不发生交互</h5>
 <div class="outline-text-5" id="text-7-3-4-8">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #465457;">//</span><span style="color: #465457;">using mocks - only mockOne is interacted</span>
@@ -2107,8 +2381,8 @@ verifyZeroInteractions(mockTwo, mockThree);
 </div>
 
 
-<div id="outline-container-orgd1638cc" class="outline-5">
-<h5 id="orgd1638cc"><span class="section-number-5">7.3.4.9</span> 寻找多余交互</h5>
+<div id="outline-container-orge651ef9" class="outline-5">
+<h5 id="orge651ef9"><span class="section-number-5">7.3.4.9</span> 寻找多余交互</h5>
 <div class="outline-text-5" id="text-7-3-4-9">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #465457;">//</span><span style="color: #465457;">using mocks</span>
@@ -2125,12 +2399,12 @@ verifyNoMoreInteractions(mockedList);
 </div>
 
 
-<div id="outline-container-org48d5b9d" class="outline-5">
-<h5 id="org48d5b9d"><span class="section-number-5">7.3.4.10</span> 注解</h5>
+<div id="outline-container-org8b29867" class="outline-5">
+<h5 id="org8b29867"><span class="section-number-5">7.3.4.10</span> 注解</h5>
 <div class="outline-text-5" id="text-7-3-4-10">
 </div>
-<div id="outline-container-org1b63897" class="outline-6">
-<h6 id="org1b63897"><span class="section-number-6">7.3.4.10.1</span> 启用注解</h6>
+<div id="outline-container-orga9b6d64" class="outline-6">
+<h6 id="orga9b6d64"><span class="section-number-6">7.3.4.10.1</span> 启用注解</h6>
 <div class="outline-text-6" id="text-7-3-4-10-1">
 <div class="org-src-container">
 <pre class="src src-java"><span style="color: #ae81ff;">@RunWith</span>(MockitoJUnitRunner.<span style="color: #f92672; font-weight: bold;">class</span>)
@@ -2143,8 +2417,8 @@ verifyNoMoreInteractions(mockedList);
 </div>
 
 
-<div id="outline-container-org58c2165" class="outline-6">
-<h6 id="org58c2165"><span class="section-number-6">7.3.4.10.2</span> @Mock</h6>
+<div id="outline-container-org516664f" class="outline-6">
+<h6 id="org516664f"><span class="section-number-6">7.3.4.10.2</span> @Mock</h6>
 <div class="outline-text-6" id="text-7-3-4-10-2">
 <p>
 不使用注解：
@@ -2188,8 +2462,8 @@ verifyNoMoreInteractions(mockedList);
 </div>
 
 
-<div id="outline-container-org0c64320" class="outline-6">
-<h6 id="org0c64320"><span class="section-number-6">7.3.4.10.3</span> @Spy</h6>
+<div id="outline-container-org91b3ed3" class="outline-6">
+<h6 id="org91b3ed3"><span class="section-number-6">7.3.4.10.3</span> @Spy</h6>
 <div class="outline-text-6" id="text-7-3-4-10-3">
 <p>
 不使用注解：
@@ -2243,8 +2517,8 @@ verifyNoMoreInteractions(mockedList);
 </div>
 
 
-<div id="outline-container-orga7bee76" class="outline-6">
-<h6 id="orga7bee76"><span class="section-number-6">7.3.4.10.4</span> @Captor</h6>
+<div id="outline-container-org2df906d" class="outline-6">
+<h6 id="org2df906d"><span class="section-number-6">7.3.4.10.4</span> @Captor</h6>
 <div class="outline-text-6" id="text-7-3-4-10-4">
 <p>
 不使用注解：
@@ -2290,8 +2564,8 @@ verifyNoMoreInteractions(mockedList);
 </div>
 
 
-<div id="outline-container-org9f7909b" class="outline-6">
-<h6 id="org9f7909b"><span class="section-number-6">7.3.4.10.5</span> @InjectMocks</h6>
+<div id="outline-container-orgb40bc92" class="outline-6">
+<h6 id="orgb40bc92"><span class="section-number-6">7.3.4.10.5</span> @InjectMocks</h6>
 <div class="outline-text-6" id="text-7-3-4-10-5">
 <p>
 相当于同时使用 @Spy 和 @Mock
@@ -2317,8 +2591,8 @@ verifyNoMoreInteractions(mockedList);
 </div>
 </div>
 
-<div id="outline-container-orgd3688a4" class="outline-5">
-<h5 id="orgd3688a4"><span class="section-number-5">7.3.4.11</span> 传送门</h5>
+<div id="outline-container-org14ba30a" class="outline-5">
+<h5 id="org14ba30a"><span class="section-number-5">7.3.4.11</span> 传送门</h5>
 <div class="outline-text-5" id="text-7-3-4-11">
 <p>
 <a href="https://www.baeldung.com/tag/mockito/">Baeldung Mockito</a>
@@ -2330,16 +2604,16 @@ verifyNoMoreInteractions(mockedList);
 </div>
 
 
-<div id="outline-container-org104a9eb" class="outline-2">
-<h2 id="org104a9eb"><span class="section-number-2">8</span> 参考</h2>
+<div id="outline-container-org8d08925" class="outline-2">
+<h2 id="org8d08925"><span class="section-number-2">8</span> 参考</h2>
 <div class="outline-text-2" id="text-8">
 </div>
-<div id="outline-container-orga6cd3e9" class="outline-3">
-<h3 id="orga6cd3e9"><span class="section-number-3">8.1</span> <a href="https://docs.spring.io/spring-boot/docs/2.0.1.RELEASE/reference/htmlsingle/#common-application-properties">所有可配置选项</a></h3>
+<div id="outline-container-org62771fa" class="outline-3">
+<h3 id="org62771fa"><span class="section-number-3">8.1</span> <a href="https://docs.spring.io/spring-boot/docs/2.0.1.RELEASE/reference/htmlsingle/#common-application-properties">所有可配置选项</a></h3>
 </div>
 
-<div id="outline-container-org0cf8ffb" class="outline-3">
-<h3 id="org0cf8ffb"><span class="section-number-3">8.2</span> <a href="https://spring.io/blog/2013/06/03/content-negotiation-using-views">Content Negotiation Using Views</a></h3>
+<div id="outline-container-org5215955" class="outline-3">
+<h3 id="org5215955"><span class="section-number-3">8.2</span> <a href="https://spring.io/blog/2013/06/03/content-negotiation-using-views">Content Negotiation Using Views</a></h3>
 </div>
 </div>
 </div>

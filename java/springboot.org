@@ -13,11 +13,95 @@
 | Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
 #+HTML: </div>
 
-* Spring MVC
+* WEB
 
-** Handler
+** 静态资源路径
 
-*** 使用 ServletAPI 作为入参
+- =classpath:/META-INF/resources/=
+- =classpath:/resources/=
+- =classpath:/static/=
+- =classpath:/public/=
+- 当前项目的根路径(=/=)
+
+
+** Spring MVC 原理
+
+#+HTML: <img src="http://www.51gjie.com/Images/image1/epnnzel2.4i4.jpg"/>
+#+HTML: </br>
+#+HTML: <img src="http://www.51gjie.com/Images/image1/srcc4b4l.hix.jpg"/>
+
+
+- 用户发送请求到前端控制器(DispatcherServlet)，前端控制器收到请求后自己不进行处理，而是委托给其他的解析器进行处理，作为统一访问点，进行全局的流程控制
+- 前端控制器请求 HandlerMapping 查找 Handler ，返回 HandlerExecutionChain 对象（包含一个 Handler 对象，即 *Controller* ，和多个 HandlerInterceptor 拦截器）对象，
+  通过这种策略模式，很容易添加新的映射策略（这个过程可以根据 xml 配置或注解进行查找）
+- HandlerAdapter 将会把处理器包装为适配器，从而支持多种类型的处理器，即适配器设计模式的应用，从而很容易支持很多类型的处理器
+- 处理器适配器去执行 Handler ，将会根据适配的结果调用真正的处理器的功能处理方法，完成功能处理，并返回一个 ModelAndView 对象
+- 处理器适配器向前端控制器返回ModelAndView，ModelAndView是springmvc框架的一个底层对象，包括 Model 和 View
+- 前端控制器请求 ViewResolver 进行视图解析，即根据逻辑视图名解析成真正的视图
+- View 会根据传进来的 Model 模型数据进行渲染
+- 前端控制器向用户响应结果
+
+*** DispatcherServlet 原理
+
+#+HTML: <img src="http://www.51gjie.com/Images/image1/0meux44p.4vz.jpg"/>
+
+
+*** 运行流程
+
+[[file:img/spring-mvc-seq.png]]
+
+#+HTML: <img src="https://www.javacodebook.com/wp-content/uploads/2015/03/fig14-06.jpg"/>
+
+*** Default Servlet Handler
+
+
+=<mvc:default-servlet-handler/>= 将在 SpringMVC 上下文中定义一个 DefaultServletHttpRequestHandler ，它会对进入 DispatcherServlet 的请求进行筛查，
+如果发现是没有经过映射的请求，就将该请求交由 WEB 应用服务器默认的 Servlet 处理， *如果不是静态资源的请求，才由 DispatcherServlet 继续处理* 。
+
+一般 WEB 应用服务器默认的 Servlet 的名称都是 default 。若所使用的 WEB 服务器的默认 Servlet 名称不是 default ，则需要通过 =default-servlet-name= 属性显式指定。
+
+
+*** @InitBinder
+
+- 由 =@InitBinder= 标识的方法，可以对 =WebDataBinder= 对象进行初始化
+- WebDataBinder 是 DataBinder 的子类，用于完成由表单字段到 POJO 属性的绑定
+- =@InitBinder= 方法不能有返回值，它必须声明为void
+- =@InitBinder= 方法的参数通常是 WebDataBinder
+
+*** HttpMessageConverter<T>
+
+#+HTML: <img src="https://qsli.github.io/2016/11/29/HttpMessageConverter/http-message-converter.jpg"/>
+
+负责将请求信息转换为一个 T 类型的对象，或将 T 类型的对象输出为响应信息。
+
+**** 接口方法
+
+- canRead
+
+  指定转换器可以读取的对象类型，即是否可将请求信息转换为 T 类型的对象
+- canWrite
+
+  指定是否可将 T 类型的对象写到响应流中
+- read
+
+  将请求信息转为 T 类型对象
+- write
+
+  将 T 类型对象写到响应流
+
+
+**** 使用方式
+
+- 使用 =@RequestBody= / =@ResponseBody= 对处理方法进行标注
+- 使用 =HttpEntity<T>= / =ResponseEntity<T>= 作为入参或返回值
+
+**** 原理
+
+Spring 首先根据请求头选择匹配的 HttpMessageConverter ，进而根据泛型类型过滤匹配的 HttpMessageConverter ，若找不到可用的 converter 则报错。
+
+
+
+*** 使用 ServletAPI 作为 Handler 入参
 
 MVC 的 Handler 方法可以接受的 ServletAPI 类型的参数，具体可参考：
 
@@ -35,7 +119,8 @@ MVC 的 Handler 方法可以接受的 ServletAPI 类型的参数，具体可参�
 - Reader
 - Writer
 
-** HiddenHttpMethodFilter
+
+*** HiddenHttpMethodFilter
 
 浏览器表单只支持 GET 与 POST 请求，而 DELETE，PUT 等方法并不支持，Spring3.0 添加了一个过滤器，可以将这些请求转换为标准的 HTTP 方法，
 使得支持 GET，POST，PUT 与 DELETE 请求。
@@ -97,55 +182,36 @@ MVC 的 Handler 方法可以接受的 ServletAPI 类型的参数，具体可参�
 
 
 
-* WEB
+*** 拦截器
 
-** 静态资源路径
+**** 执行流程
 
-- =classpath:/META-INF/resources/=
-- =classpath:/resources/=
-- =classpath:/static/=
-- =classpath:/public/=
-- 当前项目的根路径(=/=)
+[[file:img/spring-mvc-filter-seq.png]]
 
 
-** Spring MVC 原理
+*** 异常处理
 
-#+HTML: <img src="http://www.51gjie.com/Images/image1/epnnzel2.4i4.jpg"/>
-#+HTML: </br>
-#+HTML: <img src="http://www.51gjie.com/Images/image1/srcc4b4l.hix.jpg"/>
+[[file:img/spring-mvc-ex-handle.png]]
 
 
-- 用户发送请求到前端控制器(DispatcherServlet)，前端控制器收到请求后自己不进行处理，而是委托给其他的解析器进行处理，作为统一访问点，进行全局的流程控制
-- 前端控制器请求 HandlerMapping 查找 Handler ，返回 HandlerExecutionChain 对象（包含一个 Handler 对象，即 *Controller* ，和多个 HandlerInterceptor 拦截器）对象，
-  通过这种策略模式，很容易添加新的映射策略（这个过程可以根据 xml 配置或注解进行查找）
-- HandlerAdapter 将会把处理器包装为适配器，从而支持多种类型的处理器，即适配器设计模式的应用，从而很容易支持很多类型的处理器
-- 处理器适配器去执行 Handler ，将会根据适配的结果调用真正的处理器的功能处理方法，完成功能处理，并返回一个 ModelAndView 对象
-- 处理器适配器向前端控制器返回ModelAndView，ModelAndView是springmvc框架的一个底层对象，包括 Model 和 View
-- 前端控制器请求 ViewResolver 进行视图解析，即根据逻辑视图名解析成真正的视图
-- View 会根据传进来的 Model 模型数据进行渲染
-- 前端控制器向用户响应结果、
+**** ExceptionHandlerExceptionResolver
 
-*** DispatcherServlet 原理
+[[file:img/spring-mvc-ExceptionHandlerExceptionResolver.png]]
 
-#+HTML: <img src="http://www.51gjie.com/Images/image1/0meux44p.4vz.jpg"/>
+***** ResponseStatusExceptionResolver
+
+[[file:img/spring-mvc-ResponseStatusExceptionResolver.png]]
 
 
-*** 重要组件
 
-**** ContentNegotiatingViewResovler
+
+*** ContentNegotiatingViewResovler
 
 #+HTML: <img src="http://blog.springsource.org/wp-content/uploads/2013/06/cnvr-all-flow.png"/>
 
 - =ContentNegotiatingViewResolver= 组合所有视图解析器
 - 可以自定义一个视图解析器， =ContentNegotiatingViewResolver= 自动将其整合进来
 
-**** =HttpMessageConverters=
-
-转换 HTTP 响应，如 User => JOSN
-
-**** =ConfigurableWebBindingInitializer=
-
-用于将请求的数据转换成 RequestBody
 
 
 * 缓存
