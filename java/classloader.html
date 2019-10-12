@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- 2019-10-09 Wed 10:52 -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>类加载器</title>
+<meta name="generator" content="Org mode">
+<meta name="author" content="Hao Ruan">
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="../css/style.css" />
+<link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+<link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">类加载器</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgdc65249">1. 类的加载，连接与初始化</a>
+<ul>
+<li><a href="#orgc4573fe">1.1. 加载</a></li>
+<li><a href="#orgd3969a1">1.2. 连接</a></li>
+<li><a href="#org3fdf9ea">1.3. 初始化</a></li>
+</ul>
+</li>
+<li><a href="#orgc10f0ab">2. Create Class Without Unchecked Cast</a></li>
+<li><a href="#orgda26d8a">3. 类加载器加载文件</a></li>
+<li><a href="#orgd684cd9">4. ClassLoader</a>
+<ul>
+<li>
+<ul>
+<li><a href="#org9c79a90">4.0.1. Bootstrap</a></li>
+<li><a href="#orgedf8457">4.0.2. Extension</a></li>
+<li><a href="#org7025d6f">4.0.3. System</a></li>
+<li><a href="#org516fe9d">4.0.4. 类加载过程</a></li>
+<li><a href="#org73199ec">4.0.5. Summary</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org2cd73f5">5. 编写自定义 ClassLoader</a>
+<ul>
+<li><a href="#org2d4ee07">5.1. 继承 ClassLoader 抽象类</a></li>
+<li><a href="#org634f476">5.2. loadClass(String name)</a></li>
+<li><a href="#orgabd766a">5.3. findClass(String name)</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgdc65249">1. 类的加载，连接与初始化</a>
+<ul>
+<li><a href="#orgc4573fe">1.1. 加载</a></li>
+<li><a href="#orgd3969a1">1.2. 连接</a></li>
+<li><a href="#org3fdf9ea">1.3. 初始化</a></li>
+</ul>
+</li>
+<li><a href="#orgc10f0ab">2. Create Class Without Unchecked Cast</a></li>
+<li><a href="#orgda26d8a">3. 类加载器加载文件</a></li>
+<li><a href="#orgd684cd9">4. ClassLoader</a>
+<ul>
+<li>
+<ul>
+<li><a href="#org9c79a90">4.0.1. Bootstrap</a></li>
+<li><a href="#orgedf8457">4.0.2. Extension</a></li>
+<li><a href="#org7025d6f">4.0.3. System</a></li>
+<li><a href="#org516fe9d">4.0.4. 类加载过程</a></li>
+<li><a href="#org73199ec">4.0.5. Summary</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org2cd73f5">5. 编写自定义 ClassLoader</a>
+<ul>
+<li><a href="#org2d4ee07">5.1. 继承 ClassLoader 抽象类</a></li>
+<li><a href="#org634f476">5.2. loadClass(String name)</a></li>
+<li><a href="#orgabd766a">5.3. findClass(String name)</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-orgdc65249" class="outline-2">
+<h2 id="orgdc65249"><span class="section-number-2">1</span> 类的加载，连接与初始化</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-orgc4573fe" class="outline-3">
+<h3 id="orgc4573fe"><span class="section-number-3">1.1</span> 加载</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+查找并加载类的二进制数据
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgd3969a1" class="outline-3">
+<h3 id="orgd3969a1"><span class="section-number-3">1.2</span> 连接</h3>
+<div class="outline-text-3" id="text-1-2">
+<ul class="org-ul">
+<li>验证
+确保被加载类的正确性</li>
+<li>准备
+为类的静态变量分配内存，并将其初始化为 <b>默认值</b></li>
+<li>解析
+把类中的符号引用转换为直接引用</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org3fdf9ea" class="outline-3">
+<h3 id="org3fdf9ea"><span class="section-number-3">1.3</span> 初始化</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+为类的静态变量赋予 <b>正确的初始值</b>
+</p>
+</div>
+</div>
+</div>
+
+
+
+
+<div id="outline-container-orgc10f0ab" class="outline-2">
+<h2 id="orgc10f0ab"><span class="section-number-2">2</span> Create Class Without Unchecked Cast</h2>
+<div class="outline-text-2" id="text-2">
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #66d9ef; font-weight: bold;">Class</span>&lt;? <span style="color: #f92672; font-weight: bold;">extends</span> <span style="color: #66d9ef; font-weight: bold;">MyClass</span>&gt; <span style="color: #fd971f;">clazz</span> = <span style="color: #ae81ff;">null</span>;
+<span style="color: #f92672; font-weight: bold;">try</span> {
+    clazz = Class.forName(<span style="color: #e6db74;">"MyClass"</span>, <span style="color: #ae81ff;">true</span>, ClassLoader.getSystemClassLoader()).asSubclass(MyClass.<span style="color: #f92672; font-weight: bold;">class</span>);
+} <span style="color: #f92672; font-weight: bold;">catch</span> (<span style="color: #66d9ef; font-weight: bold;">Exception</span> <span style="color: #fd971f;">e</span>) {
+    e.printStackTrace();
+}
+</pre>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-orgda26d8a" class="outline-2">
+<h2 id="orgda26d8a"><span class="section-number-2">3</span> 类加载器加载文件</h2>
+<div class="outline-text-2" id="text-3">
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #66d9ef; font-weight: bold;">InputStream</span> <span style="color: #fd971f;">ips</span> = ClassName.<span style="color: #f92672; font-weight: bold;">class</span>.getClassLoader().getResource(<span style="color: #e6db74;">"resourse-file-name"</span>); <span style="color: #465457;">// </span><span style="color: #465457;">Way 1 &#38656;&#25351;&#23450;&#30456;&#23545; classpath &#30340;&#36335;&#24452;</span>
+
+<span style="color: #66d9ef; font-weight: bold;">InputStream</span> <span style="color: #fd971f;">ips</span> = ClassName.<span style="color: #f92672; font-weight: bold;">class</span>.getResourceAsStream(<span style="color: #e6db74;">"resourse-file-name"</span>); <span style="color: #465457;">// </span><span style="color: #465457;">Way 2 &#38656;&#25351;&#23450;&#30456;&#23545;&#21253;&#30340;&#36335;&#24452;</span>
+
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgd684cd9" class="outline-2">
+<h2 id="orgd684cd9"><span class="section-number-2">4</span> ClassLoader</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+类加载器是一个用来加载类文件的类。Java源代码通过javac编译器编译成类文件。类加载器负责加载文件系统、网络或其他来源的类文件。有三种默认使用的类加载器：Bootstrap类加载器、Extension类加载器和System类加载器（或者叫作Application类加载器）。*每个类加载器负责加载特定位置的类*
+</p>
+</div>
+
+<div id="outline-container-org9c79a90" class="outline-4">
+<h4 id="org9c79a90"><span class="section-number-4">4.0.1</span> Bootstrap</h4>
+<div class="outline-text-4" id="text-4-0-1">
+<p>
+Bootstrap 类加载器负责加载rt.jar中的JDK类文件，它是所有类加载器的父加载器。Bootstrap类加载器没有任何父类加载器，如果你调用String.class.getClassLoader()，会返回null。Bootstrap加载器被称为初始类加载器。
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-orgedf8457" class="outline-4">
+<h4 id="orgedf8457"><span class="section-number-4">4.0.2</span> Extension</h4>
+<div class="outline-text-4" id="text-4-0-2">
+<p>
+而Extension将加载类的请求先委托给它的父加载器，也就是Bootstrap，如果没有成功加载的话，再从jre/lib/ext目录下或者java.ext.dirs系统属性定义的目录下加载类。Extension加载器由sun.misc.Launcher$ExtClassLoader实现。
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-org7025d6f" class="outline-4">
+<h4 id="org7025d6f"><span class="section-number-4">4.0.3</span> System</h4>
+<div class="outline-text-4" id="text-4-0-3">
+<p>
+第三种默认的加载器就是System类加载器（又叫作Application类加载器）。它负责从classpath环境变量中加载某些应用相关的类，classpath环境变量通常由-classpath或-cp命令行选项来定义，或者是JAR中的Manifest的classpath属性。Application类加载器是Extension类加载器的子加载器。通过sun.misc.Launcher$AppClassLoader实现。
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-org516fe9d" class="outline-4">
+<h4 id="org516fe9d"><span class="section-number-4">4.0.4</span> 类加载过程</h4>
+<div class="outline-text-4" id="text-4-0-4">
+<ol class="org-ol">
+<li>首先由当前线程的类加载器( Thread.getContextClassLoader() )来完成加载</li>
+
+<li>如果类 A 引用了类 B ，JVM将使用加载类 A 的类加载器来加载类 B</li>
+
+<li>也可以直接调用 ClassLoader.loadClass() 方法来指定某个类加载器去加载某个类</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org73199ec" class="outline-4">
+<h4 id="org73199ec"><span class="section-number-4">4.0.5</span> Summary</h4>
+<div class="outline-text-4" id="text-4-0-5">
+<p>
+除了Bootstrap类加载器是大部分由C来写的，其他的类加载器都是通过java.lang.ClassLoader来实现的。
+</p>
+
+<p>
+下面是三种类加载器加载类文件的地方：
+</p>
+
+<ul class="org-ul">
+<li>Bootstrap类加载器   - JRE/lib/rt.jar</li>
+
+<li>Extension类加载器   - JRE/lib/ext或者java.ext.dirs指向的目录</li>
+
+<li>Application类加载器 - CLASSPATH环境变量, 由-classpath或-cp选项定义,或者是JAR中的Manifest的classpath属性定义.</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org2cd73f5" class="outline-2">
+<h2 id="org2cd73f5"><span class="section-number-2">5</span> 编写自定义 ClassLoader</h2>
+<div class="outline-text-2" id="text-5">
+</div>
+<div id="outline-container-org2d4ee07" class="outline-3">
+<h3 id="org2d4ee07"><span class="section-number-3">5.1</span> 继承 ClassLoader 抽象类</h3>
+</div>
+
+
+<div id="outline-container-org634f476" class="outline-3">
+<h3 id="org634f476"><span class="section-number-3">5.2</span> loadClass(String name)</h3>
+<div class="outline-text-3" id="text-5-2">
+<pre class="example">
+该方法内部实现了父委托机制，一般情况下不用覆写
+当父类加载器无法加载时，将调用 findClass(String name)
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgabd766a" class="outline-3">
+<h3 id="orgabd766a"><span class="section-number-3">5.3</span> findClass(String name)</h3>
+<div class="outline-text-3" id="text-5-3">
+<pre class="example">
+需要覆写该方法
+需实现找到 class 文件，并转换成字节流
+将字节流传入 defineClass(String binaryName, byte[] stream, int off, int len) 即返回 Class 对象引用
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Hao Ruan</p>
+<p class="date">Created: 2019-10-09 Wed 10:52</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

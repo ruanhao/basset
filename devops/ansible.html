@@ -1,23 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<!-- 2019-10-12 Sat 16:19 -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ansible</title>
-<!-- 2018-02-05 Mon 13:43 -->
-<meta  charset="utf-8">
-<meta  name="generator" content="Org-mode">
-<meta  name="author" content="Hao Ruan">
+<meta name="generator" content="Org mode">
+<meta name="author" content="Hao Ruan">
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
-  .title  { text-align: center; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
   .todo   { font-family: monospace; color: red; }
-  .done   { color: green; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
   .tag    { background-color: #eee; font-family: monospace;
             padding: 2px; font-size: 80%; font-weight: normal; }
   .timestamp { color: #bebebe; }
   .timestamp-kwd { color: #5f9ea0; }
-  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
-  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
-  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
   .underline { text-decoration: underline; }
   #postamble p, #preamble p { font-size: 90%; margin: .2em; }
   p.verse { margin-left: 3%; }
@@ -44,27 +51,111 @@
     border: 1px solid black;
   }
   pre.src:hover:before { display: inline;}
-  pre.src-sh:before    { content: 'sh'; }
-  pre.src-bash:before  { content: 'sh'; }
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
   pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
-  pre.src-R:before     { content: 'R'; }
-  pre.src-perl:before  { content: 'Perl'; }
-  pre.src-java:before  { content: 'Java'; }
-  pre.src-sql:before   { content: 'SQL'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
 
   table { border-collapse:collapse; }
   caption.t-above { caption-side: top; }
   caption.t-bottom { caption-side: bottom; }
   td, th { vertical-align:top;  }
-  th.right  { text-align: center;  }
-  th.left   { text-align: center;   }
-  th.center { text-align: center; }
-  td.right  { text-align: right;  }
-  td.left   { text-align: left;   }
-  td.center { text-align: center; }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
   dt { font-weight: bold; }
-  .footpara:nth-child(2) { display: inline; }
-  .footpara { display: block; }
+  .footpara { display: inline; }
   .footdef  { margin-bottom: 1em; }
   .figure { padding: 1em; }
   .figure p { text-align: center; }
@@ -84,16 +175,17 @@
     { font-size: 10px; font-weight: bold; white-space: nowrap; }
   .org-info-js_search-highlight
     { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
   /*]]>*/-->
 </style>
 <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
-<link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+<link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2013 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -142,138 +234,169 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. Inventory</a>
+<li><a href="#org58312e3">1. 工作架构与原理</a>
 <ul>
-<li><a href="#sec-1-1">1.1. 静态配置</a></li>
-</ul>
-</li>
-<li><a href="#sec-2">2. Module</a>
+<li><a href="#org5e92691">1.1. 相关配置文件</a>
 <ul>
-<li><a href="#sec-2-1">2.1. 文件处理</a>
+<li><a href="#org941a2ec">1.1.1. 主配置文件 (<code>/etc/ansible/ansible.cfg</code>)</a></li>
+<li><a href="#org7151bc5">1.1.2. 主机清单配置文件 (<code>/etc/ansible/hosts</code>)</a>
 <ul>
-<li><a href="#sec-2-1-1">2.1.1. synchronize</a></li>
-<li><a href="#sec-2-1-2">2.1.2. copy</a></li>
-<li><a href="#sec-2-1-3">2.1.3. get_url</a></li>
-<li><a href="#sec-2-1-4">2.1.4. template</a></li>
-</ul>
-</li>
-<li><a href="#sec-2-2">2.2. 网络管理</a>
-<ul>
-<li><a href="#sec-2-2-1">2.2.1. ping</a></li>
-</ul>
-</li>
-<li><a href="#sec-2-3">2.3. 服务管理</a>
-<ul>
-<li><a href="#sec-2-3-1">2.3.1. service</a></li>
-<li><a href="#sec-2-3-2">2.3.2. cron</a></li>
-</ul>
-</li>
-<li><a href="#sec-2-4">2.4. 远程执行</a>
-<ul>
-<li><a href="#sec-2-4-1">2.4.1. command</a></li>
-<li><a href="#sec-2-4-2">2.4.2. shell</a></li>
-</ul>
-</li>
-<li><a href="#sec-2-5">2.5. 资产管理</a>
-<ul>
-<li><a href="#sec-2-5-1">2.5.1. setup</a></li>
-</ul>
-</li>
-<li><a href="#sec-2-6">2.6. 包管理</a>
-<ul>
-<li><a href="#sec-2-6-1">2.6.1. apt</a></li>
-<li><a href="#sec-2-6-2">2.6.2. yum</a></li>
-</ul>
-</li>
-<li><a href="#sec-2-7">2.7. 主要用于 Playbook 的模块</a>
-<ul>
-<li><a href="#sec-2-7-1">2.7.1. pause</a></li>
-<li><a href="#sec-2-7-2">2.7.2. wait_for</a></li>
-<li><a href="#sec-2-7-3">2.7.3. add_host</a></li>
-<li><a href="#sec-2-7-4">2.7.4. group_by</a></li>
-<li><a href="#sec-2-7-5">2.7.5. debug</a></li>
-<li><a href="#sec-2-7-6">2.7.6. fail</a></li>
+<li><a href="#org046a82b">1.1.2.1. 对主机进行分组</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#sec-3">3. Task</a></li>
-<li><a href="#sec-4">4. Variable</a>
+<li><a href="#org8463101">1.2. 相关命令</a>
 <ul>
-<li><a href="#sec-4-1">4.1. 在 Inventory 中定义变量</a></li>
-<li><a href="#sec-4-2">4.2. 在 Playbook 中定义变量</a>
+<li><a href="#org3905c9e">1.2.1. 临时命令执行工具 (<code>/usr/bin/ansible</code>)</a>
 <ul>
-<li><a href="#sec-4-2-1">4.2.1. vars, vars_files 关键字</a></li>
-<li><a href="#sec-4-2-2">4.2.2. vars_prompt 实现人机交互</a></li>
-<li><a href="#sec-4-2-3">4.2.3. 通过 roles 带入变量</a></li>
+<li><a href="#orga3d2832">1.2.1.1. 执行过程</a></li>
+<li><a href="#org125090a">1.2.1.2. 执行状态</a></li>
+<li><a href="#org0d56a5b">1.2.1.3. 显示所有主机</a></li>
 </ul>
 </li>
-<li><a href="#sec-4-3">4.3. 注册变量</a></li>
-<li><a href="#sec-4-4">4.4. 通过 fact 获取/设置变量</a></li>
-<li><a href="#sec-4-5">4.5. 内置变量</a>
+<li><a href="#orgdf56cfe">1.2.2. 模块查看工具 (<code>/usr/bin/ansible-doc</code>)</a>
 <ul>
-<li><a href="#sec-4-5-1">4.5.1. hostvars</a></li>
-<li><a href="#sec-4-5-2">4.5.2. inventory_hostname</a></li>
-<li><a href="#sec-4-5-3">4.5.3. inventory_hostname_short</a></li>
-<li><a href="#sec-4-5-4">4.5.4. group_names</a></li>
-<li><a href="#sec-4-5-5">4.5.5. groups</a></li>
-<li><a href="#sec-4-5-6">4.5.6. play_hosts</a></li>
-<li><a href="#sec-4-5-7">4.5.7. ansible_version</a></li>
-<li><a href="#sec-4-5-8">4.5.8. inventory_dir</a></li>
-<li><a href="#sec-4-5-9">4.5.9. inventory_file</a></li>
+<li><a href="#orga0eb10c">1.2.2.1. 显示所有模块</a></li>
+<li><a href="#org5ec9174">1.2.2.2. 查看模块用法</a></li>
 </ul>
 </li>
-<li><a href="#sec-4-6">4.6. 通过命令行设置变量</a></li>
-</ul>
-</li>
-<li><a href="#sec-5">5. Template</a>
-<ul>
-<li><a href="#sec-5-1">5.1. 示例</a></li>
-</ul>
-</li>
-<li><a href="#sec-6">6. Playbook</a>
-<ul>
-<li><a href="#sec-6-1">6.1. 示例</a></li>
-<li><a href="#sec-6-2">6.2. 循环</a>
-<ul>
-<li><a href="#sec-6-2-1">6.2.1. with_items</a></li>
-<li><a href="#sec-6-2-2">6.2.2. with_nested</a></li>
-<li><a href="#sec-6-2-3">6.2.3. with_dict</a></li>
-<li><a href="#sec-6-2-4">6.2.4. with_subelement</a></li>
-<li><a href="#sec-6-2-5">6.2.5. with_sequence</a></li>
-<li><a href="#sec-6-2-6">6.2.6. with_random_choice</a></li>
-<li><a href="#sec-6-2-7">6.2.7. do_util</a></li>
-</ul>
-</li>
-<li><a href="#sec-6-3">6.3. 条件</a>
-<ul>
-<li><a href="#sec-6-3-1">6.3.1. when</a>
-<ul>
-<li><a href="#sec-6-3-1-1">6.3.1.1. jinja2 语法</a></li>
-<li><a href="#sec-6-3-1-2">6.3.1.2. 变量不存在</a></li>
-<li><a href="#sec-6-3-1-3">6.3.1.3. 用于循环</a></li>
-<li><a href="#sec-6-3-1-4">6.3.1.4. 用于 include</a></li>
-<li><a href="#sec-6-3-1-5">6.3.1.5. 用于 roles</a></li>
+<li><a href="#orgb12ceac">1.2.3. 模块下载工具 (<code>/usr/bin/ansible-galaxy</code>)</a></li>
+<li><a href="#org1bf0ee4">1.2.4. 编排剧本工具 (<code>/usr/bin/ansible-playbook</code>)</a></li>
+<li><a href="#org7ee0c91">1.2.5. 文件加密工具 (<code>/usr/bin/ansible-vault</code>)</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#sec-6-4">6.4. handlers</a></li>
+<li><a href="#orgf6cb0f9">2. 常用模块 (Module)</a>
+<ul>
+<li><a href="#orgb72c5c5">2.1. 远程执行</a>
+<ul>
+<li><a href="#org96de2d9">2.1.1. command (默认模块)</a></li>
+<li><a href="#orgb86ef47">2.1.2. shell</a></li>
+<li><a href="#orgfffab42">2.1.3. script</a></li>
 </ul>
 </li>
-<li><a href="#sec-7">7. Role</a>
+<li><a href="#org5b36ae9">2.2. 文件管理</a>
 <ul>
-<li><a href="#sec-7-1">7.1. 创建</a>
-<ul>
-<li><a href="#sec-7-1-1">7.1.1. roles 各目录的作用</a></li>
+<li><a href="#orge2d9082">2.2.1. copy</a></li>
+<li><a href="#orgb0aeeb5">2.2.2. fetch</a></li>
+<li><a href="#org5a9c2c6">2.2.3. file</a></li>
+<li><a href="#orgc2e8cef">2.2.4. synchronize</a></li>
+<li><a href="#org0935c4d">2.2.5. get_url</a></li>
 </ul>
 </li>
-<li><a href="#sec-7-2">7.2. pre_tasks 和 post_tasks</a></li>
-<li><a href="#sec-7-3">7.3. 依赖</a></li>
-<li><a href="#sec-7-4">7.4. 项目结构</a>
+<li><a href="#org0d4194d">2.3. 网络管理</a>
 <ul>
-<li><a href="#sec-7-4-1">7.4.1. 入口文件 (site.xml)</a></li>
-<li><a href="#sec-7-4-2">7.4.2. 执行</a></li>
+<li><a href="#org2df5a61">2.3.1. ping</a></li>
+</ul>
+</li>
+<li><a href="#org3f76531">2.4. 服务管理</a>
+<ul>
+<li><a href="#org40025e0">2.4.1. service</a></li>
+<li><a href="#org01a2218">2.4.2. cron</a></li>
+</ul>
+</li>
+<li><a href="#org2027282">2.5. 用户（组）管理</a>
+<ul>
+<li><a href="#org629e2e2">2.5.1. user</a></li>
+<li><a href="#org100ab7d">2.5.2. group</a></li>
+</ul>
+</li>
+<li><a href="#org384c41d">2.6. 主机信息</a>
+<ul>
+<li><a href="#orgbf5d829">2.6.1. setup</a></li>
+</ul>
+</li>
+<li><a href="#orgd1b14b7">2.7. 主要用于 Playbook 的模块</a>
+<ul>
+<li><a href="#org0de6290">2.7.1. pause</a></li>
+<li><a href="#orga47f02c">2.7.2. wait_for</a></li>
+<li><a href="#org3d0e539">2.7.3. add_host</a></li>
+<li><a href="#orgd3913be">2.7.4. group_by</a></li>
+<li><a href="#org413dbd1">2.7.5. debug</a></li>
+<li><a href="#orga0e66ea">2.7.6. fail</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org38107c8">3. Task</a></li>
+<li><a href="#org96d01ef">4. Variable</a>
+<ul>
+<li><a href="#orgb4e7775">4.1. 在 Inventory 中定义变量</a></li>
+<li><a href="#org15cb6de">4.2. 在 Playbook 中定义变量</a>
+<ul>
+<li><a href="#org03b80ed">4.2.1. vars, vars_files 关键字</a></li>
+<li><a href="#org4ba7149">4.2.2. vars_prompt 实现人机交互</a></li>
+<li><a href="#orgb3a5ded">4.2.3. 通过 roles 带入变量</a></li>
+</ul>
+</li>
+<li><a href="#orgdc2d004">4.3. 注册变量</a></li>
+<li><a href="#org814522e">4.4. 通过 fact 获取/设置变量</a></li>
+<li><a href="#org3fe47e4">4.5. 内置变量</a>
+<ul>
+<li><a href="#orgaff4502">4.5.1. hostvars</a></li>
+<li><a href="#org778f3f8">4.5.2. inventory_hostname</a></li>
+<li><a href="#orga1daab9">4.5.3. inventory_hostname_short</a></li>
+<li><a href="#org7c66e8a">4.5.4. group_names</a></li>
+<li><a href="#org0e3e522">4.5.5. groups</a></li>
+<li><a href="#org54579fc">4.5.6. play_hosts</a></li>
+<li><a href="#orga729646">4.5.7. ansible_version</a></li>
+<li><a href="#org33c4f35">4.5.8. inventory_dir</a></li>
+<li><a href="#org1915976">4.5.9. inventory_file</a></li>
+</ul>
+</li>
+<li><a href="#org22497f9">4.6. 通过命令行设置变量</a></li>
+</ul>
+</li>
+<li><a href="#orgeac917a">5. Template</a>
+<ul>
+<li><a href="#org58a3515">5.1. 示例</a></li>
+</ul>
+</li>
+<li><a href="#org8d4bcca">6. Playbook</a>
+<ul>
+<li><a href="#orgc344fba">6.1. 示例</a></li>
+<li><a href="#org20b82d1">6.2. 循环</a>
+<ul>
+<li><a href="#orgb21da36">6.2.1. with_items</a></li>
+<li><a href="#orgaeb0326">6.2.2. with_nested</a></li>
+<li><a href="#org0d05b9d">6.2.3. with_dict</a></li>
+<li><a href="#org82a3df6">6.2.4. with_subelement</a></li>
+<li><a href="#org7626b40">6.2.5. with_sequence</a></li>
+<li><a href="#org5fac052">6.2.6. with_random_choice</a></li>
+<li><a href="#org96c19cb">6.2.7. do_util</a></li>
+</ul>
+</li>
+<li><a href="#org5c11572">6.3. 条件</a>
+<ul>
+<li><a href="#orga50c14a">6.3.1. when</a>
+<ul>
+<li><a href="#org263cd7f">6.3.1.1. jinja2 语法</a></li>
+<li><a href="#org1330266">6.3.1.2. 变量不存在</a></li>
+<li><a href="#org66577d1">6.3.1.3. 用于循环</a></li>
+<li><a href="#org8e02e7a">6.3.1.4. 用于 include</a></li>
+<li><a href="#org9883c08">6.3.1.5. 用于 roles</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org30648ca">6.4. handlers</a></li>
+</ul>
+</li>
+<li><a href="#org376f6f6">7. Role</a>
+<ul>
+<li><a href="#org5e0526f">7.1. 创建</a>
+<ul>
+<li><a href="#orga68fd7c">7.1.1. roles 各目录的作用</a></li>
+</ul>
+</li>
+<li><a href="#orga0347c3">7.2. pre_tasks 和 post_tasks</a></li>
+<li><a href="#org04e04ea">7.3. 依赖</a></li>
+<li><a href="#orge2e726e">7.4. 项目结构</a>
+<ul>
+<li><a href="#orgb879060">7.4.1. 入口文件 (site.xml)</a></li>
+<li><a href="#orgde00bc7">7.4.2. 执行</a></li>
 </ul>
 </li>
 </ul>
@@ -286,19 +409,19 @@ for the JavaScript code in this tag.
 
 
 <colgroup>
-<col  class="left">
+<col  class="org-left">
 
-<col  class="left">
+<col  class="org-left">
 </colgroup>
 <tbody>
 <tr>
-<td class="left">Author</td>
-<td class="left">Hao Ruan (ruanhao1116@gmail.com)</td>
+<td class="org-left">Author</td>
+<td class="org-left">Hao Ruan (ruanhao1116@gmail.com)</td>
 </tr>
 
 <tr>
-<td class="left">Date</td>
-<td class="left">2018-02-05 13:43:45</td>
+<td class="org-left">Date</td>
+<td class="org-left">2019-10-12 16:19:44</td>
 </tr>
 </tbody>
 </table>
@@ -306,11 +429,11 @@ for the JavaScript code in this tag.
 <pre class="example">
 <p>
 Ansible is used to:
-  -&gt; execute <b>tasks</b> for an <b>inventory</b>,
-  -&gt; utilizing some <b>modules</b>,
-  -&gt; using or populating some <b>variables</b>,
-  -&gt; processing some file <b>templates</b>,
-  -&gt; in a <b>playbook</b>, which can be organized in <b>roles</b>.
+  -&gt; execute <i>tasks</i> for an <i>inventory</i>,
+  -&gt; utilizing some <i>modules</i>,
+  -&gt; using or populating some <i>variables</i>,
+  -&gt; processing some file <i>templates</i>,
+  -&gt; in a <i>playbook</i>, which can be organized in <i>roles</i>.
 </p>
 </pre>
 
@@ -319,130 +442,169 @@ Ansible is used to:
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. Inventory</a>
+<li><a href="#org58312e3">1. 工作架构与原理</a>
 <ul>
-<li><a href="#sec-1-1">1.1. 静态配置</a></li>
-</ul>
-</li>
-<li><a href="#sec-2">2. Module</a>
+<li><a href="#org5e92691">1.1. 相关配置文件</a>
 <ul>
-<li><a href="#sec-2-1">2.1. 文件处理</a>
+<li><a href="#org941a2ec">1.1.1. 主配置文件 (<code>/etc/ansible/ansible.cfg</code>)</a></li>
+<li><a href="#org7151bc5">1.1.2. 主机清单配置文件 (<code>/etc/ansible/hosts</code>)</a>
 <ul>
-<li><a href="#sec-2-1-1">2.1.1. synchronize</a></li>
-<li><a href="#sec-2-1-2">2.1.2. copy</a></li>
-<li><a href="#sec-2-1-3">2.1.3. get_url</a></li>
-<li><a href="#sec-2-1-4">2.1.4. template</a></li>
-</ul>
-</li>
-<li><a href="#sec-2-2">2.2. 网络管理</a>
-<ul>
-<li><a href="#sec-2-2-1">2.2.1. ping</a></li>
-</ul>
-</li>
-<li><a href="#sec-2-3">2.3. 服务管理</a>
-<ul>
-<li><a href="#sec-2-3-1">2.3.1. service</a></li>
-<li><a href="#sec-2-3-2">2.3.2. cron</a></li>
-</ul>
-</li>
-<li><a href="#sec-2-4">2.4. 远程执行</a>
-<ul>
-<li><a href="#sec-2-4-1">2.4.1. command</a></li>
-<li><a href="#sec-2-4-2">2.4.2. shell</a></li>
-</ul>
-</li>
-<li><a href="#sec-2-5">2.5. 资产管理</a>
-<ul>
-<li><a href="#sec-2-5-1">2.5.1. setup</a></li>
-</ul>
-</li>
-<li><a href="#sec-2-6">2.6. 包管理</a>
-<ul>
-<li><a href="#sec-2-6-1">2.6.1. apt</a></li>
-<li><a href="#sec-2-6-2">2.6.2. yum</a></li>
-</ul>
-</li>
-<li><a href="#sec-2-7">2.7. 主要用于 Playbook 的模块</a>
-<ul>
-<li><a href="#sec-2-7-1">2.7.1. pause</a></li>
-<li><a href="#sec-2-7-2">2.7.2. wait_for</a></li>
-<li><a href="#sec-2-7-3">2.7.3. add_host</a></li>
-<li><a href="#sec-2-7-4">2.7.4. group_by</a></li>
-<li><a href="#sec-2-7-5">2.7.5. debug</a></li>
-<li><a href="#sec-2-7-6">2.7.6. fail</a></li>
+<li><a href="#org046a82b">1.1.2.1. 对主机进行分组</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#sec-3">3. Task</a></li>
-<li><a href="#sec-4">4. Variable</a>
+<li><a href="#org8463101">1.2. 相关命令</a>
 <ul>
-<li><a href="#sec-4-1">4.1. 在 Inventory 中定义变量</a></li>
-<li><a href="#sec-4-2">4.2. 在 Playbook 中定义变量</a>
+<li><a href="#org3905c9e">1.2.1. 临时命令执行工具 (<code>/usr/bin/ansible</code>)</a>
 <ul>
-<li><a href="#sec-4-2-1">4.2.1. vars, vars_files 关键字</a></li>
-<li><a href="#sec-4-2-2">4.2.2. vars_prompt 实现人机交互</a></li>
-<li><a href="#sec-4-2-3">4.2.3. 通过 roles 带入变量</a></li>
+<li><a href="#orga3d2832">1.2.1.1. 执行过程</a></li>
+<li><a href="#org125090a">1.2.1.2. 执行状态</a></li>
+<li><a href="#org0d56a5b">1.2.1.3. 显示所有主机</a></li>
 </ul>
 </li>
-<li><a href="#sec-4-3">4.3. 注册变量</a></li>
-<li><a href="#sec-4-4">4.4. 通过 fact 获取/设置变量</a></li>
-<li><a href="#sec-4-5">4.5. 内置变量</a>
+<li><a href="#orgdf56cfe">1.2.2. 模块查看工具 (<code>/usr/bin/ansible-doc</code>)</a>
 <ul>
-<li><a href="#sec-4-5-1">4.5.1. hostvars</a></li>
-<li><a href="#sec-4-5-2">4.5.2. inventory_hostname</a></li>
-<li><a href="#sec-4-5-3">4.5.3. inventory_hostname_short</a></li>
-<li><a href="#sec-4-5-4">4.5.4. group_names</a></li>
-<li><a href="#sec-4-5-5">4.5.5. groups</a></li>
-<li><a href="#sec-4-5-6">4.5.6. play_hosts</a></li>
-<li><a href="#sec-4-5-7">4.5.7. ansible_version</a></li>
-<li><a href="#sec-4-5-8">4.5.8. inventory_dir</a></li>
-<li><a href="#sec-4-5-9">4.5.9. inventory_file</a></li>
+<li><a href="#orga0eb10c">1.2.2.1. 显示所有模块</a></li>
+<li><a href="#org5ec9174">1.2.2.2. 查看模块用法</a></li>
 </ul>
 </li>
-<li><a href="#sec-4-6">4.6. 通过命令行设置变量</a></li>
+<li><a href="#orgb12ceac">1.2.3. 模块下载工具 (<code>/usr/bin/ansible-galaxy</code>)</a></li>
+<li><a href="#org1bf0ee4">1.2.4. 编排剧本工具 (<code>/usr/bin/ansible-playbook</code>)</a></li>
+<li><a href="#org7ee0c91">1.2.5. 文件加密工具 (<code>/usr/bin/ansible-vault</code>)</a></li>
 </ul>
 </li>
-<li><a href="#sec-5">5. Template</a>
-<ul>
-<li><a href="#sec-5-1">5.1. 示例</a></li>
 </ul>
 </li>
-<li><a href="#sec-6">6. Playbook</a>
+<li><a href="#orgf6cb0f9">2. 常用模块 (Module)</a>
 <ul>
-<li><a href="#sec-6-1">6.1. 示例</a></li>
-<li><a href="#sec-6-2">6.2. 循环</a>
+<li><a href="#orgb72c5c5">2.1. 远程执行</a>
 <ul>
-<li><a href="#sec-6-2-1">6.2.1. with_items</a></li>
-<li><a href="#sec-6-2-2">6.2.2. with_nested</a></li>
-<li><a href="#sec-6-2-3">6.2.3. with_dict</a></li>
-<li><a href="#sec-6-2-4">6.2.4. with_subelement</a></li>
-<li><a href="#sec-6-2-5">6.2.5. with_sequence</a></li>
-<li><a href="#sec-6-2-6">6.2.6. with_random_choice</a></li>
-<li><a href="#sec-6-2-7">6.2.7. do_util</a></li>
+<li><a href="#org96de2d9">2.1.1. command (默认模块)</a></li>
+<li><a href="#orgb86ef47">2.1.2. shell</a></li>
+<li><a href="#orgfffab42">2.1.3. script</a></li>
 </ul>
 </li>
-<li><a href="#sec-6-3">6.3. 条件</a>
+<li><a href="#org5b36ae9">2.2. 文件管理</a>
 <ul>
-<li><a href="#sec-6-3-1">6.3.1. when</a></li>
+<li><a href="#orge2d9082">2.2.1. copy</a></li>
+<li><a href="#orgb0aeeb5">2.2.2. fetch</a></li>
+<li><a href="#org5a9c2c6">2.2.3. file</a></li>
+<li><a href="#orgc2e8cef">2.2.4. synchronize</a></li>
+<li><a href="#org0935c4d">2.2.5. get_url</a></li>
 </ul>
 </li>
-<li><a href="#sec-6-4">6.4. handlers</a></li>
+<li><a href="#org0d4194d">2.3. 网络管理</a>
+<ul>
+<li><a href="#org2df5a61">2.3.1. ping</a></li>
 </ul>
 </li>
-<li><a href="#sec-7">7. Role</a>
+<li><a href="#org3f76531">2.4. 服务管理</a>
 <ul>
-<li><a href="#sec-7-1">7.1. 创建</a>
-<ul>
-<li><a href="#sec-7-1-1">7.1.1. roles 各目录的作用</a></li>
+<li><a href="#org40025e0">2.4.1. service</a></li>
+<li><a href="#org01a2218">2.4.2. cron</a></li>
 </ul>
 </li>
-<li><a href="#sec-7-2">7.2. pre_tasks 和 post_tasks</a></li>
-<li><a href="#sec-7-3">7.3. 依赖</a></li>
-<li><a href="#sec-7-4">7.4. 项目结构</a>
+<li><a href="#org2027282">2.5. 用户（组）管理</a>
 <ul>
-<li><a href="#sec-7-4-1">7.4.1. 入口文件 (site.xml)</a></li>
-<li><a href="#sec-7-4-2">7.4.2. 执行</a></li>
+<li><a href="#org629e2e2">2.5.1. user</a></li>
+<li><a href="#org100ab7d">2.5.2. group</a></li>
+</ul>
+</li>
+<li><a href="#org384c41d">2.6. 主机信息</a>
+<ul>
+<li><a href="#orgbf5d829">2.6.1. setup</a></li>
+</ul>
+</li>
+<li><a href="#orgd1b14b7">2.7. 主要用于 Playbook 的模块</a>
+<ul>
+<li><a href="#org0de6290">2.7.1. pause</a></li>
+<li><a href="#orga47f02c">2.7.2. wait_for</a></li>
+<li><a href="#org3d0e539">2.7.3. add_host</a></li>
+<li><a href="#orgd3913be">2.7.4. group_by</a></li>
+<li><a href="#org413dbd1">2.7.5. debug</a></li>
+<li><a href="#orga0e66ea">2.7.6. fail</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org38107c8">3. Task</a></li>
+<li><a href="#org96d01ef">4. Variable</a>
+<ul>
+<li><a href="#orgb4e7775">4.1. 在 Inventory 中定义变量</a></li>
+<li><a href="#org15cb6de">4.2. 在 Playbook 中定义变量</a>
+<ul>
+<li><a href="#org03b80ed">4.2.1. vars, vars_files 关键字</a></li>
+<li><a href="#org4ba7149">4.2.2. vars_prompt 实现人机交互</a></li>
+<li><a href="#orgb3a5ded">4.2.3. 通过 roles 带入变量</a></li>
+</ul>
+</li>
+<li><a href="#orgdc2d004">4.3. 注册变量</a></li>
+<li><a href="#org814522e">4.4. 通过 fact 获取/设置变量</a></li>
+<li><a href="#org3fe47e4">4.5. 内置变量</a>
+<ul>
+<li><a href="#orgaff4502">4.5.1. hostvars</a></li>
+<li><a href="#org778f3f8">4.5.2. inventory_hostname</a></li>
+<li><a href="#orga1daab9">4.5.3. inventory_hostname_short</a></li>
+<li><a href="#org7c66e8a">4.5.4. group_names</a></li>
+<li><a href="#org0e3e522">4.5.5. groups</a></li>
+<li><a href="#org54579fc">4.5.6. play_hosts</a></li>
+<li><a href="#orga729646">4.5.7. ansible_version</a></li>
+<li><a href="#org33c4f35">4.5.8. inventory_dir</a></li>
+<li><a href="#org1915976">4.5.9. inventory_file</a></li>
+</ul>
+</li>
+<li><a href="#org22497f9">4.6. 通过命令行设置变量</a></li>
+</ul>
+</li>
+<li><a href="#orgeac917a">5. Template</a>
+<ul>
+<li><a href="#org58a3515">5.1. 示例</a></li>
+</ul>
+</li>
+<li><a href="#org8d4bcca">6. Playbook</a>
+<ul>
+<li><a href="#orgc344fba">6.1. 示例</a></li>
+<li><a href="#org20b82d1">6.2. 循环</a>
+<ul>
+<li><a href="#orgb21da36">6.2.1. with_items</a></li>
+<li><a href="#orgaeb0326">6.2.2. with_nested</a></li>
+<li><a href="#org0d05b9d">6.2.3. with_dict</a></li>
+<li><a href="#org82a3df6">6.2.4. with_subelement</a></li>
+<li><a href="#org7626b40">6.2.5. with_sequence</a></li>
+<li><a href="#org5fac052">6.2.6. with_random_choice</a></li>
+<li><a href="#org96c19cb">6.2.7. do_util</a></li>
+</ul>
+</li>
+<li><a href="#org5c11572">6.3. 条件</a>
+<ul>
+<li><a href="#orga50c14a">6.3.1. when</a>
+<ul>
+<li><a href="#org263cd7f">6.3.1.1. jinja2 语法</a></li>
+<li><a href="#org1330266">6.3.1.2. 变量不存在</a></li>
+<li><a href="#org66577d1">6.3.1.3. 用于循环</a></li>
+<li><a href="#org8e02e7a">6.3.1.4. 用于 include</a></li>
+<li><a href="#org9883c08">6.3.1.5. 用于 roles</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org30648ca">6.4. handlers</a></li>
+</ul>
+</li>
+<li><a href="#org376f6f6">7. Role</a>
+<ul>
+<li><a href="#org5e0526f">7.1. 创建</a>
+<ul>
+<li><a href="#orga68fd7c">7.1.1. roles 各目录的作用</a></li>
+</ul>
+</li>
+<li><a href="#orga0347c3">7.2. pre_tasks 和 post_tasks</a></li>
+<li><a href="#org04e04ea">7.3. 依赖</a></li>
+<li><a href="#orge2e726e">7.4. 项目结构</a>
+<ul>
+<li><a href="#orgb879060">7.4.1. 入口文件 (site.xml)</a></li>
+<li><a href="#orgde00bc7">7.4.2. 执行</a></li>
 </ul>
 </li>
 </ul>
@@ -451,23 +613,532 @@ Ansible is used to:
 </div>
 </div>
 
-
-<div id="outline-container-sec-1" class="outline-2">
-<h2 id="sec-1"><span class="section-number-2">1</span> Inventory</h2>
+<div id="outline-container-org58312e3" class="outline-2">
+<h2 id="org58312e3"><span class="section-number-2">1</span> 工作架构与原理</h2>
 <div class="outline-text-2" id="text-1">
-</div><div id="outline-container-sec-1-1" class="outline-3">
-<h3 id="sec-1-1"><span class="section-number-3">1.1</span> 静态配置</h3>
+<img src="https://qiankunli.github.io/public/upload/tool/ansible_framework.png"/>
+</div>
+
+<div id="outline-container-org5e92691" class="outline-3">
+<h3 id="org5e92691"><span class="section-number-3">1.1</span> 相关配置文件</h3>
 <div class="outline-text-3" id="text-1-1">
+</div>
+<div id="outline-container-org941a2ec" class="outline-4">
+<h4 id="org941a2ec"><span class="section-number-4">1.1.1</span> 主配置文件 (<code>/etc/ansible/ansible.cfg</code>)</h4>
+<div class="outline-text-4" id="text-1-1-1">
 <div class="org-src-container">
+<pre class="src src-sh">
+<span style="color: #465457;"># </span><span style="color: #465457;">config file for ansible -- https://ansible.com/</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">===============================================</span>
 
-<pre class="src src-ini">[<span style="color: #0087ff;">master</span>]
-server-master        ansible_ssh_host=10.0.0.5    ansible_ssh_user=ubuntu
+<span style="color: #465457;"># </span><span style="color: #465457;">nearly all parameters can be overridden in ansible-playbook</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">or with command line flags. ansible will read ANSIBLE_CONFIG,</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">ansible.cfg in the current working directory, .ansible.cfg in</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">the home directory or /etc/ansible/ansible.cfg, whichever it</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">finds first</span>
 
-[<span style="color: #0087ff;">standbys</span>]
-server-standby-01    ansible_ssh_host=10.0.0.6    ansible_ssh_user=ubuntu
-server-standby-02    ansible_ssh_host=10.0.0.7    ansible_ssh_user=ubuntu
+[defaults]
 
-[<span style="color: #0087ff;">replication:children</span>]
+<span style="color: #465457;"># </span><span style="color: #465457;">some basic default values...</span>
+
+<span style="color: #465457;">#</span><span style="color: #465457;">inventory      = /etc/ansible/hosts</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">library        = /usr/share/my_modules/</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">module_utils   = /usr/share/my_module_utils/</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">remote_tmp     = ~/.ansible/tmp</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">local_tmp      = ~/.ansible/tmp</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">plugin_filters_cfg = /etc/ansible/plugin_filters.yml</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">forks          = 5</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">poll_interval  = 15</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">sudo_user      = root</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">ask_sudo_pass = True</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">ask_pass      = True</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">transport      = smart</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">remote_port    = 22</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">module_lang    = C</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">module_set_locale = False</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">plays will gather facts by default, which contain information about</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">the remote system.</span>
+<span style="color: #465457;">#</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">smart - gather by default, but don't regather if already gathered</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">implicit - gather by default, turn off with gather_facts: False</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">explicit - do not gather by default, must say gather_facts: True</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">gathering = implicit</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">This only affects the gathering done by a play's gather_facts directive,</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">by default gathering retrieves all facts subsets</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">all - gather all subsets</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">network - gather min and network facts</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">hardware - gather hardware facts (longest facts to retrieve)</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">virtual - gather min and virtual facts</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">facter - import facts from facter</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">ohai - import facts from ohai</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">You can combine them using comma (ex: network,virtual)</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">You can negate them using ! (ex: !hardware,!facter,!ohai)</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">A minimal set of facts is always gathered.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">gather_subset = all</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">some hardware related facts are collected</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">with a maximum timeout of 10 seconds. This</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">option lets you increase or decrease that</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">timeout to something more suitable for the</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">environment.</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">gather_timeout = 10</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">Ansible facts are available inside the ansible_facts.* dictionary</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">namespace. This setting maintains the behaviour which was the default prior</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">to 2.5, duplicating these variables into the main namespace, each with a</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">prefix of 'ansible_'.</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">This variable is set to True by default for backwards compatibility. It</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">will be changed to a default of 'False' in a future release.</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">ansible_facts.</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">inject_facts_as_vars = True</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">additional paths to search for roles in, colon separated</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">roles_path    = /etc/ansible/roles</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">uncomment this to disable SSH key host checking</span>
+host_key_checking = False <span style="color: #465457;"># </span><span style="color: #465457;">&#26816;&#26597;&#23545;&#24212;&#26381;&#21153;&#22120;&#30340; host_key &#65292;&#24314;&#35758;&#21462;&#28040;&#27880;&#37322;</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">change the default callback, you can only have one 'stdout' type  enabled at a time.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">stdout_callback = skippy</span>
+
+
+<span style="color: #465457;">## </span><span style="color: #465457;">Ansible ships with some plugins that require whitelisting,</span>
+<span style="color: #465457;">## </span><span style="color: #465457;">this is done to avoid running all of a type by default.</span>
+<span style="color: #465457;">## </span><span style="color: #465457;">These setting lists those that you want enabled for your system.</span>
+<span style="color: #465457;">## </span><span style="color: #465457;">Custom plugins should not need this unless plugin author specifies it.</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">enable callback plugins, they can output to stdout but cannot be 'stdout' type.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">callback_whitelist = timer, mail</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">Determine whether includes in tasks and handlers are "static" by</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">default. As of 2.0, includes are dynamic by default. Setting these</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">values to True will make includes behave more like they did in the</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">1.x versions.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">task_includes_static = False</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">handler_includes_static = False</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">Controls if a missing handler for a notification event is an error or a warning</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">error_on_missing_handler = True</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">change this for alternative sudo implementations</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">sudo_exe = sudo</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">What flags to pass to sudo</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">WARNING: leaving out the defaults might create unexpected behaviours</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">sudo_flags = -H -S -n</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">SSH timeout</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">timeout = 10</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">default user to use for playbooks if user is not specified</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">(/usr/bin/ansible will use current user as default)</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">remote_user = root</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">logging is off by default unless this path is defined</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">if so defined, consider logrotate</span>
+log_path = /var/log/ansible.log <span style="color: #465457;"># </span><span style="color: #465457;">&#26085;&#24535;&#25991;&#20214;&#20301;&#32622;</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">default module name for /usr/bin/ansible</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">module_name = command</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">use this shell for commands executed under sudo</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">you may need to change this to bin/bash in rare instances</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">if sudo is constrained</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">executable = /bin/sh</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">if inventory variables overlap, does the higher precedence one win</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">or are hash values merged together?  The default is 'replace' but</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">this can also be set to 'merge'.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">hash_behaviour = replace</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">by default, variables from roles will be visible in the global variable</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">scope. To prevent this, the following option can be enabled, and only</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">tasks and handlers within the role will see the variables there</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">private_role_vars = yes</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">list any Jinja2 extensions to enable here:</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">jinja2_extensions = jinja2.ext.do,jinja2.ext.i18n</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">if set, always use this private key file for authentication, same as</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">if passing --private-key to ansible or ansible-playbook</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">private_key_file = /path/to/file</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">If set, configures the path to the Vault password file as an alternative to</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">specifying --vault-password-file on the command line.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">vault_password_file = /path/to/vault_password_file</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">format of string {{ ansible_managed }} available within Jinja2</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">templates indicates to users editing templates files will be replaced.</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">replacing {file}, {host} and {uid} and strftime codes with proper values.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">ansible_managed = Ansible managed: {file} modified on %Y-%m-%d %H:%M:%S by {uid} on {host}</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">{file}, {host}, {uid}, and the timestamp can all interfere with idempotence</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">in some situations so the default is a static string:</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">ansible_managed = Ansible managed</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">by default, ansible-playbook will display "Skipping [host]" if it determines a task</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">should not be run on a host.  Set this to "False" if you don't want to see these "Skipping"</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">messages. NOTE: the task header will still be shown regardless of whether or not the</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">task is skipped.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">display_skipped_hosts = True</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">by default, if a task in a playbook does not include a name: field then</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">ansible-playbook will construct a header that includes the task's action but</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">not the task's args.  This is a security feature because ansible cannot know</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">if the *module* considers an argument to be no_log at the time that the</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">header is printed.  If your environment doesn't have a problem securing</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">stdout from ansible-playbook (or you have manually specified no_log in your</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">playbook on all of the tasks where you have secret information) then you can</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">safely set this to True to get more informative messages.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">display_args_to_stdout = False</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">by default (as of 1.3), Ansible will raise errors when attempting to dereference</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">Jinja2 variables that are not set in templates or action lines. Uncomment this line</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">to revert the behavior to pre-1.3.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">error_on_undefined_vars = False</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">by default (as of 1.6), Ansible may display warnings based on the configuration of the</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">system running ansible itself. This may include warnings about 3rd party packages or</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">other conditions that should be resolved if possible.</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">to disable these warnings, set the following value to False:</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">system_warnings = True</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">by default (as of 1.4), Ansible may display deprecation warnings for language</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">features that should no longer be used and will be removed in future versions.</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">to disable these warnings, set the following value to False:</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">deprecation_warnings = True</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">(as of 1.8), Ansible can optionally warn when usage of the shell and</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">command module appear to be simplified by using a default Ansible module</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">instead.  These warnings can be silenced by adjusting the following</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">setting or adding warn=yes or warn=no to the end of the command line</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">parameter string.  This will for example suggest using the git module</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">instead of shelling out to the git command.</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">command_warnings = False</span>
+
+
+<span style="color: #465457;"># </span><span style="color: #465457;">set plugin path directories here, separate with colons</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">action_plugins     = /usr/share/ansible/plugins/action</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">become_plugins     = /usr/share/ansible/plugins/become</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">cache_plugins      = /usr/share/ansible/plugins/cache</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">callback_plugins   = /usr/share/ansible/plugins/callback</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">connection_plugins = /usr/share/ansible/plugins/connection</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">lookup_plugins     = /usr/share/ansible/plugins/lookup</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">inventory_plugins  = /usr/share/ansible/plugins/inventory</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">vars_plugins       = /usr/share/ansible/plugins/vars</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">filter_plugins     = /usr/share/ansible/plugins/filter</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">test_plugins       = /usr/share/ansible/plugins/test</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">terminal_plugins   = /usr/share/ansible/plugins/terminal</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">strategy_plugins   = /usr/share/ansible/plugins/strategy</span>
+
+
+<span style="color: #465457;"># </span><span style="color: #465457;">by default, ansible will use the 'linear' strategy but you may want to try</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">another one</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">strategy = free</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">by default callbacks are not loaded for /bin/ansible, enable this if you</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">want, for example, a notification or logging callback to also apply to</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">/bin/ansible runs</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">bin_ansible_callbacks = False</span>
+
+
+<span style="color: #465457;"># </span><span style="color: #465457;">don't like cows?  that's unfortunate.</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">set to 1 if you don't want cowsay support or export ANSIBLE_NOCOWS=1</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">nocows = 1</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">set which cowsay stencil you'd like to use by default. When set to 'random',</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">a random stencil will be selected for each task. The selection will be filtered</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">against the `cow_whitelist` option below.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">cow_selection = default</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">cow_selection = random</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">when using the 'random' option for cowsay, stencils will be restricted to this list.</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">it should be formatted as a comma-separated list with no spaces between names.</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">NOTE: line continuations here are for formatting purposes only, as the INI parser</span>
+<span style="color: #465457;">#       </span><span style="color: #465457;">in python does not support them.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">cow_whitelist=bud-frogs,bunny,cheese,daemon,default,dragon,elephant-in-snake,elephant,eyes,\</span>
+<span style="color: #465457;">#              </span><span style="color: #465457;">hellokitty,kitty,luke-koala,meow,milk,moofasa,moose,ren,sheep,small,stegosaurus,\</span>
+<span style="color: #465457;">#              </span><span style="color: #465457;">stimpy,supermilker,three-eyes,turkey,turtle,tux,udder,vader-koala,vader,www</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">don't like colors either?</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">set to 1 if you don't want colors, or export ANSIBLE_NOCOLOR=1</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">nocolor = 1</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">if set to a persistent type (not 'memory', for example 'redis') fact values</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">from previous runs in Ansible will be stored.  This may be useful when</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">wanting to use, for example, IP information from one group of servers</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">without having to talk to them in the same playbook run to get their</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">current IP information.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">fact_caching = memory</span>
+
+<span style="color: #465457;">#</span><span style="color: #465457;">This option tells Ansible where to cache facts. The value is plugin dependent.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">For the jsonfile plugin, it should be a path to a local directory.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">For the redis plugin, the value is a host:port:database triplet: fact_caching_connection = localhost:6379:0</span>
+
+<span style="color: #465457;">#</span><span style="color: #465457;">fact_caching_connection=/tmp</span>
+
+
+
+<span style="color: #465457;"># </span><span style="color: #465457;">retry files</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">When a playbook fails a .retry file can be created that will be placed in ~/</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">You can enable this feature by setting retry_files_enabled to True</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">and you can change the location of the files by setting retry_files_save_path</span>
+
+<span style="color: #465457;">#</span><span style="color: #465457;">retry_files_enabled = False</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">retry_files_save_path = ~/.ansible-retry</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">squash actions</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">Ansible can optimise actions that call modules with list parameters</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">when looping. Instead of calling the module once per with_ item, the</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">module is called once with all items at once. Currently this only works</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">under limited circumstances, and only with parameters named 'name'.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">squash_actions = apk,apt,dnf,homebrew,pacman,pkgng,yum,zypper</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">prevents logging of task data, off by default</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">no_log = False</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">prevents logging of tasks, but only on the targets, data is still logged on the master/controller</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">no_target_syslog = False</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">controls whether Ansible will raise an error or warning if a task has no</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">choice but to create world readable temporary files to execute a module on</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">the remote machine.  This option is False by default for security.  Users may</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">turn this on to have behaviour more like Ansible prior to 2.1.x.  See</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">https://docs.ansible.com/ansible/become.html#becoming-an-unprivileged-user</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">for more secure ways to fix this than enabling this option.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">allow_world_readable_tmpfiles = False</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">controls the compression level of variables sent to</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">worker processes. At the default of 0, no compression</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">is used. This value must be an integer from 0 to 9.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">var_compression_level = 9</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">controls what compression method is used for new-style ansible modules when</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">they are sent to the remote system.  The compression types depend on having</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">support compiled into both the controller's python and the client's python.</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">The names should match with the python Zipfile compression types:</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">* ZIP_STORED (no compression. available everywhere)</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">* ZIP_DEFLATED (uses zlib, the default)</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">These values may be set per host via the ansible_module_compression inventory</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">variable</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">module_compression = 'ZIP_DEFLATED'</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">This controls the cutoff point (in bytes) on --diff for files</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">set to 0 for unlimited (RAM may suffer!).</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">max_diff_size = 1048576</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">This controls how ansible handles multiple --tags and --skip-tags arguments</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">on the CLI.  If this is True then multiple arguments are merged together.  If</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">it is False, then the last specified argument is used and the others are ignored.</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">This option will be removed in 2.8.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">merge_multiple_cli_flags = True</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">Controls showing custom stats at the end, off by default</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">show_custom_stats = True</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">Controls which files to ignore when using a directory as inventory with</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">possibly multiple sources (both static and dynamic)</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">inventory_ignore_extensions = ~, .orig, .bak, .ini, .cfg, .retry, .pyc, .pyo</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">This family of modules use an alternative execution path optimized for network appliances</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">only update this setting if you know how this works, otherwise it can break module execution</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">network_group_modules=eos, nxos, ios, iosxr, junos, vyos</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">When enabled, this option allows lookups (via variables like {{lookup('foo')}} or when used as</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">a loop with `with_foo`) to return data that is not marked "unsafe". This means the data may contain</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">jinja2 templating language which will be run through the templating engine.</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">ENABLING THIS COULD BE A SECURITY RISK</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">allow_unsafe_lookups = False</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">set default errors for all plays</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">any_errors_fatal = False</span>
+
+[inventory]
+<span style="color: #465457;"># </span><span style="color: #465457;">enable inventory plugins, default: 'host_list', 'script', 'auto', 'yaml', 'ini', 'toml'</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">enable_plugins = host_list, virtualbox, yaml, constructed</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">ignore these extensions when parsing a directory as inventory source</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">ignore_extensions = .pyc, .pyo, .swp, .bak, ~, .rpm, .md, .txt, ~, .orig, .ini, .cfg, .retry</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">ignore files matching these patterns when parsing a directory as inventory source</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">ignore_patterns=</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">If 'true' unparsed inventory sources become fatal errors, they are warnings otherwise.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">unparsed_is_failed=False</span>
+
+[privilege_escalation]
+<span style="color: #465457;">#</span><span style="color: #465457;">become=True</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">become_method=sudo</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">become_user=root</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">become_ask_pass=False</span>
+
+[paramiko_connection]
+
+<span style="color: #465457;"># </span><span style="color: #465457;">uncomment this line to cause the paramiko connection plugin to not record new host</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">keys encountered.  Increases performance on new host additions.  Setting works independently of the</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">host key checking setting above.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">record_host_keys=False</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">by default, Ansible requests a pseudo-terminal for commands executed under sudo. Uncomment this</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">line to disable this behaviour.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">pty=False</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">paramiko will default to looking for SSH keys initially when trying to</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">authenticate to remote devices.  This is a problem for some network devices</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">that close the connection after a key failure.  Uncomment this line to</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">disable the Paramiko look for keys function</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">look_for_keys = False</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">When using persistent connections with Paramiko, the connection runs in a</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">background process.  If the host doesn't already have a valid SSH key, by</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">default Ansible will prompt to add the host key.  This will cause connections</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">running in background processes to fail.  Uncomment this line to have</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">Paramiko automatically add host keys.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">host_key_auto_add = True</span>
+
+[ssh_connection]
+
+<span style="color: #465457;"># </span><span style="color: #465457;">ssh arguments to use</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">Leaving off ControlPersist will result in poor performance, so use</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">paramiko on older platforms rather than removing it, -C controls compression use</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">ssh_args = -C -o ControlMaster=auto -o ControlPersist=60s</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">The base directory for the ControlPath sockets.</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">This is the "%(directory)s" in the control_path option</span>
+<span style="color: #465457;">#</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">Example:</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">control_path_dir = /tmp/.ansible/cp</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">control_path_dir = ~/.ansible/cp</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">The path to use for the ControlPath sockets. This defaults to a hashed string of the hostname,</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">port and username (empty string in the config). The hash mitigates a common problem users</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">found with long hostnames and the conventional %(directory)s/ansible-ssh-%%h-%%p-%%r format.</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">In those cases, a "too long for Unix domain socket" ssh error would occur.</span>
+<span style="color: #465457;">#</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">Example:</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">control_path = %(directory)s/%%h-%%r</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">control_path =</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">Enabling pipelining reduces the number of SSH operations required to</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">execute a module on the remote server. This can result in a significant</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">performance improvement when enabled, however when using "sudo:" you must</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">first disable 'requiretty' in /etc/sudoers</span>
+<span style="color: #465457;">#</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">By default, this option is disabled to preserve compatibility with</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">sudoers configurations that have requiretty (the default on many distros).</span>
+<span style="color: #465457;">#</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">pipelining = False</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">Control the mechanism for transferring files (old)</span>
+<span style="color: #465457;">#   </span><span style="color: #465457;">* smart = try sftp and then try scp [default]</span>
+<span style="color: #465457;">#   </span><span style="color: #465457;">* True = use scp only</span>
+<span style="color: #465457;">#   </span><span style="color: #465457;">* False = use sftp only</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">scp_if_ssh = smart</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">Control the mechanism for transferring files (new)</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">If set, this will override the scp_if_ssh option</span>
+<span style="color: #465457;">#   </span><span style="color: #465457;">* sftp  = use sftp to transfer files</span>
+<span style="color: #465457;">#   </span><span style="color: #465457;">* scp   = use scp to transfer files</span>
+<span style="color: #465457;">#   </span><span style="color: #465457;">* piped = use 'dd' over SSH to transfer files</span>
+<span style="color: #465457;">#   </span><span style="color: #465457;">* smart = try sftp, scp, and piped, in that order [default]</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">transfer_method = smart</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">if False, sftp will not use batch mode to transfer files. This may cause some</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">types of file transfer failures impossible to catch however, and should</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">only be disabled if your sftp version has problems with batch mode</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">sftp_batch_mode = False</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">The -tt argument is passed to ssh when pipelining is not enabled because sudo</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">requires a tty by default.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">usetty = True</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">Number of times to retry an SSH connection to a host, in case of UNREACHABLE.</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">For each retry attempt, there is an exponential backoff,</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">so after the first attempt there is 1s wait, then 2s, 4s etc. up to 30s (max).</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">retries = 3</span>
+
+[persistent_connection]
+
+<span style="color: #465457;"># </span><span style="color: #465457;">Configures the persistent connection timeout value in seconds.  This value is</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">how long the persistent connection will remain idle before it is destroyed.</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">If the connection doesn't receive a request before the timeout value</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">expires, the connection is shutdown. The default value is 30 seconds.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">connect_timeout = 30</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">The command timeout value defines the amount of time to wait for a command</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">or RPC call before timing out. The value for the command timeout must</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">be less than the value of the persistent connection idle timeout (connect_timeout)</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">The default value is 30 second.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">command_timeout = 30</span>
+
+[accelerate]
+<span style="color: #465457;">#</span><span style="color: #465457;">accelerate_port = 5099</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">accelerate_timeout = 30</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">accelerate_connect_timeout = 5.0</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">The daemon timeout is measured in minutes. This time is measured</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">from the last activity to the accelerate daemon.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">accelerate_daemon_timeout = 30</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">If set to yes, accelerate_multi_key will allow multiple</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">private keys to be uploaded to it, though each user must</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">have access to the system via SSH to add a new key. The default</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">is "no".</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">accelerate_multi_key = yes</span>
+
+[selinux]
+<span style="color: #465457;"># </span><span style="color: #465457;">file systems that require special treatment when dealing with security context</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">the default behaviour that copies the existing context or uses the user default</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">needs to be changed to use the file system dependent context.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">special_context_filesystems=nfs,vboxsf,fuse,ramfs,9p,vfat</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">Set this to yes to allow libvirt_lxc connections to work without SELinux.</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">libvirt_lxc_noseclabel = yes</span>
+
+[colors]
+<span style="color: #465457;">#</span><span style="color: #465457;">highlight = white</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">verbose = blue</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">warn = bright purple</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">error = red</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">debug = dark gray</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">deprecate = purple</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">skip = cyan</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">unreachable = red</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">ok = green</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">changed = yellow</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">diff_add = green</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">diff_remove = red</span>
+<span style="color: #465457;">#</span><span style="color: #465457;">diff_lines = cyan</span>
+
+
+[diff]
+<span style="color: #465457;"># </span><span style="color: #465457;">Always print diff when running ( same as always running with -D/--diff )</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">always = no</span>
+
+<span style="color: #465457;"># </span><span style="color: #465457;">Set how many context lines to show in diff</span>
+<span style="color: #465457;"># </span><span style="color: #465457;">context = 3</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7151bc5" class="outline-4">
+<h4 id="org7151bc5"><span class="section-number-4">1.1.2</span> 主机清单配置文件 (<code>/etc/ansible/hosts</code>)</h4>
+<div class="outline-text-4" id="text-1-1-2">
+</div>
+<div id="outline-container-org046a82b" class="outline-5">
+<h5 id="org046a82b"><span class="section-number-5">1.1.2.1</span> 对主机进行分组</h5>
+<div class="outline-text-5" id="text-1-1-2-1">
+<div class="org-src-container">
+<pre class="src src-sh">[master]
+server-master        <span style="color: #fd971f;">ansible_ssh_host</span>=10.0.0.5    <span style="color: #fd971f;">ansible_ssh_user</span>=ubuntu
+
+[standbys]
+server-standby-01    <span style="color: #fd971f;">ansible_ssh_host</span>=10.0.0.6    <span style="color: #fd971f;">ansible_ssh_user</span>=ubuntu
+server-standby-02    <span style="color: #fd971f;">ansible_ssh_host</span>=10.0.0.7    <span style="color: #fd971f;">ansible_ssh_user</span>=ubuntu
+
+[replication]
 master
 standbys
 </pre>
@@ -475,74 +1146,267 @@ standbys
 </div>
 </div>
 </div>
+</div>
 
 
-<div id="outline-container-sec-2" class="outline-2">
-<h2 id="sec-2"><span class="section-number-2">2</span> Module</h2>
+<div id="outline-container-org8463101" class="outline-3">
+<h3 id="org8463101"><span class="section-number-3">1.2</span> 相关命令</h3>
+<div class="outline-text-3" id="text-1-2">
+</div>
+<div id="outline-container-org3905c9e" class="outline-4">
+<h4 id="org3905c9e"><span class="section-number-4">1.2.1</span> 临时命令执行工具 (<code>/usr/bin/ansible</code>)</h4>
+<div class="outline-text-4" id="text-1-2-1">
+</div>
+<div id="outline-container-orga3d2832" class="outline-5">
+<h5 id="orga3d2832"><span class="section-number-5">1.2.1.1</span> 执行过程</h5>
+<div class="outline-text-5" id="text-1-2-1-1">
+<ol class="org-ol">
+<li>加载配置文件 <code>ansible.cfg</code></li>
+<li>加载模块文件</li>
+<li>将模块生成的临时 python 文件传输至服务器</li>
+<li>执行并返回结果</li>
+<li>删除临时 python 文件</li>
+<li>退出</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org125090a" class="outline-5">
+<h5 id="org125090a"><span class="section-number-5">1.2.1.2</span> 执行状态</h5>
+<div class="outline-text-5" id="text-1-2-1-2">
+<ul class="org-ul">
+<li>绿色
+执行成功且无改变的操作</li>
+<li>黄色
+执行成功且对目标主机做出改变的操作</li>
+<li>红色
+执行失败</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org0d56a5b" class="outline-5">
+<h5 id="org0d56a5b"><span class="section-number-5">1.2.1.3</span> 显示所有主机</h5>
+<div class="outline-text-5" id="text-1-2-1-3">
+<p>
+<code>ansible all --list</code>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgdf56cfe" class="outline-4">
+<h4 id="orgdf56cfe"><span class="section-number-4">1.2.2</span> 模块查看工具 (<code>/usr/bin/ansible-doc</code>)</h4>
+<div class="outline-text-4" id="text-1-2-2">
+</div>
+<div id="outline-container-orga0eb10c" class="outline-5">
+<h5 id="orga0eb10c"><span class="section-number-5">1.2.2.1</span> 显示所有模块</h5>
+<div class="outline-text-5" id="text-1-2-2-1">
+<p>
+<code>ansible-doc -l</code>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org5ec9174" class="outline-5">
+<h5 id="org5ec9174"><span class="section-number-5">1.2.2.2</span> 查看模块用法</h5>
+<div class="outline-text-5" id="text-1-2-2-2">
+<p>
+<code>ansible-doc [-s] &lt;module_name&gt;</code>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb12ceac" class="outline-4">
+<h4 id="orgb12ceac"><span class="section-number-4">1.2.3</span> 模块下载工具 (<code>/usr/bin/ansible-galaxy</code>)</h4>
+</div>
+
+<div id="outline-container-org1bf0ee4" class="outline-4">
+<h4 id="org1bf0ee4"><span class="section-number-4">1.2.4</span> 编排剧本工具 (<code>/usr/bin/ansible-playbook</code>)</h4>
+</div>
+
+<div id="outline-container-org7ee0c91" class="outline-4">
+<h4 id="org7ee0c91"><span class="section-number-4">1.2.5</span> 文件加密工具 (<code>/usr/bin/ansible-vault</code>)</h4>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-orgf6cb0f9" class="outline-2">
+<h2 id="orgf6cb0f9"><span class="section-number-2">2</span> 常用模块 (Module)</h2>
 <div class="outline-text-2" id="text-2">
-</div><div id="outline-container-sec-2-1" class="outline-3">
-<h3 id="sec-2-1"><span class="section-number-3">2.1</span> 文件处理</h3>
+</div>
+<div id="outline-container-orgb72c5c5" class="outline-3">
+<h3 id="orgb72c5c5"><span class="section-number-3">2.1</span> 远程执行</h3>
 <div class="outline-text-3" id="text-2-1">
-</div><div id="outline-container-sec-2-1-1" class="outline-4">
-<h4 id="sec-2-1-1"><span class="section-number-4">2.1.1</span> synchronize</h4>
+</div>
+<div id="outline-container-org96de2d9" class="outline-4">
+<h4 id="org96de2d9"><span class="section-number-4">2.1.1</span> command (默认模块)</h4>
 <div class="outline-text-4" id="text-2-1-1">
-<div class="org-src-container">
+<p>
+<b>对管道和特殊字符的支持有限，可以选择使用 shell 模块</b>
+</p>
 
-<pre class="src src-sh">synchronize: <span style="color: #0087ff;">src</span>=some/relative/path <span style="color: #0087ff;">dest</span>=/some/absolute/path <span style="color: #0087ff;">rsync_path</span>=<span style="color: #00afaf;">"sudo rsync"</span>
-synchronize: <span style="color: #0087ff;">src</span>=some/relative/path <span style="color: #0087ff;">dest</span>=/some/absolute/path <span style="color: #0087ff;">archive</span>=no   <span style="color: #0087ff;">links</span>=yes
-synchronize: <span style="color: #0087ff;">src</span>=some/relative/path <span style="color: #0087ff;">dest</span>=/some/absolute/path <span style="color: #0087ff;">checksum</span>=yes <span style="color: #0087ff;">times</span>=no
-synchronize: <span style="color: #0087ff;">src</span>=some/relative/path <span style="color: #0087ff;">dest</span>=/some/absolute/path <span style="color: #0087ff;">rsync_opts</span>=--no-motd,--exclude=.git <span style="color: #0087ff;">mode</span>=pull
+<div class="org-src-container">
+<pre class="src src-sh">ansible all -a <span style="color: #e6db74;">'df -h'</span>
+ansible all -a <span style="color: #e6db74;">'chdir=/tmp ls'</span> <span style="color: #465457;"># </span><span style="color: #465457;">&#20999;&#25442;&#30446;&#24405;</span>
+
 </pre>
 </div>
-</div>
-</div>
 
-
-<div id="outline-container-sec-2-1-2" class="outline-4">
-<h4 id="sec-2-1-2"><span class="section-number-4">2.1.2</span> copy</h4>
-<div class="outline-text-4" id="text-2-1-2">
 <dl class="org-dl">
-<dt> src </dt><dd>  本地文件地址，可以是绝对路径，也可以是相对路径。 如果路径是一个目录，它将递归复制。
+<dt>creates</dt><dd>指定一个文件名，如果给文件存在，则不执行。</dd>
 
-<p>
-如果路径使用 <code>/</code> 来结尾，则只复制目录里的内容；如果没有使用 <code>/</code> 来结尾，则包含目录在内的整个内容全部复制，类似于 <code>rsync</code> 。
-</p>
-</dd>
+<dt>removes</dt><dd>指定一个文件名，如果给文件不存在，则不执行。</dd>
 
-<dt> dest </dt><dd>  远程主机的绝对路径，如果源文件是一个目录，那么该路径也必须是个目录。
-</dd>
-
-<dt> force </dt><dd>  如果设置为 <code>yes</code> （默认），则强制覆盖。
-</dd>
+<dt>chdir</dt><dd>执行命令前，切换到指定目录。</dd>
 </dl>
 </div>
 </div>
 
 
-<div id="outline-container-sec-2-1-3" class="outline-4">
-<h4 id="sec-2-1-3"><span class="section-number-4">2.1.3</span> get_url</h4>
-<div class="outline-text-4" id="text-2-1-3">
-<div class="org-src-container">
+<div id="outline-container-orgb86ef47" class="outline-4">
+<h4 id="orgb86ef47"><span class="section-number-4">2.1.2</span> shell</h4>
+<div class="outline-text-4" id="text-2-1-2">
+<p>
+和 <code>command</code> 类似， <b>但支持管道与特殊字符</b> 。
+</p>
 
-<pre class="src src-sh">get_url: <span style="color: #0087ff;">url</span>=http://example.com/path/file.conf <span style="color: #0087ff;">dest</span>=/etc/foo.conf <span style="color: #0087ff;">mode</span>=0440
+
+<div class="org-src-container">
+<pre class="src src-sh">ansible all -m shell -b -a <span style="color: #e6db74;">'useradd haoru'</span>
+ansible all -m shell -b -a <span style="color: #e6db74;">'echo haoru:mypassword | chpasswd'</span> <span style="color: #465457;"># </span><span style="color: #465457;">&#20462;&#25913;&#23494;&#30721;</span>
+ansible all -m shell -a <span style="color: #e6db74;">'getent passwd haoru'</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-sec-2-1-4" class="outline-4">
-<h4 id="sec-2-1-4"><span class="section-number-4">2.1.4</span> template</h4>
+
+<div id="outline-container-orgfffab42" class="outline-4">
+<h4 id="orgfffab42"><span class="section-number-4">2.1.3</span> script</h4>
+<div class="outline-text-4" id="text-2-1-3">
+<div class="org-src-container">
+<pre class="src src-sh">ansible all -m script -a <span style="color: #e6db74;">'/path/to/local/script.sh'</span>
+</pre>
+</div>
+</div>
 </div>
 </div>
 
 
-
-<div id="outline-container-sec-2-2" class="outline-3">
-<h3 id="sec-2-2"><span class="section-number-3">2.2</span> 网络管理</h3>
+<div id="outline-container-org5b36ae9" class="outline-3">
+<h3 id="org5b36ae9"><span class="section-number-3">2.2</span> 文件管理</h3>
 <div class="outline-text-3" id="text-2-2">
-</div><div id="outline-container-sec-2-2-1" class="outline-4">
-<h4 id="sec-2-2-1"><span class="section-number-4">2.2.1</span> ping</h4>
+</div>
+<div id="outline-container-orge2d9082" class="outline-4">
+<h4 id="orge2d9082"><span class="section-number-4">2.2.1</span> copy</h4>
 <div class="outline-text-4" id="text-2-2-1">
+<div class="org-src-container">
+<pre class="src src-sh">ansible all -m copy -a <span style="color: #e6db74;">'src=/path/to/local/file dest=/path/to/remote/file backup=yes mode=777 owner=root'</span>
+ansible all -m copy -a <span style="color: #e6db74;">'content="hello\nworld" dest=/path/to/remote/file'</span>
+
+</pre>
+</div>
+
+<ul class="org-ul">
+<li><p>
+src
+</p>
+
+<p>
+本地文件地址，可以是绝对路径，也可以是相对路径。 如果路径是一个目录，它将递归复制。
+</p>
+
+<p>
+如果路径使用 <code>/</code> 来结尾，则只复制目录里的内容；<br>
+如果没有使用 <code>/</code> 来结尾，则包含目录在内的整个内容全部复制，类似于 <code>rsync</code> 。
+</p></li>
+<li><p>
+dest
+</p>
+
+<p>
+远程主机的绝对路径，如果源文件是一个目录，那么该路径也必须是个目录。
+</p></li>
+</ul>
+</div>
+</div>
+
+
+
+<div id="outline-container-orgb0aeeb5" class="outline-4">
+<h4 id="orgb0aeeb5"><span class="section-number-4">2.2.2</span> fetch</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<p>
+从服务器下载文件，和 <code>copy</code> 作用相反。（ <span class="underline">当前不支持下载目录</span> ）
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">ansible all -m fetch -a <span style="color: #e6db74;">'src=~/test.txt dest=/tmp'</span>
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org5a9c2c6" class="outline-4">
+<h4 id="org5a9c2c6"><span class="section-number-4">2.2.3</span> file</h4>
+<div class="outline-text-4" id="text-2-2-3">
+<p>
+设置文件属性
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">ansible all -m file -a <span style="color: #e6db74;">'dest=/tmp/test.txt state=touch'</span> <span style="color: #465457;"># </span><span style="color: #465457;">&#21019;&#24314;&#25991;&#20214;</span>
+ansible all -m file -a <span style="color: #e6db74;">'dest=/tmp/test.txt state=absent'</span> <span style="color: #465457;"># </span><span style="color: #465457;">&#21024;&#38500;&#25991;&#20214;</span>
+ansible all -m file -a <span style="color: #e6db74;">'dest=/tmp/testdir state=directory'</span> <span style="color: #465457;"># </span><span style="color: #465457;">&#21019;&#24314;&#25991;&#20214;&#22841;</span>
+ansible all -m file -a <span style="color: #e6db74;">'src=/etc/fstab dest=/tmp/fstab.link state=link'</span> <span style="color: #465457;"># </span><span style="color: #465457;">&#21019;&#24314;&#36719;&#38142;&#25509;</span>
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgc2e8cef" class="outline-4">
+<h4 id="orgc2e8cef"><span class="section-number-4">2.2.4</span> synchronize</h4>
+<div class="outline-text-4" id="text-2-2-4">
+<div class="org-src-container">
+<pre class="src src-sh">synchronize: <span style="color: #fd971f;">src</span>=some/relative/path <span style="color: #fd971f;">dest</span>=/some/absolute/path <span style="color: #fd971f;">rsync_path</span>=<span style="color: #e6db74;">"sudo rsync"</span>
+synchronize: <span style="color: #fd971f;">src</span>=some/relative/path <span style="color: #fd971f;">dest</span>=/some/absolute/path <span style="color: #fd971f;">archive</span>=no   <span style="color: #fd971f;">links</span>=yes
+synchronize: <span style="color: #fd971f;">src</span>=some/relative/path <span style="color: #fd971f;">dest</span>=/some/absolute/path <span style="color: #fd971f;">checksum</span>=yes <span style="color: #fd971f;">times</span>=no
+synchronize: <span style="color: #fd971f;">src</span>=some/relative/path <span style="color: #fd971f;">dest</span>=/some/absolute/path <span style="color: #fd971f;">rsync_opts</span>=--no-motd,--exclude=.git <span style="color: #fd971f;">mode</span>=pull
+</pre>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-org0935c4d" class="outline-4">
+<h4 id="org0935c4d"><span class="section-number-4">2.2.5</span> get_url</h4>
+<div class="outline-text-4" id="text-2-2-5">
+<div class="org-src-container">
+<pre class="src src-sh">get_url: <span style="color: #fd971f;">url</span>=http://example.com/path/file.conf <span style="color: #fd971f;">dest</span>=/etc/foo.conf <span style="color: #fd971f;">mode</span>=0440
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+
+<div id="outline-container-org0d4194d" class="outline-3">
+<h3 id="org0d4194d"><span class="section-number-3">2.3</span> 网络管理</h3>
+<div class="outline-text-3" id="text-2-3">
+</div>
+<div id="outline-container-org2df5a61" class="outline-4">
+<h4 id="org2df5a61"><span class="section-number-4">2.3.1</span> ping</h4>
+<div class="outline-text-4" id="text-2-3-1">
 <p>
 <code>ansible &lt;pattern&gt; -m ping</code>
 </p>
@@ -551,126 +1415,152 @@ synchronize: <span style="color: #0087ff;">src</span>=some/relative/path <span s
 </div>
 
 
-<div id="outline-container-sec-2-3" class="outline-3">
-<h3 id="sec-2-3"><span class="section-number-3">2.3</span> 服务管理</h3>
-<div class="outline-text-3" id="text-2-3">
-</div><div id="outline-container-sec-2-3-1" class="outline-4">
-<h4 id="sec-2-3-1"><span class="section-number-4">2.3.1</span> service</h4>
-<div class="outline-text-4" id="text-2-3-1">
-<dl class="org-dl">
-<dt> enabled </dt><dd>  是否开机启动
-</dd>
-
-<dt> name </dt><dd>  服务名称
-</dd>
-
-<dt> pattern </dt><dd>  就会通过 <code>ps</code> 命令在进程中根据该模式进行查找，如果找到，则认为该服务依然在运行。
-</dd>
-
-<dt> sleep </dt><dd>  如果执行了 <code>restarted</code> ，在则 stop 和 start 之间等待几秒。
-</dd>
-
-<dt> state </dt><dd>  <code>started</code> , <code>stopped</code> , <code>restarted</code> , <code>reloaded</code>
-</dd>
-</dl>
-
-
-<div class="org-src-container">
-
-<pre class="src src-sh">service: <span style="color: #0087ff;">name</span>=httpd <span style="color: #0087ff;">state</span>=started <span style="color: #0087ff;">enabled</span>=yes
-service: <span style="color: #0087ff;">name</span>=foo <span style="color: #0087ff;">pattern</span>=/usr/bin/foo <span style="color: #0087ff;">state</span>=started <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#33509;&#21551;&#21160;&#21518;&#21457;&#29616; /usr/bin/foo &#36825;&#20010;&#36827;&#31243;&#23384;&#22312;&#65292;&#21017;&#35748;&#20026;&#21551;&#21160;&#25104;&#21151;</span>
-</pre>
-</div>
-</div>
-</div>
-
-
-<div id="outline-container-sec-2-3-2" class="outline-4">
-<h4 id="sec-2-3-2"><span class="section-number-4">2.3.2</span> cron</h4>
-<div class="outline-text-4" id="text-2-3-2">
-<dl class="org-dl">
-<dt> backup </dt><dd>  先备份原任务计划内容
-</dd>
-</dl>
-
-
-<dl class="org-dl">
-<dt> job </dt><dd>  执行的任务（命令）
-</dd>
-
-<dt> name </dt><dd>  任务的描述
-</dd>
-</dl>
-
-
-<dl class="org-dl">
-<dt> special_time </dt><dd>  <code>reboot</code> , <code>yearly</code> , <code>annually</code> , <code>monthly</code> , <code>weekly</code> , <code>daily</code> , <code>hourly</code>
-</dd>
-</dl>
-
-
-<dl class="org-dl">
-<dt> state </dt><dd>  创建 (<code>present</code>) / 删除(<code>absent</code>)
-</dd>
-
-<dt> user </dt><dd>  执行用户身份
-</dd>
-</dl>
-
-
-<div class="org-src-container">
-
-<pre class="src src-sh">cron: <span style="color: #0087ff;">name</span>=do_something_when_reboot <span style="color: #0087ff;">special_time</span>=reboot <span style="color: #0087ff;">job</span>=<span style="color: #00afaf;">"/some/job.sh"</span>
-cron: <span style="color: #0087ff;">name</span>=do_something_when_reboot <span style="color: #0087ff;">state</span>=absent
-</pre>
-</div>
-</div>
-</div>
-</div>
-
-
-<div id="outline-container-sec-2-4" class="outline-3">
-<h3 id="sec-2-4"><span class="section-number-3">2.4</span> 远程执行</h3>
+<div id="outline-container-org3f76531" class="outline-3">
+<h3 id="org3f76531"><span class="section-number-3">2.4</span> 服务管理</h3>
 <div class="outline-text-3" id="text-2-4">
-</div><div id="outline-container-sec-2-4-1" class="outline-4">
-<h4 id="sec-2-4-1"><span class="section-number-4">2.4.1</span> command</h4>
+</div>
+<div id="outline-container-org40025e0" class="outline-4">
+<h4 id="org40025e0"><span class="section-number-4">2.4.1</span> service</h4>
 <div class="outline-text-4" id="text-2-4-1">
-<dl class="org-dl">
-<dt> creates </dt><dd>  指定一个文件名，如果给文件存在，则不执行。
-</dd>
-
-<dt> removes </dt><dd>  指定一个文件名，如果给文件不存在，则不执行。
-</dd>
-
-<dt> chdir </dt><dd>  执行命令前，切换到指定目录。
-</dd>
-</dl>
-</div>
-</div>
-
-
-<div id="outline-container-sec-2-4-2" class="outline-4">
-<h4 id="sec-2-4-2"><span class="section-number-4">2.4.2</span> shell</h4>
-<div class="outline-text-4" id="text-2-4-2">
-<p>
-和 <code>command</code> 类似， <b>但支持管道</b> 。
+<ul class="org-ul">
+<li><p>
+enabled
 </p>
+
+<p>
+是否开机启动
+</p></li>
+<li><p>
+name
+</p>
+
+<p>
+服务名称
+</p></li>
+<li><p>
+pattern
+</p>
+
+<p>
+就会通过 <code>ps</code> 命令在进程中根据该模式进行查找，如果找到，则认为该服务依然在运行。
+</p></li>
+<li><p>
+sleep
+</p>
+
+<p>
+如果执行了 <code>restarted</code> ，在则 stop 和 start 之间等待几秒。
+</p></li>
+<li><p>
+state
+</p>
+
+<p>
+<code>started</code> , <code>stopped</code> , <code>restarted</code> , <code>reloaded</code>
+</p></li>
+</ul>
+
+
+<div class="org-src-container">
+<pre class="src src-sh">service: <span style="color: #fd971f;">name</span>=httpd <span style="color: #fd971f;">state</span>=started <span style="color: #fd971f;">enabled</span>=yes
+service: <span style="color: #fd971f;">name</span>=foo <span style="color: #fd971f;">pattern</span>=/usr/bin/foo <span style="color: #fd971f;">state</span>=started <span style="color: #465457;"># </span><span style="color: #465457;">&#33509;&#21551;&#21160;&#21518;&#21457;&#29616; /usr/bin/foo &#36825;&#20010;&#36827;&#31243;&#23384;&#22312;&#65292;&#21017;&#35748;&#20026;&#21551;&#21160;&#25104;&#21151;</span>
+
+ansible all -m service -a <span style="color: #e6db74;">'name=vsftpd state=started enabled=true'</span>
+ansible all -a <span style="color: #e6db74;">'systemctl is-enabled vsftpd'</span>
+ansible all -a <span style="color: #e6db74;">'systemctl status vsftpd'</span>
+</pre>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-sec-2-5" class="outline-3">
-<h3 id="sec-2-5"><span class="section-number-3">2.5</span> 资产管理</h3>
+<div id="outline-container-org01a2218" class="outline-4">
+<h4 id="org01a2218"><span class="section-number-4">2.4.2</span> cron</h4>
+<div class="outline-text-4" id="text-2-4-2">
+<dl class="org-dl">
+<dt>backup</dt><dd>先备份原任务计划内容</dd>
+</dl>
+
+
+<dl class="org-dl">
+<dt>job</dt><dd>执行的任务（命令）</dd>
+
+<dt>name</dt><dd>任务的描述</dd>
+</dl>
+
+
+<dl class="org-dl">
+<dt>special_time</dt><dd><code>reboot</code> , <code>yearly</code> , <code>annually</code> , <code>monthly</code> , <code>weekly</code> , <code>daily</code> , <code>hourly</code></dd>
+</dl>
+
+
+<dl class="org-dl">
+<dt>state</dt><dd>创建 (<code>present</code>) / 删除(<code>absent</code>)</dd>
+
+<dt>user</dt><dd>执行用户身份</dd>
+</dl>
+
+
+<div class="org-src-container">
+<pre class="src src-sh">cron: <span style="color: #fd971f;">name</span>=do_something_when_reboot <span style="color: #fd971f;">special_time</span>=reboot <span style="color: #fd971f;">job</span>=<span style="color: #e6db74;">"/some/job.sh"</span>
+cron: <span style="color: #fd971f;">name</span>=do_something_when_reboot <span style="color: #fd971f;">state</span>=absent
+
+ansible all -m cron -a <span style="color: #e6db74;">'minute=* weekday=1,3,5 job="/usr/bin/wall hello" name=warningcron'</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-org2027282" class="outline-3">
+<h3 id="org2027282"><span class="section-number-3">2.5</span> 用户（组）管理</h3>
 <div class="outline-text-3" id="text-2-5">
-</div><div id="outline-container-sec-2-5-1" class="outline-4">
-<h4 id="sec-2-5-1"><span class="section-number-4">2.5.1</span> setup</h4>
+</div>
+<div id="outline-container-org629e2e2" class="outline-4">
+<h4 id="org629e2e2"><span class="section-number-4">2.5.1</span> user</h4>
 <div class="outline-text-4" id="text-2-5-1">
 <div class="org-src-container">
+<pre class="src src-sh">ansible all -m user -a <span style="color: #e6db74;">'name=nginx shell=/sbin/nologin system=yes home=/var/nginx groups=root,bin comment="nginx service"'</span>
+ansible all -m user -a <span style="color: #e6db74;">'name=nginx state=absent remove=yes'</span> <span style="color: #465457;"># </span><span style="color: #465457;">&#21024;&#38500;&#29992;&#25143;&#65292;&#21253;&#25324;&#23478;&#30446;&#24405;</span>
+</pre>
+</div>
 
-<pre class="src src-sh">ansible &lt;pattern&gt; -m setup -a <span style="color: #00afaf;">'filter=ansible_*_mb'</span>     <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#26597;&#30475;&#20027;&#26426;&#20869;&#23384;&#20449;&#24687;</span>
-ansible &lt;pattern&gt; -m setup -a <span style="color: #00afaf;">'filter=ansible_eth[0-2]'</span> <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#26597;&#30475;&#22320;&#25509;&#21475;&#20026;eth0-2&#30340;&#32593;&#21345;&#20449;&#24687;</span>
-ansible &lt;pattern&gt; -m setup --tree /tmp/facts            <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#23558;&#25152;&#26377;&#20027;&#26426;&#30340;&#20449;&#24687;&#36755;&#20837;&#21040; /tmp/facts &#30446;&#24405;&#19979;</span>
+<ul class="org-ul">
+<li><p>
+system
+</p>
+
+<p>
+是否是系统账号
+</p></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org100ab7d" class="outline-4">
+<h4 id="org100ab7d"><span class="section-number-4">2.5.2</span> group</h4>
+<div class="outline-text-4" id="text-2-5-2">
+<div class="org-src-container">
+<pre class="src src-sh">ansible all -m group -a <span style="color: #e6db74;">'name=nginx system=yes'</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org384c41d" class="outline-3">
+<h3 id="org384c41d"><span class="section-number-3">2.6</span> 主机信息</h3>
+<div class="outline-text-3" id="text-2-6">
+</div>
+<div id="outline-container-orgbf5d829" class="outline-4">
+<h4 id="orgbf5d829"><span class="section-number-4">2.6.1</span> setup</h4>
+<div class="outline-text-4" id="text-2-6-1">
+<div class="org-src-container">
+<pre class="src src-sh">ansible &lt;pattern&gt; -m setup -a <span style="color: #e6db74;">'filter=ansible_*_mb'</span>     <span style="color: #465457;"># </span><span style="color: #465457;">&#26597;&#30475;&#20027;&#26426;&#20869;&#23384;&#20449;&#24687;</span>
+ansible &lt;pattern&gt; -m setup -a <span style="color: #e6db74;">'filter=ansible_eth[0-2]'</span> <span style="color: #465457;"># </span><span style="color: #465457;">&#26597;&#30475;&#22320;&#25509;&#21475;&#20026;eth0-2&#30340;&#32593;&#21345;&#20449;&#24687;</span>
+ansible &lt;pattern&gt; -m setup --tree /tmp/facts            <span style="color: #465457;"># </span><span style="color: #465457;">&#23558;&#25152;&#26377;&#20027;&#26426;&#30340;&#20449;&#24687;&#36755;&#20837;&#21040; /tmp/facts &#30446;&#24405;&#19979;</span>
 </pre>
 </div>
 </div>
@@ -680,72 +1570,60 @@ ansible &lt;pattern&gt; -m setup --tree /tmp/facts            <span style="color
 
 
 
-
-<div id="outline-container-sec-2-6" class="outline-3">
-<h3 id="sec-2-6"><span class="section-number-3">2.6</span> 包管理</h3>
-<div class="outline-text-3" id="text-2-6">
-</div><div id="outline-container-sec-2-6-1" class="outline-4">
-<h4 id="sec-2-6-1"><span class="section-number-4">2.6.1</span> apt</h4>
-</div>
-
-<div id="outline-container-sec-2-6-2" class="outline-4">
-<h4 id="sec-2-6-2"><span class="section-number-4">2.6.2</span> yum</h4>
-</div>
-</div>
-
-
-<div id="outline-container-sec-2-7" class="outline-3">
-<h3 id="sec-2-7"><span class="section-number-3">2.7</span> 主要用于 Playbook 的模块</h3>
+<div id="outline-container-orgd1b14b7" class="outline-3">
+<h3 id="orgd1b14b7"><span class="section-number-3">2.7</span> 主要用于 Playbook 的模块</h3>
 <div class="outline-text-3" id="text-2-7">
-</div><div id="outline-container-sec-2-7-1" class="outline-4">
-<h4 id="sec-2-7-1"><span class="section-number-4">2.7.1</span> pause</h4>
+</div>
+<div id="outline-container-org0de6290" class="outline-4">
+<h4 id="org0de6290"><span class="section-number-4">2.7.1</span> pause</h4>
 <div class="outline-text-4" id="text-2-7-1">
 <p>
 执行的过程中暂停一定时间或者提示用户进行某些操作。
 </p>
 
 <div class="org-src-container">
-
-<pre class="src src-sh">pause: <span style="color: #0087ff;">prompt</span>=<span style="color: #00afaf;">"ENTER to continue CTRL-C a to quit"</span>
-pause: <span style="color: #0087ff;">seconds</span>=30
+<pre class="src src-sh">pause: <span style="color: #fd971f;">prompt</span>=<span style="color: #e6db74;">"ENTER to continue CTRL-C a to quit"</span>
+pause: <span style="color: #fd971f;">seconds</span>=30
 </pre>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-sec-2-7-2" class="outline-4">
-<h4 id="sec-2-7-2"><span class="section-number-4">2.7.2</span> wait_for</h4>
+<div id="outline-container-orga47f02c" class="outline-4">
+<h4 id="orga47f02c"><span class="section-number-4">2.7.2</span> wait_for</h4>
 <div class="outline-text-4" id="text-2-7-2">
 <p>
 执行过程中等待某些操作完成以后再进行后续操作。
 </p>
 
 <div class="org-src-container">
+<pre class="src src-sh"><span style="color: #465457;"># </span><span style="color: #465457;">&#31561;&#24453; 8080 &#31471;&#21475;&#24050;&#27491;&#24120;&#30417;&#21548;&#65292;&#25165;&#24320;&#22987;&#19979;&#19968;&#20010;&#20219;&#21153;</span>
+wait_for: <span style="color: #fd971f;">port</span>=8080 <span style="color: #fd971f;">state</span>=started
 
-<pre class="src src-sh"><span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#31561;&#24453; 8080 &#31471;&#21475;&#24050;&#27491;&#24120;&#30417;&#21548;&#65292;&#25165;&#24320;&#22987;&#19979;&#19968;&#20010;&#20219;&#21153;</span>
-wait_for: <span style="color: #0087ff;">port</span>=8080 <span style="color: #0087ff;">state</span>=started
+<span style="color: #465457;"># </span><span style="color: #465457;">&#31561;&#24453; 8000 &#31471;&#21475;&#27491;&#24120;&#30417;&#21548;&#65292;&#27599;&#38548; 10s &#26816;&#26597;&#19968;&#27425;&#65292;&#30452;&#33267;&#31561;&#24453;&#36229;&#26102;</span>
+wait_for: <span style="color: #fd971f;">port</span>=8000 <span style="color: #fd971f;">delay</span>=10
 
-<span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#31561;&#24453; 8000 &#31471;&#21475;&#27491;&#24120;&#30417;&#21548;&#65292;&#27599;&#38548; 10s &#26816;&#26597;&#19968;&#27425;&#65292;&#30452;&#33267;&#31561;&#24453;&#36229;&#26102;</span>
-wait_for: <span style="color: #0087ff;">port</span>=8000 <span style="color: #0087ff;">delay</span>=10
+<span style="color: #465457;"># </span><span style="color: #465457;">&#31561;&#24453; 8000 &#31471;&#21475;&#30452;&#33267;&#26377;&#36830;&#25509;&#24314;&#31435;</span>
+wait_for: <span style="color: #fd971f;">host</span>=0.0.0.0 <span style="color: #fd971f;">port</span>=8000 <span style="color: #fd971f;">delay</span>=10 <span style="color: #fd971f;">state</span>=drained
 
-<span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#31561;&#24453; 8000 &#31471;&#21475;&#30452;&#33267;&#26377;&#36830;&#25509;&#24314;&#31435;</span>
-wait_for: <span style="color: #0087ff;">host</span>=0.0.0.0 <span style="color: #0087ff;">port</span>=8000 <span style="color: #0087ff;">delay</span>=10 <span style="color: #0087ff;">state</span>=drained
+<span style="color: #465457;"># </span><span style="color: #465457;">&#31561;&#24453; 8000 &#31471;&#21475;&#26377;&#36830;&#25509;&#24314;&#31435;&#65292;&#22914;&#26524;&#36830;&#25509;&#26469;&#33258;10.2.1.2&#25110;&#32773;10.2.1.3&#65292;&#21017;&#24573;&#30053;</span>
+wait_for: <span style="color: #fd971f;">host</span>=0.0.0.0 <span style="color: #fd971f;">port</span>=8000 <span style="color: #fd971f;">state</span>=drained <span style="color: #fd971f;">exclude_hosts</span>=10.2.1.2,10.2.1.3
 
-<span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#31561;&#24453; 8000 &#31471;&#21475;&#26377;&#36830;&#25509;&#24314;&#31435;&#65292;&#22914;&#26524;&#36830;&#25509;&#26469;&#33258;10.2.1.2&#25110;&#32773;10.2.1.3&#65292;&#21017;&#24573;&#30053;</span>
-wait_for: <span style="color: #0087ff;">host</span>=0.0.0.0 <span style="color: #0087ff;">port</span>=8000 <span style="color: #0087ff;">state</span>=drained <span style="color: #0087ff;">exclude_hosts</span>=10.2.1.2,10.2.1.3
+<span style="color: #465457;"># </span><span style="color: #465457;">&#31561;&#24453; /tmp/foo &#25991;&#20214;&#24050;&#21019;&#24314;</span>
+wait_for: <span style="color: #fd971f;">path</span>=/tmp/foo
 
-<span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#31561;&#24453; /tmp/foo &#25991;&#20214;&#24050;&#21019;&#24314;</span>
-wait_for: <span style="color: #0087ff;">path</span>=/tmp/foo
+<span style="color: #465457;"># </span><span style="color: #465457;">&#31561;&#24453; /tmp/foo &#25991;&#20214;&#24050;&#21019;&#24314;&#65292;&#32780;&#19988;&#35813;&#25991;&#20214;&#20013;&#38656;&#35201;&#21253;&#21547; completed &#23383;&#31526;&#20018;</span>
+wait_for: <span style="color: #fd971f;">path</span>=/tmp/foo <span style="color: #fd971f;">search_regex</span>=completed
 
-<span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#31561;&#24453; /tmp/foo &#25991;&#20214;&#24050;&#21019;&#24314;&#65292;&#32780;&#19988;&#35813;&#25991;&#20214;&#20013;&#38656;&#35201;&#21253;&#21547; completed &#23383;&#31526;&#20018;</span>
-wait_for: <span style="color: #0087ff;">path</span>=/tmp/foo <span style="color: #0087ff;">search_regex</span>=completed
+<span style="color: #465457;"># </span><span style="color: #465457;">&#31561;&#24453; /var/lock/file.lock &#34987;&#21024;&#38500;</span>
+wait_for: <span style="color: #fd971f;">path</span>=/var/lock/file.lock <span style="color: #fd971f;">state</span>=absent
 
-<span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#31561;&#24453; /var/lock/file.lock &#34987;&#21024;&#38500;</span>
-wait_for: <span style="color: #0087ff;">path</span>=/var/lock/file.lock <span style="color: #0087ff;">state</span>=absent
+<span style="color: #465457;"># </span><span style="color: #465457;">&#31561;&#24453;&#25351;&#23450;&#30340;&#36827;&#31243;&#34987;&#38144;&#27585;</span>
+wait_for: <span style="color: #fd971f;">path</span>=/proc/3466/status <span style="color: #fd971f;">state</span>=absent
 
-<span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#31561;&#24453;&#25351;&#23450;&#30340;&#36827;&#31243;&#34987;&#38144;&#27585;</span>
-wait_for: <span style="color: #0087ff;">path</span>=/proc/3466/status <span style="color: #0087ff;">state</span>=absent
+
+
 </pre>
 </div>
 </div>
@@ -753,8 +1631,8 @@ wait_for: <span style="color: #0087ff;">path</span>=/proc/3466/status <span styl
 
 
 
-<div id="outline-container-sec-2-7-3" class="outline-4">
-<h4 id="sec-2-7-3"><span class="section-number-4">2.7.3</span> add_host</h4>
+<div id="outline-container-org3d0e539" class="outline-4">
+<h4 id="org3d0e539"><span class="section-number-4">2.7.3</span> add_host</h4>
 <div class="outline-text-4" id="text-2-7-3">
 <p>
 执行的过程中动态的添加主机到指定的主机组中。
@@ -763,62 +1641,62 @@ wait_for: <span style="color: #0087ff;">path</span>=/proc/3466/status <span styl
 </div>
 
 
-<div id="outline-container-sec-2-7-4" class="outline-4">
-<h4 id="sec-2-7-4"><span class="section-number-4">2.7.4</span> group_by</h4>
+<div id="outline-container-orgd3913be" class="outline-4">
+<h4 id="orgd3913be"><span class="section-number-4">2.7.4</span> group_by</h4>
 <div class="outline-text-4" id="text-2-7-4">
 <p>
 执行的过程中动态的创建主机组。
 </p>
 
 <div class="org-src-container">
+<pre class="src src-yaml">- name: Create operating system group
+  hosts: all
+  tasks:
+    - group_by: key=os_{{ ansible_distribution }}
 
-<pre class="src src-yaml">- <span style="color: #0087ff;">name</span>: Create operating system group
-  <span style="color: #0087ff;">hosts</span>: all
-  <span style="color: #0087ff;">tasks</span>:
-    - <span style="color: #0087ff;">group_by</span>: key=os_{{ ansible_distribution }}
+- name: Run on CentOS hosts only
+  hosts: os_CentOS
+  tasks:
+    - name: Install Apache
+      yum: name=httpd state=latest
 
-- <span style="color: #0087ff;">name</span>: Run on CentOS hosts only
-  <span style="color: #0087ff;">hosts</span>: os_CentOS
-  <span style="color: #0087ff;">tasks</span>:
-    - <span style="color: #0087ff;">name</span>: Install Apache
-      <span style="color: #0087ff;">yum</span>: name=httpd state=latest
-
-- <span style="color: #0087ff;">name</span>: Run on Ubuntu hosts only
-  <span style="color: #0087ff;">hosts</span>: os_Ubuntu
-  <span style="color: #0087ff;">tasks</span>:
-    - <span style="color: #0087ff;">name</span>: Install Apache
-      <span style="color: #0087ff;">apt</span>: pkg=apache2 state=latest
+- name: Run on Ubuntu hosts only
+  hosts: os_Ubuntu
+  tasks:
+    - name: Install Apache
+      apt: pkg=apache2 state=latest
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-sec-2-7-5" class="outline-4">
-<h4 id="sec-2-7-5"><span class="section-number-4">2.7.5</span> debug</h4>
+
+<div id="outline-container-org413dbd1" class="outline-4">
+<h4 id="org413dbd1"><span class="section-number-4">2.7.5</span> debug</h4>
 <div class="outline-text-4" id="text-2-7-5">
 <p>
 用于在调试中输出信息。
 </p>
 
 <div class="org-src-container">
+<pre class="src src-yaml">debug: msg="System {{ inventory_hostname }} has gateway {{ ansible_default_ipv4.gateway }}"
+debug: var=result verbosity=2
 
-<pre class="src src-yaml"><span style="color: #0087ff;">debug</span>: msg=<span style="color: #00afaf;">"System {{ inventory_hostname }} has gateway {{ ansible_default_ipv4.gateway }}"</span>
-<span style="color: #0087ff;">debug</span>: var=result verbosity=2
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-sec-2-7-6" class="outline-4">
-<h4 id="sec-2-7-6"><span class="section-number-4">2.7.6</span> fail</h4>
+
+<div id="outline-container-orga0e66ea" class="outline-4">
+<h4 id="orga0e66ea"><span class="section-number-4">2.7.6</span> fail</h4>
 <div class="outline-text-4" id="text-2-7-6">
 <p>
 通常与条件语句组合使用，当满足条件时，终止当前 play 的运行。
 </p>
 
 <div class="org-src-container">
-
-<pre class="src src-yaml"><span style="color: #0087ff;">fail</span>: msg=<span style="color: #00afaf;">"..."</span>
+<pre class="src src-yaml">fail: msg="..."
 </pre>
 </div>
 </div>
@@ -827,61 +1705,57 @@ wait_for: <span style="color: #0087ff;">path</span>=/proc/3466/status <span styl
 </div>
 
 
-<div id="outline-container-sec-3" class="outline-2">
-<h2 id="sec-3"><span class="section-number-2">3</span> Task</h2>
+<div id="outline-container-org38107c8" class="outline-2">
+<h2 id="org38107c8"><span class="section-number-2">3</span> Task</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 每个任务需要包含的信息：
 </p>
 
 <ul class="org-ul">
-<li>用到的模块
-</li>
-<li>模块参数
-</li>
-<li>用于描述的名称 [可选]
-</li>
-<li>执行条件 [可选]
-</li>
+<li>用到的模块</li>
+<li>模块参数</li>
+<li>用于描述的名称 [可选]</li>
+<li>执行条件 [可选]</li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-sec-4" class="outline-2">
-<h2 id="sec-4"><span class="section-number-2">4</span> Variable</h2>
+<div id="outline-container-org96d01ef" class="outline-2">
+<h2 id="org96d01ef"><span class="section-number-2">4</span> Variable</h2>
 <div class="outline-text-2" id="text-4">
-</div><div id="outline-container-sec-4-1" class="outline-3">
-<h3 id="sec-4-1"><span class="section-number-3">4.1</span> 在 Inventory 中定义变量</h3>
+</div>
+<div id="outline-container-orgb4e7775" class="outline-3">
+<h3 id="orgb4e7775"><span class="section-number-3">4.1</span> 在 Inventory 中定义变量</h3>
 <div class="outline-text-3" id="text-4-1">
 <div class="org-src-container">
-
-<pre class="src src-ini">[<span style="color: #0087ff;">mygroup</span>]
+<pre class="src src-ini">[mygroup]
 host1
 host2
 
-[<span style="color: #0087ff;">mygroup:vars</span>]
-<span style="color: #0087ff;">proxy</span>=1.2.3.4
+[mygroup:vars]
+proxy=1.2.3.4
 </pre>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-sec-4-2" class="outline-3">
-<h3 id="sec-4-2"><span class="section-number-3">4.2</span> 在 Playbook 中定义变量</h3>
+<div id="outline-container-org15cb6de" class="outline-3">
+<h3 id="org15cb6de"><span class="section-number-3">4.2</span> 在 Playbook 中定义变量</h3>
 <div class="outline-text-3" id="text-4-2">
-</div><div id="outline-container-sec-4-2-1" class="outline-4">
-<h4 id="sec-4-2-1"><span class="section-number-4">4.2.1</span> vars, vars_files 关键字</h4>
+</div>
+<div id="outline-container-org03b80ed" class="outline-4">
+<h4 id="org03b80ed"><span class="section-number-4">4.2.1</span> vars, vars_files 关键字</h4>
 <div class="outline-text-4" id="text-4-2-1">
 <div class="org-src-container">
-
-<pre class="src src-yaml">- <span style="color: #0087ff;">hosts</span>: all
-  <span style="color: #0087ff;">user</span>: root
-  <span style="color: #0087ff;">vars</span>:
-    <span style="color: #0087ff;">var1</span>: a
-    <span style="color: #0087ff;">var2</span>: b
-  <span style="color: #0087ff;">vars_files</span>:
+<pre class="src src-yaml">- hosts: all
+  user: root
+  vars:
+    var1: a
+    var2: b
+  vars_files:
     - /vars/nginx_vars.yml
 </pre>
 </div>
@@ -900,96 +1774,94 @@ conf_file: /etc/nginx/conf/default.conf
 </div>
 </div>
 
-<div id="outline-container-sec-4-2-2" class="outline-4">
-<h4 id="sec-4-2-2"><span class="section-number-4">4.2.2</span> vars_prompt 实现人机交互</h4>
+<div id="outline-container-org4ba7149" class="outline-4">
+<h4 id="org4ba7149"><span class="section-number-4">4.2.2</span> vars_prompt 实现人机交互</h4>
 <div class="outline-text-4" id="text-4-2-2">
 <div class="org-src-container">
-
-<pre class="src src-yaml"><span style="color: #0087ff;">hosts</span>: all
-<span style="color: #0087ff;">user</span>: root
-<span style="color: #0087ff;">vars_prompt</span>:
-  - <span style="color: #0087ff;">name</span>: <span style="color: #00afaf;">'https_passphrase'</span>          <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#21464;&#37327;&#21517;</span>
-    <span style="color: #0087ff;">prompt</span>: <span style="color: #00afaf;">'Please input:'</span>
-    <span style="color: #0087ff;">private</span>: yes                      <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">&#36755;&#20837;&#20869;&#23481;&#19981;&#20250;&#22312;&#32456;&#31471;&#26174;&#31034;</span>
+<pre class="src src-yaml">hosts: all
+user: root
+vars_prompt:
+  - name: 'https_passphrase'          # 变量名
+    prompt: 'Please input:'
+    private: yes                      # 输入内容不会在终端显示
 </pre>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-sec-4-2-3" class="outline-4">
-<h4 id="sec-4-2-3"><span class="section-number-4">4.2.3</span> 通过 roles 带入变量</h4>
+<div id="outline-container-orgb3a5ded" class="outline-4">
+<h4 id="orgb3a5ded"><span class="section-number-4">4.2.3</span> 通过 roles 带入变量</h4>
 </div>
 </div>
 
 
-<div id="outline-container-sec-4-3" class="outline-3">
-<h3 id="sec-4-3"><span class="section-number-3">4.3</span> 注册变量</h3>
+<div id="outline-container-orgdc2d004" class="outline-3">
+<h3 id="orgdc2d004"><span class="section-number-3">4.3</span> 注册变量</h3>
 <div class="outline-text-3" id="text-4-3">
 <p>
 使用 <code>register</code> 将任务的执行结果保存到变量中
 </p>
 
 <div class="org-src-container">
-
-<pre class="src src-yaml">- <span style="color: #0087ff;">hosts</span>: all
-    <span style="color: #0087ff;">tasks</span>:
-        - <span style="color: #0087ff;">shell</span>: cat /etc/hosts
-          <span style="color: #0087ff;">register</span>: result
-        - <span style="color: #0087ff;">shell</span>: echo <span style="color: #00afaf;">"/etc/hosts contains localhost"</span>
-          <span style="color: #0087ff;">when</span>: result.stdout.find(<span style="color: #00afaf;">'localhost'</span>) <span style="color: #af8700;">!=</span> -1
+<pre class="src src-yaml">- hosts: all
+    tasks:
+        - shell: cat /etc/hosts
+          register: result
+        - shell: echo "/etc/hosts contains localhost"
+          when: result.stdout.find('localhost') != -1
 </pre>
 </div>
 
 <div class="org-src-container">
+<pre class="src src-yaml">- hosts: all
+    tasks:
+      - command: ls /home
+        register: result
+      - file: path=/mnt/home/{{ item }} src=/home/{{ item }} state=link
+        with_items: result.stdout_lines # same as with_items: result.stdout.split()
 
-<pre class="src src-yaml">- <span style="color: #0087ff;">hosts</span>: all
-    <span style="color: #0087ff;">tasks</span>:
-      - <span style="color: #0087ff;">command</span>: ls /home
-        <span style="color: #0087ff;">register</span>: result
-      - <span style="color: #0087ff;">file</span>: path=/mnt/home/{{ item }} src=/home/{{ item }} state=link
-        <span style="color: #0087ff;">with_items</span>: result.stdout_lines <span style="color: #585858; font-style: italic;"># </span><span style="color: #585858; font-style: italic;">same as with_items: result.stdout.split()</span>
 </pre>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-sec-4-4" class="outline-3">
-<h3 id="sec-4-4"><span class="section-number-3">4.4</span> 通过 fact 获取/设置变量</h3>
+<div id="outline-container-org814522e" class="outline-3">
+<h3 id="org814522e"><span class="section-number-3">4.4</span> 通过 fact 获取/设置变量</h3>
 <div class="outline-text-3" id="text-4-4">
 <div class="org-src-container">
+<pre class="src src-yaml">- name: Configure MySql
+  hosts: sqlservers
+  tasks:
+    - name: Install MySql
+      yum: name=mysql-server state=installed
 
-<pre class="src src-yaml">- <span style="color: #0087ff;">name</span>: Configure MySql
-  <span style="color: #0087ff;">hosts</span>: sqlservers
-  <span style="color: #0087ff;">tasks</span>:
-    - <span style="color: #0087ff;">name</span>: Install MySql
-      <span style="color: #0087ff;">yum</span>: name=mysql-server state=installed
+    - name: Calculate InnoDB buffer pool size
+      set_fact: innodb_buffer_pool_size_mb="{{ ansible_memtotal_mb / 2 }}"
 
-    - <span style="color: #0087ff;">name</span>: Calculate InnoDB buffer pool size
-      <span style="color: #0087ff;">set_fact</span>: innodb_buffer_pool_size_mb=<span style="color: #00afaf;">"{{ ansible_memtotal_mb / 2 }}"</span>
+    - name: Configure MySql
+      template: src=templates/mysql.cnf dest=/etc/mysql.cnf owner=root group=root mode=0644
+      notify: restart mysql
 
-    - <span style="color: #0087ff;">name</span>: Configure MySql
-      <span style="color: #0087ff;">template</span>: src=templates/mysql.cnf dest=/etc/mysql.cnf owner=root group=root mode=0644
-      <span style="color: #0087ff;">notify</span>: restart mysql
+    - name: Start MySql
+      service: name=mysqld state=started enabled=yes
 
-    - <span style="color: #0087ff;">name</span>: Start MySql
-      <span style="color: #0087ff;">service</span>: name=mysqld state=started enabled=yes
-
-  <span style="color: #0087ff;">handlers</span>:
-    - <span style="color: #0087ff;">name</span>: Restart MySql
-      <span style="color: #0087ff;">service</span>: name=mysqld state=restarted
+  handlers:
+    - name: Restart MySql
+      service: name=mysqld state=restarted
 </pre>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-sec-4-5" class="outline-3">
-<h3 id="sec-4-5"><span class="section-number-3">4.5</span> 内置变量</h3>
+<div id="outline-container-org3fe47e4" class="outline-3">
+<h3 id="org3fe47e4"><span class="section-number-3">4.5</span> 内置变量</h3>
 <div class="outline-text-3" id="text-4-5">
-</div><div id="outline-container-sec-4-5-1" class="outline-4">
-<h4 id="sec-4-5-1"><span class="section-number-4">4.5.1</span> hostvars</h4>
+</div>
+<div id="outline-container-orgaff4502" class="outline-4">
+<h4 id="orgaff4502"><span class="section-number-4">4.5.1</span> hostvars</h4>
 <div class="outline-text-4" id="text-4-5-1">
 <p>
 用于获取某台指定的主机的相关变量。
@@ -1006,8 +1878,8 @@ conf_file: /etc/nginx/conf/default.conf
 </div>
 
 
-<div id="outline-container-sec-4-5-2" class="outline-4">
-<h4 id="sec-4-5-2"><span class="section-number-4">4.5.2</span> inventory_hostname</h4>
+<div id="outline-container-org778f3f8" class="outline-4">
+<h4 id="org778f3f8"><span class="section-number-4">4.5.2</span> inventory_hostname</h4>
 <div class="outline-text-4" id="text-4-5-2">
 <p>
 利用 hostvars 和 inventory_hostname 变量，可以输出与当前主机相关联的所有变量：
@@ -1020,8 +1892,8 @@ conf_file: /etc/nginx/conf/default.conf
 </div>
 
 
-<div id="outline-container-sec-4-5-3" class="outline-4">
-<h4 id="sec-4-5-3"><span class="section-number-4">4.5.3</span> inventory_hostname_short</h4>
+<div id="outline-container-orga1daab9" class="outline-4">
+<h4 id="orga1daab9"><span class="section-number-4">4.5.3</span> inventory_hostname_short</h4>
 <div class="outline-text-4" id="text-4-5-3">
 <p>
 如果一台主机的 inventory_hostname 为 <code>server1.exmaple.com</code> ，则 inventory_hostname_short 的值为 server1 。
@@ -1030,8 +1902,8 @@ conf_file: /etc/nginx/conf/default.conf
 </div>
 
 
-<div id="outline-container-sec-4-5-4" class="outline-4">
-<h4 id="sec-4-5-4"><span class="section-number-4">4.5.4</span> group_names</h4>
+<div id="outline-container-org7c66e8a" class="outline-4">
+<h4 id="org7c66e8a"><span class="section-number-4">4.5.4</span> group_names</h4>
 <div class="outline-text-4" id="text-4-5-4">
 <p>
 用于标识当前正在执行 task 的目标主机位于的主机组。
@@ -1040,8 +1912,8 @@ conf_file: /etc/nginx/conf/default.conf
 </div>
 
 
-<div id="outline-container-sec-4-5-5" class="outline-4">
-<h4 id="sec-4-5-5"><span class="section-number-4">4.5.5</span> groups</h4>
+<div id="outline-container-org0e3e522" class="outline-4">
+<h4 id="org0e3e522"><span class="section-number-4">4.5.5</span> groups</h4>
 <div class="outline-text-4" id="text-4-5-5">
 <p>
 当需要访问一组主机的变量时，groups 变量会很有用。
@@ -1052,18 +1924,17 @@ conf_file: /etc/nginx/conf/default.conf
 </p>
 
 <div class="org-src-container">
-
-<pre class="src src-yaml">- <span style="color: #0087ff;">name</span>: Create a user for all db servers
-  <span style="color: #0087ff;">mysql_user</span>: name=test password=test host={{ hostvars.[item].ansible_eth0.ipv4.address }} state=present
-  <span style="color: #0087ff;">with_items</span>: groups[<span style="color: #00afaf;">'dbservers'</span>]
+<pre class="src src-yaml">- name: Create a user for all db servers
+  mysql_user: name=test password=test host={{ hostvars.[item].ansible_eth0.ipv4.address }} state=present
+  with_items: groups['dbservers']
 </pre>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-sec-4-5-6" class="outline-4">
-<h4 id="sec-4-5-6"><span class="section-number-4">4.5.6</span> play_hosts</h4>
+<div id="outline-container-org54579fc" class="outline-4">
+<h4 id="org54579fc"><span class="section-number-4">4.5.6</span> play_hosts</h4>
 <div class="outline-text-4" id="text-4-5-6">
 <p>
 当前 playbook 会在哪些 hosts 上运行。
@@ -1072,8 +1943,8 @@ conf_file: /etc/nginx/conf/default.conf
 </div>
 
 
-<div id="outline-container-sec-4-5-7" class="outline-4">
-<h4 id="sec-4-5-7"><span class="section-number-4">4.5.7</span> ansible_version</h4>
+<div id="outline-container-orga729646" class="outline-4">
+<h4 id="orga729646"><span class="section-number-4">4.5.7</span> ansible_version</h4>
 <div class="outline-text-4" id="text-4-5-7">
 <p>
 当前 ansible 的版本。
@@ -1082,8 +1953,8 @@ conf_file: /etc/nginx/conf/default.conf
 </div>
 
 
-<div id="outline-container-sec-4-5-8" class="outline-4">
-<h4 id="sec-4-5-8"><span class="section-number-4">4.5.8</span> inventory_dir</h4>
+<div id="outline-container-org33c4f35" class="outline-4">
+<h4 id="org33c4f35"><span class="section-number-4">4.5.8</span> inventory_dir</h4>
 <div class="outline-text-4" id="text-4-5-8">
 <p>
 主机清单所在目录。
@@ -1092,8 +1963,8 @@ conf_file: /etc/nginx/conf/default.conf
 </div>
 
 
-<div id="outline-container-sec-4-5-9" class="outline-4">
-<h4 id="sec-4-5-9"><span class="section-number-4">4.5.9</span> inventory_file</h4>
+<div id="outline-container-org1915976" class="outline-4">
+<h4 id="org1915976"><span class="section-number-4">4.5.9</span> inventory_file</h4>
 <div class="outline-text-4" id="text-4-5-9">
 <p>
 主机清单文件。
@@ -1103,13 +1974,12 @@ conf_file: /etc/nginx/conf/default.conf
 </div>
 
 
-<div id="outline-container-sec-4-6" class="outline-3">
-<h3 id="sec-4-6"><span class="section-number-3">4.6</span> 通过命令行设置变量</h3>
+<div id="outline-container-org22497f9" class="outline-3">
+<h3 id="org22497f9"><span class="section-number-3">4.6</span> 通过命令行设置变量</h3>
 <div class="outline-text-3" id="text-4-6">
 <div class="org-src-container">
-
-<pre class="src src-sh">--extra-vars <span style="color: #00afaf;">'user=starbucks'</span>
---extra-vars <span style="color: #00afaf;">'{"pacman":"mrs","ghosts":["inky","pinky","clyde","sue"]}'</span>
+<pre class="src src-sh">--extra-vars <span style="color: #e6db74;">'user=starbucks'</span>
+--extra-vars <span style="color: #e6db74;">'{"pacman":"mrs","ghosts":["inky","pinky","clyde","sue"]}'</span>
 </pre>
 </div>
 </div>
@@ -1120,34 +1990,34 @@ conf_file: /etc/nginx/conf/default.conf
 
 
 
-<div id="outline-container-sec-5" class="outline-2">
-<h2 id="sec-5"><span class="section-number-2">5</span> Template</h2>
+<div id="outline-container-orgeac917a" class="outline-2">
+<h2 id="orgeac917a"><span class="section-number-2">5</span> Template</h2>
 <div class="outline-text-2" id="text-5">
-</div><div id="outline-container-sec-5-1" class="outline-3">
-<h3 id="sec-5-1"><span class="section-number-3">5.1</span> 示例</h3>
+</div>
+<div id="outline-container-org58a3515" class="outline-3">
+<h3 id="org58a3515"><span class="section-number-3">5.1</span> 示例</h3>
 <div class="outline-text-3" id="text-5-1">
 <div class="org-src-container">
-
 <pre class="src src-sh">options {
     listen-on port 53 {
         127.0.0.1;
-        {% for ip<span style="color: #5f8700;"> in</span> ansible_all_ipv4_addresses %}
+        {% for ip<span style="color: #f92672; font-weight: bold;"> in</span> ansible_all_ipv4_addresses %}
         {{ ip }};
         {% endfor %}
     };
 };
 
-{# Variables for zone config <span style="color: #585858; font-style: italic;">#</span><span style="color: #585858; font-style: italic;">}</span>
+{# Variables for zone config <span style="color: #465457;">#</span><span style="color: #465457;">}</span>
 
-{% if <span style="color: #00afaf;">'authorativenames'</span><span style="color: #5f8700;"> in</span> group_names %}
-    {% set zone_type = <span style="color: #00afaf;">'master'</span> %}
+{% if <span style="color: #e6db74;">'authorativenames'</span><span style="color: #f92672; font-weight: bold;"> in</span> group_names %}
+    {% set zone_type = <span style="color: #e6db74;">'master'</span> %}
 {% else %}
-    {% set zone_type = <span style="color: #00afaf;">'slave'</span> %}
+    {% set zone_type = <span style="color: #e6db74;">'slave'</span> %}
 {% endif %}
 
-<span style="color: #5f8700;">type</span> {{ zone_type }};
+<span style="color: #a6e22e;">type</span> {{ zone_type }};
 
-{% if <span style="color: #00afaf;">'authorativenames'</span> not<span style="color: #5f8700;"> in</span> group_names %}
+{% if <span style="color: #e6db74;">'authorativenames'</span> not<span style="color: #f92672; font-weight: bold;"> in</span> group_names %}
 masters { 192.168.2.2; };
 {% endif %}
 </pre>
@@ -1157,8 +2027,8 @@ masters { 192.168.2.2; };
 </div>
 
 
-<div id="outline-container-sec-6" class="outline-2">
-<h2 id="sec-6"><span class="section-number-2">6</span> Playbook</h2>
+<div id="outline-container-org8d4bcca" class="outline-2">
+<h2 id="org8d4bcca"><span class="section-number-2">6</span> Playbook</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 ansbile-playbook 是一系列 ansible 命令的集合，使用 yaml 语言编写。
@@ -1171,121 +2041,120 @@ playbook 允许你传输某个命令的状态到后面的指令, 如可以从一
 </p>
 
 
-<div id="ansible-playbook" class="figure">
+<div id="orgf06095d" class="figure">
 <p><img src="img/ansible-playbook.png" alt="ansible-playbook.png">
 </p>
-<p><span class="figure-number">Figure 1:</span> Playbook 组织结构</p>
+<p><span class="figure-number">Figure 1: </span>Playbook 组织结构</p>
 </div>
 </div>
 
-<div id="outline-container-sec-6-1" class="outline-3">
-<h3 id="sec-6-1"><span class="section-number-3">6.1</span> 示例</h3>
+<div id="outline-container-orgc344fba" class="outline-3">
+<h3 id="orgc344fba"><span class="section-number-3">6.1</span> 示例</h3>
 <div class="outline-text-3" id="text-6-1">
 <div class="org-src-container">
+<pre class="src src-yaml">- name: Example
+  hosts: all
+  user: root
+  gather_facts: True
+  vars:
+    user: test
+  tasks:
+    - name: Create User
+      user: name="{{ user }}"
+    - name: Install Apache on CentOS
+        yum: name=httpd state=present
+        when: ansible_os_family =="CentOS"
 
-<pre class="src src-yaml">- <span style="color: #0087ff;">name</span>: Example
-  <span style="color: #0087ff;">hosts</span>: all
-  <span style="color: #0087ff;">user</span>: root
-  <span style="color: #0087ff;">gather_facts</span>: <span style="color: #00afaf;">True</span>
-  <span style="color: #0087ff;">vars</span>:
-    <span style="color: #0087ff;">user</span>: test
-  <span style="color: #0087ff;">tasks</span>:
-    - <span style="color: #0087ff;">name</span>: Create User
-      <span style="color: #0087ff;">user</span>: name=<span style="color: #00afaf;">"{{ user }}"</span>
-    - <span style="color: #0087ff;">name</span>: Install Apache on CentOS
-        <span style="color: #0087ff;">yum</span>: name=httpd state=present
-        <span style="color: #0087ff;">when</span>: ansible_os_family ==<span style="color: #00afaf;">"CentOS"</span>
 </pre>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-sec-6-2" class="outline-3">
-<h3 id="sec-6-2"><span class="section-number-3">6.2</span> 循环</h3>
+<div id="outline-container-org20b82d1" class="outline-3">
+<h3 id="org20b82d1"><span class="section-number-3">6.2</span> 循环</h3>
 <div class="outline-text-3" id="text-6-2">
-</div><div id="outline-container-sec-6-2-1" class="outline-4">
-<h4 id="sec-6-2-1"><span class="section-number-4">6.2.1</span> with_items</h4>
 </div>
-<div id="outline-container-sec-6-2-2" class="outline-4">
-<h4 id="sec-6-2-2"><span class="section-number-4">6.2.2</span> with_nested</h4>
+<div id="outline-container-orgb21da36" class="outline-4">
+<h4 id="orgb21da36"><span class="section-number-4">6.2.1</span> with_items</h4>
 </div>
-<div id="outline-container-sec-6-2-3" class="outline-4">
-<h4 id="sec-6-2-3"><span class="section-number-4">6.2.3</span> with_dict</h4>
+<div id="outline-container-orgaeb0326" class="outline-4">
+<h4 id="orgaeb0326"><span class="section-number-4">6.2.2</span> with_nested</h4>
 </div>
-<div id="outline-container-sec-6-2-4" class="outline-4">
-<h4 id="sec-6-2-4"><span class="section-number-4">6.2.4</span> with_subelement</h4>
+<div id="outline-container-org0d05b9d" class="outline-4">
+<h4 id="org0d05b9d"><span class="section-number-4">6.2.3</span> with_dict</h4>
 </div>
-<div id="outline-container-sec-6-2-5" class="outline-4">
-<h4 id="sec-6-2-5"><span class="section-number-4">6.2.5</span> with_sequence</h4>
+<div id="outline-container-org82a3df6" class="outline-4">
+<h4 id="org82a3df6"><span class="section-number-4">6.2.4</span> with_subelement</h4>
 </div>
-<div id="outline-container-sec-6-2-6" class="outline-4">
-<h4 id="sec-6-2-6"><span class="section-number-4">6.2.6</span> with_random_choice</h4>
+<div id="outline-container-org7626b40" class="outline-4">
+<h4 id="org7626b40"><span class="section-number-4">6.2.5</span> with_sequence</h4>
 </div>
-<div id="outline-container-sec-6-2-7" class="outline-4">
-<h4 id="sec-6-2-7"><span class="section-number-4">6.2.7</span> do_util</h4>
+<div id="outline-container-org5fac052" class="outline-4">
+<h4 id="org5fac052"><span class="section-number-4">6.2.6</span> with_random_choice</h4>
+</div>
+<div id="outline-container-org96c19cb" class="outline-4">
+<h4 id="org96c19cb"><span class="section-number-4">6.2.7</span> do_util</h4>
 </div>
 </div>
 
-<div id="outline-container-sec-6-3" class="outline-3">
-<h3 id="sec-6-3"><span class="section-number-3">6.3</span> 条件</h3>
+<div id="outline-container-org5c11572" class="outline-3">
+<h3 id="org5c11572"><span class="section-number-3">6.3</span> 条件</h3>
 <div class="outline-text-3" id="text-6-3">
-</div><div id="outline-container-sec-6-3-1" class="outline-4">
-<h4 id="sec-6-3-1"><span class="section-number-4">6.3.1</span> when</h4>
+</div>
+<div id="outline-container-orga50c14a" class="outline-4">
+<h4 id="orga50c14a"><span class="section-number-4">6.3.1</span> when</h4>
 <div class="outline-text-4" id="text-6-3-1">
-</div><div id="outline-container-sec-6-3-1-1" class="outline-5">
-<h5 id="sec-6-3-1-1"><span class="section-number-5">6.3.1.1</span> jinja2 语法</h5>
+</div>
+<div id="outline-container-org263cd7f" class="outline-5">
+<h5 id="org263cd7f"><span class="section-number-5">6.3.1.1</span> jinja2 语法</h5>
 </div>
 
-<div id="outline-container-sec-6-3-1-2" class="outline-5">
-<h5 id="sec-6-3-1-2"><span class="section-number-5">6.3.1.2</span> 变量不存在</h5>
+<div id="outline-container-org1330266" class="outline-5">
+<h5 id="org1330266"><span class="section-number-5">6.3.1.2</span> 变量不存在</h5>
 <div class="outline-text-5" id="text-6-3-1-2">
 <div class="org-src-container">
-
-<pre class="src src-yaml"><span style="color: #0087ff;">tasks</span>:
-  - <span style="color: #0087ff;">shell</span>: echo <span style="color: #00afaf;">"I've got '{{ foo }}' and am not afraid to use it!"</span>
-    <span style="color: #0087ff;">when</span>: foo is defined
-  - <span style="color: #0087ff;">fail</span>: msg=<span style="color: #00afaf;">"Bailing out. this play requires 'bar'"</span>
-    <span style="color: #0087ff;">when</span>: bar is not defined
+<pre class="src src-yaml">tasks:
+  - shell: echo "I've got '{{ foo }}' and am not afraid to use it!"
+    when: foo is defined
+  - fail: msg="Bailing out. this play requires 'bar'"
+    when: bar is not defined
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-sec-6-3-1-3" class="outline-5">
-<h5 id="sec-6-3-1-3"><span class="section-number-5">6.3.1.3</span> 用于循环</h5>
+<div id="outline-container-org66577d1" class="outline-5">
+<h5 id="org66577d1"><span class="section-number-5">6.3.1.3</span> 用于循环</h5>
 <div class="outline-text-5" id="text-6-3-1-3">
 <div class="org-src-container">
-
-<pre class="src src-yaml"><span style="color: #0087ff;">tasks</span>:
-  - <span style="color: #0087ff;">command</span>: echo {{ item }}
-    <span style="color: #0087ff;">with_items</span>: [ 0, 2, 4, 6, 8, 10 ]
-    <span style="color: #0087ff;">when</span>: item &gt; 56
+<pre class="src src-yaml">tasks:
+  - command: echo {{ item }}
+    with_items: [ 0, 2, 4, 6, 8, 10 ]
+    when: item &gt; 56
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-sec-6-3-1-4" class="outline-5">
-<h5 id="sec-6-3-1-4"><span class="section-number-5">6.3.1.4</span> 用于 include</h5>
+<div id="outline-container-org8e02e7a" class="outline-5">
+<h5 id="org8e02e7a"><span class="section-number-5">6.3.1.4</span> 用于 include</h5>
 <div class="outline-text-5" id="text-6-3-1-4">
 <div class="org-src-container">
-
-<pre class="src src-yaml">- <span style="color: #0087ff;">include</span>: tasks/sometasks.yml
-  <span style="color: #0087ff;">when</span>: <span style="color: #00afaf;">"'reticulating splines' in output"</span>
+<pre class="src src-yaml">- include: tasks/sometasks.yml
+  when: "'reticulating splines' in output"
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-sec-6-3-1-5" class="outline-5">
-<h5 id="sec-6-3-1-5"><span class="section-number-5">6.3.1.5</span> 用于 roles</h5>
+<div id="outline-container-org9883c08" class="outline-5">
+<h5 id="org9883c08"><span class="section-number-5">6.3.1.5</span> 用于 roles</h5>
 <div class="outline-text-5" id="text-6-3-1-5">
 <div class="org-src-container">
-
-<pre class="src src-yaml">- <span style="color: #0087ff;">hosts</span>: webservers
-  <span style="color: #0087ff;">roles</span>:
-     - { <span style="color: #0087ff;">role</span>: debian_stock_config, <span style="color: #0087ff;">when</span>: ansible_os_family == <span style="color: #00afaf;">'Debian'</span> }
+<pre class="src src-yaml">- hosts: webservers
+  roles:
+     - { role: debian_stock_config, when: ansible_os_family == 'Debian' }
 </pre>
 </div>
 </div>
@@ -1293,8 +2162,8 @@ playbook 允许你传输某个命令的状态到后面的指令, 如可以从一
 </div>
 </div>
 
-<div id="outline-container-sec-6-4" class="outline-3">
-<h3 id="sec-6-4"><span class="section-number-3">6.4</span> handlers</h3>
+<div id="outline-container-org30648ca" class="outline-3">
+<h3 id="org30648ca"><span class="section-number-3">6.4</span> handlers</h3>
 <div class="outline-text-3" id="text-6-4">
 <p>
 用于当关注的资源发生变化时采取一定的操作。
@@ -1309,66 +2178,62 @@ notify 这个 action 可用于在每个 play 的最后被触发，这样可以�
 </div>
 
 
-<div id="outline-container-sec-7" class="outline-2">
-<h2 id="sec-7"><span class="section-number-2">7</span> Role</h2>
+<div id="outline-container-org376f6f6" class="outline-2">
+<h2 id="org376f6f6"><span class="section-number-2">7</span> Role</h2>
 <div class="outline-text-2" id="text-7">
 <p>
 在 Ansible 中，Playbook 组织 Task ，Role 组织 Playbook 。
 </p>
 </div>
 
-<div id="outline-container-sec-7-1" class="outline-3">
-<h3 id="sec-7-1"><span class="section-number-3">7.1</span> 创建</h3>
+<div id="outline-container-org5e0526f" class="outline-3">
+<h3 id="org5e0526f"><span class="section-number-3">7.1</span> 创建</h3>
 <div class="outline-text-3" id="text-7-1">
 <div class="org-src-container">
-
 <pre class="src src-sh">ansible-galaxy init &lt;role&gt;
 </pre>
 </div>
 </div>
 
-<div id="outline-container-sec-7-1-1" class="outline-4">
-<h4 id="sec-7-1-1"><span class="section-number-4">7.1.1</span> roles 各目录的作用</h4>
+<div id="outline-container-orga68fd7c" class="outline-4">
+<h4 id="orga68fd7c"><span class="section-number-4">7.1.1</span> roles 各目录的作用</h4>
 <div class="outline-text-4" id="text-7-1-1">
 <dl class="org-dl">
-<dt> files </dt><dd>  存放由 copy 或 script 等模块调用的文件
-</dd>
+<dt>files</dt><dd>存放由 copy 或 script 等模块调用的文件</dd>
 
-<dt> tempaltes </dt><dd>  Jinja2 模板文件
-</dd>
+<dt>tempaltes</dt><dd>Jinja2 模板文件</dd>
 
-<dt> tasks </dt><dd>  定义了角色的任务列表。
+<dt>tasks</dt><dd><p>
+  定义了角色的任务列表。
+</p>
 
 <p>
 可以使用 include 包含其他的位于此目录中的 task 文件。
-</p>
-</dd>
+</p></dd>
 </dl>
 
 
 <dl class="org-dl">
-<dt> handlers </dt><dd>  用于定义角色用到的各 handler 。
+<dt>handlers</dt><dd><p>
+  用于定义角色用到的各 handler 。
+</p>
 
 <p>
 在 handler 中可以使用 include 包含的其他位于此目录中 的 handler 文件。
-</p>
-</dd>
+</p></dd>
 
-<dt> vars </dt><dd>  用于定义角色用到的变量
-</dd>
+<dt>vars</dt><dd>用于定义角色用到的变量</dd>
 
-<dt> meta </dt><dd>  定义角色的特殊设定及依赖关系等
-</dd>
+<dt>meta</dt><dd>定义角色的特殊设定及依赖关系等</dd>
 
-<dt> default </dt><dd>  设定默认变量
-</dd>
+<dt>default</dt><dd>设定默认变量</dd>
 </dl>
 </div>
 </div>
 </div>
 
-<div id="outline-container-sec-7-2" class="outline-3">
-<h3 id="sec-7-2"><span class="section-number-3">7.2</span> pre_tasks 和 post_tasks</h3>
+<div id="outline-container-orga0347c3" class="outline-3">
+<h3 id="orga0347c3"><span class="section-number-3">7.2</span> pre_tasks 和 post_tasks</h3>
 <div class="outline-text-3" id="text-7-2">
 <p>
 在执行 roles 时，需要在其前或其后执行某些任务，可以使用 pre_tasks 及 post_tasks 来声明。
@@ -1376,26 +2241,26 @@ notify 这个 action 可用于在每个 play 的最后被触发，这样可以�
 </div>
 </div>
 
-<div id="outline-container-sec-7-3" class="outline-3">
-<h3 id="sec-7-3"><span class="section-number-3">7.3</span> 依赖</h3>
+<div id="outline-container-org04e04ea" class="outline-3">
+<h3 id="org04e04ea"><span class="section-number-3">7.3</span> 依赖</h3>
 <div class="outline-text-3" id="text-7-3">
 <p>
 如果当前 role 在执行前需要依赖另一个 role ，可以在 meta 目录中的 main.yml 文件中定义依赖关系。
 </p>
 
 <div class="org-src-container">
+<pre class="src src-yaml">dependencies:
+  - { role: common, some_parameter: 3 }
+  - { role: postgres, dbname: blarg, other_parameter: 12 }
 
-<pre class="src src-yaml"><span style="color: #0087ff;">dependencies</span>:
-  - { <span style="color: #0087ff;">role</span>: common, <span style="color: #0087ff;">some_parameter</span>: 3 }
-  - { <span style="color: #0087ff;">role</span>: postgres, <span style="color: #0087ff;">dbname</span>: blarg, <span style="color: #0087ff;">other_parameter</span>: 12 }
 </pre>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-sec-7-4" class="outline-3">
-<h3 id="sec-7-4"><span class="section-number-3">7.4</span> 项目结构</h3>
+<div id="outline-container-orge2e726e" class="outline-3">
+<h3 id="orge2e726e"><span class="section-number-3">7.4</span> 项目结构</h3>
 <div class="outline-text-3" id="text-7-4">
 <pre class="example">
 site.yml
@@ -1429,8 +2294,8 @@ roles/
 </pre>
 </div>
 
-<div id="outline-container-sec-7-4-1" class="outline-4">
-<h4 id="sec-7-4-1"><span class="section-number-4">7.4.1</span> 入口文件 (site.xml)</h4>
+<div id="outline-container-orgb879060" class="outline-4">
+<h4 id="orgb879060"><span class="section-number-4">7.4.1</span> 入口文件 (site.xml)</h4>
 <div class="outline-text-4" id="text-7-4-1">
 <pre class="example">
 ---
@@ -1443,11 +2308,10 @@ roles/
 </div>
 </div>
 
-<div id="outline-container-sec-7-4-2" class="outline-4">
-<h4 id="sec-7-4-2"><span class="section-number-4">7.4.2</span> 执行</h4>
+<div id="outline-container-orgde00bc7" class="outline-4">
+<h4 id="orgde00bc7"><span class="section-number-4">7.4.2</span> 执行</h4>
 <div class="outline-text-4" id="text-7-4-2">
 <div class="org-src-container">
-
 <pre class="src src-sh">ansible-playbook site.yml -vvv
 </pre>
 </div>

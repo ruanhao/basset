@@ -1,11 +1,52 @@
-#+TITLE:     Class Loader
+#+TITLE:     类加载器
 #+AUTHOR:    Hao Ruan
 #+EMAIL:     ruanhao1116@gmail.com
 #+LANGUAGE:  en
 #+LINK_HOME: http://www.github.com/ruanhao
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/style.css" />
-#+OPTIONS:   H:2 num:nil \n:nil @:t ::t |:t ^:{} _:{} *:t TeX:t LaTeX:t
 #+STARTUP:   showall
+#+TOC:       headlines 4
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
+
+
+* 类的加载，连接与初始化
+
+** 加载
+
+查找并加载类的二进制数据
+
+** 连接
+
+- 验证
+  确保被加载类的正确性
+- 准备
+  为类的静态变量分配内存，并将其初始化为 *默认值*
+- 解析
+  把类中的符号引用转换为直接引用（内存位置）
+
+** 初始化
+
+为类的静态变量赋予 *正确的初始值*
+
+
+
+* 类的使用方式
+
+Java 程序对类的使用方式可分为 _主动使用_ 和 _被动使用_ 。
+
+虚拟机在类或接口 *首次主动使用* 时才 *初始化* 他们。
+
+** 主动使用场景
+
+- 创建类的实例
+- 访问类或接口的静态变量，或对该静态变量赋值（只有 *直接定义了该字段的类* 才会被初始化）
+- 调用类的静态方法
+- 反射(Class.forName("com.test.Test"))
+- 初始化类的子类的时候（当初始化一个类时，要求其父类已经初始化完毕）
+
+
 
 
 
