@@ -531,7 +531,7 @@ Ansible is used to:
 
 #+BEGIN_SRC sh
   [master]
-  server-master        ansible_ssh_host=10.0.0.5    ansible_ssh_user=ubuntu
+  server-master        ansible_ssh_host=10.0.0.5    ansible_ssh_user=ubuntu ansible_sudo_pass=!qaz2wsx
 
   [standbys]
   server-standby-01    ansible_ssh_host=10.0.0.6    ansible_ssh_user=ubuntu
@@ -569,24 +569,71 @@ Ansible is used to:
 
 =ansible all --list=
 
+
 *** 模块查看工具 (=/usr/bin/ansible-doc=)
 
 **** 显示所有模块
 
 =ansible-doc -l=
 
+
 **** 查看模块用法
 =ansible-doc [-s] <module_name>=
 
+
 *** 模块下载工具 (=/usr/bin/ansible-galaxy=)
 
+用于从 galaxy 服务器上下载相应的 Role 。
+
+使用 =ansible-galaxy list= 列出已安装的 galaxy 。
+
+#+BEGIN_SRC sh
+  > ansible-galaxy install geerlingguy.nginx
+  > tree ~/.ansible/roles/geerlingguy.nginx
+  ~/.ansible/roles/geerlingguy.nginx
+  ├── LICENSE
+  ├── README.md
+  ├── defaults
+  │   └── main.yml
+  ├── handlers
+  │   └── main.yml
+  ├── meta
+  │   └── main.yml
+  ├── molecule
+  │   └── default
+  │       ├── molecule.yml
+  │       ├── playbook.yml
+  │       └── yaml-lint.yml
+  ├── tasks
+  │   ├── main.yml
+  │   ├── setup-Archlinux.yml
+  │   ├── setup-Debian.yml
+  │   ├── setup-FreeBSD.yml
+  │   ├── setup-OpenBSD.yml
+  │   ├── setup-RedHat.yml
+  │   ├── setup-Ubuntu.yml
+  │   └── vhosts.yml
+  ├── templates
+  │   ├── nginx.conf.j2
+  │   ├── nginx.repo.j2
+  │   └── vhost.j2
+  └── vars
+      ├── Archlinux.yml
+      ├── Debian.yml
+      ├── FreeBSD.yml
+      ├── OpenBSD.yml
+      └── RedHat.yml
+#+END_SRC
+
+
 *** 编排剧本工具 (=/usr/bin/ansible-playbook=)
+
 
 *** 文件加密工具 (=/usr/bin/ansible-vault=)
 
 
 
-* 常用模块 (Module)
+* 模块 (Module)
 
 ** 远程执行
 
@@ -792,6 +839,7 @@ Ansible is used to:
   ansible all -m group -a 'name=nginx system=yes'
 #+END_SRC
 
+
 ** 主机信息
 
 *** setup
@@ -901,20 +949,26 @@ Ansible is used to:
 #+END_SRC
 
 
-* Task
-
-每个任务需要包含的信息：
-
-- 用到的模块
-- 模块参数
-- 用于描述的名称 [可选]
-- 执行条件 [可选]
 
 
-* Variable
 
 
-** 在 Inventory 中定义变量
+
+* Playbook
+
+ansbile-playbook 是一系列 ansible 命令的集合，使用 yaml 语言编写。
+playbook 命令根据自上而下的顺序依次执行。
+
+playbook 允许你传输某个命令的状态到后面的指令, 如可以从一台机器的文件中抓取内容并附为变量,
+然后在另一台机器中使用, 这使得可以实现一些复杂的部署机制, 这是 adhoc 方式无法实现的。
+
+#+CAPTION: Playbook 组织结构
+#+NAME: ansible-playbook
+[[file:img/ansible-playbook.png]]
+
+** Variable
+
+*** 在 Inventory 中定义变量
 
 #+BEGIN_SRC ini
   [mygroup]
@@ -926,9 +980,9 @@ Ansible is used to:
 #+END_SRC
 
 
-** 在 Playbook 中定义变量
+*** 在 Playbook 中定义变量
 
-*** vars, vars_files 关键字
+**** vars, vars_files 关键字
 
 #+BEGIN_SRC yaml
   - hosts: all
@@ -950,7 +1004,7 @@ Ansible is used to:
   conf_file: /etc/nginx/conf/default.conf
 #+END_EXAMPLE
 
-*** vars_prompt 实现人机交互
+**** vars_prompt 实现人机交互
 
 #+BEGIN_SRC yaml
   hosts: all
@@ -962,10 +1016,10 @@ Ansible is used to:
 #+END_SRC
 
 
-*** 通过 roles 带入变量
+**** 通过 roles 带入变量
 
 
-** 注册变量
+*** 注册变量
 
 使用 =register= 将任务的执行结果保存到变量中
 
@@ -989,7 +1043,7 @@ Ansible is used to:
 #+END_SRC
 
 
-** 通过 fact 获取/设置变量
+*** 通过 fact 获取/设置变量
 
 #+BEGIN_SRC yaml
   - name: Configure MySql
@@ -1014,9 +1068,9 @@ Ansible is used to:
 #+END_SRC
 
 
-** 内置变量
+*** 内置变量
 
-*** hostvars
+**** hostvars
 
 用于获取某台指定的主机的相关变量。
 
@@ -1025,24 +1079,24 @@ Ansible is used to:
 需要注意的是 =db.example.com= 不能使用 ip 地址来取代， *只能使用主机名或别名* 。
 
 
-*** inventory_hostname
+**** inventory_hostname
 
 利用 hostvars 和 inventory_hostname 变量，可以输出与当前主机相关联的所有变量：
 
 =- debug: var=hostvars[inventory_hostname]=
 
 
-*** inventory_hostname_short
+**** inventory_hostname_short
 
 如果一台主机的 inventory_hostname 为 =server1.exmaple.com= ，则 inventory_hostname_short 的值为 server1 。
 
 
-*** group_names
+**** group_names
 
 用于标识当前正在执行 task 的目标主机位于的主机组。
 
 
-*** groups
+**** groups
 
 当需要访问一组主机的变量时，groups 变量会很有用。
 
@@ -1055,27 +1109,27 @@ Ansible is used to:
 #+END_SRC
 
 
-*** play_hosts
+**** play_hosts
 
 当前 playbook 会在哪些 hosts 上运行。
 
 
-*** ansible_version
+**** ansible_version
 
 当前 ansible 的版本。
 
 
-*** inventory_dir
+**** inventory_dir
 
 主机清单所在目录。
 
 
-*** inventory_file
+**** inventory_file
 
 主机清单文件。
 
 
-** 通过命令行设置变量
+*** 通过命令行设置变量
 
 #+BEGIN_SRC sh
   --extra-vars 'user=starbucks'
@@ -1083,12 +1137,66 @@ Ansible is used to:
 #+END_SRC
 
 
+** Tasks
+
+每个任务需要包含的信息：
+
+- 用到的模块
+- 模块参数
+- 用于描述的名称 [可选]
+- 执行条件 [可选]
+
+#+BEGIN_SRC yaml
+  - name: Example
+    hosts: all
+    remote_user: root
+    gather_facts: True
+    vars:
+      user: test
+    tasks:
+      - name: Create User
+        user: name="{{ user }}"
+      - name: Install Apache on CentOS
+          yum: name=httpd state=present
+          when: ansible_os_family =="CentOS"
+
+#+END_SRC
 
 
 
-* Template
+** Handlers
 
-** 示例
+用于当关注的资源发生变化时采取一定的操作。
+
+notify 这个 action 可用于在每个 play 的最后被触发，这样可以避免多次有改变发生时每次都执行指定的操作，
+而仅在所有的变化发生完成后 *一次性* 地执行指定操作。
+
+#+BEGIN_SRC yaml
+  ---
+  - hosts: 10.74.68.55
+    remote_user: cisco
+
+    tasks:
+      - name: create a file       # 描述
+        file: name=/tmp/newfile state=touch # 使用模块
+        notify: restart ssh service
+      - name: run this command and ignore error
+        shell: /usr/bin/nocommand
+        ignore_errors: true
+      - name: start ssh service
+        service: name=ssh state=started enabled=yes
+        become: true
+
+    handlers:
+      - name: restart ssh service
+        service: name=ssh state=restarted
+        become: true
+#+END_SRC
+
+
+
+
+** Template
 
 #+BEGIN_SRC sh
   options {
@@ -1116,54 +1224,10 @@ Ansible is used to:
 #+END_SRC
 
 
-* Playbook
 
-ansbile-playbook 是一系列 ansible 命令的集合，使用 yaml 语言编写。
-playbook 命令根据自上而下的顺序依次执行。
+** When
 
-playbook 允许你传输某个命令的状态到后面的指令, 如可以从一台机器的文件中抓取内容并附为变量,
-然后在另一台机器中使用, 这使得可以实现一些复杂的部署机制, 这是 ansible 命令无法实现的。
-
-#+CAPTION: Playbook 组织结构
-#+NAME: ansible-playbook
-[[file:img/ansible-playbook.png]]
-
-** 示例
-
-#+BEGIN_SRC yaml
-  - name: Example
-    hosts: all
-    user: root
-    gather_facts: True
-    vars:
-      user: test
-    tasks:
-      - name: Create User
-        user: name="{{ user }}"
-      - name: Install Apache on CentOS
-          yum: name=httpd state=present
-          when: ansible_os_family =="CentOS"
-
-#+END_SRC
-
-
-** 循环
-
-*** with_items
-*** with_nested
-*** with_dict
-*** with_subelement
-*** with_sequence
-*** with_random_choice
-*** do_util
-
-** 条件
-
-*** when
-
-**** jinja2 语法
-
-**** 变量不存在
+*** 变量不存在
 
 #+BEGIN_SRC yaml
   tasks:
@@ -1173,7 +1237,8 @@ playbook 允许你传输某个命令的状态到后面的指令, 如可以从一
       when: bar is not defined
 #+END_SRC
 
-**** 用于循环
+
+*** 用于循环
 
 #+BEGIN_SRC yaml
   tasks:
@@ -1182,14 +1247,16 @@ playbook 允许你传输某个命令的状态到后面的指令, 如可以从一
       when: item > 56
 #+END_SRC
 
-**** 用于 include
+
+*** 用于 include
 
 #+BEGIN_SRC yaml
   - include: tasks/sometasks.yml
     when: "'reticulating splines' in output"
 #+END_SRC
 
-**** 用于 roles
+
+*** 用于 roles
 
 #+BEGIN_SRC yaml
   - hosts: webservers
@@ -1197,17 +1264,68 @@ playbook 允许你传输某个命令的状态到后面的指令, 如可以从一
        - { role: debian_stock_config, when: ansible_os_family == 'Debian' }
 #+END_SRC
 
-** handlers
 
-用于当关注的资源发生变化时采取一定的操作。
 
-notify 这个 action 可用于在每个 play 的最后被触发，这样可以避免多次有改变发生时每次都执行指定的操作，
-而仅在所有的变化发生完成后 *一次性* 地执行指定操作。
+
+** 循环
+
+*** with_items
+
+#+BEGIN_SRC yaml
+  ---
+  - hosts: 10.74.68.55
+    remote_user: cisco
+
+    tasks:
+      - name: create files
+        file: name=/tmp/{{item}} state=touch
+        with_items:
+          - a
+          - b
+          - c
+#+END_SRC
+
+#+BEGIN_SRC yaml
+  ---
+  - hosts: 10.74.68.55
+    remote_user: cisco
+
+    tasks:
+      - name: create users
+        user: name={{item.name}} group={{item.group}}
+        with_items:
+          - {name: 'user1', group: 'g1'}
+          - {name: 'user2', group: 'g2'}
+          - {name: 'user3', group: 'g3'}
+
+#+END_SRC
+
+
+*** with_nested
+
+*** with_dict
+
+*** with_subelement
+
+*** with_sequence
+
+*** with_random_choice
+
+*** do_util
+
+
 
 
 * Role
 
 在 Ansible 中，Playbook 组织 Task ，Role 组织 Playbook 。
+
+用于层次性，结构化地组织 playbook 。Roles 能够根据层次型结构自动装载变量文件，tasks 以及 handlers 。\\
+要使用 roles 只需在 palybook 中使用 =include= 指令即可。
+
+简单来讲，Roles 就是通过分别将变量，文件，任务，模板及处理器放置于单独的目录中，并可以便捷地 =include= 它们的一种机制。
+
+
 
 ** 创建
 
@@ -1250,9 +1368,11 @@ notify 这个 action 可用于在每个 play 的最后被触发，这样可以�
 
   设定默认变量
 
+
 ** pre_tasks 和 post_tasks
 
 在执行 roles 时，需要在其前或其后执行某些任务，可以使用 pre_tasks 及 post_tasks 来声明。
+
 
 ** 依赖
 
