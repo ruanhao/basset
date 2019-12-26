@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- 2019-12-25 Wed 19:11 -->
+<!-- 2019-12-26 Thu 10:58 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RabbitMQ</title>
@@ -234,68 +234,72 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org2780d5c">1. KEY 操作</a>
+<li><a href="#orge34071d">1. KEY 操作</a>
 <ul>
-<li><a href="#org6470392">1.1. 设置过期时间</a></li>
-<li><a href="#org082b929">1.2. 查看还有多少秒过期</a></li>
-<li><a href="#orgfb322c9">1.3. 查看当前数据库 key 的数量</a></li>
-<li><a href="#orgbc20fb8">1.4. 清空 key</a></li>
+<li><a href="#org209c7ec">1.1. 设置过期时间</a></li>
+<li><a href="#org3f7255a">1.2. 查看还有多少秒过期</a></li>
+<li><a href="#orgbf20fee">1.3. 查看当前数据库 key 的数量</a></li>
+<li><a href="#org9192fce">1.4. 清空 key</a></li>
 </ul>
 </li>
-<li><a href="#org1cff288">2. String</a>
+<li><a href="#org5bffdf0">2. String</a>
 <ul>
-<li><a href="#org66765c8">2.1. SET,SETNX,GET,APPEND,STRLEN</a></li>
-<li><a href="#orgda5fc7b">2.2. MSET,MGET,MSETNX</a></li>
-<li><a href="#org0a5ba92">2.3. INCR,DECR,INCRBY,DECRBY</a></li>
-<li><a href="#orgd4b2a57">2.4. SETEX</a></li>
-<li><a href="#orgcdc013a">2.5. GETSET</a></li>
+<li><a href="#org47d6e19">2.1. SET,SETNX,GET,APPEND,STRLEN</a></li>
+<li><a href="#org94a5728">2.2. MSET,MGET,MSETNX</a></li>
+<li><a href="#org8b3c701">2.3. INCR,DECR,INCRBY,DECRBY</a></li>
+<li><a href="#orgf476572">2.4. SETEX</a></li>
+<li><a href="#org270d799">2.5. GETSET</a></li>
 </ul>
 </li>
-<li><a href="#org2f8986c">3. List</a>
+<li><a href="#org9cfbe81">3. List</a>
 <ul>
-<li><a href="#org02e5c3e">3.1. LPUSH,RPUSH,LPOP,RPOP,RPOPLPUSH</a></li>
-<li><a href="#org9e8412e">3.2. LRANGE,LINDEX,LLEN</a></li>
-<li><a href="#orgcb407ea">3.3. LINSERT,LREM</a></li>
+<li><a href="#org40b0e85">3.1. LPUSH,RPUSH,LPOP,RPOP,RPOPLPUSH</a></li>
+<li><a href="#org94613d9">3.2. LRANGE,LINDEX,LLEN</a></li>
+<li><a href="#org3163ce7">3.3. LINSERT,LREM</a></li>
 </ul>
 </li>
-<li><a href="#orgfd0423a">4. Set</a>
+<li><a href="#org320f627">4. Set</a>
 <ul>
-<li><a href="#org185f93c">4.1. SADD,SMEMBERS,SISMEMBER</a></li>
-<li><a href="#org5a898c5">4.2. SCARD,SPOP,SRANDMEMBER</a></li>
-<li><a href="#orgde29eb5">4.3. SINTER,SUNION,SDIFF</a></li>
+<li><a href="#org14b95aa">4.1. SADD,SMEMBERS,SISMEMBER</a></li>
+<li><a href="#orgf261622">4.2. SCARD,SPOP,SRANDMEMBER</a></li>
+<li><a href="#orgb6ce05f">4.3. SINTER,SUNION,SDIFF</a></li>
 </ul>
 </li>
-<li><a href="#org7842eef">5. Hash</a>
+<li><a href="#org401d1e1">5. Hash</a>
 <ul>
-<li><a href="#org023f6d6">5.1. HSET,HMSET,HGET,HGETALL</a></li>
-<li><a href="#orge88a4f7">5.2. HEXISTS,HKEYS,HVALS,HINCRBY,HSETNX</a></li>
+<li><a href="#orgc0afebc">5.1. HSET,HMSET,HGET,HGETALL</a></li>
+<li><a href="#org2d61888">5.2. HEXISTS,HKEYS,HVALS,HINCRBY,HSETNX</a></li>
 </ul>
 </li>
-<li><a href="#org9b76769">6. Zset</a></li>
-<li><a href="#orga796b61">7. 事务</a></li>
-<li><a href="#orgf4aa22b">8. 持久化</a>
+<li><a href="#orgc0aea6f">6. Zset</a></li>
+<li><a href="#org9c75410">7. 事务</a>
 <ul>
-<li><a href="#org7310e5c">8.1. RDB (Redis DataBase)</a></li>
-<li><a href="#org171f257">8.2. AOF</a></li>
+<li><a href="#org274ac80">7.1. MULTI 和 PIPELINE 区别</a></li>
 </ul>
 </li>
-<li><a href="#org6d4afa1">9. 主从复制</a>
+<li><a href="#orga0d0da9">8. 持久化</a>
 <ul>
-<li><a href="#orgc93d725">9.1. 复制原理</a></li>
-<li><a href="#org79ee426">9.2. 哨兵机制</a>
+<li><a href="#org6a11503">8.1. RDB (Redis DataBase)</a></li>
+<li><a href="#orgc542974">8.2. AOF</a></li>
+</ul>
+</li>
+<li><a href="#orgafcd2e6">9. 主从复制</a>
 <ul>
-<li><a href="#org043f72d">9.2.1. 启动哨兵</a></li>
-<li><a href="#org723d5ab">9.2.2. 故障恢复原理</a></li>
+<li><a href="#orgeb75aec">9.1. 复制原理</a></li>
+<li><a href="#orgffc22ab">9.2. 哨兵机制</a>
+<ul>
+<li><a href="#org3f792d1">9.2.1. 启动哨兵</a></li>
+<li><a href="#orga3b4f42">9.2.2. 故障恢复原理</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgde6ef62">10. 集群</a>
+<li><a href="#orgc1c1a3b">10. 集群</a>
 <ul>
-<li><a href="#org54ab6dd">10.1. slots</a></li>
+<li><a href="#org032815f">10.1. slots</a></li>
 </ul>
 </li>
-<li><a href="#org48c407e">11. 参考资料</a></li>
+<li><a href="#org77b9c3d">11. 参考资料</a></li>
 </ul>
 </div>
 </div>
@@ -316,7 +320,7 @@ for the JavaScript code in this tag.
 
 <tr>
 <td class="org-left">Date</td>
-<td class="org-left">2019-12-25 19:11:47</td>
+<td class="org-left">2019-12-26 10:58:33</td>
 </tr>
 </tbody>
 </table>
@@ -325,79 +329,83 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org2780d5c">1. KEY 操作</a>
+<li><a href="#orge34071d">1. KEY 操作</a>
 <ul>
-<li><a href="#org6470392">1.1. 设置过期时间</a></li>
-<li><a href="#org082b929">1.2. 查看还有多少秒过期</a></li>
-<li><a href="#orgfb322c9">1.3. 查看当前数据库 key 的数量</a></li>
-<li><a href="#orgbc20fb8">1.4. 清空 key</a></li>
+<li><a href="#org209c7ec">1.1. 设置过期时间</a></li>
+<li><a href="#org3f7255a">1.2. 查看还有多少秒过期</a></li>
+<li><a href="#orgbf20fee">1.3. 查看当前数据库 key 的数量</a></li>
+<li><a href="#org9192fce">1.4. 清空 key</a></li>
 </ul>
 </li>
-<li><a href="#org1cff288">2. String</a>
+<li><a href="#org5bffdf0">2. String</a>
 <ul>
-<li><a href="#org66765c8">2.1. SET,SETNX,GET,APPEND,STRLEN</a></li>
-<li><a href="#orgda5fc7b">2.2. MSET,MGET,MSETNX</a></li>
-<li><a href="#org0a5ba92">2.3. INCR,DECR,INCRBY,DECRBY</a></li>
-<li><a href="#orgd4b2a57">2.4. SETEX</a></li>
-<li><a href="#orgcdc013a">2.5. GETSET</a></li>
+<li><a href="#org47d6e19">2.1. SET,SETNX,GET,APPEND,STRLEN</a></li>
+<li><a href="#org94a5728">2.2. MSET,MGET,MSETNX</a></li>
+<li><a href="#org8b3c701">2.3. INCR,DECR,INCRBY,DECRBY</a></li>
+<li><a href="#orgf476572">2.4. SETEX</a></li>
+<li><a href="#org270d799">2.5. GETSET</a></li>
 </ul>
 </li>
-<li><a href="#org2f8986c">3. List</a>
+<li><a href="#org9cfbe81">3. List</a>
 <ul>
-<li><a href="#org02e5c3e">3.1. LPUSH,RPUSH,LPOP,RPOP,RPOPLPUSH</a></li>
-<li><a href="#org9e8412e">3.2. LRANGE,LINDEX,LLEN</a></li>
-<li><a href="#orgcb407ea">3.3. LINSERT,LREM</a></li>
+<li><a href="#org40b0e85">3.1. LPUSH,RPUSH,LPOP,RPOP,RPOPLPUSH</a></li>
+<li><a href="#org94613d9">3.2. LRANGE,LINDEX,LLEN</a></li>
+<li><a href="#org3163ce7">3.3. LINSERT,LREM</a></li>
 </ul>
 </li>
-<li><a href="#orgfd0423a">4. Set</a>
+<li><a href="#org320f627">4. Set</a>
 <ul>
-<li><a href="#org185f93c">4.1. SADD,SMEMBERS,SISMEMBER</a></li>
-<li><a href="#org5a898c5">4.2. SCARD,SPOP,SRANDMEMBER</a></li>
-<li><a href="#orgde29eb5">4.3. SINTER,SUNION,SDIFF</a></li>
+<li><a href="#org14b95aa">4.1. SADD,SMEMBERS,SISMEMBER</a></li>
+<li><a href="#orgf261622">4.2. SCARD,SPOP,SRANDMEMBER</a></li>
+<li><a href="#orgb6ce05f">4.3. SINTER,SUNION,SDIFF</a></li>
 </ul>
 </li>
-<li><a href="#org7842eef">5. Hash</a>
+<li><a href="#org401d1e1">5. Hash</a>
 <ul>
-<li><a href="#org023f6d6">5.1. HSET,HMSET,HGET,HGETALL</a></li>
-<li><a href="#orge88a4f7">5.2. HEXISTS,HKEYS,HVALS,HINCRBY,HSETNX</a></li>
+<li><a href="#orgc0afebc">5.1. HSET,HMSET,HGET,HGETALL</a></li>
+<li><a href="#org2d61888">5.2. HEXISTS,HKEYS,HVALS,HINCRBY,HSETNX</a></li>
 </ul>
 </li>
-<li><a href="#org9b76769">6. Zset</a></li>
-<li><a href="#orga796b61">7. 事务</a></li>
-<li><a href="#orgf4aa22b">8. 持久化</a>
+<li><a href="#orgc0aea6f">6. Zset</a></li>
+<li><a href="#org9c75410">7. 事务</a>
 <ul>
-<li><a href="#org7310e5c">8.1. RDB (Redis DataBase)</a></li>
-<li><a href="#org171f257">8.2. AOF</a></li>
+<li><a href="#org274ac80">7.1. MULTI 和 PIPELINE 区别</a></li>
 </ul>
 </li>
-<li><a href="#org6d4afa1">9. 主从复制</a>
+<li><a href="#orga0d0da9">8. 持久化</a>
 <ul>
-<li><a href="#orgc93d725">9.1. 复制原理</a></li>
-<li><a href="#org79ee426">9.2. 哨兵机制</a>
+<li><a href="#org6a11503">8.1. RDB (Redis DataBase)</a></li>
+<li><a href="#orgc542974">8.2. AOF</a></li>
+</ul>
+</li>
+<li><a href="#orgafcd2e6">9. 主从复制</a>
 <ul>
-<li><a href="#org043f72d">9.2.1. 启动哨兵</a></li>
-<li><a href="#org723d5ab">9.2.2. 故障恢复原理</a></li>
+<li><a href="#orgeb75aec">9.1. 复制原理</a></li>
+<li><a href="#orgffc22ab">9.2. 哨兵机制</a>
+<ul>
+<li><a href="#org3f792d1">9.2.1. 启动哨兵</a></li>
+<li><a href="#orga3b4f42">9.2.2. 故障恢复原理</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgde6ef62">10. 集群</a>
+<li><a href="#orgc1c1a3b">10. 集群</a>
 <ul>
-<li><a href="#org54ab6dd">10.1. slots</a></li>
+<li><a href="#org032815f">10.1. slots</a></li>
 </ul>
 </li>
-<li><a href="#org48c407e">11. 参考资料</a></li>
+<li><a href="#org77b9c3d">11. 参考资料</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-org2780d5c" class="outline-2">
-<h2 id="org2780d5c"><span class="section-number-2">1</span> KEY 操作</h2>
+<div id="outline-container-orge34071d" class="outline-2">
+<h2 id="orge34071d"><span class="section-number-2">1</span> KEY 操作</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org6470392" class="outline-3">
-<h3 id="org6470392"><span class="section-number-3">1.1</span> 设置过期时间</h3>
+<div id="outline-container-org209c7ec" class="outline-3">
+<h3 id="org209c7ec"><span class="section-number-3">1.1</span> 设置过期时间</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 <code>EXPIRE &lt;key&gt; &lt;seconds&gt;</code>
@@ -405,8 +413,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org082b929" class="outline-3">
-<h3 id="org082b929"><span class="section-number-3">1.2</span> 查看还有多少秒过期</h3>
+<div id="outline-container-org3f7255a" class="outline-3">
+<h3 id="org3f7255a"><span class="section-number-3">1.2</span> 查看还有多少秒过期</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 <code>TTL &lt;key&gt;</code>
@@ -419,8 +427,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-orgfb322c9" class="outline-3">
-<h3 id="orgfb322c9"><span class="section-number-3">1.3</span> 查看当前数据库 key 的数量</h3>
+<div id="outline-container-orgbf20fee" class="outline-3">
+<h3 id="orgbf20fee"><span class="section-number-3">1.3</span> 查看当前数据库 key 的数量</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 <code>DBSIZE</code>
@@ -428,8 +436,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-orgbc20fb8" class="outline-3">
-<h3 id="orgbc20fb8"><span class="section-number-3">1.4</span> 清空 key</h3>
+<div id="outline-container-org9192fce" class="outline-3">
+<h3 id="org9192fce"><span class="section-number-3">1.4</span> 清空 key</h3>
 <div class="outline-text-3" id="text-1-4">
 <ul class="org-ul">
 <li><code>FLUSHDB</code>
@@ -442,8 +450,8 @@ for the JavaScript code in this tag.
 </div>
 
 
-<div id="outline-container-org1cff288" class="outline-2">
-<h2 id="org1cff288"><span class="section-number-2">2</span> String</h2>
+<div id="outline-container-org5bffdf0" class="outline-2">
+<h2 id="org5bffdf0"><span class="section-number-2">2</span> String</h2>
 <div class="outline-text-2" id="text-2">
 <ul class="org-ul">
 <li>String 类型是二进制安全的，意味着可以包含任何数据，如 jpg 图片或者序列化后的对象</li>
@@ -451,8 +459,8 @@ for the JavaScript code in this tag.
 </ul>
 </div>
 
-<div id="outline-container-org66765c8" class="outline-3">
-<h3 id="org66765c8"><span class="section-number-3">2.1</span> SET,SETNX,GET,APPEND,STRLEN</h3>
+<div id="outline-container-org47d6e19" class="outline-3">
+<h3 id="org47d6e19"><span class="section-number-3">2.1</span> SET,SETNX,GET,APPEND,STRLEN</h3>
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
 <pre class="src src-sh">127.0.0.1:6379&gt; set k1 v1
@@ -475,8 +483,8 @@ OK
 </div>
 </div>
 
-<div id="outline-container-orgda5fc7b" class="outline-3">
-<h3 id="orgda5fc7b"><span class="section-number-3">2.2</span> MSET,MGET,MSETNX</h3>
+<div id="outline-container-org94a5728" class="outline-3">
+<h3 id="org94a5728"><span class="section-number-3">2.2</span> MSET,MGET,MSETNX</h3>
 <div class="outline-text-3" id="text-2-2">
 <div class="org-src-container">
 <pre class="src src-sh">127.0.0.1:6379&gt; mset k1 v1 k2 v2 k3 v3
@@ -494,8 +502,8 @@ OK
 </div>
 </div>
 
-<div id="outline-container-org0a5ba92" class="outline-3">
-<h3 id="org0a5ba92"><span class="section-number-3">2.3</span> INCR,DECR,INCRBY,DECRBY</h3>
+<div id="outline-container-org8b3c701" class="outline-3">
+<h3 id="org8b3c701"><span class="section-number-3">2.3</span> INCR,DECR,INCRBY,DECRBY</h3>
 <div class="outline-text-3" id="text-2-3">
 <div class="org-src-container">
 <pre class="src src-sh">127.0.0.1:6379&gt; set num 1
@@ -517,22 +525,22 @@ OK
 </div>
 </div>
 
-<div id="outline-container-orgd4b2a57" class="outline-3">
-<h3 id="orgd4b2a57"><span class="section-number-3">2.4</span> SETEX</h3>
+<div id="outline-container-orgf476572" class="outline-3">
+<h3 id="orgf476572"><span class="section-number-3">2.4</span> SETEX</h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
 设置键值的同时设置过期时间
 </p>
 </div>
 </div>
-<div id="outline-container-orgcdc013a" class="outline-3">
-<h3 id="orgcdc013a"><span class="section-number-3">2.5</span> GETSET</h3>
+<div id="outline-container-org270d799" class="outline-3">
+<h3 id="org270d799"><span class="section-number-3">2.5</span> GETSET</h3>
 </div>
 </div>
 
 
-<div id="outline-container-org2f8986c" class="outline-2">
-<h2 id="org2f8986c"><span class="section-number-2">3</span> List</h2>
+<div id="outline-container-org9cfbe81" class="outline-2">
+<h2 id="org9cfbe81"><span class="section-number-2">3</span> List</h2>
 <div class="outline-text-2" id="text-3">
 
 <div class="figure">
@@ -542,8 +550,8 @@ OK
 </div>
 
 
-<div id="outline-container-org02e5c3e" class="outline-3">
-<h3 id="org02e5c3e"><span class="section-number-3">3.1</span> LPUSH,RPUSH,LPOP,RPOP,RPOPLPUSH</h3>
+<div id="outline-container-org40b0e85" class="outline-3">
+<h3 id="org40b0e85"><span class="section-number-3">3.1</span> LPUSH,RPUSH,LPOP,RPOP,RPOPLPUSH</h3>
 <div class="outline-text-3" id="text-3-1">
 <div class="org-src-container">
 <pre class="src src-sh">127.0.0.1:6379&gt; lpush list1 v1 v2 v3
@@ -572,8 +580,8 @@ OK
 </div>
 </div>
 
-<div id="outline-container-org9e8412e" class="outline-3">
-<h3 id="org9e8412e"><span class="section-number-3">3.2</span> LRANGE,LINDEX,LLEN</h3>
+<div id="outline-container-org94613d9" class="outline-3">
+<h3 id="org94613d9"><span class="section-number-3">3.2</span> LRANGE,LINDEX,LLEN</h3>
 <div class="outline-text-3" id="text-3-2">
 <div class="org-src-container">
 <pre class="src src-sh">127.0.0.1:6379&gt; lpush list1 v1 v2 v3 v4 v5 v6
@@ -596,8 +604,8 @@ OK
 </div>
 </div>
 
-<div id="outline-container-orgcb407ea" class="outline-3">
-<h3 id="orgcb407ea"><span class="section-number-3">3.3</span> LINSERT,LREM</h3>
+<div id="outline-container-org3163ce7" class="outline-3">
+<h3 id="org3163ce7"><span class="section-number-3">3.3</span> LINSERT,LREM</h3>
 <div class="outline-text-3" id="text-3-3">
 <ul class="org-ul">
 <li><code>LINSERT &lt;key&gt; [before|after] &lt;value&gt; &lt;new-value&gt;</code></li>
@@ -616,8 +624,8 @@ n 为零：将列表中符合 value 的值全部删除
 </div>
 
 
-<div id="outline-container-orgfd0423a" class="outline-2">
-<h2 id="orgfd0423a"><span class="section-number-2">4</span> Set</h2>
+<div id="outline-container-org320f627" class="outline-2">
+<h2 id="org320f627"><span class="section-number-2">4</span> Set</h2>
 <div class="outline-text-2" id="text-4">
 
 <div class="figure">
@@ -626,8 +634,8 @@ n 为零：将列表中符合 value 的值全部删除
 </div>
 </div>
 
-<div id="outline-container-org185f93c" class="outline-3">
-<h3 id="org185f93c"><span class="section-number-3">4.1</span> SADD,SMEMBERS,SISMEMBER</h3>
+<div id="outline-container-org14b95aa" class="outline-3">
+<h3 id="org14b95aa"><span class="section-number-3">4.1</span> SADD,SMEMBERS,SISMEMBER</h3>
 <div class="outline-text-3" id="text-4-1">
 <div class="org-src-container">
 <pre class="src src-sh">127.0.0.1:6379&gt; SADD s1 v1 v2 v3 v3
@@ -651,8 +659,8 @@ n 为零：将列表中符合 value 的值全部删除
 </div>
 </div>
 
-<div id="outline-container-org5a898c5" class="outline-3">
-<h3 id="org5a898c5"><span class="section-number-3">4.2</span> SCARD,SPOP,SRANDMEMBER</h3>
+<div id="outline-container-orgf261622" class="outline-3">
+<h3 id="orgf261622"><span class="section-number-3">4.2</span> SCARD,SPOP,SRANDMEMBER</h3>
 <div class="outline-text-3" id="text-4-2">
 <div class="org-src-container">
 <pre class="src src-sh">127.0.0.1:6379&gt; SADD s1 v1 v2 v3 v4 v5
@@ -679,8 +687,8 @@ n 为零：将列表中符合 value 的值全部删除
 </div>
 </div>
 
-<div id="outline-container-orgde29eb5" class="outline-3">
-<h3 id="orgde29eb5"><span class="section-number-3">4.3</span> SINTER,SUNION,SDIFF</h3>
+<div id="outline-container-orgb6ce05f" class="outline-3">
+<h3 id="orgb6ce05f"><span class="section-number-3">4.3</span> SINTER,SUNION,SDIFF</h3>
 <div class="outline-text-3" id="text-4-3">
 <div class="org-src-container">
 <pre class="src src-sh">127.0.0.1:6379&gt; sadd s1 1 2 3 4 5
@@ -714,8 +722,8 @@ n 为零：将列表中符合 value 的值全部删除
 </div>
 
 
-<div id="outline-container-org7842eef" class="outline-2">
-<h2 id="org7842eef"><span class="section-number-2">5</span> Hash</h2>
+<div id="outline-container-org401d1e1" class="outline-2">
+<h2 id="org401d1e1"><span class="section-number-2">5</span> Hash</h2>
 <div class="outline-text-2" id="text-5">
 
 <div class="figure">
@@ -731,8 +739,8 @@ n 为零：将列表中符合 value 的值全部删除
 </div>
 
 
-<div id="outline-container-org023f6d6" class="outline-3">
-<h3 id="org023f6d6"><span class="section-number-3">5.1</span> HSET,HMSET,HGET,HGETALL</h3>
+<div id="outline-container-orgc0afebc" class="outline-3">
+<h3 id="orgc0afebc"><span class="section-number-3">5.1</span> HSET,HMSET,HGET,HGETALL</h3>
 <div class="outline-text-3" id="text-5-1">
 <div class="org-src-container">
 <pre class="src src-sh">127.0.0.1:6379&gt; hset h1 name zhangsan
@@ -754,14 +762,14 @@ OK
 </div>
 
 
-<div id="outline-container-orge88a4f7" class="outline-3">
-<h3 id="orge88a4f7"><span class="section-number-3">5.2</span> HEXISTS,HKEYS,HVALS,HINCRBY,HSETNX</h3>
+<div id="outline-container-org2d61888" class="outline-3">
+<h3 id="org2d61888"><span class="section-number-3">5.2</span> HEXISTS,HKEYS,HVALS,HINCRBY,HSETNX</h3>
 </div>
 </div>
 
 
-<div id="outline-container-org9b76769" class="outline-2">
-<h2 id="org9b76769"><span class="section-number-2">6</span> Zset</h2>
+<div id="outline-container-orgc0aea6f" class="outline-2">
+<h2 id="orgc0aea6f"><span class="section-number-2">6</span> Zset</h2>
 <div class="outline-text-2" id="text-6">
 
 <div class="figure">
@@ -772,8 +780,8 @@ OK
 </div>
 
 
-<div id="outline-container-orga796b61" class="outline-2">
-<h2 id="orga796b61"><span class="section-number-2">7</span> 事务</h2>
+<div id="outline-container-org9c75410" class="outline-2">
+<h2 id="org9c75410"><span class="section-number-2">7</span> 事务</h2>
 <div class="outline-text-2" id="text-7">
 <ul class="org-ul">
 <li>事务是一个单独的隔离操作：事务中所有命令都会序列化，按顺序执行。执行过程中不会被客户端发送来的命令请求打断</li>
@@ -800,20 +808,34 @@ OK
 </div>
 
 
-
 <p>
 参考：<a href="https://www.youtube.com/watch?v=4-vWCotst64&amp;list=PLmOn9nNkQxJEi-V3CqOaOyTruYhTViQDc&amp;index=9">09 Redis 验证码案例演示 校验验证码 &amp; 事务简介(23:00)</a>
 </p>
 </div>
+
+<div id="outline-container-org274ac80" class="outline-3">
+<h3 id="org274ac80"><span class="section-number-3">7.1</span> MULTI 和 PIPELINE 区别</h3>
+<div class="outline-text-3" id="text-7-1">
+<ul class="org-ul">
+<li>pipeline 选择客户端缓冲，multi 选择服务端缓冲</li>
+<li>请求次数的不一致，multi 需要每个命令都发送一次给服务端，pipeline 最后一次性发送给服务端，请求次数相对于 multi 减少</li>
+<li>multi/exec 可以保证原子性，而 pipeline 不保证原子性</li>
+</ul>
+
+<p>
+参考：<a href="https://juejin.im/post/5b42e025f265da0fa332d4dc">redis中multi与pipeline介绍分析</a>
+</p>
+</div>
+</div>
 </div>
 
 
-<div id="outline-container-orgf4aa22b" class="outline-2">
-<h2 id="orgf4aa22b"><span class="section-number-2">8</span> 持久化</h2>
+<div id="outline-container-orga0d0da9" class="outline-2">
+<h2 id="orga0d0da9"><span class="section-number-2">8</span> 持久化</h2>
 <div class="outline-text-2" id="text-8">
 </div>
-<div id="outline-container-org7310e5c" class="outline-3">
-<h3 id="org7310e5c"><span class="section-number-3">8.1</span> RDB (Redis DataBase)</h3>
+<div id="outline-container-org6a11503" class="outline-3">
+<h3 id="org6a11503"><span class="section-number-3">8.1</span> RDB (Redis DataBase)</h3>
 <div class="outline-text-3" id="text-8-1">
 <p>
 在指定时间内将内存中的数据集 <b>快照</b> 写入磁盘。
@@ -833,8 +855,8 @@ OK
 </div>
 </div>
 
-<div id="outline-container-org171f257" class="outline-3">
-<h3 id="org171f257"><span class="section-number-3">8.2</span> AOF</h3>
+<div id="outline-container-orgc542974" class="outline-3">
+<h3 id="orgc542974"><span class="section-number-3">8.2</span> AOF</h3>
 <div class="outline-text-3" id="text-8-2">
 
 <div class="figure">
@@ -859,8 +881,8 @@ OK
 
 
 
-<div id="outline-container-org6d4afa1" class="outline-2">
-<h2 id="org6d4afa1"><span class="section-number-2">9</span> 主从复制</h2>
+<div id="outline-container-orgafcd2e6" class="outline-2">
+<h2 id="orgafcd2e6"><span class="section-number-2">9</span> 主从复制</h2>
 <div class="outline-text-2" id="text-9">
 <p>
 <b>主从复制不属于集群的概念</b>
@@ -873,8 +895,8 @@ OK
 </div>
 </div>
 
-<div id="outline-container-orgc93d725" class="outline-3">
-<h3 id="orgc93d725"><span class="section-number-3">9.1</span> 复制原理</h3>
+<div id="outline-container-orgeb75aec" class="outline-3">
+<h3 id="orgeb75aec"><span class="section-number-3">9.1</span> 复制原理</h3>
 <div class="outline-text-3" id="text-9-1">
 
 <div class="figure">
@@ -890,8 +912,8 @@ OK
 </div>
 </div>
 
-<div id="outline-container-org79ee426" class="outline-3">
-<h3 id="org79ee426"><span class="section-number-3">9.2</span> 哨兵机制</h3>
+<div id="outline-container-orgffc22ab" class="outline-3">
+<h3 id="orgffc22ab"><span class="section-number-3">9.2</span> 哨兵机制</h3>
 <div class="outline-text-3" id="text-9-2">
 
 <div class="figure">
@@ -912,8 +934,8 @@ OK
 </div>
 </div>
 
-<div id="outline-container-org043f72d" class="outline-4">
-<h4 id="org043f72d"><span class="section-number-4">9.2.1</span> 启动哨兵</h4>
+<div id="outline-container-org3f792d1" class="outline-4">
+<h4 id="org3f792d1"><span class="section-number-4">9.2.1</span> 启动哨兵</h4>
 <div class="outline-text-4" id="text-9-2-1">
 <p>
 <code>redis-sentinel /myredis/sentinel.conf</code>
@@ -921,8 +943,8 @@ OK
 </div>
 </div>
 
-<div id="outline-container-org723d5ab" class="outline-4">
-<h4 id="org723d5ab"><span class="section-number-4">9.2.2</span> 故障恢复原理</h4>
+<div id="outline-container-orga3b4f42" class="outline-4">
+<h4 id="orga3b4f42"><span class="section-number-4">9.2.2</span> 故障恢复原理</h4>
 <div class="outline-text-4" id="text-9-2-2">
 
 <div class="figure">
@@ -935,8 +957,8 @@ OK
 </div>
 
 
-<div id="outline-container-orgde6ef62" class="outline-2">
-<h2 id="orgde6ef62"><span class="section-number-2">10</span> 集群</h2>
+<div id="outline-container-orgc1c1a3b" class="outline-2">
+<h2 id="orgc1c1a3b"><span class="section-number-2">10</span> 集群</h2>
 <div class="outline-text-2" id="text-10">
 <p>
 <b>集群至少要有 6 台，其中 3 个 master ，每个 master 有一个 slave</b>
@@ -949,8 +971,8 @@ OK
 </div>
 </div>
 
-<div id="outline-container-org54ab6dd" class="outline-3">
-<h3 id="org54ab6dd"><span class="section-number-3">10.1</span> slots</h3>
+<div id="outline-container-org032815f" class="outline-3">
+<h3 id="org032815f"><span class="section-number-3">10.1</span> slots</h3>
 <div class="outline-text-3" id="text-10-1">
 
 <div class="figure">
@@ -961,12 +983,13 @@ OK
 </div>
 </div>
 
-<div id="outline-container-org48c407e" class="outline-2">
-<h2 id="org48c407e"><span class="section-number-2">11</span> 参考资料</h2>
+<div id="outline-container-org77b9c3d" class="outline-2">
+<h2 id="org77b9c3d"><span class="section-number-2">11</span> 参考资料</h2>
 <div class="outline-text-2" id="text-11">
 <ul class="org-ul">
 <li><a href="https://www.jianshu.com/p/2639549bedc8">使用python来操作redis用法详解</a></li>
 <li><a href="https://www.youtube.com/watch?v=p3AOOU8wzO0&amp;list=PLmOn9nNkQxJEi-V3CqOaOyTruYhTViQDc&amp;index=14">Redis 主从复制 读写分离 1</a></li>
+<li><a href="http://redisdoc.com/topic/cluster-tutorial.html">集群教程</a></li>
 </ul>
 </div>
 </div>

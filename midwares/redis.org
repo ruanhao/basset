@@ -287,8 +287,15 @@ file:img/redis-transaction2.png
 file:img/redis-transaction3.png
 
 
-
 参考：[[https://www.youtube.com/watch?v=4-vWCotst64&list=PLmOn9nNkQxJEi-V3CqOaOyTruYhTViQDc&index=9][09 Redis 验证码案例演示 校验验证码 & 事务简介(23:00)]]
+
+** MULTI 和 PIPELINE 区别
+
+- pipeline 选择客户端缓冲，multi 选择服务端缓冲
+- 请求次数的不一致，multi 需要每个命令都发送一次给服务端，pipeline 最后一次性发送给服务端，请求次数相对于 multi 减少
+- multi/exec 可以保证原子性，而 pipeline 不保证原子性
+
+参考：[[https://juejin.im/post/5b42e025f265da0fa332d4dc][redis中multi与pipeline介绍分析]]
 
 
 * 持久化
@@ -353,3 +360,4 @@ file:img/redis-slots.png
 
 - [[https://www.jianshu.com/p/2639549bedc8][使用python来操作redis用法详解]]
 - [[https://www.youtube.com/watch?v=p3AOOU8wzO0&list=PLmOn9nNkQxJEi-V3CqOaOyTruYhTViQDc&index=14][Redis 主从复制 读写分离 1]]
+- [[http://redisdoc.com/topic/cluster-tutorial.html][集群教程]]
