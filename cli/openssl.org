@@ -14,6 +14,44 @@
 
 * 基本知识
 
+** 相关术语
+
+*** session key
+这是 TLS/SSL 最后协商的结果，用来进行对称加密。
+*** client random
+是一个 32B 的序列值，每次连接来时，都会动态生成，即，每次连接生成的值都不会一样。因为，他包含了 4B 的时间戳和 28B 的随机数。
+*** server random
+和 client random 一样，只是是由 server 端生成。
+*** premaster secret
+这是 48B 的 blob 数据。它能和 client & server random 通过 pseudorandom (PRF) 一起生成 session key。
+*** cipher suite
+用来定义 TLS 连接用到的算法。通常有 4 部分：
+
+- 非对称加密 (ECDH 或 RSA)
+- 证书验证 (证书的类型)
+- 保密性 (对称加密算法)
+- 数据完整性 (产生 hash 的函数)
+
+比如 AES128-SHA 代表着：
+
+#+BEGIN_EXAMPLE
+RSA 算法进行非对称加密
+RSA 进行证书验证
+128bit AES 对称加密
+160bit SHA 数据加密算法
+#+END_EXAMPLE
+
+比如 ECDHE-ECDSA-AES256-GCM-SHA384 代表着
+
+#+BEGIN_EXAMPLE
+ECDHE  算法进行非对称加密
+ECDSA 进行证书验证
+265bit AES 对称加密
+384bit SHA 数据加密算法
+#+END_EXAMPLE
+
+
+
 ** openssl 组成
 
 - libcrypto: 加密库
@@ -72,7 +110,11 @@ p：大素数；g：生成数；x：clnt_random；y：srv_random
 
 
 
+
 #+HTML: <img src="http://www.ruanyifeng.com/blogimg/asset/2014/bg2014092008.png"/>
+
+
+[[file:img/openssl-dh2.png]]
 
 
 ** 算法种类
@@ -139,6 +181,7 @@ ECC 与 RSA 相比，有以下的优点：
 
 - [[http://www.ruanyifeng.com/blog/2014/09/illustration-ssl.html][图解SSL/TLS协议]]
 - [[https://blog.cloudflare.com/keyless-ssl-the-nitty-gritty-technical-details/][The Nitty Gritty Technical Details]]
+- [[https://juejin.im/post/5b305758e51d4558ce5ea0d9][完全吃透 TLS/SSL]]
 
 
 * 常见用法

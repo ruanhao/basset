@@ -1,0 +1,89 @@
+#+TITLE:     JWT
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS:   h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
+#+STARTUP:   showall
+#+TOC:       headlines 3
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
+#+HTML_HEAD: <link href="../org-html-themes/css/style.css" rel="stylesheet" type="text/css" />
+ #+HTML: <div class="outline-2" id="meta">
+| Author   | {{{author}}} ({{{email}}})    |
+| Date     | {{{time(%Y-%m-%d %H:%M:%S)}}} |
+#+HTML: </div>
+
+* 基本知识
+
+=JSON Web Token= 一般用于用户认证，无需在服务器端保存。
+
+** Base64URL
+
+这个算法跟 Base64 算法基本类似，但有一些小的不同。
+
+JWT 作为一个令牌，有些场合可能会放到 URL 中。Base64 有三个字符 =+=, =/= 和 === ，在 URL 里面有特殊含义，所以要被替换掉：
+
+=== 被省略， =+= 替换成 =-= ， =/= 替换成 =_= 。这就是 Base64URL 算法。
+
+** JWT 组成
+
+由 3 段字符串组成，并用 =.= 连接。
+
+*** Header
+
+Header 部分是一个 JSON 对象，描述 JWT 的元数据，通常是下面的样子。
+
+#+BEGIN_SRC js
+{
+  "alg": "HS256", // 表示签名的算法，默认是 HMAC SHA256
+  "typ": "JWT"    // 表示这个 token 的类型，JWT 令牌统一写为 JWT
+}
+#+END_SRC
+
+
+将上面的 JSON 对象使用 Base64URL 算法转成字符串。
+
+
+
+*** Payload
+
+Payload 部分也是一个 JSON 对象，用来存放实际需要传递的数据。JWT 规定了7个官方字段，供选用。
+
+- iss (issuer) :: 签发人
+- exp (expiration time) :: 过期时间
+- sub (subject) :: 主题
+- aud (audience) :: 受众
+- nbf (Not Before) :: 生效时间
+- iat (Issued At) :: 签发时间
+- jti (JWT ID) :: 编号
+
+除了官方字段，你还可以在这个部分定义私有字段。 *不要把秘密信息放在这个部分*
+
+这个 JSON 对象也要使用 Base64URL 算法转成字符串。
+
+*** Signature
+
+Signature 部分是对前两部分的签名，防止数据篡改。
+
+首先，需要指定一个密钥（secret）。这个密钥只有服务器才知道，不能泄露给用户。
+
+然后，使用 Header 里面指定的签名算法（默认是 HMAC SHA256），按照下面的公式产生签名。
+
+=HMACSHA256(base64UrlEncode(header) + "." + base64UrlEncode(payload), secret)=
+
+
+
+
+** JWT 校验
+
+1. 先检验过期时间
+2. 检验 token 的合法性
+
+
+** 使用方式
+
+比较好的做法是放在 HTTP 请求的头信息 Authorization 字段里面：
+
+
+=Authorization: Bearer <token>=

@@ -5,7 +5,7 @@
 #+LINK_HOME: http://www.github.com/ruanhao
 #+OPTIONS:   h:6 html-postamble:nil html-preamble:t tex:t f:t ^:nil
 #+STARTUP:   showall
-#+TOC:       headlines 4
+#+TOC:       headlines 5
 #+HTML_DOCTYPE: <!DOCTYPE html>
 #+HTML_HEAD: <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
 #+HTML_HEAD: <link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
@@ -29,6 +29,8 @@
 多路复用器轮询到连接有 I/O 请求就进行处理。
 
 [[file:img/netty-nio.png]]
+
+[[file:img/netty-nio2.png]]
 
 
 *** AIO
@@ -302,6 +304,110 @@ java 的 Selector 在原生的 select api 之上 增加了个 =Selector.wakeup()
 - mainReactor 对应 bossGroup
 - subReactor 对应 workerGroup ，本质是 *IO 线程池* ，负责 IO 事件
 - Thread Pool 对应用户业务的线程池（即不阻塞 IO 线程池）
+
+Reactor 模式中核心组成:
+
+- Reactor
+
+  在一个单独的线程中运行，负责监听和分发事件，分发给适当的处理程序来对 IO 事件做出反应
+- Handlers
+
+  处理程序执行 I/O 事件要完成的实际事件
+
+
+根据 Reactor 的数量和处理资源池线程的数量不同，有 3 种典型的实现：
+
+- 单 Reactor 单线程
+- 单 Reactor 多线程
+- 主从 Reactor 多线程
+
+
+***** 单 Reactor 单线程
+
+[[file:img/netty-reactor1.png]]
+
+***** 单 Reactor 多线程
+
+[[file:img/netty-reactor2.png]]
+
+- 优点
+
+  可以充分的利用多核cpu的处理能力
+- 缺点
+
+  多线程数据共享和访问比较复杂，Reactor 处理所有的事件的监听和响应，在单线程运行，在高并发场景容易出现性能瓶颈
+
+
+***** 主从 Reactor 多线程
+
+file:img/netty-reactor3.png
+
+- 优点
+
+  父线程与子线程的数据交互简单职责明确，父线程只需要接收新连接，子线程完成后续的业务处理。\\
+父线程与子线程的数据交互简单，Reactor 主线程只需要把新连接传给子线程，子线程无需返回数据。
+- 缺点
+
+  编程复杂度较高
+
+Nginx ，Memcached 和 Netty 都是基于主从多线程模型。
+
+参考：[[https://www.youtube.com/watch?v=fCFGxmj_8w8&list=PLmOn9nNkQxJH02M10mFnBW0yPRnLmRSMo&index=41][主从Reactor模式]]
+
+
+***** Netty 模型
+
+file:img/netty-reactor4.png
+
+
+- Netty 抽象出两组线程池 BossGroup 专门负责接收客户端的连接，WorkerGroup 专门负责网络的读写
+- BossGroup 和 WorkerGroup 类型都是 NioEventLoopGroup
+- NioEventLoopGroup 相当于一个事件循环组，这个组中含有多个事件循环，每一个事件循环是 NioEventLoop
+- NioEventLoop 表示一个不断循环的执行处理任务的线程，每个 NioEventLoop 都有一个 selector ，用于监听绑定在其上的 socket 的网络通讯
+- NioEventLoopGroup 可以有多个线程，即可以含有多个 NioEventLoop
+- 每个 BossNioEventLoop 循环执行的步骤有:
+  - 轮询 accept 事件
+  - 处理 accept 事件，与 client 建立连接，生成 NioScocketChannel ，并将其注册到某个 worker NIOEventLoop 上的 selector
+  - 处理任务队列的任务，即 =runAllTasks=
+- 每个 WorkerNIOEventLoop 循环执行的步骤
+  - 轮询 read/write 事件
+  - 处理 i/o 事件，即 read/write 事件，在对应 NioScocketChannel 处理
+  - 处理任务队列的任务，即 =runAllTasks=
+- 每个 WorkerNIOEventLoop 处理业务时，会使用pipeline(管道)，pipeline 中包含了 channel，即通过 pipeline 可以获取到对应通道，管道中维护了很多处理器
+
+
+*** 任务队列
+
+EventLoop 拥有 2 种任务队列:
+
+**** 自定义的普通任务
+
+这类任务将提交该 channel 对应的 EventLoop 的 =taskQueue= 中：
+
+#+BEGIN_SRC java
+  ctx.channel().eventLoop().execute(new Runnable() {
+          @Override
+          public void run() {
+              // 耗时任务
+          }
+      });
+
+#+END_SRC
+
+
+**** 自定义定时任务
+
+该任务是提交到 =scheduledTaskQueue= 中:
+
+#+BEGIN_SRC java
+  ctx.channel().eventLoop().schedule(new Runnable() {
+          @Override
+          public void run() {
+              // TODO
+          }
+      }, 5, TimeUnit.SECONDS);
+#+END_SRC
+
 
 
 
