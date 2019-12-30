@@ -5846,6 +5846,32 @@ dtype: float64
 
 * 实用方法
 
+** 清洗
+
+*** 去重
+
+#+BEGIN_SRC python
+  students = pd.read_excel('data/Students_Duplicates.xlsx')
+  dupe = students.duplicated(subset='Name')
+  dupe = dupe[dupe == True]  # dupe = dupe[dupe]
+  print(students.iloc[dupe.index])  # 找出去除的条目
+  print("=========")
+  students.drop_duplicates(subset='Name', inplace=True, keep='last')
+  print(students)
+#+END_SRC
+
+** 整形
+
+*** 将一列分割成多列
+
+#+BEGIN_SRC python
+  employees = pd.read_excel('data/Employees.xlsx', index_col='ID')
+  df = employees['Full Name'].str.split(expand=True)
+  employees['First Name'] = df[0]
+  employees['Last Name'] = df[1]
+#+END_SRC
+
+
 ** 链式操作
 
 *** DataFrame.assign
@@ -5954,6 +5980,7 @@ dtype: float64
 5    5
 dtype: int64
 #+end_example
+
 
 ** 数据操作
 
