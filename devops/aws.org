@@ -334,6 +334,142 @@ To configure auto-scaling, you need to create two parts of the configuration:
   Tells the EC2 service how many virtual machines should be started with a specific launch configuration, how to monitor the instances,
   and in which subnets EC2 instances should be started.
 
+
+* S3
+
+** Object Store
+
+Data in S3 is managed as objects, so the storage system is called an *object store*.
+
+In an object store, data is stored as objects.\\
+Each object consists of a _globally unique identifier_, _some metadata_, and the _data_ itself,\\
+An object's globally unique identifier (GUID) is also known as its key; you can address the object using the GUID.
+
+file:img/aws_s3_obj_storage.png
+
+
+** Buckets
+
+S3 uses *buckets* to group objects.\\
+A bucket is a _container_ for objects. You can create multiple buckets, _each of which has a globally unique name_, \\
+to separate data for different scenarios.
+
+You have to choose a bucket name *that isn't used by any other AWS customer in any other region*.
+
+file:img/aws_s3_https.png
+
+file:img/aws_s3_buckets.png
+
+
+** CLI
+
+*** 文件操作
+
+**** 拷贝
+
+#+BEGIN_SRC sh
+  aws s3 cp --recursive s3://haoru.cisco.com/<dir>/ <local-path>
+#+END_SRC
+
+
+*** 目录操作
+
+**** 创建桶
+
+The name of the bucket must be unique among all other S3 buckets, even those in other regions and those of other AWS customers.
+
+#+BEGIN_SRC sh
+  aws s3 mb s3://haoru.cisco.com
+#+END_SRC
+
+**** 同步
+
+#+BEGIN_SRC sh
+  aws s3 sync <path> s3://haoru.cisco.com/<dir>
+#+END_SRC
+
+
+
+**** 删除桶
+
+#+BEGIN_SRC sh
+  aws s3 rb --force s3://haoru.cisco.com
+#+END_SRC
+
+**** Versioning for objects
+
+#+BEGIN_SRC sh
+  aws s3api put-bucket-versioning --bucket <bucket-name> --versioning-configuration Status=Enabled # 启用 versioning
+  aws s3api list-object-versions --bucket <bucket-name> # retrieves all objects and versions
+#+END_SRC
+
+
+** 静态资源
+
+参考: https://github.com/ruanhao/python-for-fun/blob/master/aws/s3/ut.py
+
+*** 创建桶
+
+#+BEGIN_SRC sh
+  aws s3 mb s3://<BucketName>
+  aws s3 cp helloworld.html s3://$BucketName/helloworld.html
+#+END_SRC
+
+*** 配置桶使其支持 static web hosting
+
+Allow everyone to view or download the documents included in your bucket:
+
+#+BEGIN_SRC sh
+  aws s3api put-bucket-policy --bucket $BucketName --policy file://bucketpolicy.json
+#+END_SRC
+
+bucketpolicy.json:
+
+#+BEGIN_SRC js
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "AddPerm",
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": ["s3:GetObject"],
+        "Resource": ["arn:aws:s3:::<BucketName>/*"]
+      }
+    ]
+  }
+#+END_SRC
+
+
+Enable and configure the static web-hosting feature of S3:
+
+#+BEGIN_SRC sh
+  aws s3 website s3://$BucketName --index-document helloworld.html
+#+END_SRC
+
+*** 访问
+
+=http://$BucketName.s3-website-$Region.amazonaws.com=
+
+
+*** 自定义域名
+
+All you have to do is to add a CNAME record for your domain, pointing to the bucket's S3 endpoint.
+
+*The CNAME record will only work if you comply with the following rules:*
+
+- Your bucket name must match the CNAME record name
+
+  For example, if you want to create a CNAME for =awsinaction.example.com=, your bucket name must be awsinaction.example.com as well.
+- CNAME records *won't work for the primary domain name* (such as =example.com=)
+
+  You need to use a subdomain for CNAMEs like awsinaction or www, for example.
+  If you want to link a primary domain name to an S3 bucket, you need to use the Route 53 DNS service from AWS.
+
+Linking a custom domain to your S3 bucket only works for HTTP.
+If you want to use HTTPS (and you probably should), use AWS CloudFront together with S3.
+AWS CloudFront accepts HTTPS from the client and forwards the request to S3.
+
 * 参考资料
 
 - [[https://github.com/AWSinAction/code2][AWS in Action]]
