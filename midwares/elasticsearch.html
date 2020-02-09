@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- 2020-02-09 Sun 19:46 -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ElasticSearch (快速检索)</title>
+<meta name="generator" content="Org mode">
+<meta name="author" content="Hao Ruan">
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link href="../org-html-themes/notes/notes.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">ElasticSearch (快速检索)</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgc4831ba">1. 数据组织</a>
+<ul>
+<li><a href="#org85510ec">1.1. 存储方式</a></li>
+<li><a href="#orgc634cc5">1.2. 检索原理</a></li>
+<li><a href="#orgb2d97ca">1.3. 分词原理</a></li>
+</ul>
+</li>
+<li><a href="#org16ef306">2. 增删改查 </a>
+<ul>
+<li><a href="#orgc0acde5">2.1. Mapping</a>
+<ul>
+<li><a href="#org0baa754">2.1.1. Get API</a></li>
+<li><a href="#orgf726b77">2.1.2. Put API</a>
+<ul>
+<li><a href="#org5c3e4c0">2.1.2.1. Mapping 设置</a>
+<ul>
+<li><a href="#org6948fcc">2.1.2.1.1. fields</a></li>
+<li><a href="#org9f4d371">2.1.2.1.2. index</a></li>
+<li><a href="#org9825f59">2.1.2.1.3. _source / store</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgb54edd7">2.2. Updating</a>
+<ul>
+<li><a href="#org0b669e2">2.2.1. API</a></li>
+<li><a href="#orgcfd498e">2.2.2. 并发控制</a></li>
+</ul>
+</li>
+<li><a href="#orgcb3eb97">2.3. Deleting</a>
+<ul>
+<li><a href="#orgd1dc7cf">2.3.1. API</a></li>
+</ul>
+</li>
+<li><a href="#orgc81bc1b">2.4. Quering</a>
+<ul>
+<li><a href="#org0d6f8ee">2.4.1. Filter</a></li>
+<li><a href="#orgf49b927">2.4.2. match_all</a></li>
+<li><a href="#org39981b0">2.4.3. query string</a></li>
+<li><a href="#org043bfdf">2.4.4. term query</a></li>
+<li><a href="#org51dac75">2.4.5. bool query</a>
+<ul>
+<li><a href="#org5e4beb2">2.4.5.1. minimum_should_match</a></li>
+</ul>
+</li>
+<li><a href="#org9c8eb6d">2.4.6. match / multi_match</a>
+<ul>
+<li><a href="#orgf489fc0">2.4.6.1. 布林查询行为</a>
+<ul>
+<li><a href="#org1f26e65">2.4.6.1.1. AND</a></li>
+<li><a href="#org6c54936">2.4.6.1.2. OR</a></li>
+</ul>
+</li>
+<li><a href="#org76c41a8">2.4.6.2. match phrase</a></li>
+<li><a href="#orgcf377a0">2.4.6.3. match phrase prefix</a></li>
+<li><a href="#org862b732">2.4.6.4. multi_match</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+
+<div id="outline-container-orgc4831ba" class="outline-2">
+<h2 id="orgc4831ba"><span class="section-number-2">1</span> 数据组织</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-org85510ec" class="outline-3">
+<h3 id="org85510ec"><span class="section-number-3">1.1</span> 存储方式</h3>
+</div>
+
+
+<div id="outline-container-orgc634cc5" class="outline-3">
+<h3 id="orgc634cc5"><span class="section-number-3">1.2</span> 检索原理</h3>
+</div>
+
+<div id="outline-container-orgb2d97ca" class="outline-3">
+<h3 id="orgb2d97ca"><span class="section-number-3">1.3</span> 分词原理</h3>
+</div>
+</div>
+
+
+
+<div id="outline-container-org16ef306" class="outline-2">
+<h2 id="org16ef306"><span class="section-number-2">2</span> 增删改查 <sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup></h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-orgc0acde5" class="outline-3">
+<h3 id="orgc0acde5"><span class="section-number-3">2.1</span> Mapping</h3>
+<div class="outline-text-3" id="text-2-1">
+</div>
+<div id="outline-container-org0baa754" class="outline-4">
+<h4 id="org0baa754"><span class="section-number-4">2.1.1</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-get-mapping.html">Get API</a></h4>
+</div>
+
+<div id="outline-container-orgf726b77" class="outline-4">
+<h4 id="orgf726b77"><span class="section-number-4">2.1.2</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-put-mapping.html">Put API</a></h4>
+<div class="outline-text-4" id="text-2-1-2">
+<ul class="org-ul">
+<li>如果更新一个存在的 mapping，Elasticsearch 会将两者进行合并(merge)</li>
+<li>不能修改已经存在的字段的类型，除非删除数据(mapping 也会被删除)，并重新建立索引</li>
+</ul>
+</div>
+
+<div id="outline-container-org5c3e4c0" class="outline-5">
+<h5 id="org5c3e4c0"><span class="section-number-5">2.1.2.1</span> Mapping 设置</h5>
+<div class="outline-text-5" id="text-2-1-2-1">
+</div>
+<div id="outline-container-org6948fcc" class="outline-6">
+<h6 id="org6948fcc"><span class="section-number-6">2.1.2.1.1</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/multi-fields.html">fields</a></h6>
+<div class="outline-text-6" id="text-2-1-2-1-1">
+<p>
+fields 是使用多种不同的设定对同一数据进行多次索引。
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-org9f4d371" class="outline-6">
+<h6 id="org9f4d371"><span class="section-number-6">2.1.2.1.2</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/mapping-index.html">index</a></h6>
+<div class="outline-text-6" id="text-2-1-2-1-2">
+<p>
+用于决定是否对字段建立索引。
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-org9825f59" class="outline-6">
+<h6 id="org9825f59"><span class="section-number-6">2.1.2.1.3</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html">_source</a> / <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-store.html">store</a></h6>
+<div class="outline-text-6" id="text-2-1-2-1-3">
+<p>
+<code>_source</code> 用于决定是否保存原始文档.
+</p>
+
+<p>
+如果 <code>_source</code> 被禁止，可以使用 <code>store</code> 参数来保存个别字段。
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-orgb54edd7" class="outline-3">
+<h3 id="orgb54edd7"><span class="section-number-3">2.2</span> Updating</h3>
+<div class="outline-text-3" id="text-2-2">
+</div>
+<div id="outline-container-org0b669e2" class="outline-4">
+<h4 id="org0b669e2"><span class="section-number-4">2.2.1</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/docs-update.html">API</a></h4>
+<div class="outline-text-4" id="text-2-2-1">
+<ul class="org-ul">
+<li>部分更新</li>
+<li>支持 <code>upsert</code></li>
+<li>可以使用 <code>script</code> 进行更新</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgcfd498e" class="outline-4">
+<h4 id="orgcfd498e"><span class="section-number-4">2.2.2</span> 并发控制</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<p>
+文档创建时会生成三个数值 <code>version</code>, <code>seq_no</code> 和 <code>primary_term</code> ：
+</p>
+
+<ul class="org-ul">
+<li><code>seq_no</code> 和 <code>primary_term</code> 用于内部版本控制(要与需更新文档的值相同)</li>
+<li><code>version</code> 用于外部版本控制 (外部的 <code>version</code> 要大于文档的 <code>version</code>)</li>
+</ul>
+
+
+<p>
+使用 Update API 时可以指定 <code>retry_on_conflict</code> 参数进行并发控制。
+</p>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-orgcb3eb97" class="outline-3">
+<h3 id="orgcb3eb97"><span class="section-number-3">2.3</span> Deleting</h3>
+<div class="outline-text-3" id="text-2-3">
+</div>
+<div id="outline-container-orgd1dc7cf" class="outline-4">
+<h4 id="orgd1dc7cf"><span class="section-number-4">2.3.1</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/docs-delete.html">API</a></h4>
+<div class="outline-text-4" id="text-2-3-1">
+<ul class="org-ul">
+<li>根据 ID 删除单个 doc</li>
+<li>用 bulk 方式删除多个 doc</li>
+<li>根据 query 条件删除 doc</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgc81bc1b" class="outline-3">
+<h3 id="orgc81bc1b"><span class="section-number-3">2.4</span> Quering</h3>
+<div class="outline-text-3" id="text-2-4">
+</div>
+<div id="outline-container-org0d6f8ee" class="outline-4">
+<h4 id="org0d6f8ee"><span class="section-number-4">2.4.1</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html">Filter</a></h4>
+<div class="outline-text-4" id="text-2-4-1">
+<p>
+Elasticsearch uses filter to filter out the documents <span class="underline">that it shouldn't be searching based on the query part of the search</span>. <br>
+Because of this, filtering can be much faster than combining the entire query into a single search.
+</p>
+
+<p>
+Depending on what kind of filter is used, Elasticsearch can <span class="underline">cache</span> the results in a <code>bitset</code>, <br>
+so if the filter is used for another search, it doesn't have to be calculated.
+</p>
+
+<p>
+Make parts of your query into filters if you can to speed the search.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgf49b927" class="outline-4">
+<h4 id="orgf49b927"><span class="section-number-4">2.4.2</span> match_all</h4>
+<div class="outline-text-4" id="text-2-4-2">
+<p>
+用于返回所有 doc
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js">{
+  <span style="color: #e6db74;">"query"</span>: {
+    <span style="color: #e6db74;">"match_all"</span>: {}
+  }
+}
+</pre>
+</div>
+
+<p>
+with filter:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js">{
+  <span style="color: #e6db74;">'query'</span>: {
+    <span style="color: #e6db74;">'bool'</span>: {
+      <span style="color: #e6db74;">'must'</span>: {
+        <span style="color: #e6db74;">'match_all'</span>: {}
+      },
+      <span style="color: #e6db74;">'filter'</span>: {
+      }
+    }
+  }
+
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org39981b0" class="outline-4">
+<h4 id="org39981b0"><span class="section-number-4">2.4.3</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">query string</a></h4>
+<div class="outline-text-4" id="text-2-4-3">
+<p>
+A <code>query_string</code> search can be performed either from the URL of the request or sent in a request body.
+</p>
+
+<p>
+<code>curl -XGET 'localhost:9200/_search?q=nosql&amp;pretty'</code>
+</p>
+
+<p>
+<b>If you don't need to support a <span class="underline">query syntax</span>, consider using the <code>match</code> query.</b>
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-org043bfdf" class="outline-4">
+<h4 id="org043bfdf"><span class="section-number-4">2.4.4</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html">term query</a></h4>
+<div class="outline-text-4" id="text-2-4-4">
+<p>
+Note that because the term being searched for <span class="underline">isn't analyzed</span>,
+it must match a term in the document <span class="underline">exactly</span> for the result to be found.
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-org51dac75" class="outline-4">
+<h4 id="org51dac75"><span class="section-number-4">2.4.5</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html">bool query</a></h4>
+<div class="outline-text-4" id="text-2-4-5">
+<p>
+The <code>Bool</code> query allows you to <b>combine</b> any number of queries into a single query by specifying a query clause that <br>
+indicates which parts <code>must</code>, <code>should</code>, or <code>must not</code> match the data in your Elasticsearch index.
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Bool clause</td>
+<td class="org-left">Equivalent</td>
+</tr>
+
+<tr>
+<td class="org-left">must</td>
+<td class="org-left">q1 AND q2 AND q3</td>
+</tr>
+
+<tr>
+<td class="org-left">must_not</td>
+<td class="org-left">NOT q1 AND NOT q2 AND NOT q3</td>
+</tr>
+
+<tr>
+<td class="org-left">should</td>
+<td class="org-left">q1 OR q2 OR q3</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div id="outline-container-org5e4beb2" class="outline-5">
+<h5 id="org5e4beb2"><span class="section-number-5">2.4.5.1</span> minimum_should_match</h5>
+<div class="outline-text-5" id="text-2-4-5-1">
+<ul class="org-ul">
+<li>If the bool query includes at least one should clause and no must or filter clauses, the default value is 1.</li>
+<li>Otherwise, the default value is 0.</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org9c8eb6d" class="outline-4">
+<h4 id="org9c8eb6d"><span class="section-number-4">2.4.6</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html">match</a> / multi_match</h4>
+<div class="outline-text-4" id="text-2-4-6">
+<p>
+<code>match</code> and <code>multi_match</code> queries behave similarly to the <code>term</code> query,
+except that <span class="underline">they analyze the field being passed in</span>.
+</p>
+</div>
+
+<div id="outline-container-orgf489fc0" class="outline-5">
+<h5 id="orgf489fc0"><span class="section-number-5">2.4.6.1</span> 布林查询行为</h5>
+<div class="outline-text-5" id="text-2-4-6-1">
+</div>
+<div id="outline-container-org1f26e65" class="outline-6">
+<h6 id="org1f26e65"><span class="section-number-6">2.4.6.1.1</span> AND</h6>
+<div class="outline-text-6" id="text-2-4-6-1-1">
+<p>
+By default, the <code>match</code> query uses the <b>OR</b> operator. <br>
+For example, if you search for the text "Elasticsearch Denver" Elasticsearch searches for "Elasticsearch OR Denver".
+</p>
+</div>
+</div>
+
+<div id="outline-container-org6c54936" class="outline-6">
+<h6 id="org6c54936"><span class="section-number-6">2.4.6.1.2</span> OR</h6>
+<div class="outline-text-6" id="text-2-4-6-1-2">
+<div class="org-src-container">
+<pre class="src src-js">{
+  <span style="color: #e6db74;">"query"</span>: {
+    <span style="color: #e6db74;">"match"</span>: {
+      <span style="color: #e6db74;">"name"</span>: {
+        <span style="color: #e6db74;">"query"</span>: <span style="color: #e6db74;">"elasticsearch denver"</span>,
+        <span style="color: #e6db74;">"operator"</span>: <span style="color: #e6db74;">"and"</span>
+      }
+    }
+  }
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org76c41a8" class="outline-5">
+<h5 id="org76c41a8"><span class="section-number-5">2.4.6.2</span> match phrase</h5>
+<div class="outline-text-5" id="text-2-4-6-2">
+<p>
+查询分词文本，并从分词后的文本中创建短语查询， <code>match_phrase</code> 的主要作用是用于匹配包含当前短语的文档。<sup><a id="fnr.2" class="footref" href="#fn.2">2</a></sup>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js">GET /_search
+{
+    <span style="color: #e6db74;">"query"</span>: {
+        <span style="color: #e6db74;">"match_phrase"</span> : {
+            <span style="color: #e6db74;">"message"</span> : <span style="color: #e6db74;">"this is a test"</span>,
+            <span style="color: #e6db74;">"analyzer"</span>:<span style="color: #e6db74;">"english"</span>,
+            <span style="color: #e6db74;">"slop"</span>:0
+        }
+    }
+}
+</pre>
+</div>
+
+<p>
+<code>slop</code> 的数值意味着输入的短语中每个词项 (term) 之间允许隔着几个词项 (term) 。
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-orgcf377a0" class="outline-5">
+<h5 id="orgcf377a0"><span class="section-number-5">2.4.6.3</span> match phrase prefix</h5>
+<div class="outline-text-5" id="text-2-4-6-3">
+<p>
+与 <code>match_phrase</code> 类似，但是它多了一个特性，就是它允许在文本的最后一个词项 (term) 上的前缀匹配。<br>
+如果是一个单词，比如 a ，它会匹配文档字段所有以 a 开头的文档；如果是一个短语，比如 "this is ma" ，
+则它会先进行 <code>match_phrase</code> 查询，找出所有包含短语 "this is" 的文档，然后在这些匹配的文档中找出所有包含以 "ma" 为前缀的文档。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js">{
+  <span style="color: #e6db74;">"query"</span>: {
+    <span style="color: #e6db74;">"match_phrase_prefix"</span>: {
+      <span style="color: #e6db74;">"title"</span>: {
+        <span style="color: #e6db74;">"query"</span>: <span style="color: #e6db74;">"this is r"</span>,
+        <span style="color: #e6db74;">"analyzer"</span>: <span style="color: #e6db74;">"standard"</span>,
+        <span style="color: #e6db74;">"max_expansions"</span>: 10, <span style="color: #465457;">// </span><span style="color: #465457;">&#25511;&#21046;&#26368;&#22823;&#30340;&#36820;&#22238;&#32467;&#26524;</span>
+        <span style="color: #e6db74;">"slop"</span>:2,
+        <span style="color: #e6db74;">"boost"</span>:100
+      }
+    }
+  }
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org862b732" class="outline-5">
+<h5 id="org862b732"><span class="section-number-5">2.4.6.4</span> multi_match</h5>
+<div class="outline-text-5" id="text-2-4-6-4">
+<p>
+Exactly like the <code>match</code> query, except that multiple fields can be specified for searching instead of a single field only.
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <div class="footpara"><p class="footpara">
+<a href="https://github.com/ruanhao/python-for-fun/tree/master/elastic">Examples</a>
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> <div class="footpara"><p class="footpara">
+<a href="https://www.felayman.com/articles/2017/12/11/1512989203372.html">深入理解 Match Phrase Query</a>
+</p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<p class="author">Author: Hao Ruan (<a href="mailto:haoru@cisco.com">haoru@cisco.com</a>)</p>
+<p class="date">Created: 2020-02-07 Fri 10:16</p>
+<p class="date">Updated: 2020-02-09 Sun 19:46</p>
+</div>
+</body>
+</html>

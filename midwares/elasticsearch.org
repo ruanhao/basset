@@ -1,0 +1,237 @@
+#+TITLE:     ElasticSearch (快速检索)
+#+AUTHOR:    Hao Ruan
+#+EMAIL:     haoru@cisco.com
+#+DATE: <2020-02-07 Fri 10:16>
+#+LANGUAGE:  en
+#+LINK_HOME: http://www.github.com/ruanhao
+#+OPTIONS:   h:6 html-postamble:t html-preamble:t tex:t f:t ^:nil
+#+STARTUP:   showall
+#+HTML_DOCTYPE: <!DOCTYPE html>
+#+HTML_HEAD: <link href="../org-html-themes/notes/notes.css" rel="stylesheet" type="text/css" />
+
+
+
+* 数据组织
+
+
+
+** 存储方式
+
+
+** 检索原理
+
+** 分词原理
+
+
+
+* 增删改查 [fn:crud]
+
+** Mapping
+
+*** [[https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-get-mapping.html][Get API]]
+
+*** [[https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-put-mapping.html][Put API]]
+
+- 如果更新一个存在的 mapping，Elasticsearch 会将两者进行合并(merge)
+- 不能修改已经存在的字段的类型，除非删除数据(mapping 也会被删除)，并重新建立索引
+
+**** Mapping 设置
+
+***** [[https://www.elastic.co/guide/en/elasticsearch/reference/current/multi-fields.html][fields]]
+
+fields 是使用多种不同的设定对同一数据进行多次索引。
+
+
+***** [[https://www.elastic.co/guide/en/elasticsearch/reference/master/mapping-index.html][index]]
+
+用于决定是否对字段建立索引。
+
+
+***** [[https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html][_source]] / [[https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-store.html][store]]
+
+=_source= 用于决定是否保存原始文档.
+
+如果 =_source= 被禁止，可以使用 =store= 参数来保存个别字段。
+
+
+
+** Updating
+
+*** [[https://www.elastic.co/guide/en/elasticsearch/reference/master/docs-update.html][API]]
+
+- 部分更新
+- 支持 =upsert=
+- 可以使用 =script= 进行更新
+
+*** 并发控制
+
+文档创建时会生成三个数值 =version=, =seq_no= 和 =primary_term= ：
+
+- =seq_no= 和 =primary_term= 用于内部版本控制(要与需更新文档的值相同)
+- =version= 用于外部版本控制 (外部的 =version= 要大于文档的 =version=)
+
+
+使用 Update API 时可以指定 =retry_on_conflict= 参数进行并发控制。
+
+
+
+** Deleting
+
+*** [[https://www.elastic.co/guide/en/elasticsearch/reference/master/docs-delete.html][API]]
+
+- 根据 ID 删除单个 doc
+- 用 bulk 方式删除多个 doc
+- 根据 query 条件删除 doc
+
+
+** Quering
+
+*** [[https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html][Filter]]
+
+Elasticsearch uses filter to filter out the documents _that it shouldn't be searching based on the query part of the search_. \\
+Because of this, filtering can be much faster than combining the entire query into a single search.
+
+Depending on what kind of filter is used, Elasticsearch can _cache_ the results in a =bitset=, \\
+so if the filter is used for another search, it doesn't have to be calculated.
+
+Make parts of your query into filters if you can to speed the search.
+
+*** match_all
+
+用于返回所有 doc
+
+#+BEGIN_SRC js
+  {
+    "query": {
+      "match_all": {}
+    }
+  }
+#+END_SRC
+
+with filter:
+
+#+BEGIN_SRC js
+  {
+    'query': {
+      'bool': {
+        'must': {
+          'match_all': {}
+        },
+        'filter': {
+        }
+      }
+    }
+
+  }
+#+END_SRC
+
+*** [[https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html][query string]]
+
+A =query_string= search can be performed either from the URL of the request or sent in a request body.
+
+=curl -XGET 'localhost:9200/_search?q=nosql&pretty'=
+
+*If you don't need to support a _query syntax_, consider using the =match= query.*
+
+
+*** [[https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html][term query]]
+
+Note that because the term being searched for _isn't analyzed_,
+it must match a term in the document _exactly_ for the result to be found.
+
+
+*** [[https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html][bool query]]
+
+The =Bool= query allows you to *combine* any number of queries into a single query by specifying a query clause that \\
+indicates which parts =must=, =should=, or =must not= match the data in your Elasticsearch index.
+
+| Bool clause | Equivalent                   |
+| must        | q1 AND q2 AND q3             |
+| must_not    | NOT q1 AND NOT q2 AND NOT q3 |
+| should      | q1 OR q2 OR q3               |
+
+**** minimum_should_match
+
+- If the bool query includes at least one should clause and no must or filter clauses, the default value is 1.
+- Otherwise, the default value is 0.
+
+*** [[https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html][match]] / multi_match
+
+=match= and =multi_match= queries behave similarly to the =term= query,
+except that _they analyze the field being passed in_.
+
+**** 布林查询行为
+
+***** AND
+
+By default, the =match= query uses the *OR* operator. \\
+For example, if you search for the text "Elasticsearch Denver" Elasticsearch searches for "Elasticsearch OR Denver".
+
+***** OR
+
+#+BEGIN_SRC js
+  {
+    "query": {
+      "match": {
+        "name": {
+          "query": "elasticsearch denver",
+          "operator": "and"
+        }
+      }
+    }
+  }
+#+END_SRC
+
+
+**** match phrase
+
+查询分词文本，并从分词后的文本中创建短语查询， =match_phrase= 的主要作用是用于匹配包含当前短语的文档。[fn:match_phrase]
+
+#+BEGIN_SRC js
+  GET /_search
+  {
+      "query": {
+          "match_phrase" : {
+              "message" : "this is a test",
+              "analyzer":"english",
+              "slop":0
+          }
+      }
+  }
+#+END_SRC
+
+=slop= 的数值意味着输入的短语中每个词项 (term) 之间允许隔着几个词项 (term) 。
+
+
+**** match phrase prefix
+
+与 =match_phrase= 类似，但是它多了一个特性，就是它允许在文本的最后一个词项 (term) 上的前缀匹配。\\
+如果是一个单词，比如 a ，它会匹配文档字段所有以 a 开头的文档；如果是一个短语，比如 "this is ma" ，
+则它会先进行 =match_phrase= 查询，找出所有包含短语 "this is" 的文档，然后在这些匹配的文档中找出所有包含以 "ma" 为前缀的文档。
+
+#+BEGIN_SRC js
+  {
+    "query": {
+      "match_phrase_prefix": {
+        "title": {
+          "query": "this is r",
+          "analyzer": "standard",
+          "max_expansions": 10, // 控制最大的返回结果
+          "slop":2,
+          "boost":100
+        }
+      }
+    }
+  }
+#+END_SRC
+
+**** multi_match
+
+Exactly like the =match= query, except that multiple fields can be specified for searching instead of a single field only.
+
+
+* Footnotes
+
+[fn:match_phrase] [[https://www.felayman.com/articles/2017/12/11/1512989203372.html][深入理解 Match Phrase Query]]
+
+[fn:crud] [[https://github.com/ruanhao/python-for-fun/tree/master/elastic][Examples]]

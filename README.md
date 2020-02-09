@@ -24,6 +24,7 @@
 - [RabbitMQ](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/midwares/rabbitmq.html)
 - [Nginx](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/midwares/nginx.html)
 - [MongoDB](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/midwares/mongodb.html)
+- [Elasticsearch](https://nbviewer.jupyter.org/github/ruanhao/basset/blob/master/midwares/elasticsearch.html)
 
 
 ## 运维
