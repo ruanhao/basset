@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- 2020-02-09 Sun 19:46 -->
+<!-- 2020-02-13 Thu 14:36 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ElasticSearch (快速检索)</title>
@@ -233,110 +233,403 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgc4831ba">1. 数据组织</a>
+<li><a href="#orgf57e1be">1. 基本概念</a>
 <ul>
-<li><a href="#org85510ec">1.1. 存储方式</a></li>
-<li><a href="#orgc634cc5">1.2. 检索原理</a></li>
-<li><a href="#orgb2d97ca">1.3. 分词原理</a></li>
+<li><a href="#org6125481">1.1. 存储结构</a>
+<ul>
+<li><a href="#org5d0b33a">1.1.1. Node</a></li>
+<li><a href="#orga26834b">1.1.2. Index</a>
+<ul>
+<li><a href="#org894ba72">1.1.2.1. Inverted Index </a></li>
 </ul>
 </li>
-<li><a href="#org16ef306">2. 增删改查 </a>
+<li><a href="#org5f28361">1.1.3. Document</a></li>
+<li><a href="#org3e293a0">1.1.4. Type</a></li>
+<li><a href="#orgc3b82c7">1.1.5. Shard</a></li>
+</ul>
+</li>
+<li><a href="#orga173944">1.2. 集群</a>
 <ul>
-<li><a href="#orgc0acde5">2.1. Mapping</a>
+<li><a href="#orgb91c404">1.2.1. 集群分片</a></li>
+<li><a href="#orgcf87fc7">1.2.2. 集群健康</a></li>
+<li><a href="#orgd9b3a6b">1.2.3. 集群中对文档创建索引</a></li>
+</ul>
+</li>
+<li><a href="#org1d6cb97">1.3. 分词</a></li>
+<li><a href="#orgafc8392">1.4. 相关性</a>
 <ul>
-<li><a href="#org0baa754">2.1.1. Get API</a></li>
-<li><a href="#orgf726b77">2.1.2. Put API</a>
-<ul>
-<li><a href="#org5c3e4c0">2.1.2.1. Mapping 设置</a>
-<ul>
-<li><a href="#org6948fcc">2.1.2.1.1. fields</a></li>
-<li><a href="#org9f4d371">2.1.2.1.2. index</a></li>
-<li><a href="#org9825f59">2.1.2.1.3. _source / store</a></li>
+<li><a href="#org8522f62">1.4.1. boost</a></li>
 </ul>
 </li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a href="#orgb54edd7">2.2. Updating</a>
+<li><a href="#org044b298">2. 增删改查 </a>
 <ul>
-<li><a href="#org0b669e2">2.2.1. API</a></li>
-<li><a href="#orgcfd498e">2.2.2. 并发控制</a></li>
-</ul>
-</li>
-<li><a href="#orgcb3eb97">2.3. Deleting</a>
+<li><a href="#org811edb1">2.1. Mapping</a>
 <ul>
-<li><a href="#orgd1dc7cf">2.3.1. API</a></li>
-</ul>
-</li>
-<li><a href="#orgc81bc1b">2.4. Quering</a>
+<li><a href="#org97f5a31">2.1.1. Get API</a></li>
+<li><a href="#org28628b0">2.1.2. Put API</a>
 <ul>
-<li><a href="#org0d6f8ee">2.4.1. Filter</a></li>
-<li><a href="#orgf49b927">2.4.2. match_all</a></li>
-<li><a href="#org39981b0">2.4.3. query string</a></li>
-<li><a href="#org043bfdf">2.4.4. term query</a></li>
-<li><a href="#org51dac75">2.4.5. bool query</a>
+<li><a href="#org2c6c9bb">2.1.2.1. Mapping 设置</a>
 <ul>
-<li><a href="#org5e4beb2">2.4.5.1. minimum_should_match</a></li>
-</ul>
-</li>
-<li><a href="#org9c8eb6d">2.4.6. match / multi_match</a>
-<ul>
-<li><a href="#orgf489fc0">2.4.6.1. 布林查询行为</a>
-<ul>
-<li><a href="#org1f26e65">2.4.6.1.1. AND</a></li>
-<li><a href="#org6c54936">2.4.6.1.2. OR</a></li>
-</ul>
-</li>
-<li><a href="#org76c41a8">2.4.6.2. match phrase</a></li>
-<li><a href="#orgcf377a0">2.4.6.3. match phrase prefix</a></li>
-<li><a href="#org862b732">2.4.6.4. multi_match</a></li>
+<li><a href="#orgeba3413">2.1.2.1.1. fields</a></li>
+<li><a href="#org0751299">2.1.2.1.2. index</a></li>
+<li><a href="#org994ab04">2.1.2.1.3. _source / store</a></li>
+<li><a href="#orgb608aba">2.1.2.1.4. dynamic</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
+<li><a href="#orgee3f6ea">2.2. Updating</a>
+<ul>
+<li><a href="#orgcbfc424">2.2.1. API</a></li>
+<li><a href="#orge253174">2.2.2. 并发控制</a></li>
+</ul>
+</li>
+<li><a href="#orgf679b88">2.3. Deleting</a>
+<ul>
+<li><a href="#orgd8ed757">2.3.1. API</a></li>
+</ul>
+</li>
+<li><a href="#org238b61a">2.4. Quering</a>
+<ul>
+<li><a href="#org9f56a86">2.4.1. explain</a></li>
+<li><a href="#org1f057c3">2.4.2. filter</a></li>
+<li><a href="#orgb83d9f1">2.4.3. match_all</a></li>
+<li><a href="#org7d50013">2.4.4. query string</a></li>
+<li><a href="#orge511eec">2.4.5. term query</a></li>
+<li><a href="#orgfa8bd89">2.4.6. bool query</a>
+<ul>
+<li><a href="#orgac723af">2.4.6.1. minimum_should_match</a></li>
+</ul>
+</li>
+<li><a href="#org719824b">2.4.7. match / multi_match</a>
+<ul>
+<li><a href="#orgc08c7fe">2.4.7.1. 布林查询行为</a>
+<ul>
+<li><a href="#org2dad311">2.4.7.1.1. AND</a></li>
+<li><a href="#org0829c78">2.4.7.1.2. OR</a></li>
+</ul>
+</li>
+<li><a href="#orge121e42">2.4.7.2. match phrase</a></li>
+<li><a href="#orgefc74ac">2.4.7.3. match phrase prefix</a></li>
+<li><a href="#orgd4e1367">2.4.7.4. multi_match</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgc89566b">3. 工具</a></li>
 </ul>
 </div>
 </div>
 
 
 
-<div id="outline-container-orgc4831ba" class="outline-2">
-<h2 id="orgc4831ba"><span class="section-number-2">1</span> 数据组织</h2>
+<div id="outline-container-orgf57e1be" class="outline-2">
+<h2 id="orgf57e1be"><span class="section-number-2">1</span> 基本概念</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org85510ec" class="outline-3">
-<h3 id="org85510ec"><span class="section-number-3">1.1</span> 存储方式</h3>
+<div id="outline-container-org6125481" class="outline-3">
+<h3 id="org6125481"><span class="section-number-3">1.1</span> 存储结构</h3>
+<div class="outline-text-3" id="text-1-1">
+</div>
+<div id="outline-container-org5d0b33a" class="outline-4">
+<h4 id="org5d0b33a"><span class="section-number-4">1.1.1</span> Node</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<p>
+Elastic 本质上是一个分布式数据库，允许多台服务器协同工作，每台服务器可以运行多个 Elastic 实例。
+</p>
+
+<p>
+单个 Elastic 实例称为一个节点（node）。一组节点构成一个集群（cluster）。
+</p>
+</div>
+</div>
+
+<div id="outline-container-orga26834b" class="outline-4">
+<h4 id="orga26834b"><span class="section-number-4">1.1.2</span> Index</h4>
+<div class="outline-text-4" id="text-1-1-2">
+<p>
+Elastic 会索引所有字段，经过处理后写入一个反向索引（Inverted Index）。查找数据的时候，直接查找该索引。
+</p>
+
+<p>
+所以，Elastic 数据管理的顶层单位就叫做 Index（索引）。它是单个数据库的同义词。每个 Index （即数据库）的名字必须是小写。
+</p>
+
+<p>
+下面的命令可以查看当前节点的所有 Index。
+</p>
+
+<p>
+<code>curl -X GET 'http://localhost:9200/_cat/indices?v'</code>
+</p>
+</div>
+
+<div id="outline-container-org894ba72" class="outline-5">
+<h5 id="org894ba72"><span class="section-number-5">1.1.2.1</span> Inverted Index <sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup></h5>
+<div class="outline-text-5" id="text-1-1-2-1">
+<table>
+
+
+<colgroup>
+<col  class="org-right">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">ID</th>
+<th scope="col" class="org-left">Tags</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">elections</td>
+</tr>
+
+<tr>
+<td class="org-right">2</td>
+<td class="org-left">peace</td>
+</tr>
+
+<tr>
+<td class="org-right">3</td>
+<td class="org-left">elections, peace</td>
+</tr>
+
+<tr>
+<td class="org-right">4</td>
+<td class="org-left">peace</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+转换成反向索引：
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Tags</th>
+<th scope="col" class="org-left">IDs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">elections</td>
+<td class="org-left">1,3</td>
+</tr>
+
+<tr>
+<td class="org-left">peace</td>
+<td class="org-left">2,3,4</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 
 
-<div id="outline-container-orgc634cc5" class="outline-3">
-<h3 id="orgc634cc5"><span class="section-number-3">1.2</span> 检索原理</h3>
+<div id="outline-container-org5f28361" class="outline-4">
+<h4 id="org5f28361"><span class="section-number-4">1.1.3</span> Document</h4>
+<div class="outline-text-4" id="text-1-1-3">
+<p>
+Index 里面单条的记录称为 Document（文档）。许多条 Document 构成了一个 Index。
+</p>
+
+<p>
+同一个 Index 里面的 Document，不要求有相同的结构（scheme），但是最好保持相同，这样有利于提高搜索效率。
+</p>
+</div>
 </div>
 
-<div id="outline-container-orgb2d97ca" class="outline-3">
-<h3 id="orgb2d97ca"><span class="section-number-3">1.3</span> 分词原理</h3>
+<div id="outline-container-org3e293a0" class="outline-4">
+<h4 id="org3e293a0"><span class="section-number-4">1.1.4</span> Type</h4>
+<div class="outline-text-4" id="text-1-1-4">
+<p>
+Document 可以分组，比如 <code>weather</code> 这个 Index 里面，可以按城市分组（北京和上海），<br>
+也可以按气候分组（晴天和雨天）。这种分组就叫做 Type，它是虚拟的逻辑分组，用来过滤 Document 。
+</p>
+
+<p>
+<b>Elastic 6.x 版只允许每个 Index 包含一个 Type，7.x 版将会彻底移除 Type。</b>
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-orgc3b82c7" class="outline-4">
+<h4 id="orgc3b82c7"><span class="section-number-4">1.1.5</span> Shard</h4>
+<div class="outline-text-4" id="text-1-1-5">
+<p>
+A shard is a Lucene index: a directory of files containing an inverted index.
+</p>
+
+<p>
+A shard can be either a primary or a replica shard. <br>
+A replica is used for searching, or it becomes a new primary shard if the original primary shard is lost.
+</p>
+
+
+<div class="figure">
+<p><img src="img/es_term_dict.jpg" alt="es_term_dict.jpg">
+</p>
+<p><span class="figure-number">Figure 1: </span>Term dictionary and frequencies in a Lucene index</p>
+</div>
+</div>
 </div>
 </div>
 
 
 
-<div id="outline-container-org16ef306" class="outline-2">
-<h2 id="org16ef306"><span class="section-number-2">2</span> 增删改查 <sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup></h2>
+
+
+<div id="outline-container-orga173944" class="outline-3">
+<h3 id="orga173944"><span class="section-number-3">1.2</span> 集群</h3>
+<div class="outline-text-3" id="text-1-2">
+
+<div class="figure">
+<p><img src="img/es_cluster.jpg" alt="es_cluster.jpg">
+</p>
+<p><span class="figure-number">Figure 2: </span>A three-node cluster with an index divided into five shards with one replica per shard</p>
+</div>
+</div>
+
+<div id="outline-container-orgb91c404" class="outline-4">
+<h4 id="orgb91c404"><span class="section-number-4">1.2.1</span> 集群分片</h4>
+<div class="outline-text-4" id="text-1-2-1">
+<p>
+集群中的主分片解决高负载问题，复制分片解决高可用问题。
+</p>
+
+<p>
+分片是 <span class="underline">针对 Index 而言的</span> ，即一个 Index 可以设置存储到多少分片上，Index 只是用来指向一个或多个分片的 <span class="underline">逻辑命名空间</span> 。
+</p>
+
+<p>
+<span class="underline">当 Index 创建完成时，主分片数量就确定下来了</span> ，复制分片的数量可以随时调整。
+</p>
+
+<p>
+当索引一个文档时，会被存储在 <span class="underline">单独</span> 一个主分片上（由哈希算法决定具体哪个分片）。<br>
+如果主分片的数量在未来被改变了，所有先前的路由值就将失效，文档就再也搜索不到了。
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgcf87fc7" class="outline-4">
+<h4 id="orgcf87fc7"><span class="section-number-4">1.2.2</span> 集群健康</h4>
+<div class="outline-text-4" id="text-1-2-2">
+<ul class="org-ul">
+<li><p>
+绿色
+</p>
+
+<p>
+所有主分片和复制分片均可用
+</p></li>
+<li><p>
+黄色
+</p>
+
+<p>
+所有主分片可用，复制分片并非都可用
+</p></li>
+<li><p>
+红色
+</p>
+
+<p>
+主分片并非都可用
+</p></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgd9b3a6b" class="outline-4">
+<h4 id="orgd9b3a6b"><span class="section-number-4">1.2.3</span> 集群中对文档创建索引</h4>
+<div class="outline-text-4" id="text-1-2-3">
+
+<div class="figure">
+<p><img src="img/es_cluster_process.jpg" alt="es_cluster_process.jpg">
+</p>
+<p><span class="figure-number">Figure 3: </span>What happens when you index a document</p>
+</div>
+
+<ul class="org-ul">
+<li>Documents are indexed to random primary shards and their replicas.</li>
+<li>Searches run on complete sets of shards, regardless of their status as primaries or replicas.</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-org1d6cb97" class="outline-3">
+<h3 id="org1d6cb97"><span class="section-number-3">1.3</span> 分词</h3>
+<div class="outline-text-3" id="text-1-3">
+
+<div class="figure">
+<p><img src="img/es_analyzer.jpg" alt="es_analyzer.jpg" width="75%">
+</p>
+<p><span class="figure-number">Figure 4: </span>Overview of the analysis process</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgafc8392" class="outline-3">
+<h3 id="orgafc8392"><span class="section-number-3">1.4</span> 相关性</h3>
+<div class="outline-text-3" id="text-1-4">
+<p>
+一个词条出现在某个文档中的次数越多，它就越相关。但是，如果该词条出现在不同的文档的次数越多，它就越不相关。<br>
+这一点被称为 <code>TF-IDF</code> 。
+</p>
+</div>
+
+<div id="outline-container-org8522f62" class="outline-4">
+<h4 id="org8522f62"><span class="section-number-4">1.4.1</span> boost</h4>
+<div class="outline-text-4" id="text-1-4-1">
+<p>
+用来修改（提升）文档的相关性。
+</p>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-org044b298" class="outline-2">
+<h2 id="org044b298"><span class="section-number-2">2</span> 增删改查 <sup><a id="fnr.2" class="footref" href="#fn.2">2</a></sup></h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orgc0acde5" class="outline-3">
-<h3 id="orgc0acde5"><span class="section-number-3">2.1</span> Mapping</h3>
+<div id="outline-container-org811edb1" class="outline-3">
+<h3 id="org811edb1"><span class="section-number-3">2.1</span> Mapping</h3>
 <div class="outline-text-3" id="text-2-1">
 </div>
-<div id="outline-container-org0baa754" class="outline-4">
-<h4 id="org0baa754"><span class="section-number-4">2.1.1</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-get-mapping.html">Get API</a></h4>
+<div id="outline-container-org97f5a31" class="outline-4">
+<h4 id="org97f5a31"><span class="section-number-4">2.1.1</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-get-mapping.html">Get API</a></h4>
 </div>
 
-<div id="outline-container-orgf726b77" class="outline-4">
-<h4 id="orgf726b77"><span class="section-number-4">2.1.2</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-put-mapping.html">Put API</a></h4>
+<div id="outline-container-org28628b0" class="outline-4">
+<h4 id="org28628b0"><span class="section-number-4">2.1.2</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-put-mapping.html">Put API</a></h4>
 <div class="outline-text-4" id="text-2-1-2">
 <ul class="org-ul">
 <li>如果更新一个存在的 mapping，Elasticsearch 会将两者进行合并(merge)</li>
@@ -344,12 +637,12 @@ for the JavaScript code in this tag.
 </ul>
 </div>
 
-<div id="outline-container-org5c3e4c0" class="outline-5">
-<h5 id="org5c3e4c0"><span class="section-number-5">2.1.2.1</span> Mapping 设置</h5>
+<div id="outline-container-org2c6c9bb" class="outline-5">
+<h5 id="org2c6c9bb"><span class="section-number-5">2.1.2.1</span> Mapping 设置</h5>
 <div class="outline-text-5" id="text-2-1-2-1">
 </div>
-<div id="outline-container-org6948fcc" class="outline-6">
-<h6 id="org6948fcc"><span class="section-number-6">2.1.2.1.1</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/multi-fields.html">fields</a></h6>
+<div id="outline-container-orgeba3413" class="outline-6">
+<h6 id="orgeba3413"><span class="section-number-6">2.1.2.1.1</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/multi-fields.html">fields</a></h6>
 <div class="outline-text-6" id="text-2-1-2-1-1">
 <p>
 fields 是使用多种不同的设定对同一数据进行多次索引。
@@ -358,8 +651,8 @@ fields 是使用多种不同的设定对同一数据进行多次索引。
 </div>
 
 
-<div id="outline-container-org9f4d371" class="outline-6">
-<h6 id="org9f4d371"><span class="section-number-6">2.1.2.1.2</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/mapping-index.html">index</a></h6>
+<div id="outline-container-org0751299" class="outline-6">
+<h6 id="org0751299"><span class="section-number-6">2.1.2.1.2</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/mapping-index.html">index</a></h6>
 <div class="outline-text-6" id="text-2-1-2-1-2">
 <p>
 用于决定是否对字段建立索引。
@@ -368,8 +661,8 @@ fields 是使用多种不同的设定对同一数据进行多次索引。
 </div>
 
 
-<div id="outline-container-org9825f59" class="outline-6">
-<h6 id="org9825f59"><span class="section-number-6">2.1.2.1.3</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html">_source</a> / <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-store.html">store</a></h6>
+<div id="outline-container-org994ab04" class="outline-6">
+<h6 id="org994ab04"><span class="section-number-6">2.1.2.1.3</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html">_source</a> / <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-store.html">store</a></h6>
 <div class="outline-text-6" id="text-2-1-2-1-3">
 <p>
 <code>_source</code> 用于决定是否保存原始文档.
@@ -380,18 +673,47 @@ fields 是使用多种不同的设定对同一数据进行多次索引。
 </p>
 </div>
 </div>
+
+
+
+<div id="outline-container-orgb608aba" class="outline-6">
+<h6 id="orgb608aba"><span class="section-number-6">2.1.2.1.4</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/dynamic.html">dynamic</a></h6>
+<div class="outline-text-6" id="text-2-1-2-1-4">
+<ul class="org-ul">
+<li><p>
+true
+</p>
+
+<p>
+Newly detected fields are added to the mapping. (default)
+</p></li>
+<li><p>
+false
+</p>
+
+<p>
+Newly detected fields are ignored. These fields will not be indexed so will not be searchable but will still appear in the _source field of returned hits. These fields will not be added to the mapping, new fields must be added explicitly.
+</p></li>
+<li><p>
+strict
+</p>
+
+<p>
+If new fields are detected, an exception is thrown and the document is rejected. New fields must be explicitly added to the mapping.
+</p></li>
+</ul>
+</div>
+</div>
 </div>
 </div>
 </div>
 
-
-
-<div id="outline-container-orgb54edd7" class="outline-3">
-<h3 id="orgb54edd7"><span class="section-number-3">2.2</span> Updating</h3>
+<div id="outline-container-orgee3f6ea" class="outline-3">
+<h3 id="orgee3f6ea"><span class="section-number-3">2.2</span> Updating</h3>
 <div class="outline-text-3" id="text-2-2">
 </div>
-<div id="outline-container-org0b669e2" class="outline-4">
-<h4 id="org0b669e2"><span class="section-number-4">2.2.1</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/docs-update.html">API</a></h4>
+<div id="outline-container-orgcbfc424" class="outline-4">
+<h4 id="orgcbfc424"><span class="section-number-4">2.2.1</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/docs-update.html">API</a></h4>
 <div class="outline-text-4" id="text-2-2-1">
 <ul class="org-ul">
 <li>部分更新</li>
@@ -401,8 +723,8 @@ fields 是使用多种不同的设定对同一数据进行多次索引。
 </div>
 </div>
 
-<div id="outline-container-orgcfd498e" class="outline-4">
-<h4 id="orgcfd498e"><span class="section-number-4">2.2.2</span> 并发控制</h4>
+<div id="outline-container-orge253174" class="outline-4">
+<h4 id="orge253174"><span class="section-number-4">2.2.2</span> 并发控制</h4>
 <div class="outline-text-4" id="text-2-2-2">
 <p>
 文档创建时会生成三个数值 <code>version</code>, <code>seq_no</code> 和 <code>primary_term</code> ：
@@ -423,12 +745,12 @@ fields 是使用多种不同的设定对同一数据进行多次索引。
 
 
 
-<div id="outline-container-orgcb3eb97" class="outline-3">
-<h3 id="orgcb3eb97"><span class="section-number-3">2.3</span> Deleting</h3>
+<div id="outline-container-orgf679b88" class="outline-3">
+<h3 id="orgf679b88"><span class="section-number-3">2.3</span> Deleting</h3>
 <div class="outline-text-3" id="text-2-3">
 </div>
-<div id="outline-container-orgd1dc7cf" class="outline-4">
-<h4 id="orgd1dc7cf"><span class="section-number-4">2.3.1</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/docs-delete.html">API</a></h4>
+<div id="outline-container-orgd8ed757" class="outline-4">
+<h4 id="orgd8ed757"><span class="section-number-4">2.3.1</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/docs-delete.html">API</a></h4>
 <div class="outline-text-4" id="text-2-3-1">
 <ul class="org-ul">
 <li>根据 ID 删除单个 doc</li>
@@ -440,13 +762,35 @@ fields 是使用多种不同的设定对同一数据进行多次索引。
 </div>
 
 
-<div id="outline-container-orgc81bc1b" class="outline-3">
-<h3 id="orgc81bc1b"><span class="section-number-3">2.4</span> Quering</h3>
+<div id="outline-container-org238b61a" class="outline-3">
+<h3 id="org238b61a"><span class="section-number-3">2.4</span> Quering</h3>
 <div class="outline-text-3" id="text-2-4">
 </div>
-<div id="outline-container-org0d6f8ee" class="outline-4">
-<h4 id="org0d6f8ee"><span class="section-number-4">2.4.1</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html">Filter</a></h4>
+<div id="outline-container-org9f56a86" class="outline-4">
+<h4 id="org9f56a86"><span class="section-number-4">2.4.1</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-explain.html">explain</a></h4>
 <div class="outline-text-4" id="text-2-4-1">
+<p>
+查看整个执行计划
+</p>
+
+<pre class="example">
+GET /get-together/_search?explain=true HTTP/1.1
+{
+  "query": {
+    "match": {
+      "name": {
+        "query": "Elasticsearch"
+      }
+    }
+  }
+}
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org1f057c3" class="outline-4">
+<h4 id="org1f057c3"><span class="section-number-4">2.4.2</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html">filter</a></h4>
+<div class="outline-text-4" id="text-2-4-2">
 <p>
 Elasticsearch uses filter to filter out the documents <span class="underline">that it shouldn't be searching based on the query part of the search</span>. <br>
 Because of this, filtering can be much faster than combining the entire query into a single search.
@@ -463,9 +807,9 @@ Make parts of your query into filters if you can to speed the search.
 </div>
 </div>
 
-<div id="outline-container-orgf49b927" class="outline-4">
-<h4 id="orgf49b927"><span class="section-number-4">2.4.2</span> match_all</h4>
-<div class="outline-text-4" id="text-2-4-2">
+<div id="outline-container-orgb83d9f1" class="outline-4">
+<h4 id="orgb83d9f1"><span class="section-number-4">2.4.3</span> match_all</h4>
+<div class="outline-text-4" id="text-2-4-3">
 <p>
 用于返回所有 doc
 </p>
@@ -501,9 +845,9 @@ with filter:
 </div>
 </div>
 
-<div id="outline-container-org39981b0" class="outline-4">
-<h4 id="org39981b0"><span class="section-number-4">2.4.3</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">query string</a></h4>
-<div class="outline-text-4" id="text-2-4-3">
+<div id="outline-container-org7d50013" class="outline-4">
+<h4 id="org7d50013"><span class="section-number-4">2.4.4</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">query string</a></h4>
+<div class="outline-text-4" id="text-2-4-4">
 <p>
 A <code>query_string</code> search can be performed either from the URL of the request or sent in a request body.
 </p>
@@ -519,9 +863,9 @@ A <code>query_string</code> search can be performed either from the URL of the r
 </div>
 
 
-<div id="outline-container-org043bfdf" class="outline-4">
-<h4 id="org043bfdf"><span class="section-number-4">2.4.4</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html">term query</a></h4>
-<div class="outline-text-4" id="text-2-4-4">
+<div id="outline-container-orge511eec" class="outline-4">
+<h4 id="orge511eec"><span class="section-number-4">2.4.5</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html">term query</a></h4>
+<div class="outline-text-4" id="text-2-4-5">
 <p>
 Note that because the term being searched for <span class="underline">isn't analyzed</span>,
 it must match a term in the document <span class="underline">exactly</span> for the result to be found.
@@ -530,9 +874,9 @@ it must match a term in the document <span class="underline">exactly</span> for 
 </div>
 
 
-<div id="outline-container-org51dac75" class="outline-4">
-<h4 id="org51dac75"><span class="section-number-4">2.4.5</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html">bool query</a></h4>
-<div class="outline-text-4" id="text-2-4-5">
+<div id="outline-container-orgfa8bd89" class="outline-4">
+<h4 id="orgfa8bd89"><span class="section-number-4">2.4.6</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html">bool query</a></h4>
+<div class="outline-text-4" id="text-2-4-6">
 <p>
 The <code>Bool</code> query allows you to <b>combine</b> any number of queries into a single query by specifying a query clause that <br>
 indicates which parts <code>must</code>, <code>should</code>, or <code>must not</code> match the data in your Elasticsearch index.
@@ -546,12 +890,13 @@ indicates which parts <code>must</code>, <code>should</code>, or <code>must not<
 
 <col  class="org-left">
 </colgroup>
-<tbody>
+<thead>
 <tr>
-<td class="org-left">Bool clause</td>
-<td class="org-left">Equivalent</td>
+<th scope="col" class="org-left">Bool clause</th>
+<th scope="col" class="org-left">Equivalent</th>
 </tr>
-
+</thead>
+<tbody>
 <tr>
 <td class="org-left">must</td>
 <td class="org-left">q1 AND q2 AND q3</td>
@@ -570,9 +915,9 @@ indicates which parts <code>must</code>, <code>should</code>, or <code>must not<
 </table>
 </div>
 
-<div id="outline-container-org5e4beb2" class="outline-5">
-<h5 id="org5e4beb2"><span class="section-number-5">2.4.5.1</span> minimum_should_match</h5>
-<div class="outline-text-5" id="text-2-4-5-1">
+<div id="outline-container-orgac723af" class="outline-5">
+<h5 id="orgac723af"><span class="section-number-5">2.4.6.1</span> minimum_should_match</h5>
+<div class="outline-text-5" id="text-2-4-6-1">
 <ul class="org-ul">
 <li>If the bool query includes at least one should clause and no must or filter clauses, the default value is 1.</li>
 <li>Otherwise, the default value is 0.</li>
@@ -581,22 +926,22 @@ indicates which parts <code>must</code>, <code>should</code>, or <code>must not<
 </div>
 </div>
 
-<div id="outline-container-org9c8eb6d" class="outline-4">
-<h4 id="org9c8eb6d"><span class="section-number-4">2.4.6</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html">match</a> / multi_match</h4>
-<div class="outline-text-4" id="text-2-4-6">
+<div id="outline-container-org719824b" class="outline-4">
+<h4 id="org719824b"><span class="section-number-4">2.4.7</span> <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html">match</a> / multi_match</h4>
+<div class="outline-text-4" id="text-2-4-7">
 <p>
 <code>match</code> and <code>multi_match</code> queries behave similarly to the <code>term</code> query,
 except that <span class="underline">they analyze the field being passed in</span>.
 </p>
 </div>
 
-<div id="outline-container-orgf489fc0" class="outline-5">
-<h5 id="orgf489fc0"><span class="section-number-5">2.4.6.1</span> 布林查询行为</h5>
-<div class="outline-text-5" id="text-2-4-6-1">
+<div id="outline-container-orgc08c7fe" class="outline-5">
+<h5 id="orgc08c7fe"><span class="section-number-5">2.4.7.1</span> 布林查询行为</h5>
+<div class="outline-text-5" id="text-2-4-7-1">
 </div>
-<div id="outline-container-org1f26e65" class="outline-6">
-<h6 id="org1f26e65"><span class="section-number-6">2.4.6.1.1</span> AND</h6>
-<div class="outline-text-6" id="text-2-4-6-1-1">
+<div id="outline-container-org2dad311" class="outline-6">
+<h6 id="org2dad311"><span class="section-number-6">2.4.7.1.1</span> AND</h6>
+<div class="outline-text-6" id="text-2-4-7-1-1">
 <p>
 By default, the <code>match</code> query uses the <b>OR</b> operator. <br>
 For example, if you search for the text "Elasticsearch Denver" Elasticsearch searches for "Elasticsearch OR Denver".
@@ -604,9 +949,9 @@ For example, if you search for the text "Elasticsearch Denver" Elasticsearch sea
 </div>
 </div>
 
-<div id="outline-container-org6c54936" class="outline-6">
-<h6 id="org6c54936"><span class="section-number-6">2.4.6.1.2</span> OR</h6>
-<div class="outline-text-6" id="text-2-4-6-1-2">
+<div id="outline-container-org0829c78" class="outline-6">
+<h6 id="org0829c78"><span class="section-number-6">2.4.7.1.2</span> OR</h6>
+<div class="outline-text-6" id="text-2-4-7-1-2">
 <div class="org-src-container">
 <pre class="src src-js">{
   <span style="color: #e6db74;">"query"</span>: {
@@ -625,11 +970,11 @@ For example, if you search for the text "Elasticsearch Denver" Elasticsearch sea
 </div>
 
 
-<div id="outline-container-org76c41a8" class="outline-5">
-<h5 id="org76c41a8"><span class="section-number-5">2.4.6.2</span> match phrase</h5>
-<div class="outline-text-5" id="text-2-4-6-2">
+<div id="outline-container-orge121e42" class="outline-5">
+<h5 id="orge121e42"><span class="section-number-5">2.4.7.2</span> match phrase</h5>
+<div class="outline-text-5" id="text-2-4-7-2">
 <p>
-查询分词文本，并从分词后的文本中创建短语查询， <code>match_phrase</code> 的主要作用是用于匹配包含当前短语的文档。<sup><a id="fnr.2" class="footref" href="#fn.2">2</a></sup>
+查询分词文本，并从分词后的文本中创建短语查询， <code>match_phrase</code> 的主要作用是用于匹配包含当前短语的文档。<sup><a id="fnr.3" class="footref" href="#fn.3">3</a></sup>
 </p>
 
 <div class="org-src-container">
@@ -653,9 +998,9 @@ For example, if you search for the text "Elasticsearch Denver" Elasticsearch sea
 </div>
 
 
-<div id="outline-container-orgcf377a0" class="outline-5">
-<h5 id="orgcf377a0"><span class="section-number-5">2.4.6.3</span> match phrase prefix</h5>
-<div class="outline-text-5" id="text-2-4-6-3">
+<div id="outline-container-orgefc74ac" class="outline-5">
+<h5 id="orgefc74ac"><span class="section-number-5">2.4.7.3</span> match phrase prefix</h5>
+<div class="outline-text-5" id="text-2-4-7-3">
 <p>
 与 <code>match_phrase</code> 类似，但是它多了一个特性，就是它允许在文本的最后一个词项 (term) 上的前缀匹配。<br>
 如果是一个单词，比如 a ，它会匹配文档字段所有以 a 开头的文档；如果是一个短语，比如 "this is ma" ，
@@ -681,9 +1026,9 @@ For example, if you search for the text "Elasticsearch Denver" Elasticsearch sea
 </div>
 </div>
 
-<div id="outline-container-org862b732" class="outline-5">
-<h5 id="org862b732"><span class="section-number-5">2.4.6.4</span> multi_match</h5>
-<div class="outline-text-5" id="text-2-4-6-4">
+<div id="outline-container-orgd4e1367" class="outline-5">
+<h5 id="orgd4e1367"><span class="section-number-5">2.4.7.4</span> multi_match</h5>
+<div class="outline-text-5" id="text-2-4-7-4">
 <p>
 Exactly like the <code>match</code> query, except that multiple fields can be specified for searching instead of a single field only.
 </p>
@@ -692,16 +1037,35 @@ Exactly like the <code>match</code> query, except that multiple fields can be sp
 </div>
 </div>
 </div>
+
+
+
+<div id="outline-container-orgc89566b" class="outline-2">
+<h2 id="orgc89566b"><span class="section-number-2">3</span> 工具</h2>
+<div class="outline-text-2" id="text-3">
+<ul class="org-ul">
+<li>Cerebro <sup><a id="fnr.4" class="footref" href="#fn.4">4</a></sup></li>
+</ul>
+</div>
+</div>
 <div id="footnotes">
 <h2 class="footnotes">Footnotes: </h2>
 <div id="text-footnotes">
 
 <div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <div class="footpara"><p class="footpara">
-<a href="https://github.com/ruanhao/python-for-fun/tree/master/elastic">Examples</a>
+<a href="https://zhuanlan.zhihu.com/p/33671444">elasticsearch 倒排索引原理</a>
 </p></div></div>
 
 <div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> <div class="footpara"><p class="footpara">
+<a href="https://github.com/ruanhao/python-for-fun/tree/master/elastic">Examples</a>
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3">3</a></sup> <div class="footpara"><p class="footpara">
 <a href="https://www.felayman.com/articles/2017/12/11/1512989203372.html">深入理解 Match Phrase Query</a>
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4">4</a></sup> <div class="footpara"><p class="footpara">
+<a href="https://github.com/lmenezes/cerebro">Cerebro</a>
 </p></div></div>
 
 
@@ -710,7 +1074,7 @@ Exactly like the <code>match</code> query, except that multiple fields can be sp
 <div id="postamble" class="status">
 <p class="author">Author: Hao Ruan (<a href="mailto:haoru@cisco.com">haoru@cisco.com</a>)</p>
 <p class="date">Created: 2020-02-07 Fri 10:16</p>
-<p class="date">Updated: 2020-02-09 Sun 19:46</p>
+<p class="date">Updated: 2020-02-13 Thu 14:36</p>
 </div>
 </body>
 </html>

@@ -11,16 +11,128 @@
 
 
 
-* 数据组织
+* 基本概念
+
+** 存储结构
+
+*** Node
+
+Elastic 本质上是一个分布式数据库，允许多台服务器协同工作，每台服务器可以运行多个 Elastic 实例。
+
+单个 Elastic 实例称为一个节点（node）。一组节点构成一个集群（cluster）。
+
+*** Index
+
+Elastic 会索引所有字段，经过处理后写入一个反向索引（Inverted Index）。查找数据的时候，直接查找该索引。
+
+所以，Elastic 数据管理的顶层单位就叫做 Index（索引）。它是单个数据库的同义词。每个 Index （即数据库）的名字必须是小写。
+
+下面的命令可以查看当前节点的所有 Index。
+
+=curl -X GET 'http://localhost:9200/_cat/indices?v'=
+
+**** Inverted Index [fn:ii]
+
+|----+------------------|
+| ID | Tags             |
+|----+------------------|
+|  1 | elections        |
+|  2 | peace            |
+|  3 | elections, peace |
+|  4 | peace            |
+|----+------------------|
+
+转换成反向索引：
+
+|-----------+-------|
+| Tags      | IDs   |
+|-----------+-------|
+| elections | 1,3   |
+| peace     | 2,3,4 |
+|-----------+-------|
+
+
+*** Document
+
+Index 里面单条的记录称为 Document（文档）。许多条 Document 构成了一个 Index。
+
+同一个 Index 里面的 Document，不要求有相同的结构（scheme），但是最好保持相同，这样有利于提高搜索效率。
+
+*** Type
+
+Document 可以分组，比如 =weather= 这个 Index 里面，可以按城市分组（北京和上海），\\
+也可以按气候分组（晴天和雨天）。这种分组就叫做 Type，它是虚拟的逻辑分组，用来过滤 Document 。
+
+*Elastic 6.x 版只允许每个 Index 包含一个 Type，7.x 版将会彻底移除 Type。*
+
+
+*** Shard
+
+A shard is a Lucene index: a directory of files containing an inverted index.
+
+A shard can be either a primary or a replica shard. \\
+A replica is used for searching, or it becomes a new primary shard if the original primary shard is lost.
+
+#+CAPTION: Term dictionary and frequencies in a Lucene index
+[[file:img/es_term_dict.jpg]]
 
 
 
-** 存储方式
 
 
-** 检索原理
+** 集群
 
-** 分词原理
+#+CAPTION: A three-node cluster with an index divided into five shards with one replica per shard
+[[file:img/es_cluster.jpg]]
+
+*** 集群分片
+
+集群中的主分片解决高负载问题，复制分片解决高可用问题。
+
+分片是 _针对 Index 而言的_ ，即一个 Index 可以设置存储到多少分片上，Index 只是用来指向一个或多个分片的 _逻辑命名空间_ 。
+
+_当 Index 创建完成时，主分片数量就确定下来了_ ，复制分片的数量可以随时调整。
+
+当索引一个文档时，会被存储在 _单独_ 一个主分片上（由哈希算法决定具体哪个分片）。\\
+如果主分片的数量在未来被改变了，所有先前的路由值就将失效，文档就再也搜索不到了。
+
+*** 集群健康
+
+- 绿色
+
+  所有主分片和复制分片均可用
+- 黄色
+
+  所有主分片可用，复制分片并非都可用
+- 红色
+
+  主分片并非都可用
+
+*** 集群中对文档创建索引
+
+#+CAPTION: What happens when you index a document
+[[file:img/es_cluster_process.jpg]]
+
+- Documents are indexed to random primary shards and their replicas.
+- Searches run on complete sets of shards, regardless of their status as primaries or replicas.
+
+
+
+** 分词
+
+#+CAPTION: Overview of the analysis process
+#+ATTR_HTML: :width 75%
+[[file:img/es_analyzer.jpg]]
+
+
+** 相关性
+
+一个词条出现在某个文档中的次数越多，它就越相关。但是，如果该词条出现在不同的文档的次数越多，它就越不相关。\\
+这一点被称为 =TF-IDF= 。
+
+*** boost
+
+用来修改（提升）文档的相关性。
 
 
 
@@ -55,6 +167,18 @@ fields 是使用多种不同的设定对同一数据进行多次索引。
 
 
 
+***** [[https://www.elastic.co/guide/en/elasticsearch/reference/master/dynamic.html][dynamic]]
+
+- true
+
+  Newly detected fields are added to the mapping. (default)
+- false
+
+  Newly detected fields are ignored. These fields will not be indexed so will not be searchable but will still appear in the _source field of returned hits. These fields will not be added to the mapping, new fields must be added explicitly.
+- strict
+
+  If new fields are detected, an exception is thrown and the document is rejected. New fields must be explicitly added to the mapping.
+
 ** Updating
 
 *** [[https://www.elastic.co/guide/en/elasticsearch/reference/master/docs-update.html][API]]
@@ -86,7 +210,24 @@ fields 是使用多种不同的设定对同一数据进行多次索引。
 
 ** Quering
 
-*** [[https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html][Filter]]
+*** [[https://www.elastic.co/guide/en/elasticsearch/reference/current/search-explain.html][explain]]
+
+查看整个执行计划
+
+#+BEGIN_EXAMPLE
+  GET /get-together/_search?explain=true HTTP/1.1
+  {
+    "query": {
+      "match": {
+        "name": {
+          "query": "Elasticsearch"
+        }
+      }
+    }
+  }
+#+END_EXAMPLE
+
+*** [[https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html][filter]]
 
 Elasticsearch uses filter to filter out the documents _that it shouldn't be searching based on the query part of the search_. \\
 Because of this, filtering can be much faster than combining the entire query into a single search.
@@ -146,6 +287,7 @@ The =Bool= query allows you to *combine* any number of queries into a single que
 indicates which parts =must=, =should=, or =must not= match the data in your Elasticsearch index.
 
 | Bool clause | Equivalent                   |
+|-------------+------------------------------|
 | must        | q1 AND q2 AND q3             |
 | must_not    | NOT q1 AND NOT q2 AND NOT q3 |
 | should      | q1 OR q2 OR q3               |
@@ -230,7 +372,16 @@ For example, if you search for the text "Elasticsearch Denver" Elasticsearch sea
 Exactly like the =match= query, except that multiple fields can be specified for searching instead of a single field only.
 
 
+
+* 工具
+
+- Cerebro [fn:cerebro]
+
 * Footnotes
+
+[fn:cerebro] [[https://github.com/lmenezes/cerebro][Cerebro]]
+
+[fn:ii] [[https://zhuanlan.zhihu.com/p/33671444][elasticsearch 倒排索引原理]]
 
 [fn:match_phrase] [[https://www.felayman.com/articles/2017/12/11/1512989203372.html][深入理解 Match Phrase Query]]
 
