@@ -38,8 +38,8 @@ Netfilter是由Rusty Russell提出的内核防火墙框架，
 从上往下：
 第一个 Routing Decision：判断是否为本机处理，或是转发处理
                          转发处理需要开启：echo "1"> /proc/sys/net/ipv4/ip_forward
-第二个 Routing Decision：判断数据包是否发向本地回环
-第三个 Routing Decision：选择发出网卡
+第二个 Routing Decision：选择发出网卡
+第三个 Routing Decision：再次选择发出网卡 （如果之前的 nat/OUTPUT 设置过 DNAT ，或使用 ip rule 定制了策略路由）
 #+END_EXAMPLE
 
 ** 命令格式
