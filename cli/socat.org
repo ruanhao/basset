@@ -1,4 +1,3 @@
-# -*- mode: snippet -*-
 #+TITLE:     Socat
 #+AUTHOR:    Hao Ruan
 #+EMAIL:     haoru@cisco.com
@@ -140,19 +139,21 @@ socat tcp-l:80,reuseaddr,fork tcp:<dst-ip>:<dst-port>
 echo "content" | socat - tcp-connect:1.2.3.4:12345
 #+END_SRC
 
-* Telnet
+* Shell
 
 ** 服务器端
 
 #+BEGIN_SRC sh
-  socat tcp-listen:8888 exec:'bash -i',pty,setsid,stderr,echo=0
+  # socat tcp-listen:8888 exec:'bash -i',pty,setsid,stderr,echo=0
+  socat tcp-listen:8888,reuseaddr,fork exec:'/usr/bin/bash -li',pty,setsid,stderr,sigint,sane
 #+END_SRC
 
 
 ** 客户端
 
 #+BEGIN_SRC sh
-  socat readline tcp:<server-ip>:8888
+  # socat readline tcp:<server-ip>:8888
+  socat file:`tty`,raw,echo=0 tcp:<server-ip>:8888
 #+END_SRC
 
 
