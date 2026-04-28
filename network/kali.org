@@ -165,8 +165,37 @@
 
 
 
+
+** hashcat
+
+*** cap 转为 hash 文件
+
+#+begin_src sh
+  apt install hcxtools
+  hcxpcapngtool -o output.hc22000 input.cap # 如果有握手信息，会生成 output.hc22000
+#+end_src
+
+*** 掩码暴力破解
+
+#+begin_src sh
+  hashcat -m 22000 -a 3 output.hc22000 -1 ?l?d ?1?1?1?1?1?1?1?1 --session mywifi --force # 8 位密码，小写字母与数字组合
+  hashcat --restore --session mywifi # 用于恢复计算，可以手动 checkpoint
+
+#+end_src
+
+
+*** 字典破解
+
+#+begin_src
+  hashcat -m 22000 output.hc22000 wordlist.txt
+  hashcat -m 22000 output.hc22000 /dir/to/wordlist/
+#+end_src
+
+
 * 常用链接
 
   - [[https://www.offensive-security.com/kali-linux-vm-vmware-virtualbox-hyperv-image-download/][Kali 虚拟镜像下载]]
 
   - [[https://www.virtualbox.org/wiki/Downloads][VirtualBox 扩展包下载]]
+
+  - [[https://hashcat.net/wiki/doku.php?id=example_hashes][hashcat hash types]]

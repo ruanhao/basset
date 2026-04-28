@@ -1,29 +1,37 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<!-- 2026-04-28 Tue 14:15 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>KALI</title>
-<!-- 2018-03-16 Fri 10:44 -->
-<meta  charset="utf-8">
-<meta  name="generator" content="Org-mode">
-<meta  name="author" content="Hao Ruan">
+<meta name="author" content="Hao Ruan" />
+<meta name="generator" content="Org Mode" />
 <style type="text/css">
- <!--/*--><![CDATA[/*><!--*/
-  .title  { text-align: center; }
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
   .todo   { font-family: monospace; color: red; }
-  .done   { color: green; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
   .tag    { background-color: #eee; font-family: monospace;
             padding: 2px; font-size: 80%; font-weight: normal; }
   .timestamp { color: #bebebe; }
   .timestamp-kwd { color: #5f9ea0; }
-  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
-  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
-  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
   .underline { text-decoration: underline; }
   #postamble p, #preamble p { font-size: 90%; margin: .2em; }
   p.verse { margin-left: 3%; }
   pre {
-    border: 1px solid #ccc;
-    box-shadow: 3px 3px 3px #eee;
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
     padding: 8pt;
     font-family: monospace;
     overflow: auto;
@@ -31,43 +39,140 @@
   }
   pre.src {
     position: relative;
-    overflow: visible;
-    padding-top: 1.2em;
+    overflow: auto;
   }
   pre.src:before {
     display: none;
     position: absolute;
-    background-color: white;
-    top: -10px;
-    right: 10px;
+    top: -8px;
+    right: 12px;
     padding: 3px;
-    border: 1px solid black;
+    color: #555;
+    background-color: #f2f2f299;
   }
-  pre.src:hover:before { display: inline;}
-  pre.src-sh:before    { content: 'sh'; }
-  pre.src-bash:before  { content: 'sh'; }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
   pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
-  pre.src-R:before     { content: 'R'; }
-  pre.src-perl:before  { content: 'Perl'; }
-  pre.src-java:before  { content: 'Java'; }
-  pre.src-sql:before   { content: 'SQL'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
 
   table { border-collapse:collapse; }
   caption.t-above { caption-side: top; }
   caption.t-bottom { caption-side: bottom; }
   td, th { vertical-align:top;  }
-  th.right  { text-align: center;  }
-  th.left   { text-align: center;   }
-  th.center { text-align: center; }
-  td.right  { text-align: right;  }
-  td.left   { text-align: left;   }
-  td.center { text-align: center; }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
   dt { font-weight: bold; }
-  .footpara:nth-child(2) { display: inline; }
-  .footpara { display: block; }
+  .footpara { display: inline; }
   .footdef  { margin-bottom: 1em; }
   .figure { padding: 1em; }
   .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
   .inlinetask {
     padding: 10px;
     border: 2px solid gray;
@@ -84,152 +189,120 @@
     { font-size: 10px; font-weight: bold; white-space: nowrap; }
   .org-info-js_search-highlight
     { background-color: #ffff00; color: #000000; font-weight: bold; }
-  /*]]>*/-->
+  .org-svg { }
 </style>
 <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css" />
 <link href="../org-html-themes/solarized/style.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript">
-/*
-@licstart  The following is the entire license notice for the
-JavaScript code in this tag.
-
-Copyright (C) 2012-2013 Free Software Foundation, Inc.
-
-The JavaScript code in this tag is free software: you can
-redistribute it and/or modify it under the terms of the GNU
-General Public License (GNU GPL) as published by the Free Software
-Foundation, either version 3 of the License, or (at your option)
-any later version.  The code is distributed WITHOUT ANY WARRANTY;
-without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
-
-As additional permission under GNU GPL version 3 section 7, you
-may distribute non-source (e.g., minimized or compacted) forms of
-that code without the copy of the GNU GPL normally required by
-section 4, provided you include this license notice and a URL
-through which recipients can access the Corresponding Source.
-
-
-@licend  The above is the entire license notice
-for the JavaScript code in this tag.
-*/
-<!--/*--><![CDATA[/*><!--*/
- function CodeHighlightOn(elem, id)
- {
-   var target = document.getElementById(id);
-   if(null != target) {
-     elem.cacheClassElem = elem.className;
-     elem.cacheClassTarget = target.className;
-     target.className = "code-highlighted";
-     elem.className   = "code-highlighted";
-   }
- }
- function CodeHighlightOff(elem, id)
- {
-   var target = document.getElementById(id);
-   if(elem.cacheClassElem)
-     elem.className = elem.cacheClassElem;
-   if(elem.cacheClassTarget)
-     target.className = elem.cacheClassTarget;
- }
-/*]]>*///-->
-</script>
 </head>
 <body>
-<div id="content">
+<div id="content" class="content">
 <h1 class="title">KALI</h1>
-<div id="table-of-contents">
+<div id="table-of-contents-1" role="doc-toc">
 <h2>Table of Contents</h2>
-<div id="text-table-of-contents">
+<div id="text-table-of-contents-1" role="doc-toc">
 <ul>
-<li><a href="#sec-1">1. Cracking WiFi</a>
+<li><a href="#org58e5f53">1. Cracking WiFi</a>
 <ul>
-<li><a href="#sec-1-1">1.1. 无线网卡模式切换</a>
+<li><a href="#orgbef7a88">1.1. 无线网卡模式切换</a>
 <ul>
-<li><a href="#sec-1-1-1">1.1.1. 方式一 (airmon-ng)</a></li>
-<li><a href="#sec-1-1-2">1.1.2. 方式二 (ifconfig)</a></li>
+<li><a href="#org99ef233">1.1.1. 方式一 (airmon-ng)</a></li>
+<li><a href="#org58b1d93">1.1.2. 方式二 (ifconfig)</a></li>
 </ul>
 </li>
-<li><a href="#sec-1-2">1.2. 抓包</a>
+<li><a href="#org4eb0119">1.2. 抓包</a>
 <ul>
-<li><a href="#sec-1-2-1">1.2.1. 查看所有信道信息</a></li>
-<li><a href="#sec-1-2-2">1.2.2. 查看指定信道信息</a></li>
-<li><a href="#sec-1-2-3">1.2.3. 保存数据包</a></li>
+<li><a href="#org56450a1">1.2.1. 查看所有信道信息</a></li>
+<li><a href="#org6a4b144">1.2.2. 查看指定信道信息</a></li>
+<li><a href="#org7ebaf1b">1.2.3. 保存数据包</a></li>
 </ul>
 </li>
-<li><a href="#sec-1-3">1.3. DEAUTHENTICATION</a>
+<li><a href="#orga3c28b3">1.3. DEAUTHENTICATION</a>
 <ul>
-<li><a href="#sec-1-3-1">1.3.1. 针对 AP 下的所有客户端</a></li>
-<li><a href="#sec-1-3-2">1.3.2. 针对 AP 下的某个客户端</a></li>
+<li><a href="#orge617599">1.3.1. 针对 AP 下的所有客户端</a></li>
+<li><a href="#org5aacdda">1.3.2. 针对 AP 下的某个客户端</a></li>
 </ul>
 </li>
-<li><a href="#sec-1-4">1.4. 字典文件获取</a>
+<li><a href="#orgf74ec5b">1.4. 字典文件获取</a>
 <ul>
-<li><a href="#sec-1-4-1">1.4.1. crunch</a></li>
-<li><a href="#sec-1-4-2">1.4.2. 字典下载链接</a></li>
+<li><a href="#org06ecc0f">1.4.1. crunch</a></li>
+<li><a href="#org85ef339">1.4.2. 字典下载链接</a></li>
 </ul>
 </li>
-<li><a href="#sec-1-5">1.5. 计算</a>
+<li><a href="#org2f2a194">1.5. 计算</a>
 <ul>
-<li><a href="#sec-1-5-1">1.5.1. 原理</a></li>
-<li><a href="#sec-1-5-2">1.5.2. 直接计算</a></li>
-<li><a href="#sec-1-5-3">1.5.3. 使用 airolib-ng 计算</a>
+<li><a href="#org4fbcd9c">1.5.1. 原理</a></li>
+<li><a href="#org11db0af">1.5.2. 直接计算</a></li>
+<li><a href="#org8381f1d">1.5.3. 使用 airolib-ng 计算</a>
 <ul>
-<li><a href="#sec-1-5-3-1">1.5.3.1. 创建数据库并导入字典</a></li>
-<li><a href="#sec-1-5-3-2">1.5.3.2. 导入 ESSID</a></li>
-<li><a href="#sec-1-5-3-3">1.5.3.3. 计算 PMK</a></li>
-<li><a href="#sec-1-5-3-4">1.5.3.4. 使用数据库中的数据进行破解</a></li>
+<li><a href="#org6920994">1.5.3.1. 创建数据库并导入字典</a></li>
+<li><a href="#org1584310">1.5.3.2. 导入 ESSID</a></li>
+<li><a href="#org5b03bc2">1.5.3.3. 计算 PMK</a></li>
+<li><a href="#orgd544258">1.5.3.4. 使用数据库中的数据进行破解</a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li><a href="#orgab8a41d">1.6. hashcat</a>
+<ul>
+<li><a href="#org12612e3">1.6.1. cap 转为 hash 文件</a></li>
+<li><a href="#orgac0241a">1.6.2. 掩码暴力破解</a></li>
+<li><a href="#orgc2ef67e">1.6.3. 字典破解</a></li>
 </ul>
 </li>
-<li><a href="#sec-2">2. 常用链接</a></li>
+</ul>
+</li>
+<li><a href="#org2626bfe">2. 常用链接</a></li>
 </ul>
 </div>
 </div>
-<div id="table-of-contents">
+<div id="table-of-contents" role="doc-toc">
 <h2>Table of Contents</h2>
-<div id="text-table-of-contents">
+<div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#sec-1">1. Cracking WiFi</a>
+<li><a href="#org58e5f53">1. Cracking WiFi</a>
 <ul>
-<li><a href="#sec-1-1">1.1. 无线网卡模式切换</a>
+<li><a href="#orgbef7a88">1.1. 无线网卡模式切换</a>
 <ul>
-<li><a href="#sec-1-1-1">1.1.1. 方式一 (airmon-ng)</a></li>
-<li><a href="#sec-1-1-2">1.1.2. 方式二 (ifconfig)</a></li>
+<li><a href="#org99ef233">1.1.1. 方式一 (airmon-ng)</a></li>
+<li><a href="#org58b1d93">1.1.2. 方式二 (ifconfig)</a></li>
 </ul>
 </li>
-<li><a href="#sec-1-2">1.2. 抓包</a>
+<li><a href="#org4eb0119">1.2. 抓包</a>
 <ul>
-<li><a href="#sec-1-2-1">1.2.1. 查看所有信道信息</a></li>
-<li><a href="#sec-1-2-2">1.2.2. 查看指定信道信息</a></li>
-<li><a href="#sec-1-2-3">1.2.3. 保存数据包</a></li>
+<li><a href="#org56450a1">1.2.1. 查看所有信道信息</a></li>
+<li><a href="#org6a4b144">1.2.2. 查看指定信道信息</a></li>
+<li><a href="#org7ebaf1b">1.2.3. 保存数据包</a></li>
 </ul>
 </li>
-<li><a href="#sec-1-3">1.3. DEAUTHENTICATION</a>
+<li><a href="#orga3c28b3">1.3. DEAUTHENTICATION</a>
 <ul>
-<li><a href="#sec-1-3-1">1.3.1. 针对 AP 下的所有客户端</a></li>
-<li><a href="#sec-1-3-2">1.3.2. 针对 AP 下的某个客户端</a></li>
+<li><a href="#orge617599">1.3.1. 针对 AP 下的所有客户端</a></li>
+<li><a href="#org5aacdda">1.3.2. 针对 AP 下的某个客户端</a></li>
 </ul>
 </li>
-<li><a href="#sec-1-4">1.4. 字典文件获取</a>
+<li><a href="#orgf74ec5b">1.4. 字典文件获取</a>
 <ul>
-<li><a href="#sec-1-4-1">1.4.1. crunch</a></li>
-<li><a href="#sec-1-4-2">1.4.2. 字典下载链接</a></li>
+<li><a href="#org06ecc0f">1.4.1. crunch</a></li>
+<li><a href="#org85ef339">1.4.2. 字典下载链接</a></li>
 </ul>
 </li>
-<li><a href="#sec-1-5">1.5. 计算</a>
+<li><a href="#org2f2a194">1.5. 计算</a>
 <ul>
-<li><a href="#sec-1-5-1">1.5.1. 原理</a></li>
-<li><a href="#sec-1-5-2">1.5.2. 直接计算</a></li>
-<li><a href="#sec-1-5-3">1.5.3. 使用 airolib-ng 计算</a></li>
+<li><a href="#org4fbcd9c">1.5.1. 原理</a></li>
+<li><a href="#org11db0af">1.5.2. 直接计算</a></li>
+<li><a href="#org8381f1d">1.5.3. 使用 airolib-ng 计算</a></li>
+</ul>
+</li>
+<li><a href="#orgab8a41d">1.6. hashcat</a>
+<ul>
+<li><a href="#org12612e3">1.6.1. cap 转为 hash 文件</a></li>
+<li><a href="#orgac0241a">1.6.2. 掩码暴力破解</a></li>
+<li><a href="#orgc2ef67e">1.6.3. 字典破解</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#sec-2">2. 常用链接</a></li>
+<li><a href="#org2626bfe">2. 常用链接</a></li>
 </ul>
 </div>
 </div>
@@ -238,56 +311,51 @@ for the JavaScript code in this tag.
 
 
 <colgroup>
-<col  class="left">
+<col  class="org-left">
 
-<col  class="left">
+<col  class="org-left">
 </colgroup>
 <tbody>
 <tr>
-<td class="left">Author</td>
-<td class="left">Hao Ruan (haoru@cisco.com)</td>
+<td class="org-left">Author</td>
+<td class="org-left">Hao Ruan (haoru@cisco.com)</td>
 </tr>
 
 <tr>
-<td class="left">Date</td>
-<td class="left">2018-03-16 10:44:02</td>
+<td class="org-left">Date</td>
+<td class="org-left">2026-04-28 14:15:18</td>
 </tr>
 </tbody>
 </table>
 </div>
-
-
-<div id="outline-container-sec-1" class="outline-2">
-<h2 id="sec-1"><span class="section-number-2">1</span> Cracking WiFi</h2>
+<div id="outline-container-org58e5f53" class="outline-2">
+<h2 id="org58e5f53"><span class="section-number-2">1.</span> Cracking WiFi</h2>
 <div class="outline-text-2" id="text-1">
-</div><div id="outline-container-sec-1-1" class="outline-3">
-<h3 id="sec-1-1"><span class="section-number-3">1.1</span> 无线网卡模式切换</h3>
+</div>
+<div id="outline-container-orgbef7a88" class="outline-3">
+<h3 id="orgbef7a88"><span class="section-number-3">1.1.</span> 无线网卡模式切换</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 无线网卡默认为 <code>Managed</code> 模式，需要切换到 <code>Monitor</code> 模式
 </p>
 </div>
-
-<div id="outline-container-sec-1-1-1" class="outline-4">
-<h4 id="sec-1-1-1"><span class="section-number-4">1.1.1</span> 方式一 (airmon-ng)</h4>
+<div id="outline-container-org99ef233" class="outline-4">
+<h4 id="org99ef233"><span class="section-number-4">1.1.1.</span> 方式一 (airmon-ng)</h4>
 <div class="outline-text-4" id="text-1-1-1">
 <div class="org-src-container">
-
 <pre class="src src-sh">airmon-ng check kill
-airmon-ng                       <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">&#21015;&#20986;&#25509;&#21475;</span>
+airmon-ng                       <span class="org-comment-delimiter"># </span><span class="org-comment">&#21015;&#20986;&#25509;&#21475;</span>
 airmon-ng start wlan0
 
-airmon-ng stop wlan0mon         <span style="color: #6c6c6c; font-style: italic;"># </span><span style="color: #6c6c6c; font-style: italic;">&#20999;&#25442;&#22238; Managed &#27169;&#24335;</span>
+airmon-ng stop wlan0mon         <span class="org-comment-delimiter"># </span><span class="org-comment">&#20999;&#25442;&#22238; Managed &#27169;&#24335;</span>
 </pre>
 </div>
 </div>
 </div>
-
-<div id="outline-container-sec-1-1-2" class="outline-4">
-<h4 id="sec-1-1-2"><span class="section-number-4">1.1.2</span> 方式二 (ifconfig)</h4>
+<div id="outline-container-org58b1d93" class="outline-4">
+<h4 id="org58b1d93"><span class="section-number-4">1.1.2.</span> 方式二 (ifconfig)</h4>
 <div class="outline-text-4" id="text-1-1-2">
 <div class="org-src-container">
-
 <pre class="src src-sh">ifconfig wlan0 down
 ifconfig wlan0 mode monitor
 ifconfig wlan0 up
@@ -296,24 +364,19 @@ ifconfig wlan0 up
 </div>
 </div>
 </div>
-
-
-
-
-
-<div id="outline-container-sec-1-2" class="outline-3">
-<h3 id="sec-1-2"><span class="section-number-3">1.2</span> 抓包</h3>
+<div id="outline-container-org4eb0119" class="outline-3">
+<h3 id="org4eb0119"><span class="section-number-3">1.2.</span> 抓包</h3>
 <div class="outline-text-3" id="text-1-2">
-</div><div id="outline-container-sec-1-2-1" class="outline-4">
-<h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> 查看所有信道信息</h4>
+</div>
+<div id="outline-container-org56450a1" class="outline-4">
+<h4 id="org56450a1"><span class="section-number-4">1.2.1.</span> 查看所有信道信息</h4>
 <div class="outline-text-4" id="text-1-2-1">
 <div class="org-src-container">
-
 <pre class="src src-sh">airodump-ng wlan0mon
 </pre>
 </div>
 
-<pre class="example">
+<pre class="example" id="org14eb1fb">
 BSSID              PWR  Beacons    #Data, #/s  CH  MB   ENC  CIPHER AUTH ESSID
 28:2C:B2:0C:DE:98  -60      568      763    0   1  54e. WPA2 CCMP   PSK  ChinaNationalSpyAgency(Chonggu)
 A0:91:C8:B9:72:10  -64      570       19    0   5  54e  WPA2 CCMP   PSK  CMCC-d6PS
@@ -327,113 +390,85 @@ A0:A3:3B:DB:5F:24  -83      201        0    0   7  54e  WPA2 CCMP   PSK  CU_Q69E
 </pre>
 </div>
 </div>
-
-
-<div id="outline-container-sec-1-2-2" class="outline-4">
-<h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> 查看指定信道信息</h4>
+<div id="outline-container-org6a4b144" class="outline-4">
+<h4 id="org6a4b144"><span class="section-number-4">1.2.2.</span> 查看指定信道信息</h4>
 <div class="outline-text-4" id="text-1-2-2">
 <div class="org-src-container">
-
 <pre class="src src-sh">airodump-ng --channel [channel] --bssid [bssid] [interface]
 </pre>
 </div>
 </div>
 </div>
-
-
-<div id="outline-container-sec-1-2-3" class="outline-4">
-<h4 id="sec-1-2-3"><span class="section-number-4">1.2.3</span> 保存数据包</h4>
+<div id="outline-container-org7ebaf1b" class="outline-4">
+<h4 id="org7ebaf1b"><span class="section-number-4">1.2.3.</span> 保存数据包</h4>
 <div class="outline-text-4" id="text-1-2-3">
 <div class="org-src-container">
-
 <pre class="src src-sh">airodump-ng --channel [channel] --bssid [bssid] --write [file-name] [interface]
 </pre>
 </div>
 </div>
 </div>
 </div>
-
-
-<div id="outline-container-sec-1-3" class="outline-3">
-<h3 id="sec-1-3"><span class="section-number-3">1.3</span> DEAUTHENTICATION</h3>
+<div id="outline-container-orga3c28b3" class="outline-3">
+<h3 id="orga3c28b3"><span class="section-number-3">1.3.</span> DEAUTHENTICATION</h3>
 <div class="outline-text-3" id="text-1-3">
-</div><div id="outline-container-sec-1-3-1" class="outline-4">
-<h4 id="sec-1-3-1"><span class="section-number-4">1.3.1</span> 针对 AP 下的所有客户端</h4>
+</div>
+<div id="outline-container-orge617599" class="outline-4">
+<h4 id="orge617599"><span class="section-number-4">1.3.1.</span> 针对 AP 下的所有客户端</h4>
 <div class="outline-text-4" id="text-1-3-1">
 <div class="org-src-container">
-
 <pre class="src src-sh">aireplay-ng --deauth [number of packets] -a [AP] [INTERFACE]
 </pre>
 </div>
 </div>
 </div>
-
-
-<div id="outline-container-sec-1-3-2" class="outline-4">
-<h4 id="sec-1-3-2"><span class="section-number-4">1.3.2</span> 针对 AP 下的某个客户端</h4>
+<div id="outline-container-org5aacdda" class="outline-4">
+<h4 id="org5aacdda"><span class="section-number-4">1.3.2.</span> 针对 AP 下的某个客户端</h4>
 <div class="outline-text-4" id="text-1-3-2">
 <div class="org-src-container">
-
 <pre class="src src-sh">aireplay-ng --deauth [number of deauth packets] -a [AP] -c [target] [interface]
 </pre>
 </div>
 </div>
 </div>
 </div>
-
-
-
-
-<div id="outline-container-sec-1-4" class="outline-3">
-<h3 id="sec-1-4"><span class="section-number-3">1.4</span> 字典文件获取</h3>
+<div id="outline-container-orgf74ec5b" class="outline-3">
+<h3 id="orgf74ec5b"><span class="section-number-3">1.4.</span> 字典文件获取</h3>
 <div class="outline-text-3" id="text-1-4">
-</div><div id="outline-container-sec-1-4-1" class="outline-4">
-<h4 id="sec-1-4-1"><span class="section-number-4">1.4.1</span> crunch</h4>
+</div>
+<div id="outline-container-org06ecc0f" class="outline-4">
+<h4 id="org06ecc0f"><span class="section-number-4">1.4.1.</span> crunch</h4>
 <div class="outline-text-4" id="text-1-4-1">
 <div class="org-src-container">
-
 <pre class="src src-sh">crunch &lt;min-length&gt; &lt;max-length&gt; [characters] [-t &lt;pattern&gt;] -o &lt;file&gt;
 </pre>
 </div>
 </div>
 </div>
-
-
-<div id="outline-container-sec-1-4-2" class="outline-4">
-<h4 id="sec-1-4-2"><span class="section-number-4">1.4.2</span> 字典下载链接</h4>
+<div id="outline-container-org85ef339" class="outline-4">
+<h4 id="org85ef339"><span class="section-number-4">1.4.2.</span> 字典下载链接</h4>
 <div class="outline-text-4" id="text-1-4-2">
 <ul class="org-ul">
-<li><a href="ftp://ftp.openwall.com/pub/wordlists/">ftp://ftp.openwall.com/pub/wordlists/</a>
-</li>
-<li><a href="http://www.openwall.com/mirrors/">http://www.openwall.com/mirrors/</a>
-</li>
-<li><a href="http://gdataonline.com/downloads/GDict/">http://gdataonline.com/downloads/GDict/</a>
-</li>
-<li><a href="http://www.outpost9.com/files/WordLists.html">http://www.outpost9.com/files/WordLists.html</a>
-</li>
-<li><a href="http://www.vulnerabilityassessment.co.uk/passwords.htm">http://www.vulnerabilityassessment.co.uk/passwords.htm</a>
-</li>
-<li><a href="http://packetstormsecurity.org/Crackers/wordlists/">http://packetstormsecurity.org/Crackers/wordlists/</a>
-</li>
-<li><a href="http://www.ai.uga.edu/ftplib/natural-language/moby/">http://www.ai.uga.edu/ftplib/natural-language/moby/</a>
-</li>
-<li><a href="http://www.cotse.com/tools/wordlists1.htm">http://www.cotse.com/tools/wordlists1.htm</a>
-</li>
-<li><a href="http://www.cotse.com/tools/wordlists2.htm">http://www.cotse.com/tools/wordlists2.htm</a>
-</li>
-<li><a href="http://wordlist.sourceforge.net/">http://wordlist.sourceforge.net/</a>
-</li>
+<li><a href="ftp://ftp.openwall.com/pub/wordlists/">ftp://ftp.openwall.com/pub/wordlists/</a></li>
+<li><a href="http://www.openwall.com/mirrors/">http://www.openwall.com/mirrors/</a></li>
+<li><a href="http://gdataonline.com/downloads/GDict/">http://gdataonline.com/downloads/GDict/</a></li>
+<li><a href="http://www.outpost9.com/files/WordLists.html">http://www.outpost9.com/files/WordLists.html</a></li>
+<li><a href="http://www.vulnerabilityassessment.co.uk/passwords.htm">http://www.vulnerabilityassessment.co.uk/passwords.htm</a></li>
+<li><a href="http://packetstormsecurity.org/Crackers/wordlists/">http://packetstormsecurity.org/Crackers/wordlists/</a></li>
+<li><a href="http://www.ai.uga.edu/ftplib/natural-language/moby/">http://www.ai.uga.edu/ftplib/natural-language/moby/</a></li>
+<li><a href="http://www.cotse.com/tools/wordlists1.htm">http://www.cotse.com/tools/wordlists1.htm</a></li>
+<li><a href="http://www.cotse.com/tools/wordlists2.htm">http://www.cotse.com/tools/wordlists2.htm</a></li>
+<li><a href="http://wordlist.sourceforge.net/">http://wordlist.sourceforge.net/</a></li>
 </ul>
 </div>
 </div>
 </div>
-
-
-<div id="outline-container-sec-1-5" class="outline-3">
-<h3 id="sec-1-5"><span class="section-number-3">1.5</span> 计算</h3>
+<div id="outline-container-org2f2a194" class="outline-3">
+<h3 id="org2f2a194"><span class="section-number-3">1.5.</span> 计算</h3>
 <div class="outline-text-3" id="text-1-5">
-</div><div id="outline-container-sec-1-5-1" class="outline-4">
-<h4 id="sec-1-5-1"><span class="section-number-4">1.5.1</span> 原理</h4>
+</div>
+<div id="outline-container-org4fbcd9c" class="outline-4">
+<h4 id="org4fbcd9c"><span class="section-number-4">1.5.1.</span> 原理</h4>
 <div class="outline-text-4" id="text-1-5-1">
 <p>
 使用 <code>pbkdf2</code> 算法将字典中每一个密码与 AP 名字 (essid) 进行计算得到 <code>Pairwise Master Key</code> (PMK) ，
@@ -441,62 +476,50 @@ A0:A3:3B:DB:5F:24  -83      201        0    0   7  54e  WPA2 CCMP   PSK  CU_Q69E
 </p>
 </div>
 </div>
-
-<div id="outline-container-sec-1-5-2" class="outline-4">
-<h4 id="sec-1-5-2"><span class="section-number-4">1.5.2</span> 直接计算</h4>
+<div id="outline-container-org11db0af" class="outline-4">
+<h4 id="org11db0af"><span class="section-number-4">1.5.2.</span> 直接计算</h4>
 <div class="outline-text-4" id="text-1-5-2">
 <div class="org-src-container">
-
 <pre class="src src-sh">aircrack &lt;handshake-file&gt; -w &lt;wordlist&gt;
 </pre>
 </div>
 </div>
 </div>
-
-
-<div id="outline-container-sec-1-5-3" class="outline-4">
-<h4 id="sec-1-5-3"><span class="section-number-4">1.5.3</span> 使用 airolib-ng 计算</h4>
+<div id="outline-container-org8381f1d" class="outline-4">
+<h4 id="org8381f1d"><span class="section-number-4">1.5.3.</span> 使用 airolib-ng 计算</h4>
 <div class="outline-text-4" id="text-1-5-3">
-</div><div id="outline-container-sec-1-5-3-1" class="outline-5">
-<h5 id="sec-1-5-3-1"><span class="section-number-5">1.5.3.1</span> 创建数据库并导入字典</h5>
+</div>
+<div id="outline-container-org6920994" class="outline-5">
+<h5 id="org6920994"><span class="section-number-5">1.5.3.1.</span> 创建数据库并导入字典</h5>
 <div class="outline-text-5" id="text-1-5-3-1">
 <div class="org-src-container">
-
 <pre class="src src-sh">airolib-ng &lt;db-name&gt; --import passwd &lt;wordlist&gt;
 </pre>
 </div>
 </div>
 </div>
-
-<div id="outline-container-sec-1-5-3-2" class="outline-5">
-<h5 id="sec-1-5-3-2"><span class="section-number-5">1.5.3.2</span> 导入 ESSID</h5>
+<div id="outline-container-org1584310" class="outline-5">
+<h5 id="org1584310"><span class="section-number-5">1.5.3.2.</span> 导入 ESSID</h5>
 <div class="outline-text-5" id="text-1-5-3-2">
 <div class="org-src-container">
-
 <pre class="src src-sh">airolib-ng &lt;db-name&gt; --import essid &lt;essid-file&gt;
 </pre>
 </div>
 </div>
 </div>
-
-
-<div id="outline-container-sec-1-5-3-3" class="outline-5">
-<h5 id="sec-1-5-3-3"><span class="section-number-5">1.5.3.3</span> 计算 PMK</h5>
+<div id="outline-container-org5b03bc2" class="outline-5">
+<h5 id="org5b03bc2"><span class="section-number-5">1.5.3.3.</span> 计算 PMK</h5>
 <div class="outline-text-5" id="text-1-5-3-3">
 <div class="org-src-container">
-
 <pre class="src src-sh">airolib-ng &lt;db-name&gt; --batch
 </pre>
 </div>
 </div>
 </div>
-
-
-<div id="outline-container-sec-1-5-3-4" class="outline-5">
-<h5 id="sec-1-5-3-4"><span class="section-number-5">1.5.3.4</span> 使用数据库中的数据进行破解</h5>
+<div id="outline-container-orgd544258" class="outline-5">
+<h5 id="orgd544258"><span class="section-number-5">1.5.3.4.</span> 使用数据库中的数据进行破解</h5>
 <div class="outline-text-5" id="text-1-5-3-4">
 <div class="org-src-container">
-
 <pre class="src src-sh">aircrack-ng -r &lt;db-name&gt; &lt;handshake-file&gt;
 </pre>
 </div>
@@ -504,19 +527,52 @@ A0:A3:3B:DB:5F:24  -83      201        0    0   7  54e  WPA2 CCMP   PSK  CU_Q69E
 </div>
 </div>
 </div>
+<div id="outline-container-orgab8a41d" class="outline-3">
+<h3 id="orgab8a41d"><span class="section-number-3">1.6.</span> hashcat</h3>
+<div class="outline-text-3" id="text-1-6">
 </div>
+<div id="outline-container-org12612e3" class="outline-4">
+<h4 id="org12612e3"><span class="section-number-4">1.6.1.</span> cap 转为 hash 文件</h4>
+<div class="outline-text-4" id="text-1-6-1">
+<div class="org-src-container">
+<pre class="src src-sh">apt install hcxtools
+hcxpcapngtool -o output.hc22000 input.cap <span class="org-comment-delimiter"># </span><span class="org-comment">&#22914;&#26524;&#26377;&#25569;&#25163;&#20449;&#24687;&#65292;&#20250;&#29983;&#25104; output.hc22000</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgac0241a" class="outline-4">
+<h4 id="orgac0241a"><span class="section-number-4">1.6.2.</span> 掩码暴力破解</h4>
+<div class="outline-text-4" id="text-1-6-2">
+<div class="org-src-container">
+<pre class="src src-sh">hashcat -m 22000 -a 3 output.hc22000 -1 ?l?d ?1?1?1?1?1?1?1?1 --session mywifi --force <span class="org-comment-delimiter"># </span><span class="org-comment">8 &#20301;&#23494;&#30721;&#65292;&#23567;&#20889;&#23383;&#27597;&#19982;&#25968;&#23383;&#32452;&#21512;</span>
+hashcat --restore --session mywifi <span class="org-comment-delimiter"># </span><span class="org-comment">&#29992;&#20110;&#24674;&#22797;&#35745;&#31639;&#65292;&#21487;&#20197;&#25163;&#21160; checkpoint</span>
 
-
-
-<div id="outline-container-sec-2" class="outline-2">
-<h2 id="sec-2"><span class="section-number-2">2</span> 常用链接</h2>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc2ef67e" class="outline-4">
+<h4 id="orgc2ef67e"><span class="section-number-4">1.6.3.</span> 字典破解</h4>
+<div class="outline-text-4" id="text-1-6-3">
+<div class="org-src-container">
+<pre class="src src-nil">hashcat -m 22000 output.hc22000 wordlist.txt
+hashcat -m 22000 output.hc22000 /dir/to/wordlist/
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org2626bfe" class="outline-2">
+<h2 id="org2626bfe"><span class="section-number-2">2.</span> 常用链接</h2>
 <div class="outline-text-2" id="text-2">
 <ul class="org-ul">
-<li><a href="https://www.offensive-security.com/kali-linux-vm-vmware-virtualbox-hyperv-image-download/">Kali 虚拟镜像下载</a>
-</li>
+<li><a href="https://www.offensive-security.com/kali-linux-vm-vmware-virtualbox-hyperv-image-download/">Kali 虚拟镜像下载</a></li>
 
-<li><a href="https://www.virtualbox.org/wiki/Downloads">VirtualBox 扩展包下载</a>
-</li>
+<li><a href="https://www.virtualbox.org/wiki/Downloads">VirtualBox 扩展包下载</a></li>
+
+<li><a href="https://hashcat.net/wiki/doku.php?id=example_hashes">hashcat hash types</a></li>
 </ul>
 </div>
 </div>
